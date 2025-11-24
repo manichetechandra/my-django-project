@@ -1,0 +1,164 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}أقسام المديرية - مديرية الخدمات الجامعية سطيف{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        border-bottom: 3px solid #8cc040;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .dept-card {
+        margin-bottom: 30px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        height: 100%;
+    }
+    
+    .dept-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .dept-image {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .dept-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .dept-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .dept-body {
+        padding: 20px;
+        min-height: 200px;
+    }
+    
+    .dept-title {
+        color: #2c3e50;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        min-height: 50px;
+    }
+    
+    .dept-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        min-height: 80px;
+    }
+    
+    .dept-info {
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+        margin-top: 15px;
+    }
+    
+    .dept-info p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #999;
+    }
+    
+    .dept-info i {
+        color: #8cc040;
+        width: 20px;
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 80px;">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li><a href="{% url 'homepage:index' %}">الرئيسية</a></li>
+        <li class="active">أقسام المديرية</li>
+    </ol>
+
+    <!-- العنوان -->
+    <div class="page-header">
+        <h1>
+            <i class="fa fa-sitemap"></i> أقسام المديرية
+            <small>({{ departements.count }} قسم)</small>
+        </h1>
+    </div>
+
+    <!-- قائمة الأقسام -->
+    <div class="row">
+        {% for dept in departements %}
+        <div class="col-md-4 col-sm-6">
+            <div class="panel panel-default dept-card">
+                <!-- الصورة -->
+                <div class="dept-image">
+                    {% if dept.image %}
+                    <img src="{{ dept.image.url }}" alt="{{ dept.name }}">
+                    {% else %}
+                    <div class="dept-image-placeholder">
+                        <i class="fa fa-sitemap" style="font-size: 64px; color: white;"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- المحتوى -->
+                <div class="dept-body">
+                    <h3 class="dept-title">{{ dept.name }}</h3>
+                    <p class="dept-description">{{ dept.description|truncatewords:25 }}</p>
+                    
+                    {% if dept.head_of_department or dept.email or dept.phone %}
+                    <div class="dept-info">
+                        {% if dept.head_of_department %}
+                        <p>
+                            <i class="fa fa-user"></i>
+                            <strong>رئيس القسم:</strong> {{ dept.head_of_department }}
+                        </p>
+                        {% endif %}
+                        {% if dept.email %}
+                        <p>
+                            <i class="fa fa-envelope"></i>
+                            <strong>البريد:</strong> {{ dept.email|truncatechars:30 }}
+                        </p>
+                        {% endif %}
+                        {% if dept.phone %}
+                        <p>
+                            <i class="fa fa-phone"></i>
+                            <strong>الهاتف:</strong> {{ dept.phone }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- الزر -->
+                <div class="panel-footer text-center">
+                    <a href="{% url 'departements:departement_detail' dept.slug %}" class="btn btn-success">
+                        عرض التفاصيل <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-md-12">
+            <div class="alert alert-info text-center">
+                <i class="fa fa-info-circle"></i> لا توجد أقسام حالياً
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

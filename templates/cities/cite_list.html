@@ -1,0 +1,129 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}الإقامات الجامعية - مديرية الخدمات الجامعية سطيف{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        border-bottom: 3px solid #8cc040;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .cite-card {
+        margin-bottom: 30px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        height: 100%;
+    }
+    
+    .cite-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .cite-image {
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .cite-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .cite-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 80px;">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li><a href="{% url 'homepage:index' %}">الرئيسية</a></li>
+        <li class="active">الإقامات الجامعية</li>
+    </ol>
+
+    <!-- العنوان -->
+    <div class="page-header">
+        <h1>
+            <i class="fa fa-building"></i> الإقامات الجامعية
+            <small>({{ cites.paginator.count }} إقامة)</small>
+        </h1>
+    </div>
+
+    <!-- قائمة الإقامات -->
+    <div class="row">
+        {% for cite in cites %}
+        <div class="col-md-4 col-sm-6">
+            <div class="panel panel-default cite-card">
+                <!-- الصورة -->
+                <div class="cite-image">
+                    {% if cite.main_image %}
+                    <img src="{{ cite.main_image.url }}" alt="{{ cite.name }}">
+                    {% else %}
+                    <div class="cite-image-placeholder">
+                        <i class="fa fa-building" style="font-size: 64px; color: white;"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- المحتوى -->
+                <div class="panel-body" style="min-height: 200px;">
+                    <h3 style="color: #2c3e50;">{{ cite.name }}</h3>
+                    <p>{{ cite.description|truncatewords:20 }}</p>
+                    
+                    {% if cite.capacity %}
+                    <p><i class="fa fa-users"></i> <strong>السعة:</strong> {{ cite.capacity }} طالب</p>
+                    {% endif %}
+                </div>
+                
+                <!-- الزر -->
+                <div class="panel-footer text-center">
+                    <a href="{% url 'cities:cite_detail' cite.slug %}" class="btn btn-success">
+                        عرض التفاصيل <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-md-12">
+            <div class="alert alert-info text-center">
+                <i class="fa fa-info-circle"></i> لا توجد إقامات جامعية حالياً
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if cites.has_other_pages %}
+    <div class="text-center">
+        <ul class="pagination">
+            {% if cites.has_previous %}
+            <li><a href="?page={{ cites.previous_page_number }}">السابق</a></li>
+            {% endif %}
+            
+            {% for num in cites.paginator.page_range %}
+                {% if cites.number == num %}
+                <li class="active"><span>{{ num }}</span></li>
+                {% elif num > cites.number|add:'-3' and num < cites.number|add:'3' %}
+                <li><a href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if cites.has_next %}
+            <li><a href="?page={{ cites.next_page_number }}">التالي</a></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

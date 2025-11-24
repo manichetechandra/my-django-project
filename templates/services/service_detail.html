@@ -1,0 +1,236 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ service.title }} - مديرية الخدمات الجامعية سطيف{% endblock %}
+
+{% block extra_css %}
+<style>
+    .service-detail-header {
+        background: linear-gradient(135deg, {{ service.get_type_color }} 0%, #2c3e50 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+        margin-top: 70px;
+    }
+    
+    .service-icon-large {
+        font-size: 80px;
+        margin-bottom: 20px;
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+    
+    .content-section {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .content-section h3 {
+        color: #2c3e50;
+        border-right: 5px solid {{ service.get_type_color }};
+        padding-right: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .content-section p,
+    .content-section ul {
+        line-height: 2;
+        font-size: 16px;
+        color: #555;
+        text-align: justify;
+    }
+    
+    .content-section ul {
+        list-style: none;
+        padding-right: 0;
+    }
+    
+    .content-section ul li {
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .content-section ul li:before {
+        content: "\f00c";
+        font-family: FontAwesome;
+        color: {{ service.get_type_color }};
+        margin-left: 10px;
+        font-weight: bold;
+    }
+    
+    .info-box {
+        background: #f8f9fa;
+        border-right: 5px solid {{ service.get_type_color }};
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .info-box h4 {
+        color: #2c3e50;
+        margin-top: 0;
+    }
+    
+    .related-service {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+    
+    .related-service:hover {
+        border-color: #8cc040;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .badge-type {
+        background-color: {{ service.get_type_color }};
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        display: inline-block;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="service-detail-header">
+    <div class="container">
+        <div class="service-icon-large">
+            <i class="fa {{ service.icon }}" style="font-size: 80px;"></i>
+        </div>
+        <h1 class="text-center" style="margin: 0; font-size: 36px;">
+            {{ service.title }}
+        </h1>
+        <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
+            {{ service.short_description }}
+        </p>
+        <div class="text-center">
+            <span class="badge-type">
+                <i class="fa {{ service.get_type_icon_default }}"></i>
+                {{ service.get_service_type_display }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li><a href="{% url 'homepage:index' %}">الرئيسية</a></li>
+        <li><a href="{% url 'services:service_list' %}">الخدمات الجامعية</a></li>
+        <li class="active">{{ service.title }}</li>
+    </ol>
+    
+    <div class="row">
+        <!-- المحتوى الرئيسي -->
+        <div class="col-md-8">
+            
+            <!-- الصورة الرئيسية -->
+            {% if service.main_image %}
+            <div style="margin-bottom: 30px;">
+                <img src="{{ service.main_image.url }}" 
+                     alt="{{ service.title }}" 
+                     class="img-responsive" 
+                     style="width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+            </div>
+            {% endif %}
+            
+            <!-- الوصف التفصيلي -->
+            <div class="content-section">
+                <h3><i class="fa fa-info-circle"></i> نبذة عن الخدمة</h3>
+                <p>{{ service.detailed_description|linebreaks }}</p>
+            </div>
+            
+            <!-- الشروط والمتطلبات -->
+            {% if service.requirements %}
+            <div class="content-section">
+                <h3><i class="fa fa-list-ul"></i> الشروط والمتطلبات</h3>
+                <p>{{ service.requirements|linebreaks }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- كيفية التقديم -->
+            {% if service.how_to_apply %}
+            <div class="content-section">
+                <h3><i class="fa fa-file-text"></i> كيفية التقديم</h3>
+                <p>{{ service.how_to_apply|linebreaks }}</p>
+            </div>
+            {% endif %}
+            
+        </div>
+        
+        <!-- الشريط الجانبي -->
+        <div class="col-md-4">
+            
+            <!-- معلومات الاتصال -->
+            {% if service.contact_info %}
+            <div class="info-box">
+                <h4><i class="fa fa-phone"></i> معلومات الاتصال</h4>
+                <p style="margin: 0;">{{ service.contact_info|linebreaks }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- معلومات إضافية -->
+            <div class="info-box">
+                <h4><i class="fa fa-info"></i> معلومات عامة</h4>
+                <p style="margin-bottom: 10px;">
+                    <i class="fa fa-tag"></i>
+                    <strong>النوع:</strong> {{ service.get_service_type_display }}
+                </p>
+                <p style="margin-bottom: 10px;">
+                    <i class="fa fa-calendar"></i>
+                    <strong>آخر تحديث:</strong> {{ service.updated_at|date:"d/m/Y" }}
+                </p>
+            </div>
+            
+            <!-- خدمات ذات صلة -->
+            {% if related_services %}
+            <div class="content-section">
+                <h4 style="color: #2c3e50; margin-top: 0;">
+                    <i class="fa fa-link"></i> خدمات ذات صلة
+                </h4>
+                {% for related in related_services %}
+                <div class="related-service">
+                    <h5 style="margin: 0 0 10px 0;">
+                        <i class="fa {{ related.icon }}" style="color: {{ related.get_type_color }};"></i>
+                        {{ related.title }}
+                    </h5>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                        {{ related.short_description|truncatewords:15 }}
+                    </p>
+                    <a href="{{ related.get_absolute_url }}" class="btn btn-sm btn-success">
+                        <i class="fa fa-arrow-left"></i> التفاصيل
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- العودة للقائمة -->
+            <a href="{% url 'services:service_list' %}" class="btn btn-default btn-block">
+                <i class="fa fa-arrow-right"></i> العودة لقائمة الخدمات
+            </a>
+            
+        </div>
+    </div>
+</div>
+
+<br><br>
+
+{% endblock %}

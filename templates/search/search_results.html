@@ -1,0 +1,576 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - مديرية الخدمات الجامعية سطيف{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-header {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+        margin-top: 70px;
+    }
+    
+    .search-box-large {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        margin-top: 30px;
+    }
+    
+    .search-box-large input {
+        border: none;
+        font-size: 18px;
+        padding: 15px;
+        width: 100%;
+    }
+    
+    .search-box-large input:focus {
+        outline: none;
+    }
+    
+    .search-box-large button {
+        background: #e74c3c;
+        border: none;
+        color: white;
+        padding: 15px 30px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .search-box-large button:hover {
+        background: #c0392b;
+    }
+    
+    /* الإحصائيات */
+    .stats-bar {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .stats-bar h3 {
+        margin: 0;
+        color: #2c3e50;
+    }
+    
+    .stats-bar .badge {
+        background: #e74c3c;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 16px;
+        margin-right: 10px;
+    }
+    
+    .search-keywords {
+        background: #ecf0f1;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+    
+    .search-keywords span {
+        background: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        margin: 0 5px;
+        border: 1px solid #bdc3c7;
+        display: inline-block;
+        margin-bottom: 5px;
+    }
+    
+    /* الفلاتر */
+    .filter-tabs {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .filter-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #2c3e50;
+        transition: all 0.3s;
+    }
+    
+    .filter-btn:hover {
+        border-color: #e74c3c;
+        color: #e74c3c;
+        text-decoration: none;
+    }
+    
+    .filter-btn.active {
+        background: #e74c3c;
+        border-color: #e74c3c;
+        color: white;
+    }
+    
+    .filter-btn .count {
+        background: rgba(0,0,0,0.1);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+        margin-right: 5px;
+    }
+    
+    .filter-btn.active .count {
+        background: rgba(255,255,255,0.3);
+    }
+    
+    /* بطاقات النتائج */
+    .result-section {
+        margin-bottom: 40px;
+    }
+    
+    .result-section h3 {
+        color: #2c3e50;
+        border-right: 5px solid #e74c3c;
+        padding-right: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .result-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+        transition: all 0.3s;
+        border-right: 3px solid transparent;
+    }
+    
+    .result-card:hover {
+        border-right-color: #e74c3c;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        transform: translateX(-5px);
+    }
+    
+    .result-card .type-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        color: white;
+        margin-bottom: 10px;
+    }
+    
+    .result-card h4 {
+        margin: 10px 0;
+        color: #2c3e50;
+    }
+    
+    .result-card h4 a {
+        color: #2c3e50;
+        text-decoration: none;
+    }
+    
+    .result-card h4 a:hover {
+        color: #e74c3c;
+    }
+    
+    .result-card p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+    
+    .result-card .meta {
+        color: #999;
+        font-size: 14px;
+    }
+    
+    .result-card .meta i {
+        margin-left: 5px;
+        color: #e74c3c;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 80px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        color: #999;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state .suggestions {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="search-header">
+    <div class="container">
+        <h1 class="text-center" style="margin: 0; font-size: 42px;">
+            <i class="fa fa-search"></i> البحث في الموقع
+        </h1>
+        
+        <!-- صندوق البحث -->
+        <div class="search-box-large">
+            <form method="get" action="{% url 'search:search' %}">
+                <div class="row">
+                    <div class="col-md-10">
+                        <input type="text" 
+                               name="q" 
+                               value="{{ query }}"
+                               placeholder="ابحث في الأخبار، الخدمات، الملفات، الأسئلة..."
+                               autofocus
+                               required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn-block">
+                            <i class="fa fa-search"></i> بحث
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li><a href="{% url 'homepage:index' %}">الرئيسية</a></li>
+        <li class="active">البحث</li>
+    </ol>
+    
+    {% if query %}
+    
+    <!-- الإحصائيات -->
+    <div class="stats-bar">
+        <h3>
+            <span class="badge">{{ counts.total }}</span>
+            نتيجة للبحث عن: <strong>"{{ query }}"</strong>
+        </h3>
+        
+        {% if search_terms %}
+        <div class="search-keywords">
+            <i class="fa fa-tags"></i> الكلمات المفتاحية:
+            {% for term in search_terms %}
+            <span>{{ term }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- الفلاتر -->
+    <div class="filter-tabs">
+        <a href="{% url 'search:search' %}?q={{ query }}" 
+           class="filter-btn {% if search_type == 'all' %}active{% endif %}">
+            <i class="fa fa-th"></i> الكل
+            <span class="count">{{ counts.total }}</span>
+        </a>
+        
+        <a href="{% url 'search:search' %}?q={{ query }}&type=news" 
+           class="filter-btn {% if search_type == 'news' %}active{% endif %}">
+            <i class="fa fa-newspaper-o"></i> أخبار
+            <span class="count">{{ counts.news }}</span>
+        </a>
+        
+        <a href="{% url 'search:search' %}?q={{ query }}&type=services" 
+           class="filter-btn {% if search_type == 'services' %}active{% endif %}">
+            <i class="fa fa-cogs"></i> خدمات
+            <span class="count">{{ counts.services }}</span>
+        </a>
+        
+        <a href="{% url 'search:search' %}?q={{ query }}&type=faqs" 
+           class="filter-btn {% if search_type == 'faqs' %}active{% endif %}">
+            <i class="fa fa-question-circle"></i> أسئلة
+            <span class="count">{{ counts.faqs }}</span>
+        </a>
+        
+        <a href="{% url 'search:search' %}?q={{ query }}&type=downloads" 
+           class="filter-btn {% if search_type == 'downloads' %}active{% endif %}">
+            <i class="fa fa-download"></i> ملفات
+            <span class="count">{{ counts.downloads }}</span>
+        </a>
+    </div>
+    
+    {% if counts.total > 0 %}
+    
+    <!-- 1️⃣ نتائج الأخبار -->
+    {% if results.news %}
+    <div class="result-section">
+        <h3><i class="fa fa-newspaper-o"></i> الأخبار ({{ counts.news }})</h3>
+        {% for news in results.news %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: #3498db;">
+                <i class="fa fa-newspaper-o"></i> خبر
+            </span>
+            <h4><a href="{% url 'news:news_detail' news.slug %}">{{ news.title }}</a></h4>
+            <p>{{ news.summary|truncatewords:30 }}</p>
+            <div class="meta">
+                <i class="fa fa-calendar"></i> {{ news.published_date|date:"d/m/Y" }}
+                <span style="margin-right: 15px;">
+                    <i class="fa fa-eye"></i> {{ news.views_count }} مشاهدة
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 2️⃣ نتائج الخدمات -->
+    {% if results.services %}
+    <div class="result-section">
+        <h3><i class="fa fa-cogs"></i> الخدمات ({{ counts.services }})</h3>
+        {% for service in results.services %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: {{ service.get_type_color }};">
+                <i class="fa {{ service.icon }}"></i> {{ service.get_service_type_display }}
+            </span>
+            <h4><a href="{{ service.get_absolute_url }}">{{ service.title }}</a></h4>
+            <p>{{ service.short_description|truncatewords:30 }}</p>
+            <div class="meta">
+                <i class="fa fa-clock-o"></i> آخر تحديث: {{ service.updated_at|date:"d/m/Y" }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 3️⃣ نتائج الأسئلة -->
+    {% if results.faqs %}
+    <div class="result-section">
+        <h3><i class="fa fa-question-circle"></i> الأسئلة الشائعة ({{ counts.faqs }})</h3>
+        {% for faq in results.faqs %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: {{ faq.category.get_color }};">
+                <i class="fa {{ faq.category.icon }}"></i> {{ faq.category.name }}
+            </span>
+            <h4><a href="{% url 'faq:faq_detail' faq.id %}">{{ faq.question }}</a></h4>
+            <p>{{ faq.answer|truncatewords:30 }}</p>
+            <div class="meta">
+                <i class="fa fa-eye"></i> {{ faq.views_count }} مشاهدة
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 4️⃣ نتائج الملفات -->
+    {% if results.downloads %}
+    <div class="result-section">
+        <h3><i class="fa fa-download"></i> ملفات التحميل ({{ counts.downloads }})</h3>
+        {% for file in results.downloads %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: {{ file.get_file_color }};">
+                <i class="fa {{ file.get_file_icon }}"></i> {{ file.get_file_extension|upper|slice:"1:" }}
+            </span>
+            <h4><a href="{% url 'downloads:download_file' file.slug %}">{{ file.title }}</a></h4>
+            <p>{{ file.description|truncatewords:30 }}</p>
+            <div class="meta">
+                <i class="fa fa-hdd-o"></i> {{ file.get_file_size_display }}
+                <span style="margin-right: 15px;">
+                    <i class="fa fa-download"></i> {{ file.downloads_count }} تحميل
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 5️⃣ نتائج النشاطات -->
+    {% if results.activities %}
+    <div class="result-section">
+        <h3><i class="fa fa-calendar"></i> النشاطات ({{ counts.activities }})</h3>
+        {% for activity in results.activities %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: {{ activity.get_type_color }};">
+                <i class="fa {{ activity.get_type_icon }}"></i> {{ activity.get_activity_type_display }}
+            </span>
+            <h4><a href="{{ activity.get_absolute_url }}">{{ activity.title }}</a></h4>
+            <p>{{ activity.short_description|truncatewords:30 }}</p>
+            <div class="meta">
+                <i class="fa fa-calendar"></i> {{ activity.date|date:"d/m/Y" }}
+                <span style="margin-right: 15px;">
+                    <i class="fa fa-map-marker"></i> {{ activity.location }}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 6️⃣ نتائج كلمة المدير ← المهم! كان ناقص -->
+    {% if results.director_words %}
+    <div class="result-section">
+        <h3><i class="fa fa-quote-left"></i> كلمة المدير ({{ counts.director_words }})</h3>
+        {% for word in results.director_words %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: #c0392b;">
+                <i class="fa fa-quote-left"></i> كلمة
+            </span>
+            <h4><a href="{% url 'homepage:director_word' %}">{{ word.word_title }}</a></h4>
+            <p>{{ word.word_content|truncatewords:30 }}</p>
+            <div class="meta">
+                <i class="fa fa-user"></i> {{ word.director_name }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 7️⃣ نتائج التاريخ ← المهم! كان ناقص -->
+    {% if results.history %}
+    <div class="result-section">
+        <h3><i class="fa fa-history"></i> تاريخ المديرية ({{ counts.history }})</h3>
+        {% for hist in results.history %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: #16a085;">
+                <i class="fa fa-history"></i> تاريخ
+            </span>
+            <h4><a href="{% url 'homepage:history' %}">{{ hist.title }}</a></h4>
+            <p>{{ hist.introduction|truncatewords:30 }}</p>
+            <div class="meta">
+                {% if hist.founding_year %}
+                    <i class="fa fa-calendar"></i> تأسست عام {{ hist.founding_year }}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 8️⃣ نتائج الهيكل -->
+    {% if results.organization %}
+    <div class="result-section">
+        <h3><i class="fa fa-sitemap"></i> الهيكل التنظيمي ({{ counts.organization }})</h3>
+        {% for org in results.organization %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: #d35400;">
+                <i class="fa fa-sitemap"></i> هيكل
+            </span>
+            <h4><a href="{% url 'homepage:organization' %}">{{ org.title }}</a></h4>
+            <p>{{ org.description|truncatewords:30 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 9️⃣ نتائج الإقامات -->
+    {% if results.cites %}
+    <div class="result-section">
+        <h3><i class="fa fa-university"></i> الإقامات الجامعية ({{ counts.cites }})</h3>
+        {% for cite in results.cites %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: #34495e;">
+                <i class="fa fa-university"></i> إقامة
+            </span>
+            <h4><a href="{% url 'cities:cite_detail' cite.slug %}">{{ cite.name }}</a></h4>
+            <p>{{ cite.description|truncatewords:30|default:"إقامة جامعية" }}</p>
+            <div class="meta">
+                {% if cite.address %}
+                    <i class="fa fa-map-marker"></i> {{ cite.address }}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 🔟 نتائج الأقسام -->
+    {% if results.departements %}
+    <div class="result-section">
+        <h3><i class="fa fa-building"></i> الأقسام ({{ counts.departements }})</h3>
+        {% for dept in results.departements %}
+        <div class="result-card">
+            <span class="type-badge" style="background-color: #9b59b6;">
+                <i class="fa fa-building"></i> قسم
+            </span>
+            <h4><a href="{% url 'departements:departement_detail' dept.slug %}">{{ dept.name }}</a></h4>
+            <p>{{ dept.description|truncatewords:30 }}</p>
+            <div class="meta">
+                {% if dept.phone %}
+                    <i class="fa fa-phone"></i> {{ dept.phone }}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    
+    <!-- لا توجد نتائج -->
+    <div class="empty-state">
+        <i class="fa fa-search"></i>
+        <h3>لم نجد أي نتائج لـ "{{ query }}"</h3>
+        <p style="color: #666;">جرّب البحث بكلمات أخرى</p>
+        
+        <div class="suggestions">
+            <h4 style="color: #2c3e50; margin-top: 0;">اقتراحات:</h4>
+            <ul style="text-align: right; line-height: 2;">
+                <li>تحقق من الإملاء</li>
+                <li>استخدم كلمات أقل</li>
+                <li>جرب كلمات مرادفة</li>
+            </ul>
+            
+            <h5 style="color: #2c3e50;">روابط سريعة:</h5>
+            <a href="{% url 'news:news_list' %}" class="btn btn-primary">الأخبار</a>
+            <a href="{% url 'services:service_list' %}" class="btn btn-primary">الخدمات</a>
+            <a href="{% url 'downloads:download_center' %}" class="btn btn-primary">التحميلات</a>
+            <a href="{% url 'faq:faq_list' %}" class="btn btn-primary">الأسئلة الشائعة</a>
+        </div>
+    </div>
+    
+    {% endif %}
+    
+    {% else %}
+    
+    <!-- لم يتم البحث -->
+    <div class="empty-state">
+        <i class="fa fa-search"></i>
+        <h3>ابدأ البحث في الموقع</h3>
+        <p style="color: #666;">اكتب ما تبحث عنه في الأعلى</p>
+        
+        <div class="suggestions">
+            <h4 style="color: #2c3e50; margin-top: 0;">أمثلة على البحث:</h4>
+            <ul style="text-align: right; line-height: 2;">
+                <li><strong>منحة</strong> - للبحث عن معلومات المنح</li>
+                <li><strong>سكن</strong> - للبحث عن الإقامات الجامعية</li>
+                <li><strong>نقل</strong> - للبحث عن النقل الجامعي</li>
+                <li><strong>نموذج</strong> - للبحث في الملفات والوثائق</li>
+            </ul>
+        </div>
+    </div>
+    
+    {% endif %}
+</div>
+
+<br><br>
+
+{% endblock %}

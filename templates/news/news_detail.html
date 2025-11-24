@@ -1,0 +1,143 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ news.title }} - مديرية الخدمات الجامعية{% endblock %}
+
+{% block content %}
+
+<div class="container" style="margin-top: 30px;">
+    <div class="row">
+        <!-- المحتوى الرئيسي -->
+        <div class="col-md-8">
+            <!-- عنوان الخبر -->
+            <div style="border-bottom: 3px solid #8cc040; padding-bottom: 15px; margin-bottom: 20px;">
+                <h1 style="color: #2c3e50; margin: 0;">{{ news.title }}</h1>
+            </div>
+            
+            <!-- معلومات الخبر -->
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <i class="fa fa-calendar"></i> 
+                        <strong>تاريخ النشر:</strong> 
+                        {{ news.published_date|date:"d/m/Y - H:i" }}
+                    </div>
+                    <div class="col-sm-6 text-left">
+                        <i class="fa fa-eye"></i> 
+                        <strong>المشاهدات:</strong> 
+                        {{ news.views_count }}
+                    </div>
+                </div>
+                {% if news.author %}
+                <div style="margin-top: 10px;">
+                    <i class="fa fa-user"></i> 
+                    <strong>الكاتب:</strong> 
+                    {{ news.author.username }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- الصورة الرئيسية -->
+            {% if news.main_image %}
+            <div style="margin-bottom: 30px;">
+                <img src="{{ news.main_image.url }}" alt="{{ news.title }}" 
+                     style="width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            </div>
+            {% endif %}
+            
+            <!-- ملخص الخبر -->
+            {% if news.summary %}
+            <div class="alert alert-info" style="border-right: 4px solid #8cc040;">
+                <h4><i class="fa fa-info-circle"></i> ملخص:</h4>
+                <p style="font-size: 16px; line-height: 1.8;">{{ news.summary }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- محتوى الخبر -->
+            <div style="font-size: 17px; line-height: 1.9; color: #333; text-align: justify;">
+                {{ news.content|linebreaks }}
+            </div>
+            
+            <!-- الصور الإضافية -->
+            {% if news.images.all %}
+            <div style="margin-top: 40px;">
+                <h3 style="color: #2c3e50; border-bottom: 2px solid #8cc040; padding-bottom: 10px;">
+                    <i class="fa fa-images"></i> صور إضافية
+                </h3>
+                <div class="row" style="margin-top: 20px;">
+                    {% for image in news.images.all %}
+                    <div class="col-md-4 col-sm-6" style="margin-bottom: 20px;">
+                        <div style="border: 1px solid #ddd; padding: 5px; border-radius: 5px;">
+                            <img src="{{ image.image.url }}" alt="{{ image.caption }}" 
+                                 style="width: 100%; height: 200px; object-fit: cover; border-radius: 5px;">
+                            {% if image.caption %}
+                            <p style="text-align: center; margin-top: 10px; color: #666;">
+                                {{ image.caption }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- أزرار المشاركة -->
+            <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+                <h4><i class="fa fa-share-alt"></i> شارك الخبر:</h4>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                   target="_blank" class="btn btn-primary" style="margin: 5px;">
+                    <i class="fa fa-facebook"></i> Facebook
+                </a>
+                <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}" 
+                   target="_blank" class="btn btn-info" style="margin: 5px;">
+                    <i class="fa fa-twitter"></i> Twitter
+                </a>
+                <a href="https://wa.me/?text={{ news.title }} {{ request.build_absolute_uri }}" 
+                   target="_blank" class="btn btn-success" style="margin: 5px;">
+                    <i class="fa fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+            
+        </div>
+        
+        <!-- الشريط الجانبي -->
+        <div class="col-md-4">
+            
+            <!-- أخبار ذات صلة -->
+            {% if related_news %}
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-newspaper-o"></i> أخبار ذات صلة
+                    </h3>
+                </div>
+                <div class="panel-body" style="padding: 0;">
+                    <ul class="list-group" style="margin: 0;">
+                        {% for item in related_news %}
+                        <li class="list-group-item">
+                            <a href="{% url 'news:news_detail' item.slug %}" 
+                               style="text-decoration: none; color: #2c3e50;">
+                                <h5 style="margin: 5px 0;">{{ item.title }}</h5>
+                                <small style="color: #999;">
+                                    <i class="fa fa-calendar"></i> 
+                                    {{ item.published_date|date:"d/m/Y" }}
+                                </small>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- زر العودة للأخبار -->
+            <a href="{% url 'news:news_list' %}" class="btn btn-success btn-block btn-lg">
+                <i class="fa fa-arrow-right"></i> العودة لكل الأخبار
+            </a>
+            
+        </div>
+    </div>
+</div>
+
+{% endblock %}

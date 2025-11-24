@@ -1,0 +1,418 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - مديرية الخدمات الجامعية سطيف{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notifications-header {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 40px;
+        margin-top: 70px;
+    }
+    
+    .filter-tabs {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .filter-tabs .btn-group {
+        width: 100%;
+    }
+    
+    .filter-tabs .btn {
+        flex: 1;
+    }
+    
+    .notification-item {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+        border-right: 4px solid;
+        transition: all 0.3s;
+        position: relative;
+    }
+    
+    .notification-item:hover {
+        transform: translateX(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .notification-item.unread {
+        background: #f8f9fa;
+        border-right-color: #3498db;
+    }
+    
+    .notification-item.read {
+        border-right-color: #95a5a6;
+        opacity: 0.8;
+    }
+    
+    .notification-icon {
+        font-size: 32px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(52, 152, 219, 0.1);
+    }
+    
+    .notification-content {
+        flex: 1;
+        margin-right: 20px;
+    }
+    
+    .notification-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    
+    .notification-message {
+        color: #7f8c8d;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    
+    .notification-time {
+        font-size: 12px;
+        color: #95a5a6;
+    }
+    
+    .notification-actions {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .unread-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #3498db;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: bold;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #7f8c8d;
+    }
+    
+    .empty-state i {
+        font-size: 80px;
+        margin-bottom: 20px;
+        display: block;
+        color: #bdc3c7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="notifications-header">
+    <div class="container">
+        <h1 style="margin: 0; font-size: 36px;">
+            <i class="fa fa-bell"></i> إشعاراتي
+        </h1>
+        <p style="margin-top: 10px; opacity: 0.9;">
+            تتبع كل الإشعارات والتحديثات الخاصة بك
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    
+    <ol class="breadcrumb">
+        <li><a href="{% url 'homepage:index' %}">الرئيسية</a></li>
+        <li><a href="{% url 'students:dashboard' %}">لوحة التحكم</a></li>
+        <li class="active">إشعاراتي</li>
+    </ol>
+    
+    <!-- ========================================
+         الفلاتر والإحصائيات
+         ======================================== -->
+    <div class="filter-tabs">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="btn-group" role="group">
+                    <a href="{% url 'students:notifications_list' %}" 
+                       class="btn {% if filter_type == 'all' %}btn-primary{% else %}btn-default{% endif %}">
+                        <i class="fa fa-list"></i> الكل ({{ total_count }})
+                    </a>
+                    <a href="{% url 'students:notifications_list' %}?filter=unread" 
+                       class="btn {% if filter_type == 'unread' %}btn-warning{% else %}btn-default{% endif %}">
+                        <i class="fa fa-envelope"></i> غير مقروء ({{ unread_count }})
+                    </a>
+                    <a href="{% url 'students:notifications_list' %}?filter=read" 
+                       class="btn {% if filter_type == 'read' %}btn-success{% else %}btn-default{% endif %}">
+                        <i class="fa fa-envelope-open"></i> مقروء ({{ read_count }})
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4 text-left">
+                {% if unread_count > 0 %}
+                <button type="button" class="btn btn-info" id="markAllReadBtn">
+                    <i class="fa fa-check-double"></i> تمييز الكل كمقروء
+                </button>
+                {% endif %}
+                
+                {% if read_count > 0 %}
+                <button type="button" class="btn btn-danger" id="deleteReadBtn">
+                    <i class="fa fa-trash"></i> حذف المقروءة
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- ========================================
+         قائمة الإشعارات
+         ======================================== -->
+    {% if notifications %}
+    <div id="notificationsList">
+        {% for notification in notifications %}
+        <div class="notification-item {% if not notification.is_read %}unread{% else %}read{% endif %}" 
+             data-id="{{ notification.id }}">
+            
+            {% if not notification.is_read %}
+            <span class="unread-badge">جديد</span>
+            {% endif %}
+            
+            <div style="display: flex; align-items: flex-start;">
+                <div class="notification-icon" style="color: {{ notification.get_color }};">
+                    <i class="fa {{ notification.get_icon }}"></i>
+                </div>
+                
+                <div class="notification-content">
+                    <div class="notification-title">{{ notification.title }}</div>
+                    <div class="notification-message">{{ notification.message }}</div>
+                    <div class="notification-time">
+                        <i class="fa fa-clock-o"></i>
+                        {{ notification.created_at|date:"d/m/Y H:i" }}
+                        {% if notification.is_read and notification.read_at %}
+                        - قُرئ في {{ notification.read_at|date:"d/m/Y H:i" }}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="notification-actions">
+                    {% if notification.link %}
+                    <a href="{{ notification.link }}" class="btn btn-sm btn-primary" title="عرض التفاصيل">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                    {% endif %}
+                    
+                    {% if not notification.is_read %}
+                    <button type="button" 
+                            class="btn btn-sm btn-success mark-read-btn" 
+                            data-id="{{ notification.id }}"
+                            title="تمييز كمقروء">
+                        <i class="fa fa-check"></i>
+                    </button>
+                    {% endif %}
+                    
+                    <button type="button" 
+                            class="btn btn-sm btn-danger delete-btn" 
+                            data-id="{{ notification.id }}"
+                            title="حذف">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fa fa-bell-slash"></i>
+        <h3>لا توجد إشعارات</h3>
+        <p>{% if filter_type == 'unread' %}لا توجد إشعارات غير مقروءة{% elif filter_type == 'read' %}لا توجد إشعارات مقروءة{% else %}لم تستلم أي إشعارات بعد{% endif %}</p>
+        <a href="{% url 'students:dashboard' %}" class="btn btn-primary" style="margin-top: 20px;">
+            <i class="fa fa-arrow-right"></i> العودة للوحة التحكم
+        </a>
+    </div>
+    {% endif %}
+    
+</div>
+
+<br><br>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ========================================
+// JavaScript للإشعارات
+// ========================================
+
+// الحصول على CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+// ========================================
+// تمييز إشعار كمقروء
+// ========================================
+document.querySelectorAll('.mark-read-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const notificationId = this.getAttribute('data-id');
+        
+        fetch(`/students/notifications/${notificationId}/read/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // إعادة تحميل الصفحة
+                location.reload();
+            } else {
+                alert('حدث خطأ: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ في الاتصال');
+        });
+    });
+});
+
+// ========================================
+// تمييز الكل كمقروء
+// ========================================
+const markAllReadBtn = document.getElementById('markAllReadBtn');
+if (markAllReadBtn) {
+    markAllReadBtn.addEventListener('click', function() {
+        if (!confirm('هل تريد تمييز كل الإشعارات كمقروءة؟')) {
+            return;
+        }
+        
+        fetch('/students/notifications/mark-all-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('حدث خطأ: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ في الاتصال');
+        });
+    });
+}
+
+// ========================================
+// حذف إشعار
+// ========================================
+document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        if (!confirm('هل تريد حذف هذا الإشعار؟')) {
+            return;
+        }
+        
+        const notificationId = this.getAttribute('data-id');
+        
+        fetch(`/students/notifications/${notificationId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // إخفاء الإشعار بـ animation
+                const item = document.querySelector(`[data-id="${notificationId}"]`);
+                item.style.opacity = '0';
+                setTimeout(() => {
+                    item.remove();
+                    // إعادة تحميل إذا لم يبق إشعارات
+                    if (document.querySelectorAll('.notification-item').length === 0) {
+                        location.reload();
+                    }
+                }, 300);
+            } else {
+                alert('حدث خطأ: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ في الاتصال');
+        });
+    });
+});
+
+// ========================================
+// حذف كل المقروءة
+// ========================================
+const deleteReadBtn = document.getElementById('deleteReadBtn');
+if (deleteReadBtn) {
+    deleteReadBtn.addEventListener('click', function() {
+        if (!confirm('هل تريد حذف كل الإشعارات المقروءة؟')) {
+            return;
+        }
+        
+        fetch('/students/notifications/delete-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('حدث خطأ: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ في الاتصال');
+        });
+    });
+}
+</script>
+{% endblock %}

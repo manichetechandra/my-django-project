@@ -1,0 +1,732 @@
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'homepage:index' %}">مديرية الخدمات الجامعية لولاية سطيف</a>
+        </div>
+        
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="active">
+                    <a href="{% url 'homepage:index' %}">
+                        <i class="fa fa-home"></i> الرئيسية
+                    </a>
+                </li>
+                
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                        <i class="fa fa-building"></i> المديرية <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right" style="width: 300px; max-height: 450px; overflow-y: auto; left: auto; right: 0;">
+                        <li><a href="{% url 'homepage:director_word' %}">
+                            <i class="fa fa-quote-left"></i> كلمة المدير
+                        </a></li>
+                        <li><a href="{% url 'homepage:organization' %}">
+                            <i class="fa fa-sitemap"></i> الهيكل التنظيمي
+                        </a></li>
+                        <li><a href="{% url 'homepage:history' %}">
+                            <i class="fa fa-history"></i> تاريخ المديرية
+                        </a></li>
+                    </ul>
+                </li>
+                
+                <li>
+                    <a href="#cite">
+                        <i class="fa fa-university"></i> الإقامات الجامعية
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://progres.mesrs.dz/webonou/" target="_blank" rel="noopener noreferrer">
+                        <i class="fa fa-external-link"></i> webonou
+                    </a>
+                </li>
+                
+                <li><a href="{% url 'news:news_list' %}"><i class="fa fa-newspaper-o"></i> الأخبار</a></li>
+                
+                <li>
+                    <a href="#">
+                        <i class="fa fa-trophy"></i> المسابقات
+                    </a>
+                </li>
+                
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-cogs"></i> الخدمات الجامعية <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'services:service_by_type' 'transport' %}"><i class="fa fa-bus"></i> النقل</a></li>
+                        <li><a href="{% url 'services:service_by_type' 'housing' %}"><i class="fa fa-bed"></i> الإيواء</a></li>
+                        <li><a href="{% url 'services:service_by_type' 'catering' %}"><i class="fa fa-cutlery"></i> الإطعام</a></li>
+                        <li><a href="{% url 'services:service_by_type' 'scholarship' %}"><i class="fa fa-money"></i> المنح</a></li>
+                    </ul>
+                </li>
+                
+                <li>
+                    <a href="{% url 'downloads:download_center' %}">
+                        <i class="fa fa-download"></i> التحميلات
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{% url 'faq:faq_list' %}">
+                        <i class="fa fa-question-circle"></i> الأسئلة الشائعة
+                    </a>
+                </li>
+
+                {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                                <i class="fa fa-shield"></i> لوحة المشرف <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'students:admin_dashboard' %}">
+                                    <i class="fa fa-dashboard"></i> لوحة المشرف
+                                </a></li>
+                                <li><a href="{% url 'students:admin_applications_list' %}">
+                                    <i class="fa fa-list"></i> إدارة الطلبات
+                                </a></li>
+                                <li><a href="{% url 'students:admin_applications_list' %}?status=pending">
+                                    <i class="fa fa-clock-o"></i> الطلبات المعلقة
+                                </a></li>
+                                <li><a href="/admin/">
+                                    <i class="fa fa-cog"></i> إعدادات النظام
+                                </a></li>
+                                <li class="divider"></li>
+                                {% if student_profile %}
+                                <li><a href="{% url 'students:dashboard' %}">
+                                    <i class="fa fa-user"></i> حسابي كطالب
+                                </a></li>
+                                 
+                                <li class="divider"></li>
+                                {% endif %}
+                                <li><a href="{% url 'students:logout' %}">
+                                    <i class="fa fa-sign-out"></i> تسجيل الخروج
+                                </a></li>
+                            </ul>
+                        </li>
+                        
+                    {% elif student_profile %}
+                   
+                        
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                                <i class="fa fa-user-circle"></i> {{ student_profile.full_name_arabic|truncatewords:2 }} <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'students:dashboard' %}">
+                                    <i class="fa fa-dashboard"></i> لوحة التحكم
+                                </a></li>
+                                <li><a href="{% url 'students:my_applications' %}">
+                                    <i class="fa fa-list"></i> طلباتي
+                                </a></li>
+                                <li><a href="{% url 'students:create_application' %}">
+                                    <i class="fa fa-plus"></i> طلب جديد
+                                </a></li>
+                                <li><a href="{% url 'students:profile_view' %}">
+                                <i class="fa fa-user"></i> معلوماتي الشخصية
+                                </a></li>
+                                 <!-- ← جديد! البطاقة الرقمية -->
+                                <li><a href="{% url 'students:student_card' %}"target="_blank">
+                                 <i class="fa fa-id-card"></i> بطاقتي الرقمية
+                                 </a></li>
+                                <li class="divider"></li>
+                                <li><a href="{% url 'students:logout' %}">
+                                    <i class="fa fa-sign-out"></i> تسجيل الخروج
+                                </a></li>
+                            </ul>
+                        </li>
+                        
+                        <                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" style="position: relative;">
+                                <i class="fa fa-bell" style="font-size: 18px;"></i>
+                                {% if student_profile.get_unread_notifications_count > 0 %}
+                                <span class="badge badge-danger" style="position: absolute; top: 5px; right: 8px; font-size: 10px; padding: 2px 5px;">
+                                    {{ student_profile.get_unread_notifications_count }}
+                                </span>
+                                {% endif %}
+                                <span class="caret"></span>
+                            </a>
+                            
+                            <ul class="dropdown-menu" style="width: 180px; max-height: 300px; overflow-y: auto;">
+                                <li class="dropdown-header" style="background: #34495e; color: white; font-weight: bold;">
+                                    <i class="fa fa-bell"></i> الإشعارات
+                                    {% if student_profile.get_unread_notifications_count > 0 %}
+                                    <span class="badge badge-danger pull-left">
+                                        {{ student_profile.get_unread_notifications_count }}
+                                    </span>
+                                    {% endif %}
+                                </li>
+                                <li class="divider"></li>
+                                
+                                {% with recent_notifications=student_profile.get_recent_notifications %}
+                                    {% if recent_notifications %}
+                                        {% for notif in recent_notifications %}
+                                        <li>
+                                            <a href="{% if notif.link %}{{ notif.link }}{% else %}{% url 'students:notifications_list' %}{% endif %}" 
+                                               style="white-space: normal; padding: 10px 15px; {% if not notif.is_read %}background: #f0f8ff; border-right: 3px solid #3498db;{% endif %}">
+                                                <div style="display: flex; gap: 10px;">
+                                                    <div style="flex-shrink: 0;">
+                                                        <i class="fa {{ notif.get_icon }}" style="color: {{ notif.get_color }}; font-size: 20px;"></i>
+                                                    </div>
+                                                    <div style="flex: 1;">
+                                                        <strong style="display: block; font-size: 13px; color: #2c3e50;">
+                                                            {{ notif.title }}
+                                                            {% if not notif.is_read %}
+                                                            <span class="badge badge-primary" style="font-size: 9px;">جديد</span>
+                                                            {% endif %}
+                                                        </strong>
+                                                        <small style="display: block; color: #7f8c8d; margin-top: 3px;">
+                                                            {{ notif.message|truncatewords:10 }}
+                                                        </small>
+                                                        <small style="display: block; color: #95a5a6; margin-top: 3px;">
+                                                            <i class="fa fa-clock-o"></i> {{ notif.created_at|timesince }} مضت
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                        
+                                        <li class="divider"></li>
+                                        <li class="text-center">
+                                            <a href="{% url 'students:notifications_list' %}" style="font-weight: bold; color: #3498db;">
+                                                <i class="fa fa-list"></i> عرض كل الإشعارات
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="text-center" style="padding: 30px;">
+                                            <i class="fa fa-bell-slash" style="font-size: 40px; color: #bdc3c7; display: block; margin-bottom: 10px;"></i>
+                                            <span style="color: #7f8c8d;">لا توجد إشعارات</span>
+                                        </li>
+                                    {% endif %}
+                                {% endwith %}
+                            </ul>
+
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li>
+                        <a href="{% url 'students:login' %}">
+                            <i class="fa fa-sign-in"></i> فضاء الطالب
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li>
+                    <a href="{% url 'contact:contact' %}">
+                        <i class="fa fa-envelope"></i> إتصل بنا
+                    </a>
+                </li>
+            </ul>
+            
+            <form class="navbar-form navbar-left" role="search" method="get" action="{% url 'search:search' %}">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="q" placeholder="ابحث في الموقع..." style="width: 250px;">
+                </div>
+                <button type="submit" class="btn btn-default">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<style>
+   <style>
+    .navbar-right {
+        float: right !important;
+    }
+    
+    .navbar-nav > li {
+        float: right;
+    }
+    
+    .dropdown-menu {
+        right: 0;
+        left: auto;
+    }
+    
+    .navbar-form.navbar-left {
+        float: left !important;
+        margin-left: 15px;
+    }
+    
+    .navbar-form .form-control {
+        background: rgba(255,255,255,0.9);
+        border: none;
+        color: #333;
+    }
+    
+    .navbar-form .form-control:focus {
+        background: white;
+        box-shadow: 0 0 5px rgba(255,255,255,0.5);
+    }
+    
+    .navbar-form .btn-default {
+        background: #8cc040;
+        color: white;
+        border: none;
+    }
+    
+    .navbar-form .btn-default:hover {
+        background: #7ab030;
+    }
+    
+    /* الإشعارات */
+    .notifications-dropdown .dropdown-toggle {
+        position: relative;
+        padding: 15px 20px;
+    }
+    
+    .notifications-badge {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        background: #e74c3c;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 3px 6px;
+        border-radius: 10px;
+        min-width: 18px;
+        text-align: center;
+        line-height: 1;
+    }
+    
+    .dropdown-menu-notifications {
+        width: 360px;
+        max-height: 500px;
+        padding: 0;
+        border-radius: 8px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        border: none;
+        overflow: hidden;
+        right: 0;
+        left: auto;
+    }
+    
+    .notifications-header {
+        padding: 12px 15px;
+        background: #34495e;
+        color: white;
+        font-weight: bold;
+        border-bottom: 2px solid #2c3e50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .notifications-header .unread-count {
+        background: #e74c3c;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+    }
+    
+    .notifications-list-wrapper {
+        padding: 0;
+    }
+    
+    .notifications-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .notification-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 15px;
+        border-bottom: 1px solid #ecf0f1;
+        transition: all 0.2s;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .notification-item:hover {
+        background: #f8f9fa;
+        text-decoration: none;
+    }
+    
+    .notification-item.unread {
+        background: #f0f8ff;
+        border-right: 3px solid #3498db;
+    }
+    
+    .notification-item.unread:hover {
+        background: #e8f4fd;
+    }
+    
+    .notif-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .notif-icon i {
+        font-size: 20px;
+    }
+    
+    .notif-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .notif-title {
+        font-size: 13px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 4px;
+        line-height: 1.3;
+    }
+    
+    .notif-message {
+        font-size: 12px;
+        color: #7f8c8d;
+        line-height: 1.4;
+        margin-bottom: 4px;
+    }
+    
+    .notif-time {
+        font-size: 11px;
+        color: #95a5a6;
+    }
+    
+    .new-label {
+        display: inline-block;
+        background: #e74c3c;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 9px;
+        font-weight: bold;
+        margin-right: 4px;
+    }
+    
+    .notifications-footer a {
+        display: block;
+        padding: 12px;
+        text-align: center;
+        background: #f8f9fa;
+        color: #3498db;
+        font-weight: bold;
+        border-top: 1px solid #ecf0f1;
+        text-decoration: none;
+    }
+    
+    .notifications-footer a:hover {
+        background: #ecf0f1;
+        text-decoration: none;
+    }
+    
+    .notifications-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: #95a5a6;
+    }
+    
+    .notifications-empty i {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 10px;
+        opacity: 0.3;
+    }
+    
+    .notifications-empty p {
+        margin: 0;
+        font-size: 14px;
+    }
+    
+    .notifications-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .notifications-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .notifications-list::-webkit-scrollbar-thumb {
+        background: #bdc3c7;
+        border-radius: 3px;
+    }
+    
+    .notifications-list::-webkit-scrollbar-thumb:hover {
+        background: #95a5a6;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.2);
+        }
+    }
+    
+    .notifications-badge.new-notification {
+        animation: pulse 0.5s ease 3;
+    }
+    
+    @media (max-width: 767px) {
+        .navbar-nav {
+            float: none !important;
+            margin: 0;
+        }
+        
+        .navbar-nav > li {
+            float: none;
+        }
+        
+        .dropdown-menu {
+            position: static;
+            float: none;
+            width: auto;
+        }
+        
+        .navbar-form.navbar-left {
+            float: none !important;
+            margin: 10px 0;
+        }
+        
+        .navbar-form .form-control {
+            width: 100% !important;
+        }
+        
+        .dropdown-menu-notifications {
+            width: 100%;
+            max-width: 100vw;
+            left: 0;
+            right: 0;
+            border-radius: 0;
+        }
+        
+        .notification-item {
+            padding: 10px;
+        }
+        
+        .notif-icon {
+            width: 35px;
+            height: 35px;
+        }
+        
+        .notif-icon i {
+            font-size: 18px;
+        }
+    }
+
+    /* إصلاح القائمة المنسدلة للإشعارات */
+.dropdown-menu {
+    border: 1px solid rgba(0,0,0,.15);
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+
+.dropdown-menu > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    text-decoration: none;
+    color: #262626;
+    background-color: #f5f5f5;
+}
+
+.dropdown-header {
+    display: block;
+    padding: 10px 20px;
+    font-size: 12px;
+    line-height: 1.42857143;
+    color: #777;
+}
+
+.badge-danger {
+    background-color: #e74c3c;
+}
+
+.badge-primary {
+    background-color: #3498db;
+}
+</style>
+
+<!-- ========================================
+     JavaScript للإشعارات Real-Time
+     ======================================== -->
+{% if user.is_authenticated and student_profile %}
+<script>
+(function() {
+    'use strict';
+    
+    console.log('🔔 بدء تحميل نظام الإشعارات Real-Time...');
+    
+    // الإعدادات
+    const POLL_INTERVAL = 10000; // 10 ثواني للاختبار
+    const API_URL = '{% url "students:notifications_api" %}';
+    
+    let lastUnreadCount = {{ student_profile.get_unread_notifications_count }};
+    let pollTimer = null;
+    
+    console.log('عدد الإشعارات الحالي:', lastUnreadCount);
+    
+    // دالة جلب الإشعارات
+    function fetchNotifications() {
+        console.log('📡 جلب الإشعارات من API...');
+        
+        fetch(API_URL, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            console.log('📥 استلام رد من API:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ بيانات API:', data);
+            
+            if (data.success) {
+                updateBadge(data.unread_count);
+                
+                // إذا زاد العدد - إشعار جديد!
+                if (data.unread_count > lastUnreadCount) {
+                    console.log('🆕 إشعار جديد!', data.unread_count - lastUnreadCount);
+                    playNotificationSound();
+                }
+                
+                lastUnreadCount = data.unread_count;
+            }
+        })
+        .catch(error => {
+            console.error('❌ خطأ في جلب الإشعارات:', error);
+        });
+    }
+    
+    // تحديث العداد
+    function updateBadge(count) {
+        console.log('🔄 تحديث العداد:', count);
+        
+        const badge = document.querySelector('.notifications-badge');
+        
+        if (count > 0) {
+            if (badge) {
+                badge.textContent = count;
+                badge.classList.add('new-notification');
+                setTimeout(() => {
+                    badge.classList.remove('new-notification');
+                }, 1500);
+            } else {
+                console.log('⚠️ العداد غير موجود في DOM، سأنشئه...');
+                const bellIcon = document.querySelector('.notifications-dropdown .dropdown-toggle');
+                if (bellIcon) {
+                    const newBadge = document.createElement('span');
+                    newBadge.className = 'notifications-badge new-notification';
+                    newBadge.textContent = count;
+                    bellIcon.appendChild(newBadge);
+                    console.log('✅ تم إنشاء العداد');
+                }
+            }
+        } else {
+            if (badge) {
+                badge.remove();
+                console.log('🗑️ تم حذف العداد (لا توجد إشعارات)');
+            }
+        }
+    }
+    
+    // صوت الإشعار
+    function playNotificationSound() {
+        try {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+            
+            oscillator.start(context.currentTime);
+            oscillator.stop(context.currentTime + 0.5);
+            
+            console.log('🔊 تم تشغيل صوت الإشعار');
+        } catch (e) {
+            console.log('🔇 لا يمكن تشغيل الصوت:', e.message);
+        }
+    }
+    
+    // بدء التحديث التلقائي
+    function startPolling() {
+        console.log('▶️ بدء التحديث التلقائي كل', POLL_INTERVAL/1000, 'ثانية');
+        
+        // جلب فوري
+        fetchNotifications();
+        
+        // ثم كل 10 ثواني
+        pollTimer = setInterval(fetchNotifications, POLL_INTERVAL);
+    }
+    
+    // إيقاف عند إغلاق الصفحة
+    window.addEventListener('beforeunload', () => {
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            console.log('⏹️ تم إيقاف التحديث التلقائي');
+        }
+    });
+    
+    // بدء التشغيل
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startPolling);
+    } else {
+        startPolling();
+    }
+    
+    console.log('✅ تم تفعيل نظام الإشعارات Real-Time');
+    
+})();
+
+/* إصلاح موضع قائمة الإشعارات */
+.navbar-nav > li > .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+.dropdown-menu-right {
+    right: 0;
+    left: auto;
+}
+
+/* للشاشات الصغيرة */
+@media (max-width: 767px) {
+    .navbar-nav .dropdown-menu {
+        position: static;
+        float: none;
+        width: auto;
+        margin-top: 0;
+        background-color: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+}
+</script>
+{% endif %}

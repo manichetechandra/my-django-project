@@ -1,0 +1,428 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - مديرية الخدمات الجامعية سطيف{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-header {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+        margin-top: 70px;
+    }
+    
+    .detail-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+    
+    .detail-section {
+        padding: 30px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    
+    .detail-section:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-section h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #2c3e50;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #3498db;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .info-item {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 5px;
+    }
+    
+    .info-item label {
+        display: block;
+        font-weight: bold;
+        color: #7f8c8d;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    
+    .info-item .value {
+        color: #2c3e50;
+        font-size: 16px;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 10px 25px;
+        border-radius: 25px;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    
+    .status-pending { background: #f39c12; }
+    .status-under_review { background: #3498db; }
+    .status-approved { background: #2ecc71; }
+    .status-rejected { background: #e74c3c; }
+    .status-cancelled { background: #95a5a6; }
+    
+    .documents-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .documents-list li {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .documents-list li:hover {
+        background: #ecf0f1;
+    }
+    
+    .admin-notes {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 5px;
+        padding: 20px;
+    }
+    
+    .admin-notes h4 {
+        color: #856404;
+        margin-top: 0;
+    }
+    
+    .action-buttons {
+        padding: 20px;
+        background: #f8f9fa;
+        text-align: center;
+    }
+
+
+    /* ====================================
+       CSS خاص بالطباعة
+       ==================================== */
+    @media print {
+        /* إخفاء العناصر غير المطلوبة */
+        .navbar,
+        nav,
+        .breadcrumb,
+        .action-buttons,
+        .btn,
+        button,
+        footer,
+        .footer {
+            display: none !important;
+        }
+        
+        /* إزالة الـ margin العلوي */
+        .detail-header {
+            margin-top: 0 !important;
+            padding: 30px 0 !important;
+            background: #9b59b6 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        /* تحسين الحاويات */
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .row {
+            margin: 0 !important;
+        }
+        
+        .col-md-10,
+        .col-md-offset-1 {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* الحاوية الرئيسية */
+        .detail-container {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+            page-break-inside: avoid;
+        }
+        
+        .detail-section {
+            page-break-inside: avoid;
+            padding: 20px !important;
+        }
+        
+        /* عنوان الطلب */
+        .detail-header h1 {
+            font-size: 28px !important;
+        }
+        
+        .detail-header p {
+            font-size: 16px !important;
+        }
+        
+        /* الحالة */
+        .status-badge {
+            border: 2px solid #000 !important;
+            color: #000 !important;
+            background: transparent !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        /* الوثائق */
+        .documents-list li {
+            border: 1px solid #ddd !important;
+            background: white !important;
+            page-break-inside: avoid;
+        }
+        
+        .documents-list a {
+            color: #000 !important;
+            text-decoration: underline !important;
+        }
+        
+        /* ملاحظات الإدارة */
+        .admin-notes {
+            border: 2px solid #ffc107 !important;
+            background: #fff3cd !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        /* إخفاء الروابط */
+        a[href]:after {
+            content: none !important;
+        }
+        
+        /* تحسين الألوان */
+        * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        /* إضافة معلومات الطباعة */
+        body:before {
+            content: "تاريخ الطباعة: " attr(data-print-date);
+            display: block;
+            text-align: left;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        /* فواصل الصفحات */
+        h3 {
+            page-break-after: avoid;
+        }
+        
+        .info-grid {
+            page-break-inside: avoid;
+        }
+    }
+</style>
+{% block extra_js %}
+<script>
+// إضافة تاريخ ووقت الطباعة
+window.addEventListener('beforeprint', function() {
+    const now = new Date();
+    const printDate = now.toLocaleString('ar-DZ', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    document.body.setAttribute('data-print-date', printDate);
+});
+
+// تحسين زر الطباعة
+const printBtn = document.querySelector('button[onclick="window.print()"]');
+if (printBtn) {
+    printBtn.onclick = function(e) {
+        e.preventDefault();
+        window.print();
+    };
+}
+</script>
+{% endblock %}
+
+{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="detail-header">
+    <div class="container">
+        <h1 class="text-center" style="margin: 0; font-size: 42px;">
+            <i class="fa fa-file-text"></i> تفاصيل الطلب
+        </h1>
+        <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
+            رقم الطلب: {{ application.application_number }}
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li><a href="{% url 'homepage:index' %}">الرئيسية</a></li>
+        <li><a href="{% url 'students:dashboard' %}">لوحة التحكم</a></li>
+        <li><a href="{% url 'students:my_applications' %}">طلباتي</a></li>
+        <li class="active">تفاصيل الطلب</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="detail-container">
+                
+                <!-- معلومات أساسية -->
+                <div class="detail-section">
+                    <h3><i class="fa fa-info-circle"></i> معلومات الطلب</h3>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>نوع الطلب</label>
+                            <div class="value">
+                                <i class="fa {{ application.application_type.icon }}" style="color: {{ application.application_type.color }};"></i>
+                                {{ application.application_type.name }}
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>رقم الطلب</label>
+                            <div class="value">{{ application.application_number }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>الحالة</label>
+                            <div class="value">
+                                <span class="status-badge status-{{ application.status }}">
+                                    <i class="fa {{ application.get_status_icon }}"></i>
+                                    {{ application.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>تاريخ التقديم</label>
+                            <div class="value">{{ application.submitted_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                        
+                        {% if application.reviewed_at %}
+                        <div class="info-item">
+                            <label>تاريخ المراجعة</label>
+                            <div class="value">{{ application.reviewed_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if application.reviewed_by %}
+                        <div class="info-item">
+                            <label>راجعه</label>
+                            <div class="value">{{ application.reviewed_by.get_full_name|default:application.reviewed_by.username }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- تفاصيل الطلب -->
+                {% if application.details %}
+                <div class="detail-section">
+                    <h3><i class="fa fa-comment"></i> تفاصيل الطلب</h3>
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; line-height: 1.8;">
+                        {{ application.details|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- الوثائق المرفقة -->
+                <div class="detail-section">
+                    <h3><i class="fa fa-paperclip"></i> الوثائق المرفقة</h3>
+                    
+                    {% if documents %}
+                    <ul class="documents-list">
+                        {% for doc in documents %}
+                        <li>
+                            <div>
+                                <i class="fa fa-file" style="color: #3498db; margin-left: 10px;"></i>
+                                <strong>{{ doc.document_name }}</strong>
+                                <br>
+                                <small style="color: #7f8c8d;">
+                                    <i class="fa fa-calendar"></i> {{ doc.uploaded_at|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                            <a href="{{ doc.document_file.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                <i class="fa fa-download"></i> تحميل
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p style="text-align: center; color: #7f8c8d; padding: 40px;">
+                        <i class="fa fa-inbox" style="font-size: 48px; display: block; margin-bottom: 15px;"></i>
+                        لا توجد وثائق مرفقة
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <!-- ملاحظات الإدارة -->
+                {% if application.admin_notes %}
+                <div class="detail-section">
+                    <div class="admin-notes">
+                        <h4><i class="fa fa-comment-o"></i> ملاحظات الإدارة</h4>
+                        <p style="color: #856404; margin: 0;">{{ application.admin_notes|linebreaks }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- أزرار الإجراءات -->
+                <div class="action-buttons">
+                    <a href="{% url 'students:my_applications' %}" class="btn btn-default btn-lg">
+                        <i class="fa fa-arrow-right"></i> العودة للقائمة
+                    </a>
+                    
+                    {% if application.status == 'pending' %}
+                    <form method="post" action="{% url 'students:cancel_application' application.id %}" style="display: inline;" 
+                          onsubmit="return confirm('هل أنت متأكد من إلغاء هذا الطلب؟');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fa fa-times"></i> إلغاء الطلب
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <a href="{% url 'students:application_print' application.id %}" class="btn btn-primary btn-lg" target="_blank">
+    <i class="fa fa-print"></i> طباعة
+</a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+
+{% endblock %}

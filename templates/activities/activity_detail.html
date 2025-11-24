@@ -1,0 +1,145 @@
+
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ activity.title }} - مديرية الخدمات الجامعية{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 80px;">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li><a href="{% url 'homepage:index' %}">الرئيسية</a></li>
+        <li><a href="{% url 'activities:activity_list' %}">النشاطات</a></li>
+        <li class="active">{{ activity.title }}</li>
+    </ol>
+
+    <div class="row">
+        <!-- المحتوى الرئيسي -->
+        <div class="col-md-8">
+            <!-- الصورة الرئيسية -->
+            {% if activity.main_image %}
+            <img src="{{ activity.main_image.url }}" alt="{{ activity.title }}" class="img-responsive" style="width: 100%; margin-bottom: 20px; border-radius: 5px;">
+            {% endif %}
+            
+            <!-- العنوان -->
+            <h1 style="color: #2c3e50; margin-bottom: 20px;">
+                <i class="fa {{ activity.get_type_icon }}"></i> {{ activity.title }}
+            </h1>
+            
+            <!-- معلومات سريعة -->
+            <div class="well" style="background-color: #f8f9fa;">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p style="margin: 5px 0;">
+                            <i class="fa fa-calendar" style="color: #8cc040;"></i>
+                            <strong>التاريخ:</strong> {{ activity.date|date:"d/m/Y" }}
+                        </p>
+                        <p style="margin: 5px 0;">
+                            <i class="fa fa-map-marker" style="color: #e74c3c;"></i>
+                            <strong>المكان:</strong> {{ activity.location }}
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p style="margin: 5px 0;">
+                            <i class="fa fa-tag" style="color: #3498db;"></i>
+                            <strong>النوع:</strong> {{ activity.get_activity_type_display }}
+                        </p>
+                        <p style="margin: 5px 0;">
+                            <i class="fa fa-users" style="color: #9b59b6;"></i>
+                            <strong>المشاركون:</strong> {{ activity.participants_count }} شخص
+                        </p>
+                    </div>
+                </div>
+                {% if activity.organizer %}
+                <p style="margin: 5px 0;">
+                    <i class="fa fa-building" style="color: #f39c12;"></i>
+                    <strong>المنظم:</strong> {{ activity.organizer }}
+                </p>
+                {% endif %}
+            </div>
+            
+            <!-- الوصف -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">عن النشاط</h3>
+                </div>
+                <div class="panel-body">
+                    <p style="line-height: 1.8; font-size: 16px;">{{ activity.description|linebreaks }}</p>
+                </div>
+            </div>
+            
+            <!-- معرض الصور -->
+            {% if gallery_images %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">معرض الصور</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        {% for img in gallery_images %}
+                        <div class="col-md-4 col-sm-6" style="margin-bottom: 15px;">
+                            <a href="{{ img.image.url }}" target="_blank">
+                                <img src="{{ img.image.url }}" alt="{{ img.caption }}" class="img-responsive" style="width: 100%; height: 150px; object-fit: cover; border-radius: 5px;">
+                            </a>
+                            {% if img.caption %}
+                            <small class="text-muted">{{ img.caption }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- الشريط الجانبي -->
+        <div class="col-md-4">
+            <!-- نشاطات أخرى -->
+            {% if related_activities %}
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">نشاطات مشابهة</h3>
+                </div>
+                <div class="panel-body">
+                    {% for related in related_activities %}
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                        <a href="{{ related.get_absolute_url }}" style="text-decoration: none;">
+                            <h4 style="color: #2c3e50; margin: 0;">{{ related.title }}</h4>
+                            <small class="text-muted">
+                                <i class="fa fa-calendar"></i> {{ related.date|date:"d/m/Y" }}
+                                &nbsp;|&nbsp;
+                                <i class="fa fa-tag"></i> {{ related.get_activity_type_display }}
+                            </small>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="panel-footer">
+                    <a href="{% url 'activities:activity_list' %}?type={{ activity.activity_type }}" class="btn btn-sm btn-success btn-block">
+                        عرض كل النشاطات {{ activity.get_activity_type_display }}ة
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- مشاركة -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">مشاركة النشاط</h3>
+                </div>
+                <div class="panel-body text-center">
+                    <p>شارك هذا النشاط مع الآخرين:</p>
+                    <div class="btn-group btn-group-justified">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-primary">
+                            <i class="fa fa-facebook"></i> Facebook
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?text={{ activity.title }}&url={{ request.build_absolute_uri }}" target="_blank" class="btn btn-info">
+                            <i class="fa fa-twitter"></i> Twitter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

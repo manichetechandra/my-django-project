@@ -1,0 +1,612 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="مديرية الخدمات الجامعية سطيف, الخدمات الجامعية, الإقامات">
+    <meta name="description" content="الموقع الرسمي لمديرية الخدمات الجامعية سطيف">
+    
+    <title>{% block title %}مديرية الخدمات الجامعية سطيف{% endblock %}</title>
+    
+    <link rel="shortcut icon" href="{% static 'images/dou_setif.png' %}" type="image/png">
+    
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rtl@3.4.0/dist/css/bootstrap-rtl.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <!-- Custom CSS الشامل للعربية -->
+    <style>
+        * {
+            direction: rtl;
+            text-align: right;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 70px;
+            direction: rtl;
+            text-align: right;
+        }
+        
+        /* Navbar RTL */
+        .navbar-inverse {
+            background-color: #2c3e50;
+            border: none;
+        }
+        
+        .navbar-inverse .navbar-brand {
+            color: #fff;
+            font-weight: bold;
+            float: right;
+        }
+        
+        .navbar-inverse .navbar-nav {
+            float: right;
+        }
+        
+        .navbar-inverse .navbar-nav > li {
+            float: right;
+        }
+        
+        .navbar-inverse .navbar-nav > li > a {
+            color: #ecf0f1;
+        }
+        
+        .navbar-inverse .navbar-nav > li > a:hover,
+        .navbar-inverse .navbar-nav > li > a:focus {
+            background-color: #8cc040;
+            color: #fff;
+        }
+        
+        .navbar-inverse .navbar-nav > .active > a {
+            background-color: #8cc040;
+        }
+        
+        .navbar-toggle {
+            float: left;
+        }
+        
+        .navbar-header {
+            float: none;
+        }
+        
+        .navbar-collapse {
+            text-align: right;
+        }
+        
+        /* Dropdown RTL */
+        .dropdown-menu {
+            right: 0;
+            left: auto;
+            text-align: right;
+        }
+        
+        .dropdown-menu > li > a {
+            text-align: right;
+        }
+        
+        .caret {
+            margin-right: 5px;
+            margin-left: 0;
+        }
+        
+        /* Bootstrap Grid RTL */
+        .row {
+            direction: rtl;
+        }
+        
+        .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1,
+        .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2,
+        .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3,
+        .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4,
+        .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5,
+        .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6,
+        .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7,
+        .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8,
+        .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9,
+        .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10,
+        .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11,
+        .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+            float: right !important;
+        }
+        
+        /* Panels RTL */
+        .panel {
+            text-align: right;
+            direction: rtl;
+        }
+        
+        .panel-heading,
+        .panel-body,
+        .panel-footer {
+            text-align: right;
+            direction: rtl;
+        }
+        
+        /* Buttons RTL */
+        .btn {
+            margin-left: 5px;
+            margin-right: 0;
+        }
+        
+        .btn i {
+            margin-left: 5px;
+            margin-right: 0;
+        }
+        
+        /* Text alignment */
+        .text-left {
+            text-align: right !important;
+        }
+        
+        .text-right {
+            text-align: left !important;
+        }
+        
+        /* Breadcrumb RTL */
+        .breadcrumb {
+            text-align: right;
+            direction: rtl;
+        }
+        
+        .breadcrumb > li {
+            float: right;
+        }
+        
+        .breadcrumb > li + li:before {
+            content: "/ ";
+            padding: 0 5px;
+        }
+        
+        /* Forms RTL */
+        .form-control {
+            text-align: right;
+            direction: rtl;
+        }
+        
+        /* Lists RTL */
+        ul, ol {
+            padding-right: 0;
+            padding-left: 40px;
+        }
+        
+        /* Alerts RTL */
+        .alert {
+            text-align: right;
+            direction: rtl;
+        }
+        
+        /* Carousel RTL */
+        .carousel-control.left {
+            right: 0;
+            left: auto;
+        }
+        
+        .carousel-control.right {
+            left: 0;
+            right: auto;
+        }
+        
+        .carousel-caption {
+            right: 15%;
+            left: 15%;
+            text-align: right;
+        }
+        
+        /* Pagination RTL */
+        .pagination {
+            direction: rtl;
+        }
+        
+        .pagination > li {
+            float: right;
+        }
+        
+        /* Tables RTL */
+        table {
+            direction: rtl;
+            text-align: right;
+        }
+        
+        th, td {
+            text-align: right;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<!-- ========================================
+     رسائل التنبيه (Messages)
+========================================= -->
+{% if messages %}
+<div style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 600px;">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        
+        {% if message.tags == 'success' %}
+            <i class="fa fa-check-circle"></i>
+        {% elif message.tags == 'error' %}
+            <i class="fa fa-times-circle"></i>
+        {% elif message.tags == 'warning' %}
+            <i class="fa fa-exclamation-triangle"></i>
+        {% else %}
+            <i class="fa fa-info-circle"></i>
+        {% endif %}
+        
+        <strong>{{ message }}</strong>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+// إخفاء الرسائل تلقائياً بعد 5 ثواني
+setTimeout(function() {
+    $('.alert').fadeOut('slow');
+}, 5000);
+</script>
+{% endif %}
+    <!-- Navbar -->
+    {% include 'base/navbar.html' %}
+
+    <!-- الإشعارات -->
+    {% load notification_tags %}
+    {% show_notifications %}
+
+    <!-- المحتوى الرئيسي -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    {% include 'base/footer.html' %}
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+
+
+
+
+    <!-- ... محتوى الصفحة ... -->
+    
+    <!-- ========================================
+         JavaScript للإشعارات Real-Time
+         ======================================== -->
+    {% if user.is_authenticated and student_profile %}
+    <script>
+    (function() {
+        'use strict';
+        
+        // ========================================
+        // إعدادات
+        // ========================================
+        const POLL_INTERVAL = 30000; // 30 ثانية
+        const API_URL = '{% url "students:notifications_api" %}';
+        const NOTIFICATION_SOUND = true; // تفعيل الصوت
+        const DESKTOP_NOTIFICATIONS = true; // إشعارات Desktop
+        
+        // ========================================
+        // المتغيرات
+        // ========================================
+        let lastUnreadCount = {{ student_profile.get_unread_notifications_count }};
+        let pollTimer = null;
+        
+        // ========================================
+        // دالة جلب الإشعارات
+        // ========================================
+        function fetchNotifications() {
+            fetch(API_URL, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateNotifications(data);
+                }
+            })
+            .catch(error => {
+                console.error('خطأ في جلب الإشعارات:', error);
+            });
+        }
+        
+        // ========================================
+        // دالة تحديث الإشعارات
+        // ========================================
+        function updateNotifications(data) {
+            const currentUnreadCount = data.unread_count;
+            
+            // تحديث العداد
+            updateBadge(currentUnreadCount);
+            
+            // إذا زاد عدد الإشعارات - إشعار جديد!
+            if (currentUnreadCount > lastUnreadCount) {
+                const newNotificationsCount = currentUnreadCount - lastUnreadCount;
+                onNewNotification(newNotificationsCount, data.notifications[0]);
+            }
+            
+            // تحديث قائمة الإشعارات
+            updateNotificationsList(data.notifications);
+            
+            lastUnreadCount = currentUnreadCount;
+        }
+        
+        // ========================================
+        // تحديث العداد (Badge)
+        // ========================================
+        function updateBadge(count) {
+            const badge = document.querySelector('.notifications-badge');
+            
+            if (count > 0) {
+                if (badge) {
+                    // تحديث الرقم
+                    badge.textContent = count;
+                    // Animation
+                    badge.style.animation = 'none';
+                    setTimeout(() => {
+                        badge.style.animation = 'pulse 0.5s ease';
+                    }, 10);
+                } else {
+                    // إنشاء العداد إذا لم يكن موجود
+                    const bellIcon = document.querySelector('.notifications-dropdown .dropdown-toggle');
+                    if (bellIcon) {
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'notifications-badge';
+                        newBadge.textContent = count;
+                        bellIcon.appendChild(newBadge);
+                    }
+                }
+            } else {
+                // إزالة العداد إذا لا توجد إشعارات
+                if (badge) {
+                    badge.remove();
+                }
+            }
+        }
+        
+        // ========================================
+        // تحديث قائمة الإشعارات
+        // ========================================
+        function updateNotificationsList(notifications) {
+            const listWrapper = document.querySelector('.notifications-list');
+            if (!listWrapper) return;
+            
+            // مسح القائمة الحالية
+            listWrapper.innerHTML = '';
+            
+            // إضافة الإشعارات الجديدة
+            notifications.forEach(notif => {
+                const item = createNotificationElement(notif);
+                listWrapper.appendChild(item);
+            });
+            
+            // تحديث العنوان
+            const header = document.querySelector('.notifications-header .unread-count');
+            if (header) {
+                const unreadCount = notifications.filter(n => !n.is_read).length;
+                header.textContent = unreadCount > 0 ? `${unreadCount} جديد` : '';
+            }
+        }
+        
+        // ========================================
+        // إنشاء عنصر إشعار
+        // ========================================
+        function createNotificationElement(notif) {
+            const a = document.createElement('a');
+            a.href = notif.link || '{% url "students:notifications_list" %}';
+            a.className = 'notification-item' + (!notif.is_read ? ' unread' : '');
+            
+            // حساب الوقت منذ الإشعار
+            const timeAgo = getTimeAgo(new Date(notif.created_at));
+            
+            a.innerHTML = `
+                <div class="notif-icon" style="background: ${notif.color}20;">
+                    <i class="fa ${notif.icon}" style="color: ${notif.color};"></i>
+                </div>
+                <div class="notif-content">
+                    <div class="notif-title">
+                        ${truncate(notif.title, 6)}
+                        ${!notif.is_read ? '<span class="new-label">جديد</span>' : ''}
+                    </div>
+                    <div class="notif-message">${truncate(notif.message, 12)}</div>
+                    <div class="notif-time">
+                        <i class="fa fa-clock-o"></i> ${timeAgo}
+                    </div>
+                </div>
+            `;
+            
+            return a;
+        }
+        
+        // ========================================
+        // عند وصول إشعار جديد
+        // ========================================
+        function onNewNotification(count, latestNotif) {
+            console.log(`🔔 ${count} إشعار جديد!`);
+            
+            // صوت إشعار
+            if (NOTIFICATION_SOUND) {
+                playNotificationSound();
+            }
+            
+            // Desktop notification
+            if (DESKTOP_NOTIFICATIONS && latestNotif) {
+                showDesktopNotification(latestNotif);
+            }
+            
+            // Animation للعداد
+            const badge = document.querySelector('.notifications-badge');
+            if (badge) {
+                badge.classList.add('new-notification');
+                setTimeout(() => {
+                    badge.classList.remove('new-notification');
+                }, 2000);
+            }
+        }
+        
+        // ========================================
+        // تشغيل صوت الإشعار
+        // ========================================
+        function playNotificationSound() {
+            // استخدام Web Audio API
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+            
+            oscillator.start(context.currentTime);
+            oscillator.stop(context.currentTime + 0.5);
+        }
+        
+        // ========================================
+        // Desktop Notification
+        // ========================================
+        function showDesktopNotification(notif) {
+            if (!("Notification" in window)) {
+                return;
+            }
+            
+            if (Notification.permission === "granted") {
+                createDesktopNotification(notif);
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        createDesktopNotification(notif);
+                    }
+                });
+            }
+        }
+        
+        function createDesktopNotification(notif) {
+            const notification = new Notification(notif.title, {
+                body: notif.message,
+                icon: '/static/images/logo.png', // ضع مسار اللوجو
+                badge: '/static/images/badge.png',
+                tag: 'student-notification-' + notif.id,
+                requireInteraction: false
+            });
+            
+            notification.onclick = function() {
+                window.focus();
+                if (notif.link) {
+                    window.location.href = notif.link;
+                }
+                notification.close();
+            };
+            
+            setTimeout(() => {
+                notification.close();
+            }, 5000);
+        }
+        
+        // ========================================
+        // دوال مساعدة
+        // ========================================
+        
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            const intervals = {
+                سنة: 31536000,
+                شهر: 2592000,
+                أسبوع: 604800,
+                يوم: 86400,
+                ساعة: 3600,
+                دقيقة: 60
+            };
+            
+            for (let [name, secondsInInterval] of Object.entries(intervals)) {
+                const interval = Math.floor(seconds / secondsInInterval);
+                if (interval >= 1) {
+                    return `منذ ${interval} ${name}`;
+                }
+            }
+            
+            return 'الآن';
+        }
+        
+        function truncate(text, wordCount) {
+            const words = text.split(' ');
+            if (words.length > wordCount) {
+                return words.slice(0, wordCount).join(' ') + '...';
+            }
+            return text;
+        }
+        
+        // ========================================
+        // بدء التحديث التلقائي
+        // ========================================
+        function startPolling() {
+            // جلب فوري عند تحميل الصفحة
+            fetchNotifications();
+            
+            // ثم كل 30 ثانية
+            pollTimer = setInterval(fetchNotifications, POLL_INTERVAL);
+            
+            console.log('✅ تم تفعيل الإشعارات Real-Time');
+        }
+        
+        // ========================================
+        // إيقاف عند إغلاق الصفحة
+        // ========================================
+        window.addEventListener('beforeunload', () => {
+            if (pollTimer) {
+                clearInterval(pollTimer);
+            }
+        });
+        
+        // ========================================
+        // بدء التشغيل
+        // ========================================
+        // انتظر تحميل الصفحة كاملة
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startPolling);
+        } else {
+            startPolling();
+        }
+        
+    })();
+    </script>
+    
+    <!-- CSS لـ Animation -->
+    <style>
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+        
+        .notifications-badge.new-notification {
+            animation: pulse 0.5s ease 3;
+            background: #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+        }
+    </style>
+    {% endif %}
+    
+
+</body>
+</html>
