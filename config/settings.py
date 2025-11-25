@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
-import dj_database_url
 from decouple import config, Csv  # ← جديد
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -105,8 +104,10 @@ DATABASE_URL = config('DATABASE_URL', default=None)
 if DATABASE_URL:
     # على الاستضافة (Railway) - استخدم PostgreSQL من Railway
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-    }
+    'default': dj_database_url.config(default=os.environ.get("postgresql://postgres:uqLsVtblBzqzynDffNgxhAoKyEMVhRQr@postgres.railway.internal:5432/railway"))
+}
+    
+   
 else:
     # محلياً - استخدم PostgreSQL المحلي
     DATABASES = {
