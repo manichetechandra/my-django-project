@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from decouple import config, Csv  # ← جديد
+import dj_database_url  # ← جديد
+from dotenv import load_dotenv 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-change-this')
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = False
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -34,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
+    'cloudinary_storage',
 
    
       # تطبيقاتنا
@@ -51,6 +56,7 @@ INSTALLED_APPS = [
     'search',
     'site_stats',
     'students',
+    
 ]
 
 MIDDLEWARE = [
@@ -64,7 +70,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'site_stats.middleware.VisitorTrackingMiddleware',
 ]
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -97,19 +103,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-import dj_database_url
-
-DATABASE_URL = config('DATABASE_URL', default=None)
-
+DATABASE_URL = os.getenv('DATABASE_URL',None)
 if DATABASE_URL:
-    # على الاستضافة (Railway) - استخدم PostgreSQL من Railway
+    # إذا موجود - استخدم قاعدة بيانات الاستضافة
     DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get("postgresql://postgres:uqLsVtblBzqzynDffNgxhAoKyEMVhRQr@postgres.railway.internal:5432/railway"))
-}
-    
-   
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600, ssl_require=True)
+    }
 else:
-    # محلياً - استخدم PostgreSQL المحلي
+    # محليًا - استخدم PostgreSQL المحلي
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -175,8 +176,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # ملفات الرفع (الصور المرفوعة من Admin)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#MEDIA_URL = '/media/'
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # WhiteNoise Configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+cloudinary_storage = {
+    'CLOUD_NAME': os.getenv('cloudinary_name'),
+    'API_KEY': os.getenv('cloudinary_api_key'),
+    'API_SECRET': os.getenv('cloudinary_api_secret'),
+}
