@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" preserveAspectRatio="xMidYMid slice">
+  <rect width="800" height="450" fill="#2c3e50"/>
+  <g fill="#8cc040" transform="translate(330 140)">
+    <rect x="0" y="0" width="140" height="110" rx="10" fill="none" stroke="#8cc040" stroke-width="9"/>
+    <rect x="22" y="24" width="56" height="40" rx="4"/>
+    <rect x="88" y="26" width="32" height="8" rx="4"/><rect x="88" y="46" width="32" height="8" rx="4"/>
+    <rect x="22" y="78" width="98" height="8" rx="4"/>
+  </g>
+  <text x="400" y="320" font-family="Tahoma, Arial" font-size="26" fill="#ecf0f1" text-anchor="middle">أخبار المديرية</text>
+</svg>
