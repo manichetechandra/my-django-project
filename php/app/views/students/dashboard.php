@@ -173,9 +173,10 @@
     }
     
     .status-pending { background: #f39c12; }
-    .status-under-review { background: #3498db; }
+    .status-under_review { background: #3498db; }
     .status-approved { background: #2ecc71; }
     .status-rejected { background: #e74c3c; }
+    .status-cancelled { background: #95a5a6; }
     
     /* الإشعارات */
     .notification-list {

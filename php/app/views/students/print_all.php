@@ -423,9 +423,9 @@
         <div class="section">
             <h2>📎 الوثائق المرفقة</h2>
             <ul class="documents">
-                <?php $__list = array_values($app['documents']); $__n = count($__list); foreach ($__list as $__i => $doc): ?>
+                <?php $__docs = array_values($app['documents']); foreach ($__docs as $__j => $doc): ?>
                 <li>
-                    <strong><?= e(($__i + 1)) ?>. <?= e($doc['document_name']) ?></strong><br>
+                    <strong><?= e(($__j + 1)) ?>. <?= e($doc['document_name']) ?></strong><br>
                     <small style="color: #6c757d;">
                         📅 تاريخ الرفع: <?= e(format_date($doc['uploaded_at'], 'd/m/Y - H:i')) ?>
                     </small>
