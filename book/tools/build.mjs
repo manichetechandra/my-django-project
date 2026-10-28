@@ -6,6 +6,7 @@
 //  node tools/build.mjs --fast     معاينة سريعة (مرور واحد، بدون ترقيم)
 //  node tools/build.mjs --only=03,04   بناء فصول محددة فقط (للمراجعة)
 //  node tools/build.mjs --png=1,5-7    حفظ صفحات كصور في .build/png للمراجعة
+//  node tools/build.mjs --coverage     تقرير تغطية ملفات المشروع فقط (.build/coverage.txt)
 //
 //  تعليمات خاصة داخل ملفات الفصول:
 //    @file app/core/DB.php 10-40     تضمين أسطر من ملف في مجلد php/ (يُلوَّن تلقائياً)
@@ -42,7 +43,8 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 // ------------------------------------------------------------------ الفصول
 const ORD = ['', 'الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر',
   'الحادي عشر', 'الثاني عشر', 'الثالث عشر', 'الرابع عشر', 'الخامس عشر', 'السادس عشر', 'السابع عشر', 'الثامن عشر',
-  'التاسع عشر', 'العشرون', 'الحادي والعشرون', 'الثاني والعشرون', 'الثالث والعشرون', 'الرابع والعشرون', 'الخامس والعشرون'];
+  'التاسع عشر', 'العشرون', 'الحادي والعشرون', 'الثاني والعشرون', 'الثالث والعشرون', 'الرابع والعشرون', 'الخامس والعشرون',
+  'السادس والعشرون', 'السابع والعشرون'];
 const APPX = { A: 'أ', B: 'ب', C: 'ج', D: 'د', E: 'هـ' };
 
 const chapterFiles = fs.readdirSync(path.join(BOOK, 'chapters'))
@@ -463,6 +465,7 @@ const t0 = Date.now();
 const cov = coverageReport();
 console.log(`الفصول: ${chapters.length} | العناوين: ${headings.length} | كتل كود من المشروع: ${[...coverage.values()].reduce((a, b) => a + b.length, 0)}`);
 console.log(`تغطية ملفات المشروع: ${cov.full}/${cov.total} ملف مكتمل (التفاصيل في .build/coverage.txt)`);
+if (argv.includes('--coverage')) process.exit(0); // تقرير التغطية فقط، بلا PDF
 
 const browser = await launch();
 try {
