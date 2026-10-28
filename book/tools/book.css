@@ -89,7 +89,8 @@ h4 { font-size: 11pt; margin: 4mm 0 2mm; font-weight: 700; color: #34495e; }
 
 /* ---------------- القوائم والجداول ---------------- */
 ul, ol { margin: 0 0 .7em; padding-right: 6mm; padding-left: 0; }
-li { margin: .15em 0; }
+/* عناصر القوائم بلا ضبط (justify): كثير منها قصير ويبدأ بكود طويل لا ينكسر، فيتمدد الفراغ بين الكلمات */
+li { margin: .15em 0; text-align: start; }
 li > p { margin: 0 0 .3em; }
 table { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; font-size: 9.6pt; line-height: 1.55; break-inside: auto; }
 thead { display: table-header-group; }

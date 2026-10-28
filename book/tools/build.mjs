@@ -7,6 +7,7 @@
 //  node tools/build.mjs --only=03,04   بناء فصول محددة فقط (للمراجعة)
 //  node tools/build.mjs --png=1,5-7    حفظ صفحات كصور في .build/png للمراجعة
 //  node tools/build.mjs --coverage     تقرير تغطية ملفات المشروع فقط (.build/coverage.txt)
+//  node tools/build.mjs --tagged       إبقاء وسوم إمكانية الوصول (Tagged PDF) في الملف النهائي (حجم أكبر بكثير)
 //
 //  تعليمات خاصة داخل ملفات الفصول:
 //    @file app/core/DB.php 10-40     تضمين أسطر من ملف في مجلد php/ (يُلوَّن تلقائياً)
@@ -32,6 +33,7 @@ const FINAL = path.join(BOOK, process.env.BOOK_OUT || 'dou-setif-book.pdf');
 const argv = process.argv.slice(2);
 const opt = (name) => (argv.find((a) => a.startsWith(`--${name}=`)) || '').split('=').slice(1).join('=');
 const FAST = argv.includes('--fast');
+const TAGGED = argv.includes('--tagged');
 const ONLY = opt('only') ? opt('only').split(',') : null;
 const PNG = opt('png');
 const PYENV = { ...process.env, PYTHONPATH: path.join(BT, 'pylib') };
@@ -486,6 +488,17 @@ try {
       if (stable) break;
       pages = next;
     }
+    // مرور أخير بلا وسوم: Chromium لا يُخرج الفهرس الجانبي (الذي نستخرج منه أرقام الصفحات) إلا مع وسوم
+    // إمكانية الوصول، وهذه الوسوم وحدها ~185 ألف كائن (أكثر من نصف حجم الملف). التخطيط نفسه لا يتغيّر،
+    // والفهرس الجانبي النهائي نبنيه نحن في pdftool.py stamp، فلا نحتاج الوسوم في الملف النهائي.
+    let finalBody = pass;
+    if (!TAGGED) {
+      finalBody = path.join(OUT, 'final.pdf');
+      await printPdf(browser, pageHtml(pages), finalBody, { outline: false, tagged: false });
+      const n = pdfOutline(finalBody).pages;
+      if (n !== info.pages) throw new Error(`المرور الأخير أعطى ${n} صفحة بدل ${info.pages}`);
+      console.log(`المرور الأخير (بلا وسوم): ${n} صفحة`);
+    }
     const overlay = path.join(OUT, 'overlay.pdf');
     await printPdf(browser, overlayHtml(info.pages, pages), overlay, { omitBackground: true, printBackground: true });
     // الفهرس الجانبي (Bookmarks) بعناوين نظيفة: «الفصل الأول: ...» و«1.2 ...»
@@ -499,7 +512,7 @@ try {
     const metaFile = path.join(OUT, 'meta.json');
     fs.writeFileSync(metaFile, JSON.stringify({ Title: BOOK_TITLE, Subject: 'برمجة موقع بـ PHP و MySQL من الصفر', Creator: 'book/tools/build.mjs', Keywords: 'PHP, MySQL, Bootstrap, XAMPP', _outline: bookmarks }));
     const target = ONLY ? FINAL.replace(/\.pdf$/, '.partial.pdf') : FINAL;
-    console.log(execFileSync('python3', [path.join(BOOK, 'tools', 'pdftool.py'), 'stamp', pass, overlay, target, metaFile], { env: PYENV, encoding: 'utf8' }).trim());
+    console.log(execFileSync('python3', [path.join(BOOK, 'tools', 'pdftool.py'), 'stamp', finalBody, overlay, target, metaFile], { env: PYENV, encoding: 'utf8' }).trim());
   }
 } finally {
   await browser.close();
