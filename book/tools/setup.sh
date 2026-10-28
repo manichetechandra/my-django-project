@@ -34,6 +34,8 @@ cp -f $FONTS/noto-sans/400Regular/NotoSans_400Regular.ttf $FONTS/noto-sans/700Bo
       $FONTS/noto-sans/400Regular_Italic/NotoSans_400Regular_Italic.ttf "$BT/fonts/"
 cp -f $FONTS/jetbrains-mono/400Regular/JetBrainsMono_400Regular.ttf $FONTS/jetbrains-mono/700Bold/JetBrainsMono_700Bold.ttf \
       $FONTS/jetbrains-mono/400Regular_Italic/JetBrainsMono_400Regular_Italic.ttf "$BT/fonts/"
+# الرموز التعبيرية (⚠️ ✅ 📝) والرموز (✓ ✗ ☆) الموجودة في كود المشروع: خطوط احتياطية أحادية اللون
+cp -f $FONTS/noto-emoji/400Regular/NotoEmoji_400Regular.ttf $FONTS/noto-sans-symbols-2/400Regular/NotoSansSymbols2_400Regular.ttf "$BT/fonts/"
 cat > "$BT/fonts.conf" <<EOF
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">

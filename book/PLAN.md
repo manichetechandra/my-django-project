@@ -36,12 +36,12 @@ node tools/build.mjs --only=05 --png=1-4   # معاينة فصل
 | 17-news-activities.md | الأخبار والنشاطات | news.php, activities.php + views |
 | 18-dep-cities-services.md | المصالح والإقامات والخدمات | departements, cities, services + views |
 | 19-forms-contact.md | النماذج واتصل بنا | core/Form.php, forms.php (جزء), contact |
-| 20-downloads-faq-search.md | التحميلات والأسئلة والبحث | downloads, faq, search + views |
-| 21-accounts.md | حسابات الطلبة | students.php (تسجيل/دخول/خروج), login, register, forms.php (جزء) |
-| 22-applications.md | لوحة الطالب والطلبات | core/Upload.php, dashboard, create/my/detail/print |
+| 20-downloads-faq-search.md | التحميلات والأسئلة والبحث | core/Upload.php, downloads, faq, search + views |
+| 21-accounts.md | حسابات الطلبة | students.php (تسجيل/دخول/خروج), login, register, forms.php (جزء), database/tools/create_admin.php |
+| 22-applications.md | لوحة الطالب والطلبات | dashboard, create/my/detail/print (Upload مشروح في 20) |
 | 23-student-extra.md | الإشعارات والملف الشخصي والبطاقة | notifications, profile, card, notifications_js |
 | 24-staff.md | لوحة الموظفين | staff.php, XlsxWriter.php, students/admin/* |
-| 25-admin.md | لوحة الإدارة | admin.php, admin_config.php, views/admin/*, admin.css, admin.js, create_admin.php |
+| 25-admin.md | لوحة الإدارة | admin.php, admin_config.php, views/admin/*, admin.css, admin.js |
 | 26-security-deploy.md | الأمان والنشر | — |
 | A-files.md | ملحق: شجرة الملفات | — |
 | B-django-import.md | ملحق: نقل البيانات من Django | database/tools/django_json_to_sql.php |
@@ -49,4 +49,5 @@ node tools/build.mjs --only=05 --png=1-4   # معاينة فصل
 ## الحالة
 - [x] أدوات البناء (setup.sh, build.mjs, book.css, pdftool.py)
 - [x] 00–04 الأساسيات
-- [ ] 05 ...
+- [x] 05–20
+- [ ] 21–26، A، B

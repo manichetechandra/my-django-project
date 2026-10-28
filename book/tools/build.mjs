@@ -156,10 +156,31 @@ function fixBidi(line, plain) {
     if (kind === 'string') {
       // وسوم HTML في بداية النص أو نهايته تبقى خارج العزل: '<b>المنحة</b>' تُعرض كما في المحرر
       const raw = decHtml(rest);
-      const tagLead = raw.match(/^(\s*(?:<[^>]*>\s*)*)/)[1];
-      const tagTrail = raw.slice(tagLead.length).match(/((?:\s*<[^>]*>)*\s*)$/)[1];
-      const core = raw.slice(tagLead.length, raw.length - tagTrail.length);
+      let tagLead = raw.match(/^(\s*(?:<[^>]*>\s*)*)/)[1];
+      let tagTrail = raw.slice(tagLead.length).match(/((?:\s*<[^>]*>)*\s*)$/)[1];
+      let core = raw.slice(tagLead.length, raw.length - tagTrail.length);
       if (!AR.test(core)) return m;
+      // قوس في طرف النص شريكه في نص آخر ('... (' و' حرف)</small>') يبقى خارج العزل في مكانه كما في المحرر،
+      // ثم الوسوم التي صارت في الطرف بعده
+      const cnt = (t, chars) => [...t].filter((ch) => chars.includes(ch)).length;
+      const lone = (t, ch) => (')]}'.includes(ch) && cnt(t, ')]}') > cnt(t, '([{')) || ('([{'.includes(ch) && cnt(t, '([{') > cnt(t, ')]}'));
+      for (let changed = true; changed && AR.test(core);) {
+        changed = false;
+        const last = core.slice(-1);
+        if (lone(core, last)) { tagTrail = last + tagTrail; core = core.slice(0, -1); changed = true; }
+        const first = core[0];
+        if (first && lone(core, first)) { tagLead += first; core = core.slice(1); changed = true; }
+        const t2 = core.match(/((?:\s*<[^>]*>)+\s*)$/);
+        if (t2 && t2[1].length < core.length) { tagTrail = t2[1] + tagTrail; core = core.slice(0, -t2[1].length); changed = true; }
+        const l2 = core.match(/^(\s*(?:<[^>]*>\s*)+)/);
+        if (l2 && l2[1].length < core.length) { tagLead += l2[1]; core = core.slice(l2[1].length); changed = true; }
+        const ws = core.match(/\s+$/);
+        if (ws && ws[0].length < core.length) { tagTrail = ws[0] + tagTrail; core = core.slice(0, -ws[0].length); changed = true; }
+        const wl = core.match(/^\s+/);
+        if (wl && wl[0].length < core.length) { tagLead += wl[0]; core = core.slice(wl[0].length); changed = true; }
+      }
+      if (process.env.BIDI_DEBUG && (tagLead + core + tagTrail) === raw && (tagLead !== raw.match(/^(\s*(?:<[^>]*>\s*)*)/)[1])) console.error('BIDI lead:', raw);
+      if (process.env.BIDI_DEBUG && tagTrail !== raw.slice(raw.match(/^(\s*(?:<[^>]*>\s*)*)/)[1].length).match(/((?:\s*<[^>]*>)*\s*)$/)[1]) console.error('BIDI trail:', raw);
       return `${open}${lead}${encHtml(tagLead)}<span class="rtl">${wrapLatinRuns(encHtml(core))}</span>${encHtml(tagTrail)}${trail}${close}`;
     }
     return `${open}${lead}<span class="rtl">${wrapLatinRuns(rest)}</span>${trail}${close}`;
