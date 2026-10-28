@@ -112,20 +112,26 @@ function wrapLatinRuns(text, open = '<span class="ltr">', close = '</span>', onl
   return dec(text).replace(/[^\u0600-\u06FF]+|[\u0600-\u06FF]+/g, (run) => {
     if (/[\u0600-\u06FF]/.test(run)) return enc(run);
     if (!/[A-Za-z0-9]/.test(run) || /^[\s\d.,:\-–]+$/.test(run)) return enc(run);
-    // نقشّر من الطرفين: المسافات، وعلامات ترقيم الجملة، والأقواس غير المتوازنة (تبقى خارج العزل)
-    const PUNCT = '—–:;,!?';
+    // نقشّر من الطرفين: المسافات، وعلامات ترقيم الجملة، والأسهم، والأقواس غير المتوازنة (تبقى خارج العزل)
+    const PUNCT = '—–:;,!?←→';
+    const unbalancedOpen = (t) => count(t, '([{') > count(t, ')]}');
+    const unbalancedClose = (t) => count(t, ')]}') > count(t, '([{');
+    const unbalancedQuote = (t, c) => (c === "'" || c === '"') && count(t, c) % 2 === 1;
     let core = run;
     let pre = '';
     let post = '';
     for (;;) {
       const c = core[core.length - 1];
-      if (c && (/\s/.test(c) || PUNCT.includes(c) || c === '.' || (')]}'.includes(c) && count(core, ')]}') > count(core, '([{')))) { post = c + post; core = core.slice(0, -1); } else break;
+      if (c === ';' && /&#?\w+;$/.test(core)) break; // نص كيان HTML مثل &gt; يبقى كاملاً
+      if (c && (/\s/.test(c) || PUNCT.includes(c) || c === '.' || (')]}'.includes(c) && unbalancedClose(core)) || ('([{'.includes(c) && unbalancedOpen(core)) || unbalancedQuote(core, c))) { post = c + post; core = core.slice(0, -1); } else break;
     }
     for (;;) {
       const c = core[0];
-      if (c && (/\s/.test(c) || PUNCT.includes(c) || ('([{'.includes(c) && count(core, '([{') > count(core, ')]}')))) { pre += c; core = core.slice(1); } else break;
+      // علامة الترقيم الملاصقة لكلمة لاتينية جزء منها (:question) فلا تُقشَّر
+      const punctOk = PUNCT.includes(c) && (core.length === 1 || /[\s—–:;,!?←→]/.test(core[1]));
+      if (c && (/\s/.test(c) || punctOk || ('([{'.includes(c) && unbalancedOpen(core)) || (')]}'.includes(c) && unbalancedClose(core)) || unbalancedQuote(core, c))) { pre += c; core = core.slice(1); } else break;
     }
-    if (!/[A-Za-z0-9]/.test(core)) return enc(run);
+    if (!/[A-Za-z0-9]/.test(core) || /^[\d.,:\-–]+$/.test(core)) return enc(run);
     const o = onlyIfNeeded && /^[A-Za-z0-9]/.test(core) ? '' : open;
     const c = onlyIfNeeded && /[A-Za-z0-9]$/.test(core) ? '' : close;
     return `${enc(pre)}${o}${enc(core)}${c}${enc(post)}`;

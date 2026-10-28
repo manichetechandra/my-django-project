@@ -82,9 +82,15 @@ DB::delete('news_images', 'id = ?', [12]);
 
 ```php
 DB::insert('faqs', ['question' => 'متى تبدأ التسجيلات؟', 'category_id' => 2]);
-// تبني:  INSERT INTO `faqs` (`question`, `category_id`) VALUES (:question, :category_id)
-// وتربط: :question = 'متى تبدأ التسجيلات؟'  و  :category_id = 2
 ```
+
+فتبني الجملة:
+
+```sql
+INSERT INTO `faqs` (`question`, `category_id`) VALUES (:question, :category_id)
+```
+
+ثم تربط القيمة `'متى تبدأ التسجيلات؟'` بالعلامة `:question`، والقيمة `2` بالعلامة `:category_id`.
 
 - **السطر 81**: `array_keys` تعطي أسماء الأعمدة.
 - **السطر 83**: `array_map` مع دالة سهمية تحيط كل اسم بالعلامة `` ` ``.
