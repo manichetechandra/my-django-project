@@ -207,6 +207,7 @@ th code { background: rgba(255,255,255,.15); color: #fff; }
 /* ---------------- الصور ---------------- */
 figure { margin: 4mm 0 6mm; text-align: center; break-inside: avoid; }
 figure img { max-width: 100%; max-height: 190mm; border: 1px solid #cfd8e1; border-radius: 1.5mm; box-shadow: 0 1mm 3mm rgba(0,0,0,.08); }
+.shot-missing { direction: ltr; height: 40mm; display: flex; align-items: center; justify-content: center; border: 1px dashed #c0392b; color: #c0392b; font-family: 'JetBrains Mono', monospace; font-size: 9pt; border-radius: 1.5mm; }
 figcaption { font-size: 9pt; color: var(--muted); margin-top: 2mm; }
 .pb { break-after: page; }
 .keep { break-inside: avoid; }

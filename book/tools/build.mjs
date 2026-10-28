@@ -236,8 +236,13 @@ function renderChapter(file) {
     return `\n<div data-ph="${blocks.length - 1}"></div>\n`;
   });
   text = text.replace(/^@shot\s+(\S+)\s*(?:\|\s*(.*))?$/gm, (_, img, cap) => {
-    const src = pathToFileURL(path.join(BOOK, img)).href;
-    return `\n<figure><img src="${src}">${cap ? `<figcaption>${md.utils.escapeHtml(cap)}</figcaption>` : ''}</figure>\n`;
+    const abs = path.join(BOOK, img);
+    const capHtml = cap ? `<figcaption>${md.utils.escapeHtml(cap)}</figcaption>` : '';
+    if (!fs.existsSync(abs)) {
+      console.warn(`تحذير: صورة مفقودة ${img} في ${file}`);
+      return `\n<figure><div class="shot-missing">${md.utils.escapeHtml(img)}</div>${capHtml}</figure>\n`;
+    }
+    return `\n<figure><img src="${pathToFileURL(abs).href}">${capHtml}</figure>\n`;
   });
   text = text.replace(/^@pagebreak\s*$/gm, '\n<div class="pb"></div>\n');
   let html = md.render(text);
