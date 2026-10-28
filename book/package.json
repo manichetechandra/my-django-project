@@ -1,0 +1,22 @@
+{
+  "name": "dou-setif-book",
+  "private": true,
+  "description": "كتاب: بناء موقع مديرية الخدمات الجامعية لولاية سطيف من الصفر بـ PHP و MySQL",
+  "type": "module",
+  "scripts": {
+    "setup": "bash tools/setup.sh",
+    "build": "node tools/build.mjs"
+  },
+  "dependencies": {
+    "@expo-google-fonts/cairo": "0.4.2",
+    "@expo-google-fonts/jetbrains-mono": "0.4.1",
+    "@expo-google-fonts/noto-kufi-arabic": "0.4.3",
+    "@expo-google-fonts/noto-naskh-arabic": "0.4.5",
+    "@expo-google-fonts/noto-sans": "0.4.2",
+    "@sparticuz/chromium": "153.0.0",
+    "highlight.js": "11.12.0",
+    "markdown-it": "15.0.3",
+    "markdown-it-container": "4.0.0",
+    "puppeteer-core": "25.16.0"
+  }
+}

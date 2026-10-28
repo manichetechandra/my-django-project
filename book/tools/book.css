@@ -1,0 +1,225 @@
+/* ===================================================================
+   تنسيق كتاب: بناء موقع مديرية الخدمات الجامعية من الصفر
+   الألوان مأخوذة من هوية الموقع: #2c3e50 (أزرق داكن) و #8cc040 (أخضر)
+   =================================================================== */
+@page { size: A4; margin: 25mm 19mm 22mm 19mm; }
+@page cover { margin: 0; }
+
+:root {
+  --primary: #2c3e50;
+  --accent: #8cc040;
+  --accent-dark: #6a9a2a;
+  --text: #1f2933;
+  --muted: #5f6b7a;
+  --line: #d5dce3;
+  --code-bg: #f7f9fb;
+}
+
+html { direction: rtl; }
+body {
+  margin: 0;
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+  font-size: 11pt;
+  line-height: 1.9;
+  color: var(--text);
+  text-align: justify;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+p { margin: 0 0 0.65em; orphans: 2; widows: 2; }
+strong, b { font-weight: 700; color: #111; }
+a { color: var(--primary); text-decoration: none; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 1.2em 0; }
+
+/* ---------------- الغلاف ---------------- */
+.cover {
+  page: cover;
+  width: 210mm; height: 297mm;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(160deg, #34495e 0%, #2c3e50 45%, #1b2836 100%);
+  font-family: 'Noto Kufi Arabic', 'Cairo', sans-serif;
+  text-align: center;
+  break-after: page;
+}
+.cover .band { position: absolute; left: 0; right: 0; height: 9mm; background: var(--accent); }
+.cover .band.top { top: 0; }
+.cover .band.bottom { bottom: 0; }
+.cover .circle { position: absolute; border-radius: 50%; border: 2px solid rgba(140, 192, 64, .35); }
+.cover .c1 { width: 150mm; height: 150mm; top: -55mm; left: -60mm; }
+.cover .c2 { width: 110mm; height: 110mm; bottom: -30mm; right: -40mm; border-color: rgba(255,255,255,.12); }
+.cover .logo { margin: 34mm auto 0; width: 44mm; height: 44mm; border-radius: 50%; background: #fff; padding: 6mm; box-sizing: border-box; }
+.cover .logo img { width: 100%; height: 100%; }
+.cover .kicker { margin-top: 12mm; font-size: 13pt; color: var(--accent); letter-spacing: .5px; }
+.cover .title { display: block; margin: 5mm 18mm 0; font-size: 30pt; line-height: 1.55; font-weight: 800; }
+.cover .subtitle { margin: 7mm 26mm 0; font-size: 14pt; line-height: 1.8; color: #dfe6ec; font-weight: 400; }
+.cover .tags { margin-top: 14mm; direction: ltr; }
+.cover .tags span { display: inline-block; margin: 0 2mm; padding: 1.5mm 5mm; border: 1px solid rgba(255,255,255,.45); border-radius: 20mm; font-family: 'Noto Sans', sans-serif; font-size: 10.5pt; }
+.cover .for { margin-top: 16mm; font-size: 12pt; color: #fff; }
+.cover .for b { color: var(--accent); }
+.cover .edition { position: absolute; bottom: 19mm; left: 0; right: 0; font-size: 10.5pt; color: #c9d3dc; font-weight: 400; }
+
+/* ---------------- الصفحات التمهيدية ---------------- */
+.front { break-after: page; }
+.front-title { font-family: 'Noto Kufi Arabic', sans-serif; font-size: 20pt; font-weight: 700; color: var(--primary); margin: 0 0 6mm; padding-bottom: 3mm; border-bottom: 3px solid var(--accent); }
+
+/* ---------------- الفهرس ---------------- */
+.toc { font-size: 10.5pt; line-height: 1.6; }
+.toc .row { display: flex; align-items: baseline; text-decoration: none; color: var(--text); }
+.toc .row .t { flex: 0 1 auto; }
+.toc .row .dots { flex: 1 1 auto; border-bottom: 1.4px dotted #aab4be; margin: 0 2mm 1.2mm; min-width: 6mm; }
+.toc .row .p { flex: 0 0 auto; min-width: 8mm; text-align: left; font-family: 'Noto Sans', sans-serif; font-variant-numeric: tabular-nums; }
+.toc .lvl1 { margin-top: 3.2mm; font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; font-size: 11pt; color: var(--primary); break-after: avoid; }
+.toc .lvl1 .lab { color: var(--accent-dark); margin-left: 2mm; }
+.toc .lvl2 { padding-right: 7mm; font-size: 10pt; }
+.toc .lvl2 .num { display: inline-block; min-width: 9mm; color: var(--muted); font-family: 'Noto Sans', sans-serif; }
+
+/* ---------------- العناوين ---------------- */
+h1, h2, h3, h4 { font-family: 'Noto Kufi Arabic', 'Cairo', sans-serif; color: var(--primary); text-align: right; break-after: avoid; line-height: 1.6; }
+h1 { break-before: page; margin: 18mm 0 9mm; padding-bottom: 5mm; border-bottom: 3px solid var(--accent); font-weight: 800; }
+h1 .ch-label { display: block; font-size: 13pt; font-weight: 600; color: var(--accent-dark); margin-bottom: 2mm; }
+h1 .ch-title { display: block; font-size: 25pt; }
+h2 { font-size: 15.5pt; margin: 9mm 0 3.5mm; padding: 1mm 3.5mm 1mm 0; border-right: 5px solid var(--accent); font-weight: 700; }
+h2 .num { color: var(--accent-dark); margin-left: 2.5mm; font-family: 'Noto Sans', sans-serif; font-weight: 700; }
+h3 { font-size: 12.5pt; margin: 6mm 0 2.5mm; color: #34495e; font-weight: 700; }
+h4 { font-size: 11pt; margin: 4mm 0 2mm; font-weight: 700; color: #34495e; }
+.ch-intro { font-size: 11.5pt; color: #334155; background: #f3f8ec; border-radius: 3mm; padding: 4mm 5mm; margin-bottom: 6mm; }
+
+/* ---------------- القوائم والجداول ---------------- */
+ul, ol { margin: 0 0 .7em; padding-right: 6mm; padding-left: 0; }
+li { margin: .15em 0; }
+li > p { margin: 0 0 .3em; }
+table { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; font-size: 9.6pt; line-height: 1.55; break-inside: auto; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+th { background: var(--primary); color: #fff; font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 600; padding: 1.6mm 2.4mm; text-align: right; }
+td { border-bottom: 1px solid var(--line); padding: 1.4mm 2.4mm; vertical-align: top; text-align: right; }
+tbody tr:nth-child(even) td { background: #f6f8fa; }
+
+/* ---------------- الكود داخل النص ---------------- */
+code {
+  font-family: 'JetBrains Mono', 'Noto Naskh Arabic', monospace;
+  font-size: 8.8pt;
+  background: #edf1f5;
+  color: #9b2c2c;
+  padding: .1mm 1.2mm;
+  border-radius: 1mm;
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+th code { background: rgba(255,255,255,.15); color: #fff; }
+
+/* ---------------- كتل الكود ---------------- */
+.code {
+  margin: 3.5mm 0 5mm;
+  border: 1px solid #cdd6df;
+  border-radius: 2mm;
+  background: var(--code-bg);
+  direction: ltr;
+  text-align: left;
+  font-family: 'JetBrains Mono', 'Noto Naskh Arabic', monospace;
+  font-size: 7.9pt;
+  line-height: 1.5;
+  break-inside: auto;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+.code-head {
+  display: flex; align-items: center; gap: 2.5mm;
+  background: var(--primary); color: #fff;
+  padding: 1.3mm 3mm;
+  border-radius: 1.8mm 1.8mm 0 0;
+  font-size: 8.2pt;
+  break-after: avoid;
+}
+.code-head .path { font-weight: 700; flex: 1; direction: ltr; unicode-bidi: isolate; }
+.code-head .badge, .code-head .range {
+  font-family: 'Noto Kufi Arabic', sans-serif; font-size: 7.4pt; direction: rtl; unicode-bidi: isolate;
+  padding: .2mm 2.2mm; border-radius: 3mm;
+}
+.code-head .badge.new { background: var(--accent); color: #17320a; font-weight: 700; }
+.code-head .badge.cont { background: #f0b429; color: #3d2b00; font-weight: 700; }
+.code-head .badge.ex { background: #9fb3c8; color: #102a43; font-weight: 700; }
+.code-head .range { background: rgba(255,255,255,.14); }
+.code-body { padding: 1.6mm 0; }
+.code .l { display: flex; break-inside: avoid; }
+.code .n {
+  flex: 0 0 9.5mm; box-sizing: border-box; padding: 0 2mm 0 0; text-align: right;
+  color: #9aa5b1; border-right: 1px solid #dfe5eb; margin-right: 2.5mm; user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+.code .c { flex: 1; white-space: pre-wrap; overflow-wrap: anywhere; padding-left: 0; tab-size: 4; color: #24292e; }
+.code-foot {
+  font-family: 'Noto Kufi Arabic', sans-serif; direction: rtl; text-align: center;
+  font-size: 7.4pt; color: #52606d; border-top: 1px dashed #cdd6df; padding: .6mm 0 .8mm;
+}
+.code.example { background: #fbfbf4; border-color: #dcdcc4; }
+.code.example .code-head { background: #4a5a6a; }
+.code.terminal { background: #1e2731; border-color: #1e2731; }
+.code.terminal .c { color: #e6edf3; }
+.code.terminal .n { color: #5b6b7b; border-right-color: #334250; }
+.code.terminal .code-head { background: #111820; }
+
+/* ألوان highlight.js (نمط فاتح قريب من GitHub) */
+.hljs-comment, .hljs-quote { color: #6a737d; font-style: normal; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-doctag, .hljs-section { color: #cf222e; }
+.hljs-string, .hljs-regexp, .hljs-addition, .hljs-symbol { color: #0a3069; }
+.hljs-number { color: #0550ae; }
+.hljs-title, .hljs-title.function_, .hljs-title.class_ { color: #8250df; }
+.hljs-variable, .hljs-template-variable { color: #953800; }
+.hljs-attr, .hljs-attribute, .hljs-property, .hljs-built_in, .hljs-type { color: #0550ae; }
+.hljs-tag { color: #116329; }
+.hljs-name { color: #116329; font-weight: 600; }
+.hljs-meta, .hljs-meta .hljs-keyword { color: #8a6100; }
+.hljs-selector-class, .hljs-selector-id, .hljs-selector-pseudo, .hljs-selector-attr { color: #6639ba; }
+.hljs-deletion { color: #82071e; background: #ffebe9; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
+.terminal .hljs-comment { color: #8b98a5; }
+.terminal .hljs-string { color: #a5d6ff; }
+.terminal .hljs-keyword, .terminal .hljs-built_in { color: #ff7b72; }
+
+/* ---------------- الصناديق ---------------- */
+.box { margin: 4mm 0 5mm; padding: 2.8mm 4mm 1.6mm; border-radius: 2mm; border-right: 4px solid; break-inside: avoid; font-size: 10.4pt; line-height: 1.8; }
+.box-title { font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; font-size: 10pt; margin-bottom: 1mm; }
+.box > :last-child { margin-bottom: .6em; }
+.box .code { break-inside: auto; }
+.box-tip { background: #f1f8e6; border-color: var(--accent); }
+.box-tip .box-title { color: #4d7a17; }
+.box-warning { background: #fff4ed; border-color: #e8590c; }
+.box-warning .box-title { color: #c2410c; }
+.box-note { background: #eef5fc; border-color: #3b82c4; }
+.box-note .box-title { color: #1e5a96; }
+.box-info { background: #f3f4f6; border-color: #64748b; }
+.box-info .box-title { color: #334155; }
+.box-try { background: #f6f1fd; border-color: #8250df; }
+.box-try .box-title { color: #6639ba; }
+.box-why { background: #ecfbf8; border-color: #0f9d8a; }
+.box-why .box-title { color: #0b7a6b; }
+.box-summary { background: #f7f7f7; border-color: var(--primary); }
+.box-summary .box-title { color: var(--primary); }
+
+/* ---------------- الصور ---------------- */
+figure { margin: 4mm 0 6mm; text-align: center; break-inside: avoid; }
+figure img { max-width: 100%; max-height: 190mm; border: 1px solid #cfd8e1; border-radius: 1.5mm; box-shadow: 0 1mm 3mm rgba(0,0,0,.08); }
+figcaption { font-size: 9pt; color: var(--muted); margin-top: 2mm; }
+.pb { break-after: page; }
+.keep { break-inside: avoid; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
+kbd { font-family: 'JetBrains Mono', monospace; font-size: 8.5pt; border: 1px solid #b8c2cc; border-bottom-width: 2px; border-radius: 1mm; padding: 0 1.4mm; background: #fff; direction: ltr; unicode-bidi: isolate; }
+
+/* ---------------- مخطط سير الطلب ---------------- */
+.flow { display: flex; flex-wrap: wrap; gap: 1.6mm; align-items: center; justify-content: center; margin: 4mm 0 6mm; break-inside: avoid; }
+.flow .st { background: #fff; border: 1.5px solid var(--primary); border-radius: 2mm; padding: 1.6mm 2.6mm; text-align: center; font-size: 8.6pt; line-height: 1.5; min-width: 21mm; }
+.flow .st b { display: block; color: var(--primary); font-family: 'Noto Kufi Arabic', sans-serif; font-size: 9pt; }
+.flow .st small { color: var(--muted); font-size: 7.6pt; direction: ltr; unicode-bidi: isolate; display: block; }
+.flow .st.hl { background: #f1f8e6; border-color: var(--accent-dark); }
+.flow .ar { color: var(--accent-dark); font-size: 13pt; font-weight: 700; font-family: 'Noto Sans', sans-serif; }
+.tree { font-family: 'JetBrains Mono', 'Noto Naskh Arabic', monospace; }
+h1 .ch-sep { font-size: 0; color: transparent; display: inline-block; width: 0; overflow: hidden; }
+h2 .num { margin-left: 1.2mm; }
