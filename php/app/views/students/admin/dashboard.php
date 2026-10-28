@@ -101,6 +101,7 @@
     .status-under_review { background: #3498db; }
     .status-approved { background: #2ecc71; }
     .status-rejected { background: #e74c3c; }
+    .status-cancelled { background: #95a5a6; }
     
     /* أزرار سريعة */
     .quick-actions {
@@ -161,7 +162,7 @@
             الطلبات المعلقة
         </a>
         
-        <a href="/admin/students/" class="quick-action-btn" style="background: #9b59b6;">
+        <a href="<?= e(url('admin:index')) ?>" class="quick-action-btn" style="background: #9b59b6;">
             <i class="fa fa-cog" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
             إعدادات النظام
         </a>
@@ -312,7 +313,6 @@
         </div>
     </div>
     
-</div>
 
 <br><br>
     <!-- ========================================

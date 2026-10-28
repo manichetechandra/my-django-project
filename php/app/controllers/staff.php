@@ -32,7 +32,7 @@ function staff_fetch_applications(string $where, array $params, string $limit = 
 {
     $rows = DB::all("SELECT a.*,
             s.id AS s_id, s.user_id AS s_user_id, s.registration_number AS s_registration_number, s.full_name_arabic AS s_full_name_arabic,
-            s.phone AS s_phone, s.faculty AS s_faculty, s.department AS s_department, s.current_year AS s_current_year, s.photo AS s_photo,
+            s.phone AS s_phone, s.faculty AS s_faculty, s.department AS s_department, s.current_year AS s_current_year, s.wilaya AS s_wilaya, s.photo AS s_photo,
             u.email AS u_email,
             t.id AS t_id, t.name AS t_name, t.icon AS t_icon, t.color AS t_color,
             r.id AS r_id, r.username AS r_username, r.first_name AS r_first_name, r.last_name AS r_last_name

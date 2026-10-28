@@ -64,7 +64,7 @@
     .form-control {
         border: 2px solid #ddd;
         border-radius: 5px;
-        padding: 12px;
+        padding: 12px; height: auto;
         transition: all 0.3s;
     }
     
@@ -408,7 +408,7 @@
         }, 5000);
         
         // تأكيد قبل الإرسال
-        $('form').on('submit', function(e) {
+        $('#id_message').closest('form').on('submit', function(e) {
             var message = $('#id_message').val();
             if (message.length < 10) {
                 e.preventDefault();

@@ -305,8 +305,8 @@ function student_cancel_application($pk): void
 function student_application_print($pk): void
 {
     never_cache();
-    $student = require_student();
-    $application = student_application_or_404($student, $pk);
+    $application = is_staff() ? StudentApplication::findOrFail($pk) : student_application_or_404(require_student(), $pk);
+    $student = $application['student'];
     render('students/application_print', [
         'student'     => $student,
         'application' => $application,

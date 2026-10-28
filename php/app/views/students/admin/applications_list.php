@@ -336,7 +336,7 @@
                         <td style="text-align: center;">
                             <input type="checkbox" 
                                    class="app-checkbox" 
-                                   name="selected_applications" 
+                                   name="selected_applications[]" 
                                    value="<?= e($app['id']) ?>">
                         </td>
                         

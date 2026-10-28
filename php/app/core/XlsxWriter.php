@@ -10,7 +10,7 @@ final class XlsxWriter
     private array $rows = [];        // rowNum => [colNum => [value, styleId]]
     private array $rowHeights = [];
     private array $colWidths = [];
-    private array $styles = [];      // key => [id, def]
+    private array $styles = [];      // مفتاح النمط (JSON) => رقمه
     private array $fonts = ['<font><sz val="11"/><name val="Arial"/></font>'];
     private array $fills = ['<fill><patternFill patternType="none"/></fill>', '<fill><patternFill patternType="gray125"/></fill>'];
     private array $borders = ['<border><left/><right/><top/><bottom/><diagonal/></border>'];
