@@ -280,11 +280,6 @@
 
 <br><br>
 <div class="container">
-    <!-- Breadcrumb -->
-    <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li class="active">تسجيل طالب جديد</li>
-    </ol>
     
     <!-- عرض رسائل الأخطاء -->
     <?php if (!empty($messages)): ?>
@@ -322,6 +317,5 @@
     </div>
     <?php endif; ?>
     
-    <div class="row">
-        <!-- باقي الكود... -->
+</div>
 <?php endblock(); ?>
