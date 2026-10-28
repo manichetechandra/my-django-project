@@ -95,8 +95,74 @@ function highlight(code, lang) {
   return esc(code);
 }
 
+// النص العربي داخل الكود (تعليقات، نصوص، أسطر عادية) يُعزل باتجاه RTL ليُقرأ بالترتيب الصحيح
+const AR = /[\u0600-\u06FF]/;
+const Q = "(?:&#x27;|&quot;|'|\"|`)";
+const LEAD = new RegExp(`^(\\s*(?:\\/\\/+|#|\\/\\*+|\\*+|&lt;!--|--|${Q})?\\s*)`);
+const TRAIL = new RegExp(`(\\s*(?:\\*\\/|--&gt;|${Q})?\\s*)$`);
+const TRAIL_NOQ = /(\s*(?:\*\/|--&gt;)?\s*)$/;
+const decHtml = (t) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, '&');
+const encHtml = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+// داخل نص عربي، الكلمة اللاتينية التي تبدأ أو تنتهي برموز محايدة ("/index.php" أو route() أو @name)
+// تُعزل باتجاه LTR حتى لا تنتقل رموزها إلى الجهة الخطأ. النص المُدخل HTML مُهرَّب بلا وسوم.
+function wrapLatinRuns(text, open = '<span class="ltr">', close = '</span>', onlyIfNeeded = false, html = true) {
+  const count = (str, chars) => [...str].filter((c) => chars.includes(c)).length;
+  const dec = (t) => (html ? decHtml(t) : t);
+  const enc = (t) => (html ? encHtml(t) : t);
+  return dec(text).replace(/[^\u0600-\u06FF]+|[\u0600-\u06FF]+/g, (run) => {
+    if (/[\u0600-\u06FF]/.test(run)) return enc(run);
+    if (!/[A-Za-z0-9]/.test(run) || /^[\s\d.,:\-–]+$/.test(run)) return enc(run);
+    // نقشّر من الطرفين: المسافات، وعلامات ترقيم الجملة، والأقواس غير المتوازنة (تبقى خارج العزل)
+    const PUNCT = '—–:;,!?';
+    let core = run;
+    let pre = '';
+    let post = '';
+    for (;;) {
+      const c = core[core.length - 1];
+      if (c && (/\s/.test(c) || PUNCT.includes(c) || c === '.' || (')]}'.includes(c) && count(core, ')]}') > count(core, '([{')))) { post = c + post; core = core.slice(0, -1); } else break;
+    }
+    for (;;) {
+      const c = core[0];
+      if (c && (/\s/.test(c) || PUNCT.includes(c) || ('([{'.includes(c) && count(core, '([{') > count(core, ')]}')))) { pre += c; core = core.slice(1); } else break;
+    }
+    if (!/[A-Za-z0-9]/.test(core)) return enc(run);
+    const o = onlyIfNeeded && /^[A-Za-z0-9]/.test(core) ? '' : open;
+    const c = onlyIfNeeded && /[A-Za-z0-9]$/.test(core) ? '' : close;
+    return `${enc(pre)}${o}${enc(core)}${c}${enc(post)}`;
+  });
+}
+// نفس المعالجة على نص HTML قد يحتوي وسوماً (العناوين): نعالج النصوص بين الوسوم فقط
+const isoHtml = (html) => html.replace(/(^|>)([^<]+)/g, (m, a, t) => a + wrapLatinRuns(t));
+
+function fixBidi(line, plain) {
+  if (!AR.test(line)) return line;
+  if (plain) {
+    const i = line.search(AR);
+    return `${line.slice(0, i)}<span class="rtl">${wrapLatinRuns(line.slice(i))}</span>`;
+  }
+  return line.replace(/(<span class="hljs-(comment|string|quote)">)([^<]*)(<\/span>)/g, (m, open, kind, inner, close) => {
+    if (!AR.test(inner)) return m;
+    const lead = inner.match(LEAD)[1];
+    let rest = inner.slice(lead.length);
+    // علامة التنصيص في الآخر لا تُفصل إلا إذا بدأ النص بعلامة تنصيص (نص برمجي لا تعليق)
+    const trail = rest.match(new RegExp(Q).test(lead) ? TRAIL : TRAIL_NOQ)[1];
+    rest = rest.slice(0, rest.length - trail.length);
+    if (kind === 'string') {
+      // وسوم HTML في بداية النص أو نهايته تبقى خارج العزل: '<b>المنحة</b>' تُعرض كما في المحرر
+      const raw = decHtml(rest);
+      const tagLead = raw.match(/^(\s*(?:<[^>]*>\s*)*)/)[1];
+      const tagTrail = raw.slice(tagLead.length).match(/((?:\s*<[^>]*>)*\s*)$/)[1];
+      const core = raw.slice(tagLead.length, raw.length - tagTrail.length);
+      if (!AR.test(core)) return m;
+      return `${open}${lead}${encHtml(tagLead)}<span class="rtl">${wrapLatinRuns(encHtml(core))}</span>${encHtml(tagTrail)}${trail}${close}`;
+    }
+    return `${open}${lead}<span class="rtl">${wrapLatinRuns(rest)}</span>${trail}${close}`;
+  });
+}
+
 function codeBlock({ code, lang, start = 1, head = '', badge = '', badgeClass = 'ex', range = '', foot = '', kind = '' }) {
-  const lines = splitLines(highlight(code, lang));
+  const plain = !lang || lang === 'plaintext' || !hljs.getLanguage(lang);
+  const lines = splitLines(highlight(code, lang)).map((l) => fixBidi(l, plain));
   const rows = lines.map((l, i) => `<div class="l"><span class="n">${start + i}</span><span class="c">${l === '' ? ' ' : l}</span></div>`).join('');
   const headHtml = (head || badge || range)
     ? `<div class="code-head">${badge ? `<span class="badge ${badgeClass}">${badge}</span>` : ''}<span class="path">${esc(head)}</span>${range ? `<span class="range">${range}</span>` : ''}</div>`
@@ -207,12 +273,12 @@ for (const ch of chapters) {
   let html = ch.html.replace(/<h([1-4])>([\s\S]*?)<\/h\1>/g, (_, lvl, inner) => {
     lvl = +lvl;
     const id = `h${headings.length + 1}`;
-    let content = inner;
+    let content = isoHtml(inner);
     if (lvl === 1) {
-      content = `<span class="ch-label">${ch.label}</span> <span class="ch-sep">— </span><span class="ch-title">${inner}</span>`;
+      content = `<span class="ch-label">${ch.label}</span> <span class="ch-sep">— </span><span class="ch-title">${isoHtml(inner)}</span>`;
     } else if (lvl === 2) {
       h2n += 1;
-      if (ch.num) content = `<span class="num">${ch.num}.${h2n}</span> ${inner}`;
+      if (ch.num) content = `<span class="num">${ch.num}.${h2n}</span> ${isoHtml(inner)}`;
     }
     headings.push({ id, lvl, inner, label: lvl === 1 ? ch.label : '', num: lvl === 2 && ch.num ? `${ch.num}.${h2n}` : '' });
     return `<h${lvl} id="${id}">${content}</h${lvl}>`;
@@ -223,7 +289,7 @@ for (const ch of chapters) {
 function tocHtml(pages) {
   const rows = headings.filter((h) => h.lvl <= 2).map((h) => {
     const p = pages ? (pages[h.id] ?? '') : '000';
-    const text = h.inner.replace(/<[^>]+>/g, '');
+    const text = isoHtml(h.inner.replace(/<[^>]+>/g, ''));
     if (h.lvl === 1) {
       return `<a class="row lvl1" href="#${h.id}"><span class="t">${h.label ? `<span class="lab">${h.label}:</span>` : ''}${text}</span><span class="dots"></span><span class="p">${p}</span></a>`;
     }
@@ -268,12 +334,18 @@ function coverageReport() {
   const lines = [];
   let full = 0;
   for (const f of files) {
-    const n = fs.readFileSync(path.join(SRC, f), 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n').length;
+    const src = fs.readFileSync(path.join(SRC, f), 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
+    const n = src.length;
     const cov = new Array(n + 1).fill(0);
-    for (const [s, e] of coverage.get(f) || []) for (let i = s; i <= e; i++) cov[i]++;
+    let prevEnd = 0;
+    for (const [s, e, chap] of coverage.get(f) || []) {
+      if (s <= prevEnd) console.warn(`تحذير ترتيب: ${f} ${s}-${e} في ${chap} يأتي قبل/داخل قطعة سابقة تنتهي عند ${prevEnd}`);
+      prevEnd = Math.max(prevEnd, e);
+      for (let i = s; i <= e; i++) cov[i]++;
+    }
     const missing = [], dup = [];
     for (let i = 1; i <= n; i++) {
-      if (cov[i] === 0) missing.push(i);
+      if (cov[i] === 0 && src[i - 1].trim() !== '') missing.push(i);   // الأسطر الفارغة بين القطع لا تُحسب
       if (cov[i] > 1) dup.push(i);
     }
     const ranges = (arr) => arr.reduce((acc, x) => {
@@ -383,9 +455,10 @@ try {
     await printPdf(browser, overlayHtml(info.pages, pages), overlay, { omitBackground: true, printBackground: true });
     // الفهرس الجانبي (Bookmarks) بعناوين نظيفة: «الفصل الأول: ...» و«1.2 ...»
     const plain = (s) => s.replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
+    const bm = (s) => wrapLatinRuns(plain(s), '\u200E', '\u200E', true, false);
     const bookmarks = headings.filter((h) => h.lvl <= 3 && pages[h.id]).map((h) => ({
       level: h.lvl,
-      title: h.lvl === 1 ? (h.label ? `${h.label}: ${plain(h.inner)}` : plain(h.inner)) : (h.num ? `${h.num} ${plain(h.inner)}` : plain(h.inner)),
+      title: h.lvl === 1 ? (h.label ? `${h.label}: ${bm(h.inner)}` : bm(h.inner)) : (h.num ? `${h.num} ${bm(h.inner)}` : bm(h.inner)),
       page: pages[h.id],
     }));
     const metaFile = path.join(OUT, 'meta.json');

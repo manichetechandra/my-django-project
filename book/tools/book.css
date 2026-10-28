@@ -223,3 +223,4 @@ kbd { font-family: 'JetBrains Mono', monospace; font-size: 8.5pt; border: 1px so
 .tree { font-family: 'JetBrains Mono', 'Noto Naskh Arabic', monospace; }
 h1 .ch-sep { font-size: 0; color: transparent; display: inline-block; width: 0; overflow: hidden; }
 h2 .num { margin-left: 1.2mm; }
+.code .rtl { direction: rtl; unicode-bidi: isolate; }
