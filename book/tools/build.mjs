@@ -14,8 +14,9 @@
 //    @file app/core/DB.php 41-$      حتى نهاية الملف        @file config.php   الملف كاملاً
 //    @file database/schema.sql 89-102 insert   قطعة تُدرج في وسط ملف كُتب جزء منه (خارج الترتيب)
 //    @stage home nav-html [STEP]     كتلة من ملف مؤقت (stages/home.src) بأرقام أسطرها في تلك الخطوة
+//    @stage home * 2 [FILE]          الملف المؤقت كاملاً كما هو عند الخطوة 2
 //    @moved app/views/base/base.php 22-218 | نص   أسطر نهائية سبق كتابتها في ملف مؤقت: «انقلها كما هي»
-//    @shot images/home.png | تعليق   صورة مع تعليق
+//    @shot images/home.png [40%] | تعليق   صورة مع تعليق (وعرض اختياري بالنسبة المئوية)
 //    @pagebreak                      صفحة جديدة
 //    ::: tip|warning|note|info|try|why|summary [عنوان] ... :::   صناديق ملوّنة
 // =====================================================================
@@ -27,7 +28,7 @@ import MarkdownIt from 'markdown-it';
 import mdContainer from 'markdown-it-container';
 import hljs from 'highlight.js';
 import puppeteer from 'puppeteer-core';
-import { stageBlock } from './stages.mjs';
+import { stageBlock, stageFile } from './stages.mjs';
 
 const BOOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.resolve(BOOK, '..', 'php');
@@ -237,14 +238,15 @@ function includeFile(spec, chapter) {
 
 // ------------------------------------------------------------------ الملفات المؤقتة (المراحل) والكود المنقول
 function includeStage(spec, chapter) {
-  const [name, blockName, step] = spec.trim().split(/\s+/);
-  const b = stageBlock(name, blockName, step);
-  const fin = b.block.fromFile;
+  const [name, blockName, step, file] = spec.trim().split(/\s+/);
+  // «*» = الملف كاملاً كما هو عند تلك الخطوة
+  const b = blockName === '*' ? stageFile(name, step, file) : stageBlock(name, blockName, step);
+  const fin = b.block && b.block.fromFile;
   if (fin) {
     if (!coverage.has(fin)) coverage.set(fin, []);
     coverage.get(fin).push([b.block.fromStart, b.block.fromEnd, chapter, 'stage']);
   }
-  const range = b.start === b.end ? `السطر ${b.start}` : `الأسطر ${b.start}–${b.end}`;
+  const range = blockName === '*' ? `الملف كاملاً — ${b.total} سطر` : (b.start === b.end ? `السطر ${b.start}` : `الأسطر ${b.start}–${b.end}`);
   const foot = fin && fin !== b.file
     ? `نص نهائي: سيُنقل لاحقاً كما هو إلى ${fin} (الأسطر ${b.block.fromStart}–${b.block.fromEnd})`
     : '';
@@ -313,14 +315,14 @@ function renderChapter(file) {
     blocks.push(kind === 'file' ? includeFile(spec, file) : kind === 'stage' ? includeStage(spec, file) : movedBlock(spec, file));
     return `\n<div data-ph="${blocks.length - 1}"></div>\n`;
   });
-  text = text.replace(/^@shot\s+(\S+)\s*(?:\|\s*(.*))?$/gm, (_, img, cap) => {
+  text = text.replace(/^@shot\s+(\S+)(?:\s+(\d+)%)?\s*(?:\|\s*(.*))?$/gm, (_, img, pct, cap) => {
     const abs = path.join(BOOK, img);
     const capHtml = cap ? `<figcaption>${md.utils.escapeHtml(cap)}</figcaption>` : '';
     if (!fs.existsSync(abs)) {
       console.warn(`تحذير: صورة مفقودة ${img} في ${file}`);
       return `\n<figure><div class="shot-missing">${md.utils.escapeHtml(img)}</div>${capHtml}</figure>\n`;
     }
-    return `\n<figure><img src="${pathToFileURL(abs).href}">${capHtml}</figure>\n`;
+    return `\n<figure><img src="${pathToFileURL(abs).href}"${pct ? ` style="width: ${pct}%"` : ''}>${capHtml}</figure>\n`;
   });
   text = text.replace(/^@pagebreak\s*$/gm, '\n<div class="pb"></div>\n');
   let html = md.render(text);

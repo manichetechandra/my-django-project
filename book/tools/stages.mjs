@@ -146,6 +146,17 @@ export function stageBlock(name, blockName, step) {
   throw new Error(`@stage: الكتلة ${blockName} غير ظاهرة عند الخطوة ${k}`);
 }
 
+/** ملف كامل من اللقطة عند الخطوة k (الملف الرئيسي إن لم يُحدَّد) */
+export function stageFile(name, step, file) {
+  const st = loadStage(name);
+  const k = parseFloat(step);
+  const snap = snapshot(name, k);
+  const p = file || mainFile(st, k);
+  const f = snap.get(p);
+  if (!f) throw new Error(`@stage: الملف ${p} غير موجود في ${name} عند الخطوة ${k}`);
+  return { file: p, start: 1, end: f.lines.length, total: f.lines.length, lines: f.lines, block: null, step: k };
+}
+
 export function writeSnapshot(name, k, outdir) {
   const snap = snapshot(name, k);
   const written = [];
@@ -160,6 +171,19 @@ export function writeSnapshot(name, k, outdir) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const [name, step, outdir] = process.argv.slice(2);
+  if (outdir === '--show') { // node tools/stages.mjs home 4 --show nav-html  → الكتلة بأرقام أسطرها
+    const b = stageBlock(name, process.argv[5], step);
+    console.log(`${b.file} ${b.start}-${b.end}`);
+    b.lines.forEach((l, i) => console.log(String(b.start + i).padStart(5) + '  ' + l));
+    process.exit(0);
+  }
+  if (outdir === '--ranges') { // أرقام أسطر كل كتلة في لقطة الخطوة (للكتابة عنها في الفصول)
+    for (const [p, f] of snapshot(name, parseFloat(step))) {
+      console.log(`${p} (${f.lines.length})`);
+      for (const [b, [s, e]] of f.ranges) console.log(`  ${b}: ${s}-${e}`);
+    }
+    process.exit(0);
+  }
   if (!name || step == null || !outdir) {
     console.error('الاستعمال: node tools/stages.mjs <name> <step> <outdir>');
     process.exit(1);

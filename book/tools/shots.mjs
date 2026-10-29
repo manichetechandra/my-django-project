@@ -3,6 +3,9 @@
 //  المتطلبات: خادم الموقع يعمل (php -S 0.0.0.0:8000 index.php داخل php/)
 //             وقاعدة بيانات فيها بيانات tools/shots-seed.php
 //  الاستعمال: node tools/shots.mjs [--base=http://127.0.0.1:8000] [--only=24-list,24-detail]
+//             node tools/shots.mjs --set=stages [--only=04-navbar]   لقطات الملفات المؤقتة (stages/*.src):
+//             كل لقطة تُبنى في .build/stage-site ويُشغَّل لها خادم PHP مؤقت على المنفذ 8100
+//             (قاعدة البيانات dou_stage للمراحل التي تستعمل PDO — أنشئها بـ tools/stage-db.php)
 //  مكتبات CDN (Bootstrap, jQuery, Font Awesome, Chart.js) تُقدَّم من حزم npm محلية،
 //  لأن بيئة البناء قد لا تصل إلى CDN. والباركود يُرسم محلياً بمكتبة bwip-js.
 // =====================================================================
@@ -11,12 +14,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { spawn } from 'node:child_process';
+import net from 'node:net';
 import puppeteer from 'puppeteer-core';
+import { writeSnapshot } from './stages.mjs';
 
 const BOOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BT = process.env.BOOK_TOOLS || '/tmp/booktools';
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')));
-const BASE = (args.base || 'http://127.0.0.1:8000').replace(/\/$/, '');
+const SET = args.set || 'site';
+const BASE = SET === 'stages' ? 'http://127.0.0.1:8100' : (args.base || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const ONLY = args.only ? new Set(args.only.split(',')) : null;
 const CDN = path.join(BOOK, '.build', 'cdn');
 const IMAGES = path.join(BOOK, 'images');
@@ -60,7 +67,31 @@ function barcode(url) {
 const W = Number(args.width || 1920);
 const STUDENT = ['1234566', 'Talib2026x'];
 const STAFF = ['miloudsellam', 'AdminDemo2026'];
-const shots = [
+// ------------------------------------------------------------------ لقطات المراحل (الملفات المؤقتة)
+const stageShots = [
+  { name: '02-first', stage: ['home', 2.5], url: '/', w: 1100, h: 330 },
+  { name: '03-bootstrap', stage: ['home', 3], url: '/', w: 1200, h: 330 },
+  { name: '04-navbar', stage: ['home', 4], url: '/', h: 120 },
+  {
+    name: '04-dropdown', stage: ['home', 4], url: '/', h: 300,
+    act: async (page) => { await page.click('#myNavbar .dropdown-toggle'); },
+  },
+  {
+    name: '04-mobile', stage: ['home', 4], url: '/', w: 420, h: 640,
+    act: async (page) => { await page.click('.navbar-toggle'); await new Promise((r) => setTimeout(r, 600)); },
+  },
+  { name: '05-slider', stage: ['home', 5], url: '/', h: 600 },
+  { name: '06-news', stage: ['home', 6], url: '/', h: 640, scrollTo: '#list-news', scrollPad: 75 },
+  { name: '07-activities', stage: ['home', 7], url: '/', h: 720, scrollTo: 'h3:has(.fa-calendar-check-o)', scrollPad: 100 },
+  { name: '07-stats', stage: ['home', 7], url: '/', h: 560, scrollTo: '.statistics-section', scrollPad: 60, wait: 2600 },
+  { name: '08-departments', stage: ['home', 8], url: '/', h: 760, scrollTo: '.outer', scrollPad: 100 },
+  { name: '08-cites', stage: ['home', 8], url: '/', h: 470, scrollTo: '#cite', scrollPad: 95 },
+  { name: '09-footer', stage: ['home', 9], url: '/', h: 420, scrollTo: 'footer', scrollPad: 60 },
+  { name: '09-full', stage: ['home', 9], url: '/', w: 1920, full: true, scaleTo: 0.3, wait: 2600 },
+  { name: '15-db', stage: ['home', 15], url: '/', h: 640, scrollTo: '#list-news', scrollPad: 75, files: ['config.php'] },
+];
+
+const shots = SET === 'stages' ? stageShots : [
   { name: '14-404', url: '/no-such-page/', h: 620 },
   { name: '15-home', url: '/', h: 900 },
   { name: '16-director', url: '/director-word/', h: 900 },
@@ -170,10 +201,43 @@ async function newPage(ctx, h = 800, w = W, scale = 1) {
   return page;
 }
 
+// ------------------------------------------------------------------ خادم مؤقت للمراحل
+const PHP = process.env.PHP_BIN || '/tmp/tools/bin/php';
+const SRC = path.resolve(BOOK, '..', 'php');
+let server = null;
+let serverKey = '';
+const portOpen = (port) => new Promise((res) => {
+  const sock = net.connect(port, '127.0.0.1', () => { sock.destroy(); res(true); });
+  sock.on('error', () => res(false));
+});
+async function stopServer() {
+  if (!server) return;
+  server.kill('SIGTERM');
+  for (let i = 0; i < 50 && (await portOpen(8100)); i++) await new Promise((r) => setTimeout(r, 100));
+  server = null;
+}
+async function prepareStage(s) {
+  const key = `${s.stage.join('@')}|${(s.files || []).join(',')}`;
+  if (key === serverKey && server) return;
+  await stopServer();
+  const dir = path.join(BOOK, '.build', 'stage-site');
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+  writeSnapshot(s.stage[0], s.stage[1], dir);
+  fs.cpSync(path.join(SRC, 'assets'), path.join(dir, 'assets'), { recursive: true });
+  fs.cpSync(path.join(BOOK, 'demo', 'uploads'), path.join(dir, 'uploads'), { recursive: true });
+  for (const f of s.files || []) fs.cpSync(path.join(SRC, f), path.join(dir, f), { recursive: true });
+  server = spawn(PHP, ['-S', '127.0.0.1:8100', '-t', dir], { env: { ...process.env, DB_NAME: 'dou_stage' }, stdio: ['ignore', 'ignore', 'pipe'] });
+  server.stderr.on('data', (d) => { const t = String(d); if (/error|warning|fatal/i.test(t) && !/Accepted|Closing|\[200\]|\[304\]/.test(t)) process.stderr.write('  php: ' + t); });
+  for (let i = 0; i < 50 && !(await portOpen(8100)); i++) await new Promise((r) => setTimeout(r, 100));
+  serverKey = key;
+}
+
 let ctx = null;
 let session = '';
 for (const s of shots) {
   if (ONLY && !ONLY.has(s.name)) continue;
+  if (s.stage) await prepareStage(s);
   const want = s.login ? s.login[0] : 'guest';
   if (!ctx || want !== session) {
     if (ctx) await ctx.close();
@@ -196,10 +260,10 @@ for (const s of shots) {
   await page.addStyleTag({ content: `${s.name === '19-contact' ? '' : '.flash-messages{display:none!important}'} *{transition:none!important;animation:none!important}` });
   await page.evaluate(() => document.fonts.ready);
   if (s.scrollTo) {
-    await page.evaluate((sel) => {
+    await page.evaluate((sel, pad) => {
       const el = document.querySelector(sel);
-      if (el) window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + window.scrollY - 115));
-    }, s.scrollTo);
+      if (el) window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + window.scrollY - pad));
+    }, s.scrollTo, s.scrollPad ?? 115);
   }
   await new Promise((r) => setTimeout(r, s.wait || 400));
   const file = path.join(IMAGES, `${s.name}.png`);
@@ -227,8 +291,12 @@ for (const s of shots) {
     }
   } else {
     await page.screenshot({ path: file, fullPage: !!s.full });
+    if (s.scaleTo) {
+      execFileSync('python3', ['-c', 'import sys; from PIL import Image; im = Image.open(sys.argv[1]); f = float(sys.argv[2]); im.convert("RGB").resize((int(im.width * f), int(im.height * f)), Image.LANCZOS).save(sys.argv[1], optimize=True)', file, String(s.scaleTo)], { env: { ...process.env, PYTHONPATH: path.join(BT, 'pylib') } });
+    }
   }
   console.log(`✓ ${s.name}  (${(fs.statSync(file).size / 1024).toFixed(0)} KB)`);
   await page.close();
 }
+await stopServer();
 await browser.close();
