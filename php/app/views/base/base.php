@@ -217,6 +217,15 @@
         }
     </style>
     
+    <!-- إزاحة الأعمدة (col-md-offset-*) من اليمين، لأن bootstrap-rtl لا يُحمَّل -->
+    <style>
+        @media (min-width: 992px) {
+            .col-md-offset-1 { margin-left: 0; margin-right: 8.33333333%; }
+            .col-md-offset-2 { margin-left: 0; margin-right: 16.66666667%; }
+            .col-md-offset-3 { margin-left: 0; margin-right: 25%; }
+        }
+    </style>
+    
     <?php block('extra_css'); ?><?php endblock(); ?>
 </head>
 <body>

@@ -219,7 +219,8 @@ async function newPage(ctx, h = 800, w = W, scale = 1) {
       if (f && fs.existsSync(f)) {
         return req.respond({ status: 200, contentType: MIME[path.extname(f)] || 'application/octet-stream', headers: { 'Access-Control-Allow-Origin': '*' }, body: fs.readFileSync(f) });
       }
-      if (u.startsWith('https://bwipjs-api.metafloor.com/')) return req.respond({ status: 200, contentType: 'image/png', body: barcode(u) });
+      // toBuffer() في bwip-js تُرجع Promise: ننتظرها قبل الرد
+      if (u.startsWith('https://bwipjs-api.metafloor.com/')) return barcode(u).then((body) => req.respond({ status: 200, contentType: 'image/png', body }), () => req.abort());
     } catch (e) {
       console.warn('تعذر تقديم', u, e.message);
     }
