@@ -3,6 +3,8 @@
 @@end
 @@block s-users-home 14 from=database/schema.sql:44-88
 @@end
+@@block s-director 25 from=database/schema.sql:89-102
+@@end
 @@block s-news 14 from=database/schema.sql:126-150
 @@end
 @@block s-activities 14 from=database/schema.sql:174-199
@@ -10,6 +12,10 @@
 @@block s-cites 14 from=database/schema.sql:212-232
 @@end
 @@block s-departements 14 from=database/schema.sql:245-266
+@@end
+@@block s-services 25 from=database/schema.sql:267-291
+@@end
+@@block s-downloads-faq 25 from=database/schema.sql:312-360
 @@end
 @@block s-notifications 24 from=database/schema.sql:361-381
 @@end
