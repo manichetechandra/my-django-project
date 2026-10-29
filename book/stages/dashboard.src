@@ -1,0 +1,214 @@
+@@file app/views/students/dashboard.php 32.1
+@@block head 32.1 from=app/views/students/dashboard.php:1-218
+@@end
+@@block content-static 32.1
+<?php block('content'); ?>
+
+<!-- Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <h1 style="margin: 0; font-size: 36px;">
+            <i class="fa fa-dashboard"></i> لوحة التحكم
+        </h1>
+    </div>
+</div>
+
+<div class="container">
+    
+    <!-- رسالة الترحيب -->
+    <div class="welcome-box">
+        <div class="student-info">
+            <div class="student-avatar">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="student-details">
+                <h3>مرحباً، أحمد بن علي!</h3>
+                <p>
+                    <i class="fa fa-id-card"></i> رقم التسجيل: 20249999 |
+                    <i class="fa fa-graduation-cap"></i> السنة الأولى |
+                    <i class="fa fa-university"></i> العلوم
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- إحصائيات الطلبات -->
+    <h3 style="color: #2c3e50; margin-bottom: 20px;">
+        <i class="fa fa-bar-chart"></i> إحصائيات الطلبات
+    </h3>
+    
+    <div class="row">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card pending">
+                <i class="fa fa-clock-o"></i>
+                <h2>1</h2>
+                <p>قيد الانتظار</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card under-review">
+                <i class="fa fa-search"></i>
+                <h2>0</h2>
+                <p>قيد المراجعة</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card approved">
+                <i class="fa fa-check-circle"></i>
+                <h2>1</h2>
+                <p>معتمدة</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card rejected">
+                <i class="fa fa-times-circle"></i>
+                <h2>0</h2>
+                <p>مرفوضة</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- قائمة الخيارات السريعة -->
+<h3 style="color: #2c3e50; margin: 40px 0 20px 0;">
+    <i class="fa fa-th-large"></i> الخيارات السريعة
+</h3>
+
+<div class="action-grid">
+    <a href="#" class="action-card" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;">
+        <i class="fa fa-plus-circle"></i>
+        <h4>تقديم طلب جديد</h4>
+    </a>
+    
+    <a href="#" class="action-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">
+        <i class="fa fa-list"></i>
+        <h4>طلباتي</h4>
+    </a>
+    
+    <a href="#" class="action-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
+        <i class="fa fa-user"></i>
+        <h4>معلوماتي الشخصية</h4>
+    </a>
+    
+     <!-- ← جديد! البطاقة الرقمية -->
+    <a href="#" target="_blank"class="action-card" style="background: linear-gradient(135deg, #f39c, #e67e22); color: white;">
+        <i class="fa fa-id-card"></i><h4> بطاقتي الرقمية</h4>
+    </a>
+    <a href="#" class="action-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white;">
+        <i class="fa fa-bell"></i>
+        <h4>الإشعارات</h4>
+    </a>
+</div>
+    
+    <div class="row" style="margin-top: 40px;">
+        
+       <!-- آخر الطلبات -->
+<div class="col-md-7">
+    <h3 style="color: #2c3e50; margin-bottom: 20px;">
+        <i class="fa fa-history"></i> آخر الطلبات
+    </h3>
+    
+    <div class="application-list">
+            <div class="application-item">
+                <div class="application-info">
+                    <h5>
+                        <i class="fa fa-file-text"></i>
+                        طلب المنحة الجامعية
+                    </h5>
+                    <p>
+                        <i class="fa fa-hashtag"></i> 202600002 |
+                        <i class="fa fa-calendar"></i> 28/10/2026
+                    </p>
+                </div>
+                <div>
+                    <span class="application-status status-pending">
+                        <i class="fa fa-clock-o"></i>
+                        قيد الانتظار
+                    </span>
+                </div>
+            </div>
+            <div class="application-item">
+                <div class="application-info">
+                    <h5>
+                        <i class="fa fa-home"></i>
+                        طلب السكن الجامعي
+                    </h5>
+                    <p>
+                        <i class="fa fa-hashtag"></i> 202600001 |
+                        <i class="fa fa-calendar"></i> 20/10/2026
+                    </p>
+                </div>
+                <div>
+                    <span class="application-status status-approved">
+                        <i class="fa fa-check-circle"></i>
+                        معتمد
+                    </span>
+                </div>
+            </div>
+    </div>
+</div>
+        
+        <!-- الإشعارات -->
+        <div class="col-md-5">
+            <h3 style="color: #2c3e50; margin-bottom: 20px;">
+                <i class="fa fa-bell"></i> الإشعارات
+                <span class="badge" style="background: #e74c3c; font-size: 14px;">
+                    1
+                </span>
+            </h3>
+            
+            <div class="notification-list">
+                    <div class="notification-item unread">
+                        <h5>
+                            <i class="fa fa-info-circle"></i> تم اعتماد طلبك ✅
+                        </h5>
+                        <p>تهانينا! تم اعتماد طلبك رقم 202600001.</p>
+                        <small style="color: #95a5a6;">
+                            <i class="fa fa-clock-o"></i> 25/10/2026 10:30
+                        </small>
+                    </div>
+            </div>
+        </div>
+        
+    </div>
+    
+   <!-- أنواع الطلبات المتاحة -->
+<h3 style="color: #2c3e50; margin: 40px 0 20px 0;">
+    <i class="fa fa-file-text"></i> الطلبات المتاحة
+</h3>
+
+<div class="row">
+    <div class="col-md-4 col-sm-6">
+        <div class="action-card" style="border-top: 4px solid #3498db;">
+            <i class="fa fa-file-text" style="color: #3498db;"></i>
+            <h4>طلب المنحة الجامعية</h4>
+            <p style="color: #7f8c8d; margin: 10px 0;">طلب الحصول على المنحة الدراسية</p>
+            <a href="#" class="btn btn-sm" style="background: #3498db; color: white; border: none;">
+                <i class="fa fa-plus"></i> تقديم الطلب
+            </a>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="action-card" style="border-top: 4px solid #8cc040;">
+            <i class="fa fa-home" style="color: #8cc040;"></i>
+            <h4>طلب السكن الجامعي</h4>
+            <p style="color: #7f8c8d; margin: 10px 0;">طلب الاستفادة من سكن جامعي</p>
+            <a href="#" class="btn btn-sm" style="background: #8cc040; color: white; border: none;">
+                <i class="fa fa-plus"></i> تقديم الطلب
+            </a>
+        </div>
+    </div>
+</div>
+    
+</div>
+
+<br><br>
+
+<?php endblock(); ?>
+@@end
+@@block content-final 32.2 replaces=content-static from=app/views/students/dashboard.php:219-420
+@@end
+@@block tail 32.1 from=app/views/students/dashboard.php:421-440
+@@end

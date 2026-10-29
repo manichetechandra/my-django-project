@@ -92,6 +92,7 @@ const stageShots = [
   { name: '26-director-static', overlay: ['director', 26.1], url: '/director-word/', h: 760 },
   { name: '27-newslist-static', overlay: ['newslist', 27.1], url: '/news/', h: 900 },
   { name: '29-contact-static', overlay: ['contact', 29.1], url: '/contact/', h: 1000, scrollTo: 'form', scrollPad: 200 },
+  { name: '32-dashboard-static', overlay: ['dashboard', 32.1], url: '/students/dashboard/', login: STUDENT, h: 1000 },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
@@ -119,8 +120,8 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '30-downloads', url: '/downloads/', h: 900 },
   { name: '30-search', url: '/search/?q=' + encodeURIComponent('المنحة الجامعية'), h: 900 },
   { name: '31-login', url: '/students/login/', h: 860 },
-  { name: '22-dashboard', url: '/students/dashboard/', login: STUDENT, h: 1000 },
-  { name: '22-create', url: '/students/applications/create/1/', login: STUDENT, h: 1100 },
+  { name: '32-dashboard', url: '/students/dashboard/', login: STUDENT, h: 950, scrollTo: '.application-list', scrollPad: 190 },
+  { name: '32-create', url: '/students/applications/create/1/', login: STUDENT, h: 1100 },
   { name: '23-card', url: '/students/student-card/', login: STUDENT, w: 900, h: 470, scale: 2 },
   {
     name: '24-dashboard', url: '/students/admin/dashboard/', login: STAFF, untilFooter: true, wait: 1800,
