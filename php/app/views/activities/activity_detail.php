@@ -2,7 +2,7 @@
 <?php block('title'); ?><?= e($activity['title']) ?> <?= t('- مديرية الخدمات الجامعية') ?><?php endblock(); ?>
 
 <?php block('content'); ?>
-<div class="container" style="margin-top: 80px;">
+<div class="container" style="margin-top: 30px;">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
         <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>

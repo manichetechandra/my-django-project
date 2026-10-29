@@ -238,12 +238,14 @@
 </nav>
 
 <style>
-    .navbar-right {
-        float: right !important; float: inline-start !important;
-    }
-    
-    .navbar-nav > li {
-        float: right; float: inline-start;
+    @media (min-width: 768px) {
+        .navbar-right {
+            float: right !important; float: inline-start !important;
+        }
+
+        .navbar-nav > li {
+            float: right; float: inline-start;
+        }
     }
     
     .dropdown-menu {

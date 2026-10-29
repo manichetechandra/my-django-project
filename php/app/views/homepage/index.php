@@ -124,9 +124,11 @@
         margin-inline-end: 5px;
     }
     
-    /* إصلاح الأعمدة RTL */
-    .activities-row .col-md-4 {
-        float: right !important; float: inline-start !important;
+    /* إصلاح الأعمدة RTL (على الشاشات المتوسطة فما فوق: في الهاتف كل بطاقة بعرض الشاشة) */
+    @media (min-width: 992px) {
+        .activities-row .col-md-4 {
+            float: right !important; float: inline-start !important;
+        }
     }
     
     /* بطاقات الأقسام */
@@ -137,6 +139,12 @@
     
     .outer {
         height: 100%;
+    }
+
+    /* أزرار «مواقع مهمة»: الأسماء الطويلة (بالفرنسية والإنجليزية) تنزل إلى سطر ثانٍ بدل أن تخرج من شاشة الهاتف */
+    .outer .panel-body .btn {
+        white-space: normal;
+        max-width: 100%;
     }
     
     /* السلايدر الثاني للإقامات */

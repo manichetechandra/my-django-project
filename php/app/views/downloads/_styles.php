@@ -4,7 +4,7 @@
         color: white;
         padding: 60px 0;
         margin-bottom: 40px;
-        margin-top: 70px;
+        margin-top: 0;
     }
     .stats-box {
         background: white;
@@ -77,6 +77,10 @@
     .file-info p { margin: 0 0 6px; color: #7f8c8d; font-size: 13px; }
     .file-meta { font-size: 12px; color: #95a5a6; }
     .file-meta span { margin-inline-end: 12px; white-space: nowrap; }
+    /* الهاتف: اسم التصنيف الطويل (بالفرنسية مثلاً) ينزل إلى سطر ثانٍ بدل أن يخرج من الشاشة */
+    @media (max-width: 767px) {
+        .file-meta span { display: inline-block; max-width: 100%; white-space: normal; }
+    }
     .btn-download { background: #8cc040; color: white; border: none; white-space: nowrap; }
     .btn-download:hover, .btn-download:focus { background: #7ab030; color: white; }
     .sidebar-box {

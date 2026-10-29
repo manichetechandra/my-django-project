@@ -8,7 +8,7 @@
         color: white;
         padding: 50px 0;
         margin-bottom: 40px;
-        margin-top: 70px;
+        margin-top: 0;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
     

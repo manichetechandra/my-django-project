@@ -8,7 +8,7 @@
         color: white;
         padding: 60px 0;
         margin-bottom: 40px;
-        margin-top: 70px;
+        margin-top: 0;
     }
     
     /* إحصائيات سريعة */
@@ -88,6 +88,14 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 15px;
+    }
+
+    /* الشاشات الضيقة جداً: شارة الحالة تنزل تحت عنوان الطلب بدل أن تُقص عند حافة البطاقة */
+    @media (max-width: 480px) {
+        .app-header {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
     }
     
     .app-title {

@@ -8,7 +8,7 @@
         color: white;
         padding: 40px 0;
         margin-bottom: 40px;
-        margin-top: 70px;
+        margin-top: 0;
     }
     
     .filter-tabs {
@@ -94,6 +94,27 @@
     .notification-actions {
         display: flex;
         gap: 5px;
+    }
+
+    /* الشاشات الضيقة جداً: الأزرار تنزل تحت النص بدل أن تدفعه خارج البطاقة، وشارة «جديد» لا تغطي العنوان */
+    @media (max-width: 480px) {
+        .notification-item.unread .notification-title {
+            padding-inline-end: 60px;
+        }
+
+        .notification-row {
+            flex-wrap: wrap;
+        }
+
+        .notification-content {
+            min-width: 0;
+        }
+
+        .notification-actions {
+            width: 100%;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
     }
     
     .unread-badge {
@@ -194,7 +215,7 @@
             <span class="unread-badge"><?= t('جديد') ?></span>
             <?php endif; ?>
             
-            <div style="display: flex; align-items: flex-start;">
+            <div class="notification-row" style="display: flex; align-items: flex-start;">
                 <div class="notification-icon" style="color: <?= e($notification->get_color()) ?>;">
                     <i class="fa <?= e($notification->get_icon()) ?>"></i>
                 </div>

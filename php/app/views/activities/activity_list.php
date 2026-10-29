@@ -2,7 +2,7 @@
 <?php block('title'); ?><?= t('النشاطات - مديرية الخدمات الجامعية') ?><?php endblock(); ?>
 
 <?php block('content'); ?>
-<div class="container" style="margin-top: 80px;">
+<div class="container" style="margin-top: 30px;">
     <!-- العنوان -->
     <div class="page-header">
         <h1 style="color: #2c3e50;">
@@ -19,7 +19,7 @@
                 <div class="col-md-6">
                     <form method="get" class="form-inline">
                         <div class="form-group">
-                            <input type="text" name="q" class="form-control" placeholder="<?= t('ابحث في النشاطات...') ?>" value="<?= e($search_query) ?>" style="width: 300px;">
+                            <input type="text" name="q" class="form-control" placeholder="<?= t('ابحث في النشاطات...') ?>" value="<?= e($search_query) ?>" style="width: 300px; max-width: 100%;">
                         </div>
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-search"></i> <?= t('بحث') ?>

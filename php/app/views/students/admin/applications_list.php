@@ -10,7 +10,7 @@
         color: white;
         padding: 40px 0;
         margin-bottom: 40px;
-        margin-top: 70px;
+        margin-top: 0;
     }
     
     .filter-box {
@@ -226,7 +226,7 @@
                        class="form-control" 
                        placeholder="<?= t('رقم الطلب أو اسم الطالب') ?>"
                        value="<?= e($search_query) ?>"
-                       style="width: 250px;">
+                       style="width: 250px; max-width: 100%;">
             </div>
             
             <button type="submit" class="btn btn-primary">

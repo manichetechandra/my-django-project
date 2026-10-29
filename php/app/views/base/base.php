@@ -45,8 +45,20 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-top: 70px;
             text-align: start;
+        }
+
+        /* شريط التنقل ثابت أعلى الشاشة عند التمرير، لكنه يأخذ مكانه الحقيقي في الصفحة (sticky بدل fixed):
+           ارتفاعه يتغير (100 إلى 200 بكسل حسب عرض الشاشة واللغة)، والهامش الثابت القديم (70px) كان يترك
+           أول الصفحة — عنوان الخبر مثلاً — مختفياً تحته. لذلك صار margin-top لرؤوس الصفحات الملونة 0 بدل 70px
+           (كان يعوّض الشريط الثابت)، و30px بدل 80px لصفحات النشاطات والإقامات والمصالح */
+        .navbar-fixed-top {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            left: auto;
+            right: auto;
+            margin-bottom: 0;
         }
         
         /* Navbar RTL */
@@ -61,12 +73,36 @@
             float: right; float: inline-start;
         }
         
-        .navbar-inverse .navbar-nav {
-            float: right; float: inline-start;
+        @media (min-width: 768px) {
+            .navbar-inverse .navbar-nav {
+                float: right; float: inline-start;
+            }
+
+            .navbar-inverse .navbar-nav > li {
+                float: right; float: inline-start;
+            }
         }
-        
-        .navbar-inverse .navbar-nav > li {
-            float: right; float: inline-start;
+
+        /* الهاتف: اسم الموقع الطويل (بالفرنسية مثلاً) ينزل إلى سطر ثانٍ بدل أن يتداخل مع القائمة */
+        @media (max-width: 767px) {
+            .navbar-inverse .navbar-brand {
+                height: auto;
+                max-width: calc(100% - 60px);
+                line-height: 20px;
+            }
+        }
+
+        /* الشاشات الصغيرة جداً: نص الزر الطويل ينزل إلى سطر ثانٍ بدل أن يخرج من الشاشة (الزر القصير لا يتغير)،
+           والكلمة الأطول من عرض الشاشة في العناوين («téléchargement» بخط كبير مثلاً) تنقسم بدل أن تخرج منها */
+        @media (max-width: 480px) {
+            .btn {
+                white-space: normal;
+                max-width: 100%;
+            }
+
+            h1, h2, h3 {
+                overflow-wrap: break-word;
+            }
         }
         
         .navbar-inverse .navbar-nav > li > a {
@@ -115,19 +151,40 @@
         .row {
         }
         
-        .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1,
-        .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2,
-        .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3,
-        .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4,
-        .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5,
-        .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6,
-        .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7,
-        .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8,
-        .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9,
-        .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10,
-        .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11,
-        .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+        /* كل مقاس يطفو في العرض الذي يعمل فيه فقط، كما في Bootstrap: تطبيق الطفو على كل الشاشات
+           كان يجعل أعمدة col-sm/md/lg في الهاتف تنكمش على محتواها بدل أن تأخذ عرض الشاشة */
+        .col-xs-1, .col-xs-2, .col-xs-3,
+        .col-xs-4, .col-xs-5, .col-xs-6,
+        .col-xs-7, .col-xs-8, .col-xs-9,
+        .col-xs-10, .col-xs-11, .col-xs-12 {
             float: right !important; float: inline-start !important;
+        }
+
+        @media (min-width: 768px) {
+            .col-sm-1, .col-sm-2, .col-sm-3,
+            .col-sm-4, .col-sm-5, .col-sm-6,
+            .col-sm-7, .col-sm-8, .col-sm-9,
+            .col-sm-10, .col-sm-11, .col-sm-12 {
+                float: right !important; float: inline-start !important;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .col-md-1, .col-md-2, .col-md-3,
+            .col-md-4, .col-md-5, .col-md-6,
+            .col-md-7, .col-md-8, .col-md-9,
+            .col-md-10, .col-md-11, .col-md-12 {
+                float: right !important; float: inline-start !important;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .col-lg-1, .col-lg-2, .col-lg-3,
+            .col-lg-4, .col-lg-5, .col-lg-6,
+            .col-lg-7, .col-lg-8, .col-lg-9,
+            .col-lg-10, .col-lg-11, .col-lg-12 {
+                float: right !important; float: inline-start !important;
+            }
         }
         
         /* Panels RTL */
@@ -169,6 +226,14 @@
         .breadcrumb > li {
             float: right; float: inline-start;
         }
+
+        /* عناصر المسار عائمة: نجعل الشريط الرمادي يحتويها (clearfix)، وإلا ظهر النص نصفه خارج الشريط،
+           وإذا نزل المسار إلى سطرين (في الهاتف) دخلت العناصر في ما تحته فضيّقته */
+        .breadcrumb:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
         
         .breadcrumb > li + li:before {
             content: "/ ";
@@ -184,6 +249,17 @@
         ul, ol {
             padding-inline-start: 0;
             padding-inline-end: 40px;
+        }
+
+        /* القوائم التي يصفّر Bootstrap حشوها الأيسر فقط: في العربية يقع ذلك على جهة النهاية فتصير 0 من الجهتين،
+           فنفعل مثله في الفرنسية والإنجليزية (وإلا بقي حشو 40px على اليمين، كما في قائمة الهاتف) */
+        html[dir="ltr"] .nav,
+        html[dir="ltr"] .list-unstyled,
+        html[dir="ltr"] .list-inline,
+        html[dir="ltr"] .list-group,
+        html[dir="ltr"] .media-list,
+        html[dir="ltr"] .pagination {
+            padding-right: 0;
         }
         
         /* Alerts RTL */

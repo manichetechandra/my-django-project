@@ -8,7 +8,7 @@
         color: white;
         padding: 40px 0;
         margin-bottom: 40px;
-        margin-top: 70px;
+        margin-top: 0;
     }
     
     .form-card {

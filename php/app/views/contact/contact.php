@@ -9,7 +9,7 @@
         color: white;
         padding: 60px 0;
         margin-bottom: 40px;
-        margin-top: 70px;
+        margin-top: 0;
     }
     
     .contact-form-container {
