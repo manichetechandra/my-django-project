@@ -138,7 +138,7 @@
 
 ## الإحصائيات
 
-@file app/views/homepage/index.php 432-511
+@file app/views/homepage/index.php 432-510
 
 القسم الذي كتبناه في الفصل 7، والأرقام في `data-count` من `$site_stats` كما في الفصل 11، لكن مهرّبة بـ `e()`، وكلها صارت حقيقية.
 
@@ -163,6 +163,10 @@
 @moved app/views/homepage/index.php 763-792 | سكربت الصفحة من الفصل 5 (`$(document).ready` ...).
 
 ولأنه داخل `extra_js`، يضعه القالب الرئيسي بعد jQuery وBootstrap JS (السطر 275 من `base.php`)، أي في مكانه القديم.
+
+وآخر سطر في الملف يغلق كتلة `extra_js`:
+
+@file app/views/homepage/index.php 793-793
 
 ## الشريحة الافتراضية
 

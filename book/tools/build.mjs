@@ -457,6 +457,13 @@ function coverageReport() {
   }
   const report = `ملفات مكتملة: ${full}/${files.length}\n${lines.join('\n')}\n`;
   fs.writeFileSync(path.join(OUT, 'coverage.txt'), report);
+  // لكل ملف: الفصول التي عرضت أسطره النهائية (لجدول الملحق أ)
+  const byFile = {};
+  for (const f of files) {
+    const n = fs.readFileSync(path.join(SRC, f), 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n').length;
+    byFile[f] = { lines: n, chapters: [...new Set((coverage.get(f) || []).map(([, , chap]) => chap))] };
+  }
+  fs.writeFileSync(path.join(OUT, 'files-chapters.json'), JSON.stringify(byFile, null, 1));
   return { full, total: files.length, report };
 }
 
