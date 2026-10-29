@@ -93,6 +93,7 @@ const stageShots = [
   { name: '27-newslist-static', overlay: ['newslist', 27.1], url: '/news/', h: 900 },
   { name: '29-contact-static', overlay: ['contact', 29.1], url: '/contact/', h: 1000, scrollTo: 'form', scrollPad: 200 },
   { name: '32-dashboard-static', overlay: ['dashboard', 32.1], url: '/students/dashboard/', login: STUDENT, h: 1000 },
+  { name: '34-dashboard-static', overlay: ['staffdash', 34.1], url: '/students/admin/dashboard/', login: STAFF, h: 1000 },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
@@ -124,18 +125,18 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '32-create', url: '/students/applications/create/1/', login: STUDENT, h: 1100 },
   { name: '33-card', url: '/students/student-card/', login: STUDENT, w: 900, h: 470, scale: 2 },
   {
-    name: '24-dashboard', url: '/students/admin/dashboard/', login: STAFF, untilFooter: true, wait: 1800,
+    name: '34-dashboard', url: '/students/admin/dashboard/', login: STAFF, untilFooter: true, wait: 1800,
     // صورتان من الصفحة الطويلة: الجزء العلوي (حتى جدول آخر الطلبات) والرسوم البيانية
-    regions: [['24-dashboard', null, '.recent-table'], ['24-charts', 'h2:has(.fa-bar-chart)', 'bottom:#daysChart']],
+    regions: [['34-dashboard', null, '.recent-table'], ['34-charts', 'h2:has(.fa-bar-chart)', 'bottom:#daysChart']],
   },
   {
-    name: '24-list', url: '/students/admin/applications/', login: STAFF, h: 1000, scrollTo: 'ol.breadcrumb',
+    name: '34-list', url: '/students/admin/applications/', login: STAFF, h: 1000, scrollTo: 'ol.breadcrumb',
     act: async (page) => {
       const boxes = await page.$$('.app-checkbox');
       for (const i of [1, 2]) await boxes[i].click();
     },
   },
-  { name: '24-detail', url: '/students/admin/applications/{id:202600009}/', login: STAFF, h: 1250 },
+  { name: '34-detail', url: '/students/admin/applications/{id:202600009}/', login: STAFF, h: 1250 },
   { name: '25-index', url: '/admin/', login: STAFF, h: 900 },
   { name: '25-list', url: '/admin/news/', login: STAFF, h: 760 },
   { name: '25-edit', url: '/admin/sliders/1/', login: STAFF, h: 940 },

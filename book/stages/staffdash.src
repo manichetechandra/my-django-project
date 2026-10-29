@@ -1,0 +1,220 @@
+@@file app/views/students/admin/dashboard.php 34.1
+@@block head 34.1 from=app/views/students/admin/dashboard.php:1-132
+@@end
+@@block content-static 34.1
+<?php block('content'); ?>
+
+<!-- ========================================
+     رأس الصفحة - Header
+     ======================================== -->
+<div class="admin-header">
+    <div class="container">
+        <h1 style="margin: 0; font-size: 36px;">
+            <i class="fa fa-dashboard"></i> لوحة تحكم المشرف
+        </h1>
+        <p style="margin-top: 10px; opacity: 0.9;">
+            مرحباً هشام
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    
+    <!-- ========================================
+         أزرار سريعة - Quick Actions
+         ======================================== -->
+    <div class="quick-actions">
+        <a href="#" class="quick-action-btn" style="background: #3498db;">
+            <i class="fa fa-list" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
+            عرض كل الطلبات
+        </a>
+        
+        <a href="#" class="quick-action-btn" style="background: #f39c12;">
+            <i class="fa fa-clock-o" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
+            الطلبات المعلقة
+        </a>
+        
+        <a href="#" class="quick-action-btn" style="background: #9b59b6;">
+            <i class="fa fa-cog" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
+            إعدادات النظام
+        </a>
+    </div>
+    
+    <!-- ========================================
+         بطاقات الإحصائيات
+         
+         الشرح:
+         - نستخدم Grid لترتيب البطاقات
+         - كل بطاقة تعرض رقم وأيقونة
+         - الألوان مختلفة لكل نوع
+         ======================================== -->
+    <div class="stats-grid">
+        <!-- إجمالي الطلبات -->
+        <div class="stat-card total">
+            <div class="icon">
+                <i class="fa fa-files-o"></i>
+            </div>
+            <div class="number">11</div>
+            <div class="label">إجمالي الطلبات</div>
+        </div>
+        
+        <!-- قيد الانتظار -->
+        <div class="stat-card pending">
+            <div class="icon">
+                <i class="fa fa-clock-o"></i>
+            </div>
+            <div class="number">4</div>
+            <div class="label">قيد الانتظار</div>
+        </div>
+        
+        <!-- قيد المراجعة -->
+        <div class="stat-card review">
+            <div class="icon">
+                <i class="fa fa-search"></i>
+            </div>
+            <div class="number">2</div>
+            <div class="label">قيد المراجعة</div>
+        </div>
+        
+        <!-- معتمدة -->
+        <div class="stat-card approved">
+            <div class="icon">
+                <i class="fa fa-check-circle"></i>
+            </div>
+            <div class="number">3</div>
+            <div class="label">معتمدة</div>
+        </div>
+        
+        <!-- مرفوضة -->
+        <div class="stat-card rejected">
+            <div class="icon">
+                <i class="fa fa-times-circle"></i>
+            </div>
+            <div class="number">1</div>
+            <div class="label">مرفوضة</div>
+        </div>
+    </div>
+    
+    <!-- ========================================
+         إحصائيات زمنية (اليوم/الأسبوع/الشهر)
+         ======================================== -->
+    <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-4">
+            <div class="stat-card" style="border-right-color: #1abc9c;">
+                <div class="label">طلبات اليوم</div>
+                <div class="number" style="font-size: 32px;">1</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="border-right-color: #e67e22;">
+                <div class="label">طلبات الأسبوع</div>
+                <div class="number" style="font-size: 32px;">5</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="border-right-color: #8e44ad;">
+                <div class="label">طلبات الشهر</div>
+                <div class="number" style="font-size: 32px;">11</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ========================================
+         آخر الطلبات المقدمة
+         
+         الشرح:
+         - جدول يعرض آخر 10 طلبات
+         - يستخدم Bootstrap table classes
+         - كل صف clickable (قابل للنقر)
+         ======================================== -->
+    <div class="recent-table">
+        <h3><i class="fa fa-history"></i> آخر الطلبات المقدمة</h3>
+        
+        <table class="table table-hover" style="margin: 0;">
+            <thead style="background: #ecf0f1;">
+                <tr>
+                    <th>رقم الطلب</th>
+                    <th>الطالب</th>
+                    <th>نوع الطلب</th>
+                    <th>الحالة</th>
+                    <th>التاريخ</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>202600011</strong></td>
+                    <td>سارة بلقاسمي</td>
+                    <td>
+                        <i class="fa fa-home" style="color: #8cc040;"></i>
+                        طلب السكن الجامعي
+                    </td>
+                    <td>
+                        <span class="status-badge status-pending">
+                            قيد الانتظار
+                        </span>
+                    </td>
+                    <td>29/10/2026 09:40</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-primary">
+                            <i class="fa fa-eye"></i> عرض
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>202600010</strong></td>
+                    <td>يوسف حمادي</td>
+                    <td>
+                        <i class="fa fa-file-text" style="color: #3498db;"></i>
+                        طلب المنحة الجامعية
+                    </td>
+                    <td>
+                        <span class="status-badge status-under_review">
+                            قيد المراجعة
+                        </span>
+                    </td>
+                    <td>28/10/2026 14:15</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-primary">
+                            <i class="fa fa-eye"></i> عرض
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>202600009</strong></td>
+                    <td>أمينة سعدي</td>
+                    <td>
+                        <i class="fa fa-file-text" style="color: #3498db;"></i>
+                        طلب المنحة الجامعية
+                    </td>
+                    <td>
+                        <span class="status-badge status-approved">
+                            معتمد
+                        </span>
+                    </td>
+                    <td>27/10/2026 11:05</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-primary">
+                            <i class="fa fa-eye"></i> عرض
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- زر عرض الكل -->
+        <div style="padding: 15px; background: #f8f9fa; text-align: center;">
+            <a href="#" class="btn btn-default">
+                <i class="fa fa-list"></i> عرض كل الطلبات
+            </a>
+        </div>
+    </div>
+    
+
+@@end
+@@block content-final 34.2 replaces=content-static from=app/views/students/admin/dashboard.php:133-316
+@@end
+@@block charts 34.1 from=app/views/students/admin/dashboard.php:317-374
+@@end
+@@block charts-js 34.2 from=app/views/students/admin/dashboard.php:375-550
+@@end

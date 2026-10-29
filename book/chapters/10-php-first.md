@@ -39,12 +39,24 @@ index.php
 display_errors = On
 error_reporting = E_ALL
 date.timezone = Africa/Algiers
+
+extension=fileinfo
+extension=mbstring
+extension=pdo_mysql
+extension=zip
+
+upload_max_filesize = 40M
+post_max_size = 40M
 ```
 
-`date.timezone` المنطقة الزمنية: الجزائر، حتى تكون الساعة والتاريخ صحيحين. بعد أي تعديل على `php.ini` **أوقف Apache وشغّله من جديد** (Stop ثم Start).
+- `date.timezone` المنطقة الزمنية: الجزائر، حتى تكون الساعة والتاريخ صحيحين.
+- أسطر `extension` تفعّل **امتدادات** PHP سنحتاجها في الكتاب: `pdo_mysql` للاتصال بقاعدة البيانات (الفصل 15)، و`mbstring` لمعالجة النصوص العربية، و`fileinfo` لفحص نوع الملفات المرفوعة (الفصل 30)، و`zip` لتصدير ملفات Excel (الفصل 34). في هذا الملف، السطر الذي يبدأ بفاصلة منقوطة `;` **معطّل**: إن وجدت `;extension=zip` فاحذف الفاصلة المنقوطة.
+- `upload_max_filesize` أقصى حجم لملف واحد يرفعه الزائر، و`post_max_size` أقصى حجم للطلب كله (كل الملفات والحقول معاً).
+
+بعد أي تعديل على `php.ini` **أوقف Apache وشغّله من جديد** (Stop ثم Start).
 
 ::: tip
-لمعرفة إصدار PHP وكل إعداداته، أنشئ ملفاً مؤقتاً `info.php` فيه سطر واحد `<?php phpinfo();` وافتح `http://localhost/dou-setif/info.php`. تأكّد أن **PHP Version** يبدأ بـ 8. ثم **احذف الملف**: لا يجب أن يبقى على موقع حقيقي لأنه يكشف معلومات عن الخادم.
+لمعرفة إصدار PHP وكل إعداداته، أنشئ ملفاً مؤقتاً `info.php` فيه سطر واحد `<?php phpinfo();` وافتح `http://localhost/dou-setif/info.php`. تأكّد أن **PHP Version** يبدأ بـ 8، وأن في الصفحة أقساماً باسم **pdo_mysql** و**mbstring** و**fileinfo** و**zip**. ثم **احذف الملف**: لا يجب أن يبقى على موقع حقيقي لأنه يكشف معلومات عن الخادم.
 :::
 
 ## أول سطور PHP
