@@ -2,7 +2,7 @@
 /**
  * بيانات تجريبية كاملة للقطات شاشة الكتاب (ليست جزءاً من الموقع).
  *   php demo-seed.php /tmp/site
- * 1) تعيد إنشاء قاعدة dou_setif من php/database/schema.sql
+ * 1) تعيد إنشاء قاعدة dou_setif من database/schema.sql في مجلد الموقع المعطى
  * 2) تنفّذ book/demo/demo-content.sql (محتوى الموقع العام: نفس بيانات الفصل 14 + بقية الجداول)
  * 3) تضيف الحسابات: المدير miloudsellam / AdminDemo2026، الموظف hicham41 / StaffDemo2026،
  *    والطلبة (كلمة المرور Talib2026x) مع طلبات بحالات مختلفة وإشعارات
@@ -12,13 +12,12 @@
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 $site = rtrim($argv[1] ?? '/tmp/site', '/');
 $book = realpath(__DIR__ . '/..');
-$php = realpath($book . '/../php');
 $m = new mysqli('127.0.0.1', 'root', '', '', 3306);
 $m->set_charset('utf8mb4');
 $m->query('DROP DATABASE IF EXISTS dou_setif');
 $m->query('CREATE DATABASE dou_setif CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
 $m->select_db('dou_setif');
-foreach (["$php/database/schema.sql", "$book/demo/demo-content.sql"] as $f) {
+foreach (["$site/database/schema.sql", "$book/demo/demo-content.sql"] as $f) {
     $m->multi_query(file_get_contents($f));
     do {
         if ($r = $m->store_result()) {

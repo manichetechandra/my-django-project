@@ -15,9 +15,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SRC } from './project.mjs';
 
 const BOOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SRC = path.resolve(BOOK, '..', 'php');
 const cache = new Map();
 
 function finalLines(file) {

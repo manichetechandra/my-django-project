@@ -5,11 +5,11 @@
  *   - كلمة مرور معروفة للمدير miloudsellam وللطالبين الموجودين
  *   - ستة طلبة تجريبيين وعشرة طلبات موزعة على آخر 7 أيام بحالات مختلفة
  *   - وثيقة PDF تجريبية في storage/private (المجلد مستثنى من Git)
- * الاستعمال (من مجلد php/):  php ../book/tools/shots-seed.php
+ * الاستعمال:  php tools/shots-seed.php [مجلد المشروع]   (الافتراضي: النسخة 1.0 المفكوكة في .build/project-v1)
  * يتطلب الامتداد mysqli. الاتصال: 127.0.0.1:3306 بالمستخدم root بلا كلمة مرور.
  */
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-$root = realpath(__DIR__ . '/../../php');
+$root = realpath($argv[1] ?? __DIR__ . '/../.build/project-v1/dou-setif');
 $m = new mysqli('127.0.0.1', 'root', '', '', 3306);
 $m->set_charset('utf8mb4');
 $m->query('DROP DATABASE IF EXISTS dou_setif');

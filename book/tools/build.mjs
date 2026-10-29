@@ -31,9 +31,9 @@ import mdContainer from 'markdown-it-container';
 import hljs from 'highlight.js';
 import puppeteer from 'puppeteer-core';
 import { stageBlock, stageFile } from './stages.mjs';
+import { SRC, projectFiles } from './project.mjs';
 
 const BOOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SRC = path.resolve(BOOK, '..', 'php');
 const BT = process.env.BOOK_TOOLS || '/tmp/booktools';
 const OUT = path.join(BOOK, '.build');
 const FINAL = path.join(BOOK, process.env.BOOK_OUT || 'dou-setif-book.pdf');
@@ -428,7 +428,7 @@ ${body}
 // ------------------------------------------------------------------ تقرير التغطية
 function coverageReport() {
   const EXCLUDE = [/^database\/data\.sql$/, /^README\.md$/, /\.gitkeep$/, /\.jpe?g$/i, /\.png$/i];
-  const files = execFileSync('git', ['ls-files'], { cwd: SRC, encoding: 'utf8' }).trim().split('\n')
+  const files = projectFiles()
     .filter((f) => !EXCLUDE.some((re) => re.test(f)));
   const lines = [];
   let full = 0;

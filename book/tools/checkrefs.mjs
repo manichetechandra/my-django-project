@@ -9,9 +9,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { stageBlock, stageFile } from './stages.mjs';
+import { SRC } from './project.mjs';
 
 const BOOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SRC = path.resolve(BOOK, '..', 'php');
 const only = process.argv.slice(2);
 const files = fs.readdirSync(path.join(BOOK, 'chapters')).filter((f) => f.endsWith('.md')).sort()
   .filter((f) => !only.length || only.some((p) => f.startsWith(p)));

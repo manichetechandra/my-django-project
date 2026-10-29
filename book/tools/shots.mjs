@@ -17,6 +17,7 @@ import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import net from 'node:net';
 import puppeteer from 'puppeteer-core';
+import { SRC } from './project.mjs';
 import { writeSnapshot } from './stages.mjs';
 
 const BOOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -233,7 +234,6 @@ async function newPage(ctx, h = 800, w = W, scale = 1) {
 
 // ------------------------------------------------------------------ خادم مؤقت للمراحل
 const PHP = process.env.PHP_BIN || '/tmp/tools/bin/php';
-const SRC = path.resolve(BOOK, '..', 'php');
 let server = null;
 let serverKey = '';
 const portOpen = (port) => new Promise((res) => {
