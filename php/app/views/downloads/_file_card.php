@@ -15,7 +15,7 @@
             <span><i class="fa fa-folder-o"></i> <?= e($file->get_category_display()) ?></span>
             <span><i class="fa fa-file-o"></i> <?= e(mb_strtoupper(slice_($file->get_file_extension(), '1:'))) ?: '—' ?></span>
             <span><i class="fa fa-hdd-o"></i> <?= e($file->get_file_size_display()) ?></span>
-            <span><i class="fa fa-download"></i> <?= e($file['downloads_count']) ?> <?= t('تحميل') ?></span>
+            <span><i class="fa fa-download"></i> <?= t('{count} تحميل', ['count' => $file['downloads_count']]) ?></span>
             <span><i class="fa fa-calendar"></i> <?= e(format_date($file['created_at'], 'd/m/Y')) ?></span>
         </div>
     </div>

@@ -406,7 +406,7 @@
                         <br>
                         <i class="fa fa-tag"></i> <?= e($activity->get_activity_type_display()) ?>
                         &nbsp;&nbsp;
-                        <i class="fa fa-users"></i> <?= e($activity['participants_count']) ?> <?= t('مشارك') ?>
+                        <i class="fa fa-users"></i> <?= t('{count} مشارك', ['count' => $activity['participants_count']]) ?>
                     </small>
                     <br><br>
                     <a class="btn btn-success" href="<?= e($activity->get_absolute_url()) ?>" style="margin: 0;">

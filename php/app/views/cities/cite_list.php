@@ -80,7 +80,7 @@
                     <p><?= e(truncatewords($cite['description'], 20)) ?></p>
                     
                     <?php if (!empty($cite['capacity'])): ?>
-                    <p><i class="fa fa-users"></i> <strong><?= t('السعة:') ?></strong> <?= e($cite['capacity']) ?> <?= t('طالب') ?></p>
+                    <p><i class="fa fa-users"></i> <strong><?= t('السعة:') ?></strong> <?= t('{count} طالب', ['count' => $cite['capacity']]) ?></p>
                     <?php endif; ?>
                 </div>
                 

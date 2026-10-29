@@ -43,7 +43,7 @@
                         </p>
                         <p style="margin: 5px 0;">
                             <i class="fa fa-users" style="color: #9b59b6;"></i>
-                            <strong><?= t('المشاركون:') ?></strong> <?= e($activity['participants_count']) ?> <?= t('شخص') ?>
+                            <strong><?= t('المشاركون:') ?></strong> <?= t('{count} شخص', ['count' => $activity['participants_count']]) ?>
                         </p>
                     </div>
                 </div>

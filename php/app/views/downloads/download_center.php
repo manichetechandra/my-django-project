@@ -97,7 +97,7 @@
                         <div class="category-header" style="background-color: <?= e((new DownloadFile(['category' => $cat['code']]))->get_category_color()) ?>;">
                             <i class="fa fa-folder-open" style="font-size: 24px; margin-inline-end: 12px;"></i>
                             <h3><?= e($cat['name']) ?></h3>
-                            <span class="badge"><?= e($cat['count']) ?> <?= t('ملف') ?></span>
+                            <span class="badge"><?= t('{count} ملف', ['count' => $cat['count']]) ?></span>
                         </div>
                         <?php foreach ($cat['files'] as $file): ?>
                             <?php include view_path('downloads/_file_card'); ?>

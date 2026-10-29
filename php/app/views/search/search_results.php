@@ -338,7 +338,7 @@
             <div class="meta">
                 <i class="fa fa-calendar"></i> <?= e(format_date($news['published_date'], 'd/m/Y')) ?>
                 <span style="margin-inline-start: 15px;">
-                    <i class="fa fa-eye"></i> <?= e($news['views_count']) ?> <?= t('مشاهدة') ?>
+                    <i class="fa fa-eye"></i> <?= t('{count} مشاهدة', ['count' => $news['views_count']]) ?>
                 </span>
             </div>
         </div>
@@ -377,7 +377,7 @@
             <h4><a href="<?= e(url('faq:faq_detail', $faq['id'])) ?>"><?= e($faq['question']) ?></a></h4>
             <p><?= e(truncatewords($faq['answer'], 30)) ?></p>
             <div class="meta">
-                <i class="fa fa-eye"></i> <?= e($faq['views_count']) ?> <?= t('مشاهدة') ?>
+                <i class="fa fa-eye"></i> <?= t('{count} مشاهدة', ['count' => $faq['views_count']]) ?>
             </div>
         </div>
         <?php endforeach; ?>
@@ -398,7 +398,7 @@
             <div class="meta">
                 <i class="fa fa-hdd-o"></i> <?= e($file->get_file_size_display()) ?>
                 <span style="margin-inline-start: 15px;">
-                    <i class="fa fa-download"></i> <?= e($file['downloads_count']) ?> <?= t('تحميل') ?>
+                    <i class="fa fa-download"></i> <?= t('{count} تحميل', ['count' => $file['downloads_count']]) ?>
                 </span>
             </div>
         </div>

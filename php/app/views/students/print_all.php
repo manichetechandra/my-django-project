@@ -462,7 +462,7 @@
             <p><strong><?= t('مديرية الخدمات الجامعية لولاية سطيف') ?></strong></p>
             <p><?= t('www.dsu-setif.dz | الهاتف: 036 XX XX XX') ?></p>
             <p style="margin-top: 5px; font-style: italic;">
-                <?= t('الطلب') ?> <?= e(($__i + 1)) ?> <?= t('من') ?> <?= e(count($applications)) ?>
+                <?= t('الطلب {n} من {total}', ['n' => $__i + 1, 'total' => count($applications)]) ?>
             </p>
         </div>
         

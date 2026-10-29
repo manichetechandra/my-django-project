@@ -211,7 +211,7 @@
                             <h4 style="margin: 0 0 5px 0; color: #2c3e50;"><?= e($other['name']) ?></h4>
                             <small style="color: #999;">
                                 <?php if (!empty($other['capacity'])): ?>
-                                <i class="fa fa-users"></i> <?= e($other['capacity']) ?> <?= t('طالب') ?>
+                                <i class="fa fa-users"></i> <?= t('{count} طالب', ['count' => $other['capacity']]) ?>
                                 <?php endif; ?>
                                 <?php if (!empty($other['address'])): ?>
                                 <br><i class="fa fa-map-marker"></i> <?= e(truncatewords($other['address'], 5)) ?>

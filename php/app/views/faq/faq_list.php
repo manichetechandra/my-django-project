@@ -301,7 +301,7 @@
                     <div class="category-header" style="background-color: <?= e($category->get_color()) ?>;">
                         <i class="fa <?= e($category['icon']) ?>" style="font-size: 28px; margin-inline-end: 15px;"></i>
                         <h3 style="display: inline;"><?= e($category['name']) ?></h3>
-                        <span class="badge"><?= e(count($faqs)) ?> <?= t('سؤال') ?></span>
+                        <span class="badge"><?= t('{count} سؤال', ['count' => count($faqs)]) ?></span>
                     </div>
                     
                     <?php foreach ($faqs as $faq): ?>
@@ -314,7 +314,7 @@
                             <p><?= linebreaks($faq['answer']) ?></p>
                             <div class="faq-meta">
                                 <span>
-                                    <i class="fa fa-eye"></i> <?= e($faq['views_count']) ?> <?= t('مشاهدة') ?>
+                                    <i class="fa fa-eye"></i> <?= t('{count} مشاهدة', ['count' => $faq['views_count']]) ?>
                                 </span>
                                 <span>
                                     <i class="fa fa-calendar"></i> <?= t('آخر تحديث:') ?> <?= e(format_date($faq['updated_at'], 'd/m/Y')) ?>

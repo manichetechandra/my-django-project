@@ -37,7 +37,7 @@
                 
                 <li>
                     <a href="#cite">
-                        <i class="fa fa-university"></i> <?= t('الإقامات الجامعية') ?>
+                        <i class="fa fa-university"></i> <?= tx('nav', 'الإقامات الجامعية') ?>
                     </a>
                 </li>
                 
@@ -57,7 +57,7 @@
                 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-cogs"></i> <?= t('الخدمات الجامعية') ?> <span class="caret"></span>
+                        <i class="fa fa-cogs"></i> <?= tx('nav', 'الخدمات الجامعية') ?> <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="<?= e(url('services:service_by_type', 'transport')) ?>"><i class="fa fa-bus"></i> <?= t('النقل') ?></a></li>
@@ -75,7 +75,7 @@
                 
                 <li>
                     <a href="<?= e(url('faq:faq_list')) ?>">
-                        <i class="fa fa-question-circle"></i> <?= t('الأسئلة الشائعة') ?>
+                        <i class="fa fa-question-circle"></i> <?= tx('nav', 'الأسئلة الشائعة') ?>
                     </a>
                 </li>
 
@@ -83,7 +83,7 @@
                     <?php if (!empty($user['is_staff'])): ?>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                                <i class="fa fa-shield"></i> <?= t('لوحة المشرف') ?> <span class="caret"></span>
+                                <i class="fa fa-shield"></i> <?= tx('nav', 'لوحة المشرف') ?> <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="<?= e(url('students:admin_dashboard')) ?>">
@@ -177,7 +177,7 @@
                                                     <?= e(truncatewords($notif['message'], 10)) ?>
                                                 </small>
                                                 <small style="display: block; color: #95a5a6; margin-top: 3px;">
-                                                    <i class="fa fa-clock-o"></i> <?= e(timesince($notif['created_at'])) ?> <?= t('مضت') ?>
+                                                    <i class="fa fa-clock-o"></i> <?= t('{time} مضت', ['time' => timesince($notif['created_at'])]) ?>
                                                 </small>
                                             </div>
                                         </div>
@@ -272,6 +272,14 @@
 
     .lang-switch .dropdown-menu {
         min-width: 140px;
+    }
+
+    /* الكلمات الفرنسية والإنجليزية أطول: حشو أقل حتى تبقى القائمة في سطر واحد كالعربية */
+    @media (min-width: 768px) {
+        html[dir="ltr"] .navbar-nav > li > a {
+            padding-left: 11px;
+            padding-right: 11px;
+        }
     }
     
     .navbar-form .form-control {

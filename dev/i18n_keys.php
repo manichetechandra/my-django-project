@@ -20,7 +20,15 @@ foreach ($it as $f) {
 sort($files);
 $keys = [];
 foreach ($files as $file) {
-    foreach (token_get_all(file_get_contents($file)) as $t) {
+    $tokens = token_get_all(file_get_contents($file));
+    foreach ($tokens as $i => $t) {
+        // tx('السياق', 'النص') ← مفتاح إضافي «السياق|النص»
+        if (is_array($t) && $t[0] === T_STRING && $t[1] === 'tx') {
+            $str = array_values(array_filter(array_slice($tokens, $i + 1, 6), fn($u) => is_array($u) && $u[0] === T_CONSTANT_ENCAPSED_STRING));
+            if (count($str) >= 2) {
+                $keys[substr($str[0][1], 1, -1) . '|' . substr($str[1][1], 1, -1)][] = substr($file, strlen($root) + 1) . ':' . $t[2];
+            }
+        }
         if (!is_array($t) || $t[0] !== T_CONSTANT_ENCAPSED_STRING || !preg_match('/\p{Arabic}/u', $t[1])) continue;
         $raw = $t[1];
         $s = $raw[0] === "'" ? strtr(substr($raw, 1, -1), ["\\'" => "'", '\\\\' => '\\']) : stripcslashes(substr($raw, 1, -1));

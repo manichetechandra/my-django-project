@@ -399,7 +399,7 @@
             
             <div style="padding: 15px; background: #f8f9fa; text-align: center; border-top: 1px solid #ddd;">
                 <p style="margin: 0; color: #7f8c8d;">
-                    <?= t('عرض') ?> <?= e(count($applications)) ?> <?= t('طلب من أصل') ?> <?= e($total_count) ?>
+                    <?= t('عرض {count} طلب من أصل {total}', ['count' => count($applications), 'total' => $total_count]) ?>
                 </p>
             </div>
             

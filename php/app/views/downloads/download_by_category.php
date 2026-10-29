@@ -13,7 +13,7 @@
             <i class="fa fa-folder-open"></i> <?= e($page_title) ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            <?= e(count($files)) ?> <?= t('ملف في هذا التصنيف') ?>
+            <?= t('{count} ملف في هذا التصنيف', ['count' => count($files)]) ?>
         </p>
     </div>
 </div>

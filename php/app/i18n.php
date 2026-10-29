@@ -105,6 +105,20 @@ function __(string $text, array $params = [], ?string $code = null): string
     return $text;
 }
 
+/**
+ * ترجمة حسب السياق: نفس النص العربي لكن بترجمة مختلفة في مكان معين.
+ * مثال: tx('nav', 'الإقامات الجامعية') ← «Résidences» في القائمة (والمفتاح في ملف اللغة 'nav|الإقامات الجامعية')
+ * إن لم توجد ترجمة السياق نستعمل الترجمة العادية. النتيجة مهرَّبة للعرض.
+ */
+function tx(string $context, string $text, array $params = []): string
+{
+    $code = lang();
+    if ($code !== default_lang() && isset(translations($code)[$context . '|' . $text])) {
+        return e(__($context . '|' . $text, $params));
+    }
+    return t($text, $params);
+}
+
 /** ترجمة مهرَّبة للعرض داخل HTML */
 function t(string $text, array $params = []): string
 {
