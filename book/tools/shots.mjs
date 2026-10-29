@@ -103,7 +103,7 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '27-news-list', url: '/news/', h: 900 },
   { name: '27-news-detail', url: '/news/maktaba-jadida/', h: 1100 },
   { name: '27-activities', url: '/activities/', h: 900 },
-  { name: '18-services', url: '/services/', h: 900 },
+  { name: '28-services', url: '/services/', h: 900 },
   {
     name: '19-contact', url: '/contact/', h: 1000, scrollTo: 'form:has(textarea[name=message])',
     act: async (page) => {
