@@ -140,7 +140,8 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '31-login', url: '/students/login/', h: 860 },
   { name: '32-dashboard', url: '/students/dashboard/', login: STUDENT, h: 950, scrollTo: '.application-list', scrollPad: 190 },
   { name: '32-create', url: '/students/applications/create/1/', login: STUDENT, h: 1100 },
-  { name: '33-card', url: '/students/student-card/', login: STUDENT, w: 900, h: 470, scale: 2 },
+  // البطاقة مقاسة بخط Arial (غير موجود هنا، والخط البديل أعلى سطراً فيقص آخر الصفوف): نحاكي ارتفاع سطره 1.15
+  { name: '33-card', url: '/students/student-card/', login: STUDENT, w: 900, h: 470, scale: 2, css: '.student-card *{line-height:1.15}' },
   {
     name: '34-dashboard', url: '/students/admin/dashboard/', login: STAFF, untilFooter: true, wait: 1800,
     // صورتان من الصفحة الطويلة: الجزء العلوي (حتى جدول آخر الطلبات) والرسوم البيانية
@@ -304,7 +305,7 @@ for (const s of shots) {
   await page.goto(BASE + (await resolveUrl(s.url)), { waitUntil: 'networkidle0' });
   if (s.act) await s.act(page);
   // إخفاء رسائل التنبيه العائمة (إلا في صفحة اتصل بنا) وشريط إشعار الموقع إن غطّى المحتوى
-  await page.addStyleTag({ content: `${s.name === '29-contact' ? '' : '.flash-messages{display:none!important}'} *{transition:none!important;animation:none!important}` });
+  await page.addStyleTag({ content: `${s.name === '29-contact' ? '' : '.flash-messages{display:none!important}'} *{transition:none!important;animation:none!important} ${s.css || ''}` });
   await page.evaluate(() => document.fonts.ready);
   if (s.scrollTo) {
     await page.evaluate((sel, pad) => {

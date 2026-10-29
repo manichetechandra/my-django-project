@@ -21,7 +21,7 @@
    ← (37) التعميم: admin_config.php + admin.php + القوالب النهائية، وحذف المؤقت.
 8. 38 الأمان والنشر، الملحق أ (الشجرة)، الملحق ب (استيراد Django).
 
-## الفصول (chapters/) — الإصدار القديم في chapters-v1/ للنسخ منه (يُحذف في النهاية)
+## الفصول (chapters/) — نص الإصدار الأول (chapters-v1/) حُذف بعد اكتمال الثاني، وهو في تاريخ Git (e07fc08)
 | ملف | المحتوى | ملفات نهائية تُعرض | مصدر النص القديم |
 |---|---|---|---|
 | 00-intro | ما سنبنيه، المنهج ثابت→ديناميكي، أنواع كتل الكود | — | v1/00 |
@@ -41,8 +41,8 @@
 | 14-homepage-tables | schema.sql: الرأس + sliders/statistics/news/activities/cites/departements + بيانات تجريبية | schema 1-43,63-88,126-150,174-199,212-232,245-266 | v1/06 |
 | 15-pdo | config.php + PDO + الصفحة ديناميكية | config.php | v1/05,07 |
 | 16-structure | لماذا ننظم، الهيكل، .htaccess، index.php، bootstrap، helpers 1-36، ملفات فارغة | (كما v1/05) | v1/05 |
-| 17-db-class | DB.php | DB.php | v1/07 |
-| 18-helpers | helpers 37-$ | helpers.php | v1/08 |
+| 17-helpers | helpers 37-$ | helpers.php | v1/08 |
+| 18-db-class | DB.php | DB.php | v1/07 |
 | 19-router | Router.php + routes.php 1-14 (الباقي مع كل صفحة) | Router, routes | v1/09 |
 | 20-views | View.php + errors/* | | v1/10 |
 | 21-model | Model.php + Page.php | | v1/11 |
@@ -57,10 +57,10 @@
 | 30-downloads-faq-search | Upload.php، downloads، faq، search | | v1/20 |
 | 31-accounts | users + student_profiles، students.php (جزء)، login/register، create_admin | | v1/21 |
 | 32-applications | | | v1/22 |
-| 33-student-extra | الإشعارات، الملف الشخصي، البطاقة، notifications_js | | v1/23 |
+| 33-notifications-profile | الإشعارات، الملف الشخصي، البطاقة، notifications_js | | v1/23 |
 | 34-staff | staff.php، XlsxWriter، students/admin/* | | v1/24 |
 | 35-admin-static | admin-demo/*.html ثابتة + admin.css + admin.js | admin.css, admin.js | جديد |
-| 36-admin-crud | CRUD الأخبار يدوياً (مؤقت) | admin.php 1-134؟ | جديد |
+| 36-admin-news | CRUD الأخبار يدوياً (مؤقت: stages/adminnews.src) + layout/delete/password النهائية | admin.php 35-48، 92-134 (from) | جديد |
 | 37-admin-generic | admin_config + admin.php + views/admin/* | | v1/25 |
 | 38-security-deploy | | | v1/26 |
 | A-files / B-django-import | | | v1/A, v1/B |
@@ -75,6 +75,7 @@
 - `node tools/stages.mjs <name> <step> <outdir>` يكتب اللقطة لاختبارها ولقطات الشاشة.
 
 ## البيئة (تُمسح /tmp عند كل إعادة تشغيل)
+- الأسرع: `bash tools/setup.sh` ثم `bash tools/devenv.sh` (PHP 8.0 + MySQL 5.7) ثم `bash tools/devenv.sh mysqld` (عملية دائمة) ثم `bash tools/demo-site.sh` وخادم `cd /tmp/site && /tmp/tools/bin/php -S 0.0.0.0:8000 index.php`.
 - `bash tools/setup.sh` (Node + Chromium + pypdf + خطوط).
 - PHP 8.0: `mkdir -p /tmp/tools/php80 && cd /tmp/tools/php80 && curl -sL https://registry.npmjs.org/@libphp/amazon-linux-2-v80/-/amazon-linux-2-v80-0.0.21.tgz | tar xz`
   ثم `P=/tmp/tools/php80/package/native; LD_LIBRARY_PATH=$P/lib $P/php/php -n -d extension_dir=$P/php/modules -d extension=mbstring -d extension=pdo -d extension=pdo_mysql -d extension=mysqli -d extension=fileinfo -d extension=zip ...`
@@ -82,21 +83,19 @@
 - بعد إعادة التشغيل: `git fetch origin <branch> && git reset FETCH_HEAD` ثم `git checkout -- book/dou-setif-book.pdf` (الملفات الثنائية غير المحفوظة تتلف).
 
 ## الحالة
-- [x] أدوات: stages.mjs + @stage/@moved/insert/replace في build.mjs + ORD حتى 40 + checkrefs.mjs (فحص أرقام الأسطر)
-- [x] stages/home.src (الفصول 2–15) + sample.src (بيانات تجريبية) + db.src (تطور schema.sql حتى الخطوة 25) + demo/uploads (صور مولّدة)
-- [x] 00–25 مكتوبة ومختبرة (كل اختبار hello.php وكل مرحلة جُرّبت في /tmp/s17 بخادم PHP + قاعدة dou_stage)
-- [ ] 26–30 (الصفحات العامة): لكل صفحة: (أ) دالة مؤقتة `render('...')` + القالب بمحتوى ثابت (stage master لكل قالب) + لقطة ← (ب) المتحكم النهائي + القالب النهائي + لقطة.
-      جداول تُدرج: 103-125 (هيكل/تاريخ) في 26، 151-173 + 200-211 في 27، 233-244 في 28، 292-310 في 29.
-      نماذج content.php كلها شُرحت في 22 (نرجع إليها بالإشارة فقط).
-- [ ] 31–33 فضاء الطالب: students.php يُعرض هنا (31: User+StudentProfile 1-81؛ 32: 83-226؛ 33: 227-262)، جداول 404-494،
-      navbar.php 267-465 (تنسيق الإشعارات) insert في 33. Auth.php عُرض كاملاً في 23.
-- [ ] 34 الموظفون، 35–37 لوحة المدير (35 ثابتة، 36 CRUD الأخبار يدوياً مؤقت، 37 التعميم)، 38 الأمان والنشر، A، B
-- [ ] لقطات الموقع النهائي بالبيانات التجريبية الجديدة (shots-seed.php يحتاج تحديثاً: محتوى عام من sample + صور demo/uploads،
-      وتشغيل الخادم على نسخة من php/ مع demo/uploads). الأسماء القديمة 14-404.png و15-home.png مستعملة مؤقتاً في 24 و25.
-- [ ] بناء كامل + مراجعة + ZIP + تسليم (رسالة عربية فيها قائمة إصلاحات الكود السابقة)
+- [x] أدوات: stages.mjs + @stage/@moved/insert/replace في build.mjs + checkrefs.mjs (فحص أرقام الأسطر) + `--coverage` (تقرير التغطية بلا PDF)
+- [x] الفصول 00–38 والملحقان أ و ب مكتوبة ومختبرة (المراحل جُرّبت بخادم PHP + MySQL في صندوق العمل)
+- [x] تغطية ملفات المشروع 105/105 (البناء يكتب .build/coverage.txt و .build/files-chapters.json الذي وُلّدت منه شجرة الملحق أ)
+- [x] لقطات الشاشة v2 (book/images، 49 صورة) من الموقع التجريبي: `bash tools/demo-site.sh` ثم خادم PHP على /tmp/site
+- [x] حذف chapters-v1 وصور v1 غير المستعملة
+- [x] بناء كامل + ZIP مطابق لـ php/ + تسليم (رسالة عربية فيها قائمة إصلاحات الكود)
+
+## إصلاحات في php/ أثناء الإصدار الثاني (الكتاب والـ ZIP محدّثان)
+- assets/css/admin.css الأسطر 79-82: مربعات الاختيار في RTL (bootstrap-rtl لا يُحمَّل، الفصل 3).
+- app/views/search/search_results.php السطر 24: `color: #2c3e50` لحقل البحث الكبير (كان يرث الأبيض من الترويسة فلا يُرى النص).
 
 ## ملاحظات مهمة
-- ملفات الكود النهائية في php/ لا تُغيَّر (قرار المستخدم). كل شيء آخر مؤقت ومذكور.
+- ملفات الكود النهائية في php/ لا تُغيَّر (قرار المستخدم) إلا لإصلاح خطأ حقيقي، مع تحديث الكتاب والـ ZIP معه. كل شيء آخر مؤقت ومذكور.
 - ملف صنف واحد (Auth.php, Model.php...) يجب أن يُعرض كاملاً في فصل واحد (الملف غير المكتمل خطأ صياغة يكسر الموقع).
 - routes.php عُرض كاملاً في 19 (navbar يحتاج كل أسماء المسارات).
 - اختبار خادم: لا تستعمل `pkill -f "127.0.0.1:PORT"` (يقتل أمر bash نفسه)؛ استعمل `& echo $! > pidfile` ثم `kill $(cat pidfile)`.

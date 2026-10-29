@@ -21,6 +21,7 @@
     
     .search-box-large input {
         border: none;
+        color: #2c3e50;
         font-size: 18px;
         padding: 15px;
         width: 100%;
