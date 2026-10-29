@@ -88,14 +88,17 @@ const stageShots = [
   { name: '08-cites', stage: ['home', 8], url: '/', h: 470, scrollTo: '#cite', scrollPad: 95 },
   { name: '09-footer', stage: ['home', 9], url: '/', h: 420, scrollTo: 'footer', scrollPad: 60 },
   { name: '09-full', stage: ['home', 9], url: '/', w: 1920, full: true, scaleTo: 0.3, wait: 2600 },
+  // صفحات بمحتوى ثابت فوق الموقع التجريبي (/tmp/site): overlay = [stage, step]
+  { name: '26-director-static', overlay: ['director', 26.1], url: '/director-word/', h: 760 },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
 
 const shots = SET === 'stages' ? stageShots : [
-  { name: '14-404', url: '/no-such-page/', h: 620 },
-  { name: '15-home', url: '/', h: 900 },
-  { name: '16-director', url: '/director-word/', h: 900 },
+  { name: '24-404', url: '/no-such-page/', h: 620 },
+  { name: '25-home', url: '/', h: 900 },
+  { name: '26-director', url: '/director-word/', h: 760 },
+  { name: '26-organization', url: '/organization/', h: 900, scrollTo: 'img[src*=chart]', scrollPad: 160 },
   { name: '17-activities', url: '/activities/', h: 900 },
   { name: '18-services', url: '/services/', h: 900 },
   {
@@ -234,11 +237,28 @@ async function prepareStage(s) {
   serverKey = key;
 }
 
+// صفحة من الموقع التجريبي الكامل (/tmp/site من tools/demo-site.sh) مع ملفات مؤقتة فوقه (مثل قالب بمحتوى ثابت)
+const DEMO_SITE = process.env.DEMO_SITE || '/tmp/site';
+async function prepareOverlay(s) {
+  const key = `overlay|${s.overlay.join('@')}`;
+  if (key === serverKey && server) return;
+  await stopServer();
+  const dir = path.join(BOOK, '.build', 'overlay-site');
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.cpSync(DEMO_SITE, dir, { recursive: true });
+  writeSnapshot(s.overlay[0], s.overlay[1], dir);
+  server = spawn(PHP, ['-S', '127.0.0.1:8100', '-t', dir, path.join(dir, 'index.php')], { env: { ...process.env, DB_NAME: 'dou_setif' }, stdio: ['ignore', 'ignore', 'pipe'] });
+  server.stderr.on('data', (d) => { const t = String(d); if (/error|warning|fatal/i.test(t) && !/Accepted|Closing|\[200\]|\[30\d\]/.test(t)) process.stderr.write('  php: ' + t); });
+  for (let i = 0; i < 50 && !(await portOpen(8100)); i++) await new Promise((r) => setTimeout(r, 100));
+  serverKey = key;
+}
+
 let ctx = null;
 let session = '';
 for (const s of shots) {
   if (ONLY && !ONLY.has(s.name)) continue;
   if (s.stage) await prepareStage(s);
+  if (s.overlay) await prepareOverlay(s);
   const want = s.login ? s.login[0] : 'guest';
   if (!ctx || want !== session) {
     if (ctx) await ctx.close();

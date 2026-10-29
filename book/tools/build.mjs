@@ -228,7 +228,7 @@ function includeFile(spec, chapter) {
   }
   if (s < 1 || e > all.length || s > e) throw new Error(`@file: المدى ${s}-${e} خارج الملف ${file} (${all.length} سطر) في ${chapter}`);
   if (!coverage.has(file)) coverage.set(file, []);
-  coverage.get(file).push([s, e, chapter, insert ? 'insert' : 'file']);
+  coverage.get(file).push([s, e, chapter, insert || replace ? 'insert' : 'file']);
   const whole = s === 1 && e === all.length;
   const badge = replace ? 'استبدال' : (s === 1 ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف'));
   const range = whole ? `الملف كاملاً — ${all.length} سطر` : `الأسطر ${s}–${e} من ${all.length}`;

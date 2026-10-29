@@ -1,0 +1,58 @@
+@@file app/views/homepage/director_word.php 26.1
+@@block head 26.1 from=app/views/homepage/director_word.php:1-90
+@@end
+@@block content-static 26.1
+
+<!-- Header -->
+<div class="director-header">
+    <div class="container">
+        <h1>
+            <i class="fa fa-quote-right"></i>
+            كلمة المدير
+            <i class="fa fa-quote-left"></i>
+        </h1>
+    </div>
+</div>
+
+<!-- المحتوى -->
+<div class="container">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li><a href="#">الرئيسية</a></li>
+        <li><a href="#">المديرية</a></li>
+        <li class="active">كلمة المدير</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="director-card">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- نص الكلمة -->
+                        <div class="word-content">
+                            <i class="fa fa-quote-right quote-icon"></i>
+                            <div style="margin-top: -30px;">
+                                <p>بسم الله الرحمن الرحيم</p>
+                                <p>يسعدني أن أرحب بكم في الموقع الرسمي لمديرية الخدمات الجامعية لولاية سطيف، هذه النافذة التي نريدها جسراً للتواصل بين المديرية وطلبتنا الأعزاء.</p>
+                                <p>تسهر المديرية على توفير أفضل ظروف الإيواء والإطعام والنقل والمنح لآلاف الطلبة، وتعمل باستمرار على تحسين خدماتها وتقريبها من الطالب.</p>
+                                <p>أبوابنا مفتوحة لكل اقتراح أو ملاحظة، ونتمنى لكم سنة جامعية موفقة.</p>
+                            </div>
+                        </div>
+
+                        <!-- التوقيع -->
+                        <div class="signature-section">
+                            <p class="signature-text">محمد الأمين بن علي</p>
+                            <p style="color: #8cc040; font-size: 16px;">مدير الخدمات الجامعية</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@@end
+@@block content-final 26.2 replaces=content-static from=app/views/homepage/director_word.php:91-180
+@@end
+@@block tail 26.1 from=app/views/homepage/director_word.php:181-181
+@@end

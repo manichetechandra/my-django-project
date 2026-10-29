@@ -183,7 +183,7 @@ http://localhost/dou-setif/
 
 الصفحة الرئيسية **النهائية**: مطابقة لما بنيته في الفصول 4–15، لكنها الآن تمر بكل طبقات الهيكل: نقطة الدخول ← الموجّه ← `homepage_index()` ← النماذج ← القالب `homepage/index` ← القالب الرئيسي. وكل روابطها حقيقية.
 
-@shot images/15-home.png | الصفحة الرئيسية النهائية
+@shot images/25-home.png | الصفحة الرئيسية النهائية
 
 ::: warning إن ظهر خطأ
 - **`function "homepage_index" not found`**: تأكد أن الملف اسمه `app/controllers/homepage.php` بالضبط، وأن اسم الدالة فيه `homepage_index`.
