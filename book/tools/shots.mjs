@@ -122,7 +122,7 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '31-login', url: '/students/login/', h: 860 },
   { name: '32-dashboard', url: '/students/dashboard/', login: STUDENT, h: 950, scrollTo: '.application-list', scrollPad: 190 },
   { name: '32-create', url: '/students/applications/create/1/', login: STUDENT, h: 1100 },
-  { name: '23-card', url: '/students/student-card/', login: STUDENT, w: 900, h: 470, scale: 2 },
+  { name: '33-card', url: '/students/student-card/', login: STUDENT, w: 900, h: 470, scale: 2 },
   {
     name: '24-dashboard', url: '/students/admin/dashboard/', login: STAFF, untilFooter: true, wait: 1800,
     // صورتان من الصفحة الطويلة: الجزء العلوي (حتى جدول آخر الطلبات) والرسوم البيانية
