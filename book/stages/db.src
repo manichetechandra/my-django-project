@@ -11,5 +11,7 @@
 @@end
 @@block s-departements 14 from=database/schema.sql:245-266
 @@end
+@@block s-notifications 24 from=database/schema.sql:361-381
+@@end
 @@block s-sitestats 23 from=database/schema.sql:382-403
 @@end

@@ -13,6 +13,7 @@
 //    @file app/core/DB.php 10-40     تضمين أسطر من ملف في مجلد php/ (يُلوَّن تلقائياً)
 //    @file app/core/DB.php 41-$      حتى نهاية الملف        @file config.php   الملف كاملاً
 //    @file database/schema.sql 89-102 insert   قطعة تُدرج في وسط ملف كُتب جزء منه (خارج الترتيب)
+//    @file app/views/base/navbar.php 1-11 replace  قطعة نهائية تحل محل كود مؤقت (شارة «استبدال»)
 //    @stage home nav-html [STEP]     كتلة من ملف مؤقت (stages/home.src) بأرقام أسطرها في تلك الخطوة
 //    @stage home * 2 [FILE]          الملف المؤقت كاملاً كما هو عند الخطوة 2
 //    @stage home stats-php - 16-20   جزء من كتلة (أسطرها 16–20 داخلها)؛ «-» = خطوة الكتلة نفسها
@@ -214,6 +215,7 @@ const coverage = new Map(); // file -> [[s,e,chapter]]
 function includeFile(spec, chapter) {
   const [file, rangeSpec, ...flags] = spec.trim().split(/\s+/);
   const insert = flags.includes('insert');
+  const replace = flags.includes('replace'); // قطعة تحل محل كود مؤقت موجود في الملف
   const abs = path.join(SRC, file);
   if (!fs.existsSync(abs)) throw new Error(`@file: الملف غير موجود: ${file} (${chapter})`);
   const all = fs.readFileSync(abs, 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
@@ -228,12 +230,12 @@ function includeFile(spec, chapter) {
   if (!coverage.has(file)) coverage.set(file, []);
   coverage.get(file).push([s, e, chapter, insert ? 'insert' : 'file']);
   const whole = s === 1 && e === all.length;
-  const badge = s === 1 ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف');
+  const badge = replace ? 'استبدال' : (s === 1 ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف'));
   const range = whole ? `الملف كاملاً — ${all.length} سطر` : `الأسطر ${s}–${e} من ${all.length}`;
   const foot = e === all.length && !whole ? 'نهاية الملف' : (whole ? '' : `يتبع الملف من السطر ${e + 1}`);
   return codeBlock({
     code: all.slice(s - 1, e).join('\n'), lang: langFor(file), start: s,
-    head: file, badge, badgeClass: s === 1 ? 'new' : (insert ? 'ins' : 'cont'), range, foot,
+    head: file, badge, badgeClass: replace ? 'ins' : (s === 1 ? 'new' : (insert ? 'ins' : 'cont')), range, foot,
   });
 }
 
