@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -220,7 +220,7 @@
         
         /* إضافة معلومات الطباعة */
         body:before {
-            content: "تاريخ الطباعة: " attr(data-print-date);
+            content: <?= json_encode(__('تاريخ الطباعة: '), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?> attr(data-print-date);
             display: block;
             text-align: end;
             font-size: 12px;
@@ -245,7 +245,7 @@
 // إضافة تاريخ ووقت الطباعة
 window.addEventListener('beforeprint', function() {
     const now = new Date();
-    const printDate = now.toLocaleString('ar-DZ', {
+    const printDate = now.toLocaleString(<?= json_encode(intl_locale()) ?>, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -275,10 +275,10 @@ if (printBtn) {
 <div class="detail-header">
     <div class="container">
         <h1 class="text-center" style="margin: 0; font-size: 42px;">
-            <i class="fa fa-file-text"></i> تفاصيل الطلب
+            <i class="fa fa-file-text"></i> <?= t('تفاصيل الطلب') ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            رقم الطلب: <?= e($application['application_number']) ?>
+            <?= t('رقم الطلب:') ?> <?= e($application['application_number']) ?>
         </p>
     </div>
 </div>
@@ -286,10 +286,10 @@ if (printBtn) {
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:dashboard')) ?>">لوحة التحكم</a></li>
-        <li><a href="<?= e(url('students:my_applications')) ?>">طلباتي</a></li>
-        <li class="active">تفاصيل الطلب</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:dashboard')) ?>"><?= t('لوحة التحكم') ?></a></li>
+        <li><a href="<?= e(url('students:my_applications')) ?>"><?= t('طلباتي') ?></a></li>
+        <li class="active"><?= t('تفاصيل الطلب') ?></li>
     </ol>
     
     <div class="row">
@@ -298,11 +298,11 @@ if (printBtn) {
                 
                 <!-- معلومات أساسية -->
                 <div class="detail-section">
-                    <h3><i class="fa fa-info-circle"></i> معلومات الطلب</h3>
+                    <h3><i class="fa fa-info-circle"></i> <?= t('معلومات الطلب') ?></h3>
                     
                     <div class="info-grid">
                         <div class="info-item">
-                            <label>نوع الطلب</label>
+                            <label><?= t('نوع الطلب') ?></label>
                             <div class="value">
                                 <i class="fa <?= e($application['application_type']['icon']) ?>" style="color: <?= e($application['application_type']['color']) ?>;"></i>
                                 <?= e($application['application_type']['name']) ?>
@@ -310,12 +310,12 @@ if (printBtn) {
                         </div>
                         
                         <div class="info-item">
-                            <label>رقم الطلب</label>
+                            <label><?= t('رقم الطلب') ?></label>
                             <div class="value"><?= e($application['application_number']) ?></div>
                         </div>
                         
                         <div class="info-item">
-                            <label>الحالة</label>
+                            <label><?= t('الحالة') ?></label>
                             <div class="value">
                                 <span class="status-badge status-<?= e($application['status']) ?>">
                                     <i class="fa <?= e($application->get_status_icon()) ?>"></i>
@@ -325,20 +325,20 @@ if (printBtn) {
                         </div>
                         
                         <div class="info-item">
-                            <label>تاريخ التقديم</label>
+                            <label><?= t('تاريخ التقديم') ?></label>
                             <div class="value"><?= e(format_date($application['submitted_at'], 'd/m/Y H:i')) ?></div>
                         </div>
                         
                         <?php if (!empty($application['reviewed_at'])): ?>
                         <div class="info-item">
-                            <label>تاريخ المراجعة</label>
+                            <label><?= t('تاريخ المراجعة') ?></label>
                             <div class="value"><?= e(format_date($application['reviewed_at'], 'd/m/Y H:i')) ?></div>
                         </div>
                         <?php endif; ?>
                         
                         <?php if (!empty($application['reviewed_by'])): ?>
                         <div class="info-item">
-                            <label>راجعه</label>
+                            <label><?= t('راجعه') ?></label>
                             <div class="value"><?= e(($application['reviewed_by']->get_full_name() ?: $application['reviewed_by']['username'])) ?></div>
                         </div>
                         <?php endif; ?>
@@ -348,7 +348,7 @@ if (printBtn) {
                 <!-- تفاصيل الطلب -->
                 <?php if (!empty($application['details'])): ?>
                 <div class="detail-section">
-                    <h3><i class="fa fa-comment"></i> تفاصيل الطلب</h3>
+                    <h3><i class="fa fa-comment"></i> <?= t('تفاصيل الطلب') ?></h3>
                     <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; line-height: 1.8;">
                         <?= linebreaks($application['details']) ?>
                     </div>
@@ -357,7 +357,7 @@ if (printBtn) {
                 
                 <!-- الوثائق المرفقة -->
                 <div class="detail-section">
-                    <h3><i class="fa fa-paperclip"></i> الوثائق المرفقة</h3>
+                    <h3><i class="fa fa-paperclip"></i> <?= t('الوثائق المرفقة') ?></h3>
                     
                     <?php if (!empty($documents)): ?>
                     <ul class="documents-list">
@@ -372,7 +372,7 @@ if (printBtn) {
                                 </small>
                             </div>
                             <a href="<?= e($doc->get_download_url()) ?>" class="btn btn-sm btn-primary" target="_blank">
-                                <i class="fa fa-download"></i> تحميل
+                                <i class="fa fa-download"></i> <?= t('تحميل') ?>
                             </a>
                         </li>
                         <?php endforeach; ?>
@@ -380,7 +380,7 @@ if (printBtn) {
                     <?php else: ?>
                     <p style="text-align: center; color: #7f8c8d; padding: 40px;">
                         <i class="fa fa-inbox" style="font-size: 48px; display: block; margin-bottom: 15px;"></i>
-                        لا توجد وثائق مرفقة
+                        <?= t('لا توجد وثائق مرفقة') ?>
                     </p>
                     <?php endif; ?>
                 </div>
@@ -389,7 +389,7 @@ if (printBtn) {
                 <?php if (!empty($application['admin_notes'])): ?>
                 <div class="detail-section">
                     <div class="admin-notes">
-                        <h4><i class="fa fa-comment-o"></i> ملاحظات الإدارة</h4>
+                        <h4><i class="fa fa-comment-o"></i> <?= t('ملاحظات الإدارة') ?></h4>
                         <p style="color: #856404; margin: 0;"><?= linebreaks($application['admin_notes']) ?></p>
                     </div>
                 </div>
@@ -398,21 +398,21 @@ if (printBtn) {
                 <!-- أزرار الإجراءات -->
                 <div class="action-buttons">
                     <a href="<?= e(url('students:my_applications')) ?>" class="btn btn-default btn-lg">
-                        <i class="fa fa-arrow-right"></i> العودة للقائمة
+                        <i class="fa fa-arrow-right"></i> <?= t('العودة للقائمة') ?>
                     </a>
                     
                     <?php if ($application['status'] == 'pending'): ?>
                     <form method="post" action="<?= e(url('students:cancel_application', $application['id'])) ?>" style="display: inline;" 
-                          onsubmit="return confirm('هل أنت متأكد من إلغاء هذا الطلب؟');">
+                          onsubmit="return confirm(<?= e(js_t('هل أنت متأكد من إلغاء هذا الطلب؟')) ?>);">
                         <?= csrf_field() ?>
                         <button type="submit" class="btn btn-danger btn-lg">
-                            <i class="fa fa-times"></i> إلغاء الطلب
+                            <i class="fa fa-times"></i> <?= t('إلغاء الطلب') ?>
                         </button>
                     </form>
                     <?php endif; ?>
                     
                     <a href="<?= e(url('students:application_print', $application['id'])) ?>" class="btn btn-primary btn-lg" target="_blank">
-    <i class="fa fa-print"></i> طباعة
+    <i class="fa fa-print"></i> <?= t('طباعة') ?>
 </a>
                 </div>
                 

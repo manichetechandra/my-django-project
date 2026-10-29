@@ -8,6 +8,7 @@
 class News extends Model
 {
     protected static string $table = 'news';
+    protected static array $translatable = ['title', 'summary', 'content'];
     protected static array $choices = [
         'status' => ['draft' => 'مسودة', 'published' => 'منشور', 'archived' => 'مؤرشف'],
     ];
@@ -34,6 +35,7 @@ class News extends Model
 class NewsImage extends Model
 {
     protected static string $table = 'news_images';
+    protected static array $translatable = ['caption'];
     protected static array $belongsTo = ['news' => [News::class, 'news_id']];
     protected static array $defaults = ['caption' => '', 'order' => 0];
     protected static array $createdFields = ['uploaded_at'];
@@ -42,6 +44,7 @@ class NewsImage extends Model
 class LatestNews extends Model
 {
     protected static string $table = 'latest_news';
+    protected static array $translatable = ['description'];
     protected static array $booleans = ['is_active'];
     protected static array $defaults = ['order' => 0, 'is_active' => 1];
     protected static array $createdFields = ['created_at'];
@@ -52,6 +55,7 @@ class LatestNews extends Model
 class Activity extends Model
 {
     protected static string $table = 'activities';
+    protected static array $translatable = ['title', 'short_description', 'description', 'location', 'organizer'];
     protected static array $choices = [
         'activity_type' => ['sport' => 'رياضي', 'culture' => 'ثقافي', 'scientific' => 'علمي', 'social' => 'اجتماعي', 'artistic' => 'فني', 'other' => 'أخرى'],
     ];
@@ -102,6 +106,7 @@ class Activity extends Model
 class ActivityImage extends Model
 {
     protected static string $table = 'activity_images';
+    protected static array $translatable = ['caption'];
     protected static array $belongsTo = ['activity' => [Activity::class, 'activity_id']];
     protected static array $defaults = ['caption' => '', 'order' => 0];
     protected static array $createdFields = ['uploaded_at'];
@@ -112,6 +117,7 @@ class ActivityImage extends Model
 class Cite extends Model
 {
     protected static string $table = 'cites';
+    protected static array $translatable = ['name', 'description', 'address'];
     protected static array $booleans = ['is_active'];
     protected static array $hasMany = ['images' => [CiteImage::class, 'cite_id', 'ORDER BY `order`, uploaded_at DESC']];
     protected static array $defaults = ['is_active' => 1, 'order' => 0, 'main_image' => ''];
@@ -134,6 +140,7 @@ class Cite extends Model
 class CiteImage extends Model
 {
     protected static string $table = 'cite_images';
+    protected static array $translatable = ['caption'];
     protected static array $belongsTo = ['cite' => [Cite::class, 'cite_id']];
     protected static array $defaults = ['caption' => '', 'order' => 0];
     protected static array $createdFields = ['uploaded_at'];
@@ -144,6 +151,7 @@ class CiteImage extends Model
 class Departement extends Model
 {
     protected static string $table = 'departements';
+    protected static array $translatable = ['name', 'description', 'head_of_department'];
     protected static array $booleans = ['is_active'];
     protected static array $defaults = ['is_active' => 1, 'order' => 0, 'image' => ''];
     protected static array $createdFields = ['created_at'];
@@ -167,6 +175,7 @@ class Departement extends Model
 class Service extends Model
 {
     protected static string $table = 'services';
+    protected static array $translatable = ['title', 'short_description', 'detailed_description', 'requirements', 'how_to_apply', 'contact_info'];
     protected static array $choices = [
         'service_type' => ['transport' => 'النقل', 'housing' => 'الإيواء', 'catering' => 'الإطعام', 'scholarship' => 'المنح'],
     ];
@@ -238,6 +247,7 @@ class ContactMessage extends Model
 class DownloadFile extends Model
 {
     protected static string $table = 'download_files';
+    protected static array $translatable = ['title', 'description'];
     protected static array $choices = [
         'category' => [
             'scholarship_forms' => 'نماذج المنح والإعانات', 'housing_forms' => 'نماذج السكن الجامعي',
@@ -291,7 +301,7 @@ class DownloadFile extends Model
     {
         $size = (int) ($this->attributes['file_size'] ?? 0);
         if ($size < 1024) {
-            return $size . ' بايت';
+            return __('{n} بايت', ['n' => $size]);
         }
         if ($size < 1024 * 1024) {
             return number_format($size / 1024, 1) . ' KB';
@@ -318,6 +328,7 @@ class DownloadFile extends Model
 class FaqCategory extends Model
 {
     protected static string $table = 'faq_categories';
+    protected static array $translatable = ['name'];
     protected static array $booleans = ['is_active'];
     protected static array $hasMany = ['faqs' => [Faq::class, 'category_id', 'ORDER BY `order`, created_at DESC']];
     protected static array $defaults = ['icon' => 'fa-question-circle', 'order' => 0, 'is_active' => 1];
@@ -332,6 +343,7 @@ class FaqCategory extends Model
 class Faq extends Model
 {
     protected static string $table = 'faqs';
+    protected static array $translatable = ['question', 'answer'];
     protected static array $booleans = ['is_active'];
     protected static array $belongsTo = ['category' => [FaqCategory::class, 'category_id']];
     protected static array $defaults = ['order' => 0, 'is_active' => 1, 'views_count' => 0];
@@ -355,6 +367,7 @@ class Faq extends Model
 class Notification extends Model
 {
     protected static string $table = 'notifications';
+    protected static array $translatable = ['title', 'message', 'link_text'];
     protected static array $choices = [
         'notification_type' => ['info' => 'معلومة', 'success' => 'نجاح', 'warning' => 'تحذير', 'danger' => 'عاجل/خطر', 'primary' => 'عادي'],
     ];

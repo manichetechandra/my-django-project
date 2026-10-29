@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -41,13 +41,13 @@
     <div class="container text-center">
         <h1 style="margin: 0; font-size: 42px;">
             <?php if ($service_type == 'transport'): ?>
-                <i class="fa fa-bus"></i> خدمات النقل
+                <i class="fa fa-bus"></i> <?= t('خدمات النقل') ?>
             <?php elseif ($service_type == 'housing'): ?>
-                <i class="fa fa-home"></i> خدمات الإيواء
+                <i class="fa fa-home"></i> <?= t('خدمات الإيواء') ?>
             <?php elseif ($service_type == 'catering'): ?>
-                <i class="fa fa-cutlery"></i> خدمات الإطعام
+                <i class="fa fa-cutlery"></i> <?= t('خدمات الإطعام') ?>
             <?php elseif ($service_type == 'scholarship'): ?>
-                <i class="fa fa-money"></i> المنح والإعانات
+                <i class="fa fa-money"></i> <?= t('المنح والإعانات') ?>
             <?php endif; ?>
         </h1>
     </div>
@@ -55,8 +55,8 @@
 
 <div class="container">
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('services:service_list')) ?>">الخدمات الجامعية</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('services:service_list')) ?>"><?= t('الخدمات الجامعية') ?></a></li>
         <li class="active"><?= e($page_title) ?></li>
     </ol>
     
@@ -71,10 +71,10 @@
     <?php else: ?>
         <div class="alert alert-warning text-center" style="padding: 60px;">
             <i class="fa fa-exclamation-triangle" style="font-size: 48px; display: block; margin-bottom: 20px;"></i>
-            <h3>لا توجد خدمات في هذا القسم حالياً</h3>
+            <h3><?= t('لا توجد خدمات في هذا القسم حالياً') ?></h3>
             <br>
             <a href="<?= e(url('services:service_list')) ?>" class="btn btn-success">
-                <i class="fa fa-arrow-right"></i> العودة لكل الخدمات
+                <i class="fa fa-arrow-right"></i> <?= t('العودة لكل الخدمات') ?>
             </a>
         </div>
     <?php endif; ?>

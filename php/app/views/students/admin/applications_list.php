@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -161,10 +161,10 @@
 <div class="list-header">
     <div class="container">
         <h1 style="margin: 0; font-size: 36px;">
-            <i class="fa fa-list"></i> إدارة الطلبات
+            <i class="fa fa-list"></i> <?= t('إدارة الطلبات') ?>
         </h1>
         <p style="margin-top: 10px; opacity: 0.9;">
-            عرض وإدارة كل طلبات الطلبة
+            <?= t('عرض وإدارة كل طلبات الطلبة') ?>
         </p>
     </div>
 </div>
@@ -172,44 +172,44 @@
 <div class="container">
     
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:admin_dashboard')) ?>">لوحة المشرف</a></li>
-        <li class="active">إدارة الطلبات</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:admin_dashboard')) ?>"><?= t('لوحة المشرف') ?></a></li>
+        <li class="active"><?= t('إدارة الطلبات') ?></li>
     </ol>
     
     <!-- ========================================
          قسم الفلترة والبحث
          ======================================== -->
     <div class="filter-box">
-        <h4><i class="fa fa-filter"></i> تصفية وبحث</h4>
+        <h4><i class="fa fa-filter"></i> <?= t('تصفية وبحث') ?></h4>
         
         <form method="get" class="form-inline">
             <div class="form-group" style="margin-inline-end: 15px;">
-                <label style="margin-inline-end: 5px;">الحالة:</label>
+                <label style="margin-inline-end: 5px;"><?= t('الحالة:') ?></label>
                 <select name="status" class="form-control">
-                    <option value="">الكل</option>
+                    <option value=""><?= t('الكل') ?></option>
                     <option value="pending" <?php if ($status_filter == 'pending'): ?>selected<?php endif; ?>>
-                        قيد الانتظار
+                        <?= t('قيد الانتظار') ?>
                     </option>
                     <option value="under_review" <?php if ($status_filter == 'under_review'): ?>selected<?php endif; ?>>
-                        قيد المراجعة
+                        <?= t('قيد المراجعة') ?>
                     </option>
                     <option value="approved" <?php if ($status_filter == 'approved'): ?>selected<?php endif; ?>>
-                        معتمد
+                        <?= t('معتمد') ?>
                     </option>
                     <option value="rejected" <?php if ($status_filter == 'rejected'): ?>selected<?php endif; ?>>
-                        مرفوض
+                        <?= t('مرفوض') ?>
                     </option>
                     <option value="cancelled" <?php if ($status_filter == 'cancelled'): ?>selected<?php endif; ?>>
-                        ملغي
+                        <?= t('ملغي') ?>
                     </option>
                 </select>
             </div>
             
             <div class="form-group" style="margin-inline-end: 15px;">
-                <label style="margin-inline-end: 5px;">النوع:</label>
+                <label style="margin-inline-end: 5px;"><?= t('النوع:') ?></label>
                 <select name="type" class="form-control">
-                    <option value="">الكل</option>
+                    <option value=""><?= t('الكل') ?></option>
                     <?php foreach ($application_types as $app_type): ?>
                     <option value="<?= e($app_type['id']) ?>" 
                             <?php if ($type_filter == (string)($app_type['id'])): ?>selected<?php endif; ?>>
@@ -220,21 +220,21 @@
             </div>
             
             <div class="form-group" style="margin-inline-end: 15px;">
-                <label style="margin-inline-end: 5px;">بحث:</label>
+                <label style="margin-inline-end: 5px;"><?= t('بحث:') ?></label>
                 <input type="text" 
                        name="search" 
                        class="form-control" 
-                       placeholder="رقم الطلب أو اسم الطالب"
+                       placeholder="<?= t('رقم الطلب أو اسم الطالب') ?>"
                        value="<?= e($search_query) ?>"
                        style="width: 250px;">
             </div>
             
             <button type="submit" class="btn btn-primary">
-                <i class="fa fa-search"></i> بحث
+                <i class="fa fa-search"></i> <?= t('بحث') ?>
             </button>
             
             <a href="<?= e(url('students:admin_applications_list')) ?>" class="btn btn-default">
-                <i class="fa fa-refresh"></i> إعادة تعيين
+                <i class="fa fa-refresh"></i> <?= t('إعادة تعيين') ?>
             </a>
         </form>
     </div>
@@ -253,28 +253,28 @@
                 <div>
                     <i class="fa fa-check-square-o" style="font-size: 20px; color: #856404;"></i>
                     <span class="selected-count">
-                        تم تحديد <strong id="selectedCount">0</strong> طلب
+                        <?= t('تم تحديد') ?> <strong id="selectedCount">0</strong> <?= t('طلب') ?>
                     </span>
                 </div>
                 
                 <div>
                     <select name="bulk_action" class="bulk-action-select" required>
-                        <option value="">-- اختر الإجراء --</option>
-                        <option value="approve">✅ اعتماد الكل</option>
-                        <option value="reject">❌ رفض الكل</option>
-                        <option value="review">📝 قيد المراجعة</option>
-                        <option value="pending">⏳ قيد الانتظار</option>
-                        <option value="delete" style="color: red;">🗑️ حذف</option>
+                        <option value=""><?= t('-- اختر الإجراء --') ?></option>
+                        <option value="approve"><?= t('✅ اعتماد الكل') ?></option>
+                        <option value="reject"><?= t('❌ رفض الكل') ?></option>
+                        <option value="review"><?= t('📝 قيد المراجعة') ?></option>
+                        <option value="pending"><?= t('⏳ قيد الانتظار') ?></option>
+                        <option value="delete" style="color: red;"><?= t('🗑️ حذف') ?></option>
                     </select>
                 </div>
                 
                 <div>
                     <button type="submit" class="bulk-action-btn">
-                        <i class="fa fa-bolt"></i> تطبيق
+                        <i class="fa fa-bolt"></i> <?= t('تطبيق') ?>
                     </button>
                     
                     <button type="button" class="btn btn-default btn-sm" onclick="clearSelection()">
-                        <i class="fa fa-times"></i> إلغاء التحديد
+                        <i class="fa fa-times"></i> <?= t('إلغاء التحديد') ?>
                     </button>
                 </div>
             </div>
@@ -286,9 +286,9 @@
         <div class="applications-table">
                     <h3>
             <span>
-                <i class="fa fa-list"></i> قائمة الطلبات
+                <i class="fa fa-list"></i> <?= t('قائمة الطلبات') ?>
                 <small style="opacity: 0.7; font-size: 14px; margin-inline-start: 15px;">
-                    (<?= e($total_count) ?> طلب)
+                    <?= t('({count} طلب)', ['count' => $total_count]) ?>
                 </small>
             </span>
             <span>
@@ -301,12 +301,12 @@
                      ======================================== -->
                 <a href="<?= e(url('students:export_applications_excel')) ?>?<?= e(http_build_query($_GET)) ?>" 
                    class="btn btn-success btn-sm"
-                   title="تصدير إلى Excel">
-                    <i class="fa fa-file-excel-o"></i> تصدير Excel
+                   title="<?= t('تصدير إلى Excel') ?>">
+                    <i class="fa fa-file-excel-o"></i> <?= t('تصدير Excel') ?>
                 </a>
                 
                 <a href="<?= e(url('students:admin_dashboard')) ?>" class="btn btn-default btn-sm">
-                    <i class="fa fa-arrow-right"></i> العودة
+                    <i class="fa fa-arrow-right"></i> <?= t('العودة') ?>
                 </a>
             </span>
         </h3>
@@ -319,15 +319,15 @@
                             <input type="checkbox" 
                                    class="select-all-checkbox" 
                                    id="selectAll"
-                                   title="تحديد الكل">
+                                   title="<?= t('تحديد الكل') ?>">
                         </th>
-                        <th width="10%">رقم الطلب</th>
-                        <th width="18%">الطالب</th>
-                        <th width="13%">رقم التسجيل</th>
-                        <th width="18%">نوع الطلب</th>
-                        <th width="12%">الحالة</th>
-                        <th width="13%">التاريخ</th>
-                        <th width="13%">الإجراءات</th>
+                        <th width="10%"><?= t('رقم الطلب') ?></th>
+                        <th width="18%"><?= t('الطالب') ?></th>
+                        <th width="13%"><?= t('رقم التسجيل') ?></th>
+                        <th width="18%"><?= t('نوع الطلب') ?></th>
+                        <th width="12%"><?= t('الحالة') ?></th>
+                        <th width="13%"><?= t('التاريخ') ?></th>
+                        <th width="13%"><?= t('الإجراءات') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -380,14 +380,14 @@
                         <td class="action-buttons">
                             <a href="<?= e(url('students:admin_application_detail', $app['id'])) ?>" 
                                class="btn btn-xs btn-primary"
-                               title="عرض التفاصيل">
+                               title="<?= t('عرض التفاصيل') ?>">
                                 <i class="fa fa-eye"></i>
                             </a>
                             
                             <?php if ($app['status'] == 'pending'): ?>
                             <a href="<?= e(url('students:admin_application_detail', $app['id'])) ?>" 
                                class="btn btn-xs btn-success"
-                               title="مراجعة">
+                               title="<?= t('مراجعة') ?>">
                                 <i class="fa fa-check"></i>
                             </a>
                             <?php endif; ?>
@@ -399,17 +399,17 @@
             
             <div style="padding: 15px; background: #f8f9fa; text-align: center; border-top: 1px solid #ddd;">
                 <p style="margin: 0; color: #7f8c8d;">
-                    عرض <?= e(count($applications)) ?> طلب من أصل <?= e($total_count) ?>
+                    <?= t('عرض') ?> <?= e(count($applications)) ?> <?= t('طلب من أصل') ?> <?= e($total_count) ?>
                 </p>
             </div>
             
             <?php else: ?>
             <div class="empty-state">
                 <i class="fa fa-inbox"></i>
-                <h3>لا توجد طلبات</h3>
-                <p>لا توجد طلبات تطابق معايير البحث</p>
+                <h3><?= t('لا توجد طلبات') ?></h3>
+                <p><?= t('لا توجد طلبات تطابق معايير البحث') ?></p>
                 <a href="<?= e(url('students:admin_applications_list')) ?>" class="btn btn-primary" style="margin-top: 20px;">
-                    <i class="fa fa-refresh"></i> عرض كل الطلبات
+                    <i class="fa fa-refresh"></i> <?= t('عرض كل الطلبات') ?>
                 </a>
             </div>
             <?php endif; ?>
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.classList.remove('selected');
             }
             
-            // تحديث "تحديد الكل"
+            // تحديث <?= js_t('تحديد الكل') ?>
             const allChecked = Array.from(appCheckboxes).every(cb => cb.checked);
             const someChecked = Array.from(appCheckboxes).some(cb => cb.checked);
             
@@ -511,13 +511,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!action) {
                 e.preventDefault();
-                alert('يرجى اختيار إجراء!');
+                alert(<?= js_t('يرجى اختيار إجراء!') ?>);
                 return false;
             }
             
             if (count === 0) {
                 e.preventDefault();
-                alert('يرجى تحديد طلب واحد على الأقل!');
+                alert(<?= js_t('يرجى تحديد طلب واحد على الأقل!') ?>);
                 return false;
             }
             
@@ -525,13 +525,13 @@ document.addEventListener('DOMContentLoaded', function() {
             let message = '';
             
             if (action === 'approve') {
-                message = `هل أنت متأكد من اعتماد ${count} طلب؟`;
+                message = <?= js_t('هل أنت متأكد من اعتماد {count} طلب؟') ?>.replace('{count}', count);
             } else if (action === 'reject') {
-                message = `هل أنت متأكد من رفض ${count} طلب؟\n\nملاحظة: يمكنك إضافة سبب الرفض في الخطوة التالية.`;
+                message = <?= js_t("هل أنت متأكد من رفض {count} طلب؟\n\nملاحظة: يمكنك إضافة سبب الرفض في الخطوة التالية.") ?>.replace('{count}', count);
             } else if (action === 'delete') {
-                message = `⚠️ تحذير!\n\nهل أنت متأكد من حذف ${count} طلب نهائياً؟\n\nلا يمكن التراجع عن هذا الإجراء!`;
+                message = <?= js_t("⚠️ تحذير!\n\nهل أنت متأكد من حذف {count} طلب نهائياً؟\n\nلا يمكن التراجع عن هذا الإجراء!") ?>.replace('{count}', count);
             } else {
-                message = `هل أنت متأكد من تطبيق هذا الإجراء على ${count} طلب؟`;
+                message = <?= js_t('هل أنت متأكد من تطبيق هذا الإجراء على {count} طلب؟') ?>.replace('{count}', count);
             }
             
             if (!confirm(message)) {
@@ -539,9 +539,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
             
-            // إذا كان الإجراء "رفض"، نطلب سبب الرفض
+            // إذا كان الإجراء <?= js_t('رفض') ?>، نطلب سبب الرفض
             if (action === 'reject') {
-                const notes = prompt('أدخل سبب الرفض (اختياري):');
+                const notes = prompt(<?= js_t('أدخل سبب الرفض (اختياري):') ?>);
                 if (notes !== null && notes.trim() !== '') {
                     // إضافة حقل مخفي للملاحظات
                     const notesInput = document.createElement('input');
@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ========================================
-// دالة إلغاء التحديد (من زر "إلغاء التحديد")
+// دالة إلغاء التحديد (من زر <?= js_t('إلغاء التحديد') ?>)
 // ========================================
 function clearSelection() {
     document.querySelectorAll('.app-checkbox').forEach(checkbox => {

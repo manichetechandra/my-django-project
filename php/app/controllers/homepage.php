@@ -23,7 +23,7 @@ function homepage_director_word(): void
 {
     render('homepage/director_word', [
         'director_word' => DirectorWord::firstWhere('is_active = 1', [], 'created_at DESC'),
-        'page_title'    => 'كلمة المدير',
+        'page_title'    => __('كلمة المدير'),
     ]);
 }
 
@@ -31,7 +31,7 @@ function homepage_organization(): void
 {
     render('homepage/organization_structure', [
         'organization' => OrganizationStructure::firstWhere('is_active = 1', [], 'id'),
-        'page_title'   => 'الهيكل التنظيمي',
+        'page_title'   => __('الهيكل التنظيمي'),
     ]);
 }
 
@@ -39,6 +39,6 @@ function homepage_history(): void
 {
     render('homepage/directorate_history', [
         'history'    => DirectorateHistory::firstWhere('is_active = 1', [], 'id'),
-        'page_title' => 'تاريخ المديرية',
+        'page_title' => __('تاريخ المديرية'),
     ]);
 }

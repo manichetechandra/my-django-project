@@ -1,6 +1,6 @@
 <?php extend('base/base'); ?>
 <?php block('inline_messages'); ?>1<?php endblock(); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -185,10 +185,10 @@
 <div class="contact-header">
     <div class="container">
         <h1 class="text-center" style="margin: 0; font-size: 42px;">
-            <i class="fa fa-envelope"></i> اتصل بنا
+            <i class="fa fa-envelope"></i> <?= t('اتصل بنا') ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            نحن هنا للإجابة على استفساراتكم ومساعدتكم
+            <?= t('نحن هنا للإجابة على استفساراتكم ومساعدتكم') ?>
         </p>
     </div>
 </div>
@@ -196,8 +196,8 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li class="active">اتصل بنا</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li class="active"><?= t('اتصل بنا') ?></li>
     </ol>
     
     <!-- رسائل النجاح/الخطأ -->
@@ -222,7 +222,7 @@
         <div class="col-md-7">
             <div class="contact-form-container">
                 <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 25px;">
-                    <i class="fa fa-paper-plane"></i> أرسل لنا رسالة
+                    <i class="fa fa-paper-plane"></i> <?= t('أرسل لنا رسالة') ?>
                 </h3>
                 
                 <form method="post" action="<?= e(url('contact:contact')) ?>">
@@ -230,7 +230,7 @@
                     
                     <!-- الاسم الكامل -->
                     <div class="form-group">
-                        <label for="id_full_name" class="required-field">الاسم الكامل</label>
+                        <label for="id_full_name" class="required-field"><?= t('الاسم الكامل') ?></label>
                         <?= $form->widget('full_name') ?>
                         <?php if (!empty($form->errors('full_name'))): ?>
                             <ul class="errorlist">
@@ -243,7 +243,7 @@
                     
                     <!-- البريد الإلكتروني -->
                     <div class="form-group">
-                        <label for="id_email" class="required-field">البريد الإلكتروني</label>
+                        <label for="id_email" class="required-field"><?= t('البريد الإلكتروني') ?></label>
                         <?= $form->widget('email') ?>
                         <?php if (!empty($form->errors('email'))): ?>
                             <ul class="errorlist">
@@ -256,7 +256,7 @@
                     
                     <!-- رقم الهاتف -->
                     <div class="form-group">
-                        <label for="id_phone">رقم الهاتف <small style="color: #999;">(اختياري)</small></label>
+                        <label for="id_phone"><?= t('رقم الهاتف') ?> <small style="color: #999;"><?= t('(اختياري)') ?></small></label>
                         <?= $form->widget('phone') ?>
                         <?php if (!empty($form->errors('phone'))): ?>
                             <ul class="errorlist">
@@ -269,7 +269,7 @@
                     
                     <!-- الموضوع -->
                     <div class="form-group">
-                        <label for="id_subject" class="required-field">الموضوع</label>
+                        <label for="id_subject" class="required-field"><?= t('الموضوع') ?></label>
                         <?= $form->widget('subject') ?>
                         <?php if (!empty($form->errors('subject'))): ?>
                             <ul class="errorlist">
@@ -282,7 +282,7 @@
                     
                     <!-- الرسالة -->
                     <div class="form-group">
-                        <label for="id_message" class="required-field">رسالتك</label>
+                        <label for="id_message" class="required-field"><?= t('رسالتك') ?></label>
                         <?= $form->widget('message') ?>
                         <?php if (!empty($form->errors('message'))): ?>
                             <ul class="errorlist">
@@ -295,11 +295,11 @@
                     
                     <!-- زر الإرسال -->
                     <button type="submit" class="btn btn-submit">
-                        <i class="fa fa-send"></i> إرسال الرسالة
+                        <i class="fa fa-send"></i> <?= t('إرسال الرسالة') ?>
                     </button>
                     
                     <p style="text-align: center; margin-top: 15px; color: #999; font-size: 13px;">
-                        <i class="fa fa-lock"></i> معلوماتك آمنة ولن تُستخدم إلا للرد على استفسارك
+                        <i class="fa fa-lock"></i> <?= t('معلوماتك آمنة ولن تُستخدم إلا للرد على استفسارك') ?>
                     </p>
                 </form>
             </div>
@@ -312,35 +312,35 @@
             <?php if ($total_messages > 0): ?>
             <div class="stats-box">
                 <h3><i class="fa fa-envelope-o"></i> <?= e($total_messages) ?></h3>
-                <p>رسالة تم استقبالها</p>
+                <p><?= t('رسالة تم استقبالها') ?></p>
             </div>
             <?php endif; ?>
             
             <!-- العنوان -->
             <div class="contact-info-box">
                 <i class="fa fa-map-marker"></i>
-                <h4>العنوان</h4>
+                <h4><?= t('العنوان') ?></h4>
                 <p>
-                    مديرية الخدمات الجامعية<br>
-                    جامعة فرحات عباس - سطيف 1<br>
-                    سطيف، الجزائر
+                    <?= t('مديرية الخدمات الجامعية') ?><br>
+                    <?= t('جامعة فرحات عباس - سطيف 1') ?><br>
+                    <?= t('سطيف، الجزائر') ?>
                 </p>
             </div>
             
             <!-- الهاتف -->
             <div class="contact-info-box">
                 <i class="fa fa-phone"></i>
-                <h4>الهاتف</h4>
+                <h4><?= t('الهاتف') ?></h4>
                 <p>
-                    <strong>الخط الرئيسي:</strong> 036 xx xx xx<br>
-                    <strong>الفاكس:</strong> 036 xx xx xx
+                    <strong><?= t('الخط الرئيسي:') ?></strong> 036 xx xx xx<br>
+                    <strong><?= t('الفاكس:') ?></strong> 036 xx xx xx
                 </p>
             </div>
             
             <!-- البريد الإلكتروني -->
             <div class="contact-info-box">
                 <i class="fa fa-envelope"></i>
-                <h4>البريد الإلكتروني</h4>
+                <h4><?= t('البريد الإلكتروني') ?></h4>
                 <p>
                     <a href="mailto:contact@univ-setif.dz" style="color: #3498db;">
                         contact@univ-setif.dz
@@ -350,23 +350,23 @@
             
             <!-- ساعات العمل -->
             <div class="working-hours">
-                <h5><i class="fa fa-clock-o"></i> ساعات العمل</h5>
+                <h5><i class="fa fa-clock-o"></i> <?= t('ساعات العمل') ?></h5>
                 <p>
-                    <strong>الأحد - الخميس:</strong> 8:00 صباحاً - 4:00 مساءً<br>
-                    <strong>الجمعة والسبت:</strong> مغلق
+                    <strong><?= t('الأحد - الخميس:') ?></strong> <?= t('8:00 صباحاً - 4:00 مساءً') ?><br>
+                    <strong><?= t('الجمعة والسبت:') ?></strong> <?= t('مغلق') ?>
                 </p>
             </div>
             
             <!-- روابط سريعة -->
             <div class="contact-info-box">
                 <i class="fa fa-link"></i>
-                <h4>روابط مفيدة</h4>
+                <h4><?= t('روابط مفيدة') ?></h4>
                 <p>
                     <a href="<?= e(url('services:service_list')) ?>" style="color: #3498db;">
-                        <i class="fa fa-arrow-left"></i> الخدمات الجامعية
+                        <i class="fa fa-arrow-left"></i> <?= t('الخدمات الجامعية') ?>
                     </a><br>
                     <a href="<?= e(url('news:news_list')) ?>" style="color: #3498db; margin-top: 5px; display: inline-block;">
-                        <i class="fa fa-arrow-left"></i> آخر الأخبار
+                        <i class="fa fa-arrow-left"></i> <?= t('آخر الأخبار') ?>
                     </a>
                 </p>
             </div>
@@ -378,7 +378,7 @@
     <div class="row" style="margin-top: 40px;">
         <div class="col-md-12">
             <h3 style="color: #2c3e50; margin-bottom: 20px;">
-                <i class="fa fa-map"></i> موقعنا على الخريطة
+                <i class="fa fa-map"></i> <?= t('موقعنا على الخريطة') ?>
             </h3>
             <div class="map-container">
                 <!-- خريطة Google Maps -->
@@ -392,7 +392,7 @@
                 </iframe>
             </div>
             <p style="text-align: center; margin-top: 10px; color: #999; font-size: 13px;">
-                <i class="fa fa-info-circle"></i> يمكنك استخدام الخريطة للوصول إلينا بسهولة
+                <i class="fa fa-info-circle"></i> <?= t('يمكنك استخدام الخريطة للوصول إلينا بسهولة') ?>
             </p>
         </div>
     </div>
@@ -416,7 +416,7 @@
             var message = $('#id_message').val();
             if (message.length < 10) {
                 e.preventDefault();
-                alert('يرجى كتابة رسالة أطول (10 أحرف على الأقل)');
+                alert(<?= js_t('يرجى كتابة رسالة أطول (10 أحرف على الأقل)') ?>);
                 return false;
             }
         });
@@ -427,9 +427,9 @@
             var label = $('label[for="id_message"]');
             
             if (length > 0) {
-                label.html('رسالتك <span class="required-field"></span> <small style="color: #999;">(' + length + ' حرف)</small>');
+                label.html(<?= js_t('رسالتك') ?> + ' <span class="required-field"></span> <small style="color: #999;">(' + length + ' ' + <?= js_t('حرف') ?> + ')</small>');
             } else {
-                label.html('رسالتك <span class="required-field"></span>');
+                label.html(<?= js_t('رسالتك') ?> + ' <span class="required-field"></span>');
             }
         });
     });

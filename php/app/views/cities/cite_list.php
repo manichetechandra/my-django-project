@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?>الإقامات الجامعية - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= t('الإقامات الجامعية - مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -46,15 +46,15 @@
 <div class="container" style="margin-top: 80px;">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li class="active">الإقامات الجامعية</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li class="active"><?= t('الإقامات الجامعية') ?></li>
     </ol>
 
     <!-- العنوان -->
     <div class="page-header">
         <h1>
-            <i class="fa fa-building"></i> الإقامات الجامعية
-            <small>(<?= e($cites['paginator']['count']) ?> إقامة)</small>
+            <i class="fa fa-building"></i> <?= t('الإقامات الجامعية') ?>
+            <small><?= t('({count} إقامة)', ['count' => $cites['paginator']['count']]) ?></small>
         </h1>
     </div>
 
@@ -80,14 +80,14 @@
                     <p><?= e(truncatewords($cite['description'], 20)) ?></p>
                     
                     <?php if (!empty($cite['capacity'])): ?>
-                    <p><i class="fa fa-users"></i> <strong>السعة:</strong> <?= e($cite['capacity']) ?> طالب</p>
+                    <p><i class="fa fa-users"></i> <strong><?= t('السعة:') ?></strong> <?= e($cite['capacity']) ?> <?= t('طالب') ?></p>
                     <?php endif; ?>
                 </div>
                 
                 <!-- الزر -->
                 <div class="panel-footer text-center">
                     <a href="<?= e(url('cities:cite_detail', $cite['slug'])) ?>" class="btn btn-success">
-                        عرض التفاصيل <i class="fa fa-arrow-left"></i>
+                        <?= t('عرض التفاصيل') ?> <i class="fa fa-arrow-left"></i>
                     </a>
                 </div>
             </div>
@@ -95,7 +95,7 @@
         <?php endforeach; ?><?php else: ?>
         <div class="col-md-12">
             <div class="alert alert-info text-center">
-                <i class="fa fa-info-circle"></i> لا توجد إقامات جامعية حالياً
+                <i class="fa fa-info-circle"></i> <?= t('لا توجد إقامات جامعية حالياً') ?>
             </div>
         </div>
         <?php endif; ?>
@@ -106,7 +106,7 @@
     <div class="text-center">
         <ul class="pagination">
             <?php if (!empty($cites->has_previous())): ?>
-            <li><a href="?page=<?= e($cites->previous_page_number()) ?>">السابق</a></li>
+            <li><a href="?page=<?= e($cites->previous_page_number()) ?>"><?= t('السابق') ?></a></li>
             <?php endif; ?>
             
             <?php foreach ($cites['paginator']['page_range'] as $num): ?>
@@ -118,7 +118,7 @@
             <?php endforeach; ?>
             
             <?php if (!empty($cites->has_next())): ?>
-            <li><a href="?page=<?= e($cites->next_page_number()) ?>">التالي</a></li>
+            <li><a href="?page=<?= e($cites->next_page_number()) ?>"><?= t('التالي') ?></a></li>
             <?php endif; ?>
         </ul>
     </div>

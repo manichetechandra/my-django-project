@@ -7,7 +7,7 @@ function news_list(): void
 {
     render('news/news_list', [
         'news'       => News::paginate("status = 'published'", [], 'COALESCE(published_date, created_at) DESC, id DESC', 9),
-        'page_title' => 'الأخبار',
+        'page_title' => __('الأخبار'),
     ]);
 }
 

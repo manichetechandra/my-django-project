@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <!-- Meta tags لمنع cache -->
@@ -111,10 +111,10 @@
 <div class="login-header">
     <div class="container">
         <h1 class="text-center" style="margin: 0; font-size: 42px;">
-            <i class="fa fa-sign-in"></i> تسجيل الدخول
+            <i class="fa fa-sign-in"></i> <?= t('تسجيل الدخول') ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            سجّل دخولك للوصول إلى لوحة التحكم
+            <?= t('سجّل دخولك للوصول إلى لوحة التحكم') ?>
         </p>
     </div>
 </div>
@@ -122,8 +122,8 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li class="active">تسجيل الدخول</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li class="active"><?= t('تسجيل الدخول') ?></li>
     </ol>
     
     <div class="login-container">
@@ -139,14 +139,14 @@
             
             <div class="form-group">
                 <label for="id_username">
-                    <i class="fa fa-user"></i> رقم التسجيل أو اسم المستخدم
+                    <i class="fa fa-user"></i> <?= t('رقم التسجيل أو اسم المستخدم') ?>
                 </label>
                 <?= $form->widget('username') ?>
             </div>
             
             <div class="form-group">
                 <label for="id_password">
-                    <i class="fa fa-lock"></i> كلمة المرور
+                    <i class="fa fa-lock"></i> <?= t('كلمة المرور') ?>
                 </label>
                 <?= $form->widget('password') ?>
             </div>
@@ -154,17 +154,17 @@
             <div class="remember-me">
                 <?= $form->widget('remember_me') ?>
                 <label for="id_remember_me" style="margin: 0; font-weight: normal;">
-                    تذكرني
+                    <?= t('تذكرني') ?>
                 </label>
             </div>
             
             <button type="submit" class="btn-login">
-                <i class="fa fa-sign-in"></i> تسجيل الدخول
+                <i class="fa fa-sign-in"></i> <?= t('تسجيل الدخول') ?>
             </button>
             
             <div class="forgot-password">
                 <a href="#">
-                    <i class="fa fa-question-circle"></i> نسيت كلمة المرور؟
+                    <i class="fa fa-question-circle"></i> <?= t('نسيت كلمة المرور؟') ?>
                 </a>
             </div>
             
@@ -172,11 +172,11 @@
         
         <!-- رابط التسجيل -->
         <div class="register-link">
-            <p>ليس لديك حساب؟</p>
+            <p><?= t('ليس لديك حساب؟') ?></p>
             <a href="<?= e(url('students:register')) ?>" 
                class="btn btn-default btn-lg" 
                style="background: #3498db; color: white; border: none;">
-                <i class="fa fa-user-plus"></i> سجّل الآن مجاناً
+                <i class="fa fa-user-plus"></i> <?= t('سجّل الآن مجاناً') ?>
             </a>
         </div>
         

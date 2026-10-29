@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($service['title']) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($service['title']) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -130,8 +130,8 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('services:service_list')) ?>">الخدمات الجامعية</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('services:service_list')) ?>"><?= t('الخدمات الجامعية') ?></a></li>
         <li class="active"><?= e($service['title']) ?></li>
     </ol>
     
@@ -151,14 +151,14 @@
             
             <!-- الوصف التفصيلي -->
             <div class="content-section">
-                <h3><i class="fa fa-info-circle"></i> نبذة عن الخدمة</h3>
+                <h3><i class="fa fa-info-circle"></i> <?= t('نبذة عن الخدمة') ?></h3>
                 <p><?= linebreaks($service['detailed_description']) ?></p>
             </div>
             
             <!-- الشروط والمتطلبات -->
             <?php if (!empty($service['requirements'])): ?>
             <div class="content-section">
-                <h3><i class="fa fa-list-ul"></i> الشروط والمتطلبات</h3>
+                <h3><i class="fa fa-list-ul"></i> <?= t('الشروط والمتطلبات') ?></h3>
                 <p><?= linebreaks($service['requirements']) ?></p>
             </div>
             <?php endif; ?>
@@ -166,7 +166,7 @@
             <!-- كيفية التقديم -->
             <?php if (!empty($service['how_to_apply'])): ?>
             <div class="content-section">
-                <h3><i class="fa fa-file-text"></i> كيفية التقديم</h3>
+                <h3><i class="fa fa-file-text"></i> <?= t('كيفية التقديم') ?></h3>
                 <p><?= linebreaks($service['how_to_apply']) ?></p>
             </div>
             <?php endif; ?>
@@ -179,21 +179,21 @@
             <!-- معلومات الاتصال -->
             <?php if (!empty($service['contact_info'])): ?>
             <div class="info-box">
-                <h4><i class="fa fa-phone"></i> معلومات الاتصال</h4>
+                <h4><i class="fa fa-phone"></i> <?= t('معلومات الاتصال') ?></h4>
                 <p style="margin: 0;"><?= linebreaks($service['contact_info']) ?></p>
             </div>
             <?php endif; ?>
             
             <!-- معلومات إضافية -->
             <div class="info-box">
-                <h4><i class="fa fa-info"></i> معلومات عامة</h4>
+                <h4><i class="fa fa-info"></i> <?= t('معلومات عامة') ?></h4>
                 <p style="margin-bottom: 10px;">
                     <i class="fa fa-tag"></i>
-                    <strong>النوع:</strong> <?= e($service->get_service_type_display()) ?>
+                    <strong><?= t('النوع:') ?></strong> <?= e($service->get_service_type_display()) ?>
                 </p>
                 <p style="margin-bottom: 10px;">
                     <i class="fa fa-calendar"></i>
-                    <strong>آخر تحديث:</strong> <?= e(format_date($service['updated_at'], 'd/m/Y')) ?>
+                    <strong><?= t('آخر تحديث:') ?></strong> <?= e(format_date($service['updated_at'], 'd/m/Y')) ?>
                 </p>
             </div>
             
@@ -201,7 +201,7 @@
             <?php if (!empty($related_services)): ?>
             <div class="content-section">
                 <h4 style="color: #2c3e50; margin-top: 0;">
-                    <i class="fa fa-link"></i> خدمات ذات صلة
+                    <i class="fa fa-link"></i> <?= t('خدمات ذات صلة') ?>
                 </h4>
                 <?php foreach ($related_services as $related): ?>
                 <div class="related-service">
@@ -213,7 +213,7 @@
                         <?= e(truncatewords($related['short_description'], 15)) ?>
                     </p>
                     <a href="<?= e($related->get_absolute_url()) ?>" class="btn btn-sm btn-success">
-                        <i class="fa fa-arrow-left"></i> التفاصيل
+                        <i class="fa fa-arrow-left"></i> <?= t('التفاصيل') ?>
                     </a>
                 </div>
                 <?php endforeach; ?>
@@ -222,7 +222,7 @@
             
             <!-- العودة للقائمة -->
             <a href="<?= e(url('services:service_list')) ?>" class="btn btn-default btn-block">
-                <i class="fa fa-arrow-right"></i> العودة لقائمة الخدمات
+                <i class="fa fa-arrow-right"></i> <?= t('العودة لقائمة الخدمات') ?>
             </a>
             
         </div>

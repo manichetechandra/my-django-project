@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <!-- Meta tags لمنع cache -->
@@ -222,7 +222,7 @@
 <div class="dashboard-header">
     <div class="container">
         <h1 style="margin: 0; font-size: 36px;">
-            <i class="fa fa-dashboard"></i> لوحة التحكم
+            <i class="fa fa-dashboard"></i> <?= t('لوحة التحكم') ?>
         </h1>
     </div>
 </div>
@@ -236,9 +236,9 @@
                 <i class="fa fa-user"></i>
             </div>
             <div class="student-details">
-                <h3>مرحباً، <?= e($student['full_name_arabic']) ?>!</h3>
+                <h3><?= t('مرحباً،') ?> <?= e($student['full_name_arabic']) ?>!</h3>
                 <p>
-                    <i class="fa fa-id-card"></i> رقم التسجيل: <?= e($student['registration_number']) ?> |
+                    <i class="fa fa-id-card"></i> <?= t('رقم التسجيل:') ?> <?= e($student['registration_number']) ?> |
                     <i class="fa fa-graduation-cap"></i> <?= e($student->get_current_year_display()) ?> |
                     <i class="fa fa-university"></i> <?= e($student['faculty']) ?>
                 </p>
@@ -248,7 +248,7 @@
     
     <!-- إحصائيات الطلبات -->
     <h3 style="color: #2c3e50; margin-bottom: 20px;">
-        <i class="fa fa-bar-chart"></i> إحصائيات الطلبات
+        <i class="fa fa-bar-chart"></i> <?= t('إحصائيات الطلبات') ?>
     </h3>
     
     <div class="row">
@@ -256,7 +256,7 @@
             <div class="stat-card pending">
                 <i class="fa fa-clock-o"></i>
                 <h2><?= e($pending_count) ?></h2>
-                <p>قيد الانتظار</p>
+                <p><?= t('قيد الانتظار') ?></p>
             </div>
         </div>
         
@@ -264,7 +264,7 @@
             <div class="stat-card under-review">
                 <i class="fa fa-search"></i>
                 <h2><?= e($under_review_count) ?></h2>
-                <p>قيد المراجعة</p>
+                <p><?= t('قيد المراجعة') ?></p>
             </div>
         </div>
         
@@ -272,7 +272,7 @@
             <div class="stat-card approved">
                 <i class="fa fa-check-circle"></i>
                 <h2><?= e($approved_count) ?></h2>
-                <p>معتمدة</p>
+                <p><?= t('معتمدة') ?></p>
             </div>
         </div>
         
@@ -280,39 +280,39 @@
             <div class="stat-card rejected">
                 <i class="fa fa-times-circle"></i>
                 <h2><?= e($rejected_count) ?></h2>
-                <p>مرفوضة</p>
+                <p><?= t('مرفوضة') ?></p>
             </div>
         </div>
     </div>
     
     <!-- قائمة الخيارات السريعة -->
 <h3 style="color: #2c3e50; margin: 40px 0 20px 0;">
-    <i class="fa fa-th-large"></i> الخيارات السريعة
+    <i class="fa fa-th-large"></i> <?= t('الخيارات السريعة') ?>
 </h3>
 
 <div class="action-grid">
     <a href="<?= e(url('students:create_application')) ?>" class="action-card" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;">
         <i class="fa fa-plus-circle"></i>
-        <h4>تقديم طلب جديد</h4>
+        <h4><?= t('تقديم طلب جديد') ?></h4>
     </a>
     
     <a href="<?= e(url('students:my_applications')) ?>" class="action-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;">
         <i class="fa fa-list"></i>
-        <h4>طلباتي</h4>
+        <h4><?= t('طلباتي') ?></h4>
     </a>
     
     <a href="#" class="action-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
         <i class="fa fa-user"></i>
-        <h4>معلوماتي الشخصية</h4>
+        <h4><?= t('معلوماتي الشخصية') ?></h4>
     </a>
     
      <!-- ← جديد! البطاقة الرقمية -->
     <a href="<?= e(url('students:student_card')) ?>" target="_blank"class="action-card" style="background: linear-gradient(135deg, #f39c, #e67e22); color: white;">
-        <i class="fa fa-id-card"></i><h4> بطاقتي الرقمية</h4>
+        <i class="fa fa-id-card"></i><h4> <?= t('بطاقتي الرقمية') ?></h4>
     </a>
     <a href="#" class="action-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white;">
         <i class="fa fa-bell"></i>
-        <h4>الإشعارات</h4>
+        <h4><?= t('الإشعارات') ?></h4>
     </a>
 </div>
     
@@ -321,7 +321,7 @@
        <!-- آخر الطلبات -->
 <div class="col-md-7">
     <h3 style="color: #2c3e50; margin-bottom: 20px;">
-        <i class="fa fa-history"></i> آخر الطلبات
+        <i class="fa fa-history"></i> <?= t('آخر الطلبات') ?>
     </h3>
     
     <div class="application-list">
@@ -349,9 +349,9 @@
         <?php else: ?>
             <div style="text-align: center; padding: 40px; color: #7f8c8d;">
                 <i class="fa fa-inbox" style="font-size: 64px; display: block; margin-bottom: 20px;"></i>
-                <p>لم تقدم أي طلبات بعد</p>
+                <p><?= t('لم تقدم أي طلبات بعد') ?></p>
                 <a href="<?= e(url('students:create_application')) ?>" class="btn btn-primary" style="margin-top: 15px;">
-                    <i class="fa fa-plus"></i> قدّم طلبك الأول
+                    <i class="fa fa-plus"></i> <?= t('قدّم طلبك الأول') ?>
                 </a>
             </div>
         <?php endif; ?>
@@ -361,7 +361,7 @@
         <!-- الإشعارات -->
         <div class="col-md-5">
             <h3 style="color: #2c3e50; margin-bottom: 20px;">
-                <i class="fa fa-bell"></i> الإشعارات
+                <i class="fa fa-bell"></i> <?= t('الإشعارات') ?>
                 <?php if (!empty($unread_notifications)): ?>
                 <span class="badge" style="background: #e74c3c; font-size: 14px;">
                     <?= e(count($unread_notifications)) ?>
@@ -385,7 +385,7 @@
                 <?php else: ?>
                     <div style="text-align: center; padding: 40px; color: #7f8c8d;">
                         <i class="fa fa-bell-slash-o" style="font-size: 48px; display: block; margin-bottom: 15px;"></i>
-                        <p>لا توجد إشعارات جديدة</p>
+                        <p><?= t('لا توجد إشعارات جديدة') ?></p>
                     </div>
                 <?php endif; ?>
             </div>
@@ -395,7 +395,7 @@
     
    <!-- أنواع الطلبات المتاحة -->
 <h3 style="color: #2c3e50; margin: 40px 0 20px 0;">
-    <i class="fa fa-file-text"></i> الطلبات المتاحة
+    <i class="fa fa-file-text"></i> <?= t('الطلبات المتاحة') ?>
 </h3>
 
 <div class="row">
@@ -406,7 +406,7 @@
             <h4><?= e($app_type['name']) ?></h4>
             <p style="color: #7f8c8d; margin: 10px 0;"><?= e(truncatewords($app_type['description'], 10)) ?></p>
             <a href="<?= e(url('students:create_application_type', $app_type['id'])) ?>" class="btn btn-sm" style="background: <?= e($app_type['color']) ?>; color: white; border: none;">
-                <i class="fa fa-plus"></i> تقديم الطلب
+                <i class="fa fa-plus"></i> <?= t('تقديم الطلب') ?>
             </a>
         </div>
     </div>

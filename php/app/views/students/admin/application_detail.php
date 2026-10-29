@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -174,10 +174,10 @@
 <div class="detail-header">
     <div class="container">
         <h1 style="margin: 0; font-size: 36px;">
-            <i class="fa fa-clipboard"></i> مراجعة الطلب
+            <i class="fa fa-clipboard"></i> <?= t('مراجعة الطلب') ?>
         </h1>
         <p style="margin-top: 10px; opacity: 0.9;">
-            رقم الطلب: <?= e($application['application_number']) ?>
+            <?= t('رقم الطلب:') ?> <?= e($application['application_number']) ?>
         </p>
     </div>
 </div>
@@ -186,9 +186,9 @@
     
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:admin_dashboard')) ?>">لوحة المشرف</a></li>
-        <li><a href="<?= e(url('students:admin_applications_list')) ?>">الطلبات</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:admin_dashboard')) ?>"><?= t('لوحة المشرف') ?></a></li>
+        <li><a href="<?= e(url('students:admin_applications_list')) ?>"><?= t('الطلبات') ?></a></li>
         <li class="active"><?= e($application['application_number']) ?></li>
     </ol>
     
@@ -205,7 +205,7 @@
                  ======================================== -->
             <?php if ($application['status'] == 'pending'): ?>
             <div class="action-section">
-                <h4><i class="fa fa-flash"></i> إجراءات سريعة</h4>
+                <h4><i class="fa fa-flash"></i> <?= t('إجراءات سريعة') ?></h4>
                 
                 <!-- نموذج الاعتماد -->
                 <form method="post" style="display: inline;">
@@ -227,8 +227,8 @@
                         - action=approve يعني "اعتماد"
                     -->
                     <button type="submit" class="action-btn btn-approve" 
-                            onclick="return confirm('هل أنت متأكد من اعتماد هذا الطلب؟');">
-                        <i class="fa fa-check-circle"></i> اعتماد الطلب
+                            onclick="return confirm(<?= e(js_t('هل أنت متأكد من اعتماد هذا الطلب؟')) ?>);">
+                        <i class="fa fa-check-circle"></i> <?= t('اعتماد الطلب') ?>
                     </button>
                     <!-- 
                         onclick="return confirm(...)"
@@ -242,7 +242,7 @@
                 
                 <!-- نموذج الرفض -->
                 <button type="button" class="action-btn btn-reject" data-toggle="modal" data-target="#rejectModal">
-                    <i class="fa fa-times-circle"></i> رفض الطلب
+                    <i class="fa fa-times-circle"></i> <?= t('رفض الطلب') ?>
                 </button>
                 <!-- 
                     data-toggle="modal"
@@ -261,11 +261,11 @@
                      معلومات الطلب
                      ======================================== -->
                 <div class="detail-section">
-                    <h3><i class="fa fa-info-circle"></i> معلومات الطلب</h3>
+                    <h3><i class="fa fa-info-circle"></i> <?= t('معلومات الطلب') ?></h3>
                     
                     <div class="info-grid">
                         <div class="info-item">
-                            <label>نوع الطلب</label>
+                            <label><?= t('نوع الطلب') ?></label>
                             <div class="value">
                                 <i class="fa <?= e($application['application_type']['icon']) ?>" 
                                    style="color: <?= e($application['application_type']['color']) ?>;"></i>
@@ -274,12 +274,12 @@
                         </div>
                         
                         <div class="info-item">
-                            <label>رقم الطلب</label>
+                            <label><?= t('رقم الطلب') ?></label>
                             <div class="value"><?= e($application['application_number']) ?></div>
                         </div>
                         
                         <div class="info-item">
-                            <label>الحالة</label>
+                            <label><?= t('الحالة') ?></label>
                             <div class="value">
                                 <span class="status-badge status-<?= e($application['status']) ?>">
                                     <i class="fa <?= e($application->get_status_icon()) ?>"></i>
@@ -289,20 +289,20 @@
                         </div>
                         
                         <div class="info-item">
-                            <label>تاريخ التقديم</label>
+                            <label><?= t('تاريخ التقديم') ?></label>
                             <div class="value"><?= e(format_date($application['submitted_at'], 'd/m/Y - H:i')) ?></div>
                         </div>
                         
                         <?php if (!empty($application['reviewed_at'])): ?>
                         <div class="info-item">
-                            <label>تاريخ المراجعة</label>
+                            <label><?= t('تاريخ المراجعة') ?></label>
                             <div class="value"><?= e(format_date($application['reviewed_at'], 'd/m/Y - H:i')) ?></div>
                         </div>
                         <?php endif; ?>
                         
                         <?php if (!empty($application['reviewed_by'])): ?>
                         <div class="info-item">
-                            <label>راجعه</label>
+                            <label><?= t('راجعه') ?></label>
                             <div class="value">
                                 <i class="fa fa-user"></i>
                                 <?= e(($application['reviewed_by']->get_full_name() ?: $application['reviewed_by']['username'])) ?>
@@ -316,16 +316,16 @@
                      معلومات الطالب - مهم للمشرف!
                      ======================================== -->
                 <div class="detail-section" style="background: #f8f9fa;">
-                    <h3><i class="fa fa-user"></i> معلومات الطالب</h3>
+                    <h3><i class="fa fa-user"></i> <?= t('معلومات الطالب') ?></h3>
                     
                     <div class="info-grid">
                         <div class="info-item">
-                            <label>الاسم الكامل</label>
+                            <label><?= t('الاسم الكامل') ?></label>
                             <div class="value"><?= e($student['full_name_arabic']) ?></div>
                         </div>
                         
                         <div class="info-item">
-                            <label>رقم التسجيل</label>
+                            <label><?= t('رقم التسجيل') ?></label>
                             <div class="value">
                                 <code style="background: white; padding: 5px 10px; border-radius: 3px;">
                                     <?= e($student['registration_number']) ?>
@@ -334,7 +334,7 @@
                         </div>
                         
                         <div class="info-item">
-                            <label>البريد الإلكتروني</label>
+                            <label><?= t('البريد الإلكتروني') ?></label>
                             <div class="value">
                                 <a href="mailto:<?= e($student['user']['email']) ?>">
                                     <?= e($student['user']['email']) ?>
@@ -343,7 +343,7 @@
                         </div>
                         
                         <div class="info-item">
-                            <label>رقم الهاتف</label>
+                            <label><?= t('رقم الهاتف') ?></label>
                             <div class="value">
                                 <a href="tel:<?= e($student['phone']) ?>">
                                     <i class="fa fa-phone"></i> <?= e($student['phone']) ?>
@@ -352,22 +352,22 @@
                         </div>
                         
                         <div class="info-item">
-                            <label>الكلية</label>
+                            <label><?= t('الكلية') ?></label>
                             <div class="value"><?= e($student['faculty']) ?></div>
                         </div>
                         
                         <div class="info-item">
-                            <label>القسم</label>
+                            <label><?= t('القسم') ?></label>
                             <div class="value"><?= e($student['department']) ?></div>
                         </div>
                         
                         <div class="info-item">
-                            <label>السنة الدراسية</label>
+                            <label><?= t('السنة الدراسية') ?></label>
                             <div class="value"><?= e($student->get_current_year_display()) ?></div>
                         </div>
                         
                         <div class="info-item">
-                            <label>الولاية</label>
+                            <label><?= t('الولاية') ?></label>
                             <div class="value"><?= e($student['wilaya']) ?></div>
                         </div>
                     </div>
@@ -378,7 +378,7 @@
                      ======================================== -->
                 <?php if (!empty($application['details'])): ?>
                 <div class="detail-section">
-                    <h3><i class="fa fa-comment"></i> تفاصيل الطلب</h3>
+                    <h3><i class="fa fa-comment"></i> <?= t('تفاصيل الطلب') ?></h3>
                     <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; line-height: 1.8; border-inline-start: 3px solid #3498db;">
                         <?= linebreaks($application['details']) ?>
                         <!-- 
@@ -396,7 +396,7 @@
                      الوثائق المرفقة
                      ======================================== -->
                 <div class="detail-section">
-                    <h3><i class="fa fa-paperclip"></i> الوثائق المرفقة (<?= e(count($documents)) ?>)</h3>
+                    <h3><i class="fa fa-paperclip"></i> <?= t('الوثائق المرفقة') ?> (<?= e(count($documents)) ?>)</h3>
                     
                     <?php if (!empty($documents)): ?>
                     <ul class="documents-list">
@@ -416,13 +416,13 @@
                                    class="btn btn-sm btn-primary" 
                                    target="_blank"
                                    download>
-                                    <i class="fa fa-download"></i> تحميل
+                                    <i class="fa fa-download"></i> <?= t('تحميل') ?>
                                 </a>
                                 <!-- زر معاينة -->
                                 <a href="<?= e($doc->get_download_url()) ?>" 
                                    class="btn btn-sm btn-info" 
                                    target="_blank">
-                                    <i class="fa fa-eye"></i> معاينة
+                                    <i class="fa fa-eye"></i> <?= t('معاينة') ?>
                                 </a>
                             </div>
                         </li>
@@ -431,7 +431,7 @@
                     <?php else: ?>
                     <p style="text-align: center; color: #7f8c8d; padding: 40px;">
                         <i class="fa fa-inbox" style="font-size: 48px; display: block; margin-bottom: 15px;"></i>
-                        لا توجد وثائق مرفقة
+                        <?= t('لا توجد وثائق مرفقة') ?>
                     </p>
                     <?php endif; ?>
                 </div>
@@ -441,7 +441,7 @@
                      ======================================== -->
                 <?php if (!empty($application['admin_notes'])): ?>
                 <div class="detail-section">
-                    <h3><i class="fa fa-comment-o"></i> ملاحظات الإدارة</h3>
+                    <h3><i class="fa fa-comment-o"></i> <?= t('ملاحظات الإدارة') ?></h3>
                     <div class="admin-notes-box">
                         <p style="margin: 0; white-space: pre-line;"><?= e($application['admin_notes']) ?></p>
                         <!-- 
@@ -459,7 +459,7 @@
                      أزرار تغيير الحالة
                      ======================================== -->
                 <div class="detail-section" style="background: #ecf0f1;">
-                    <h3><i class="fa fa-cog"></i> تغيير الحالة</h3>
+                    <h3><i class="fa fa-cog"></i> <?= t('تغيير الحالة') ?></h3>
                     
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <!-- زر: قيد المراجعة -->
@@ -467,7 +467,7 @@
                             <?= csrf_field() ?>
                             <input type="hidden" name="action" value="review">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-search"></i> قيد المراجعة
+                                <i class="fa fa-search"></i> <?= t('قيد المراجعة') ?>
                             </button>
                         </form>
                         
@@ -476,7 +476,7 @@
                             <?= csrf_field() ?>
                             <input type="hidden" name="action" value="pending">
                             <button type="submit" class="btn btn-warning">
-                                <i class="fa fa-clock-o"></i> قيد الانتظار
+                                <i class="fa fa-clock-o"></i> <?= t('قيد الانتظار') ?>
                             </button>
                         </form>
                         
@@ -486,8 +486,8 @@
                             <?= csrf_field() ?>
                             <input type="hidden" name="action" value="approve">
                             <button type="submit" class="btn btn-success" 
-                                    onclick="return confirm('اعتماد هذا الطلب؟');">
-                                <i class="fa fa-check"></i> اعتماد
+                                    onclick="return confirm(<?= e(js_t('اعتماد هذا الطلب؟')) ?>);">
+                                <i class="fa fa-check"></i> <?= t('اعتماد') ?>
                             </button>
                         </form>
                         <?php endif; ?>
@@ -495,7 +495,7 @@
                         <!-- زر: رفض -->
                         <?php if ($application['status'] != 'rejected'): ?>
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal">
-                            <i class="fa fa-times"></i> رفض
+                            <i class="fa fa-times"></i> <?= t('رفض') ?>
                         </button>
                         <?php endif; ?>
                     </div>
@@ -506,13 +506,13 @@
                      ======================================== -->
                 <div style="padding: 20px; background: #f8f9fa; text-align: center;">
                     <a href="<?= e(url('students:admin_applications_list')) ?>" class="btn btn-default btn-lg">
-                        <i class="fa fa-arrow-right"></i> العودة للقائمة
+                        <i class="fa fa-arrow-right"></i> <?= t('العودة للقائمة') ?>
                     </a>
                     
                     <a href="<?= e(url('students:application_print', $application['id'])) ?>" 
                        class="btn btn-primary btn-lg" 
                        target="_blank">
-                        <i class="fa fa-print"></i> طباعة
+                        <i class="fa fa-print"></i> <?= t('طباعة') ?>
                     </a>
                 </div>
                 
@@ -538,7 +538,7 @@
                     <span>&times;</span>
                 </button>
                 <h4 class="modal-title">
-                    <i class="fa fa-times-circle"></i> رفض الطلب
+                    <i class="fa fa-times-circle"></i> <?= t('رفض الطلب') ?>
                 </h4>
             </div>
             
@@ -549,15 +549,15 @@
                 
                 <div class="modal-body">
                     <p style="color: #e74c3c; font-weight: bold;">
-                        <i class="fa fa-warning"></i> هل أنت متأكد من رفض هذا الطلب؟
+                        <i class="fa fa-warning"></i> <?= t('هل أنت متأكد من رفض هذا الطلب؟') ?>
                     </p>
                     
                     <div class="form-group">
-                        <label>سبب الرفض <span style="color: red;">*</span></label>
+                        <label><?= t('سبب الرفض') ?> <span style="color: red;">*</span></label>
                         <textarea name="admin_notes" 
                                   class="form-control" 
                                   rows="5" 
-                                  placeholder="اكتب سبب رفض الطلب ليتمكن الطالب من معرفته..."
+                                  placeholder="<?= t('اكتب سبب رفض الطلب ليتمكن الطالب من معرفته...') ?>"
                                   required></textarea>
                         <!-- 
                             required
@@ -570,18 +570,18 @@
                     
                     <div class="alert alert-warning" style="margin-bottom: 0;">
                         <i class="fa fa-info-circle"></i>
-                        <strong>ملاحظة:</strong>
-                        سيتم إرسال إشعار تلقائي للطالب مع سبب الرفض.
+                        <strong><?= t('ملاحظة:') ?></strong>
+                        <?= t('سيتم إرسال إشعار تلقائي للطالب مع سبب الرفض.') ?>
                     </div>
                 </div>
                 
                 <!-- Footer الـ Modal -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">
-                        <i class="fa fa-times"></i> إلغاء
+                        <i class="fa fa-times"></i> <?= t('إلغاء') ?>
                     </button>
                     <button type="submit" class="btn btn-danger">
-                        <i class="fa fa-check"></i> تأكيد الرفض
+                        <i class="fa fa-check"></i> <?= t('تأكيد الرفض') ?>
                     </button>
                 </div>
             </form>

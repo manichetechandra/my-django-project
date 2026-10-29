@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($cite['name']) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($cite['name']) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -101,8 +101,8 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('cities:cite_list')) ?>">الإقامات الجامعية</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('cities:cite_list')) ?>"><?= t('الإقامات الجامعية') ?></a></li>
         <li class="active"><?= e($cite['name']) ?></li>
     </ol>
 
@@ -118,7 +118,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <i class="fa fa-info-circle"></i> عن الإقامة
+                        <i class="fa fa-info-circle"></i> <?= t('عن الإقامة') ?>
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -133,7 +133,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <i class="fa fa-images"></i> معرض الصور
+                        <i class="fa fa-images"></i> <?= t('معرض الصور') ?>
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -159,22 +159,22 @@
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <i class="fa fa-info"></i> معلومات الإقامة
+                        <i class="fa fa-info"></i> <?= t('معلومات الإقامة') ?>
                     </h3>
                 </div>
                 <div class="panel-body">
                     <?php if (!empty($cite['capacity'])): ?>
                     <div class="info-item">
                         <i class="fa fa-users"></i>
-                        <strong>السعة الاستيعابية:</strong><br>
-                        <span style="font-size: 24px; color: #8cc040;"><?= e($cite['capacity']) ?></span> طالب
+                        <strong><?= t('السعة الاستيعابية:') ?></strong><br>
+                        <span style="font-size: 24px; color: #8cc040;"><?= e($cite['capacity']) ?></span> <?= t('طالب') ?>
                     </div>
                     <?php endif; ?>
                     
                     <?php if (!empty($cite['address'])): ?>
                     <div class="info-item">
                         <i class="fa fa-map-marker"></i>
-                        <strong>العنوان:</strong><br>
+                        <strong><?= t('العنوان:') ?></strong><br>
                         <?= e($cite['address']) ?>
                     </div>
                     <?php endif; ?>
@@ -182,7 +182,7 @@
                     <?php if (!empty($cite['phone'])): ?>
                     <div class="info-item">
                         <i class="fa fa-phone"></i>
-                        <strong>الهاتف:</strong><br>
+                        <strong><?= t('الهاتف:') ?></strong><br>
                         <span dir="ltr" style="font-size: 18px; color: #2c3e50;"><?= e($cite['phone']) ?></span>
                     </div>
                     <?php endif; ?>
@@ -190,7 +190,7 @@
                     <?php if (empty($cite['capacity']) && empty($cite['address']) && empty($cite['phone'])): ?>
                     <p class="text-muted text-center">
                         <i class="fa fa-info-circle"></i><br>
-                        لا توجد معلومات إضافية متاحة حالياً
+                        <?= t('لا توجد معلومات إضافية متاحة حالياً') ?>
                     </p>
                     <?php endif; ?>
                 </div>
@@ -201,7 +201,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <i class="fa fa-building-o"></i> إقامات أخرى
+                        <i class="fa fa-building-o"></i> <?= t('إقامات أخرى') ?>
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -211,7 +211,7 @@
                             <h4 style="margin: 0 0 5px 0; color: #2c3e50;"><?= e($other['name']) ?></h4>
                             <small style="color: #999;">
                                 <?php if (!empty($other['capacity'])): ?>
-                                <i class="fa fa-users"></i> <?= e($other['capacity']) ?> طالب
+                                <i class="fa fa-users"></i> <?= e($other['capacity']) ?> <?= t('طالب') ?>
                                 <?php endif; ?>
                                 <?php if (!empty($other['address'])): ?>
                                 <br><i class="fa fa-map-marker"></i> <?= e(truncatewords($other['address'], 5)) ?>
@@ -223,7 +223,7 @@
                 </div>
                 <div class="panel-footer text-center">
                     <a href="<?= e(url('cities:cite_list')) ?>" class="btn btn-sm btn-success">
-                        عرض كل الإقامات
+                        <?= t('عرض كل الإقامات') ?>
                     </a>
                 </div>
             </div>

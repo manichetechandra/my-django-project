@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -134,10 +134,10 @@
 <div class="application-header">
     <div class="container">
         <h1 class="text-center" style="margin: 0; font-size: 42px;">
-            <i class="fa fa-plus-circle"></i> تقديم طلب جديد
+            <i class="fa fa-plus-circle"></i> <?= t('تقديم طلب جديد') ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            اختر نوع الطلب وأرفق الوثائق المطلوبة
+            <?= t('اختر نوع الطلب وأرفق الوثائق المطلوبة') ?>
         </p>
     </div>
 </div>
@@ -145,9 +145,9 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:dashboard')) ?>">لوحة التحكم</a></li>
-        <li class="active">تقديم طلب جديد</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:dashboard')) ?>"><?= t('لوحة التحكم') ?></a></li>
+        <li class="active"><?= t('تقديم طلب جديد') ?></li>
     </ol>
     
     <div class="row">
@@ -159,10 +159,10 @@
                     
                     <!-- اختيار نوع الطلب -->
                     <div class="form-section">
-                        <h4><i class="fa fa-file-text"></i> نوع الطلب</h4>
+                        <h4><i class="fa fa-file-text"></i> <?= t('نوع الطلب') ?></h4>
                         
                         <div class="form-group">
-                            <label class="required">اختر نوع الطلب <span style="color: red;">*</span></label>
+                            <label class="required"><?= t('اختر نوع الطلب') ?> <span style="color: red;">*</span></label>
                             <?= $form->widget('application_type') ?>
                             <?= $form->errors_html('application_type') ?>
                         </div>
@@ -170,7 +170,7 @@
                         <!-- عرض الوثائق المطلوبة حسب النوع -->
                         <div id="required-documents-section" style="display: none;">
                             <div class="required-docs">
-                                <h5><i class="fa fa-info-circle"></i> الوثائق المطلوبة لهذا الطلب:</h5>
+                                <h5><i class="fa fa-info-circle"></i> <?= t('الوثائق المطلوبة لهذا الطلب:') ?></h5>
                                 <ul id="required-documents-list"></ul>
                             </div>
                         </div>
@@ -178,10 +178,10 @@
                     
                     <!-- تفاصيل الطلب -->
                     <div class="form-section">
-                        <h4><i class="fa fa-edit"></i> تفاصيل الطلب (اختياري)</h4>
+                        <h4><i class="fa fa-edit"></i> <?= t('تفاصيل الطلب (اختياري)') ?></h4>
                         
                         <div class="form-group">
-                            <label>أضف تفاصيل أو ملاحظات إضافية</label>
+                            <label><?= t('أضف تفاصيل أو ملاحظات إضافية') ?></label>
                             <?= $form->widget('details') ?>
                             <?= $form->errors_html('details') ?>
                         </div>
@@ -189,15 +189,15 @@
                     
                     <!-- رفع الوثائق -->
                     <div class="form-section">
-                        <h4><i class="fa fa-upload"></i> رفع الوثائق</h4>
+                        <h4><i class="fa fa-upload"></i> <?= t('رفع الوثائق') ?></h4>
                         
                         <div class="document-upload-area">
                             <i class="fa fa-cloud-upload" style="font-size: 48px; color: #3498db; margin-bottom: 15px;"></i>
                             <p style="color: #7f8c8d; margin-bottom: 15px;">
-                                أرفق الوثائق المطلوبة (PDF, JPG, PNG)
+                                <?= t('أرفق الوثائق المطلوبة (PDF, JPG, PNG)') ?>
                             </p>
                             <button type="button" class="btn-add-document" onclick="addDocumentField()">
-                                <i class="fa fa-plus"></i> إضافة وثيقة
+                                <i class="fa fa-plus"></i> <?= t('إضافة وثيقة') ?>
                             </button>
                         </div>
                         
@@ -207,10 +207,10 @@
                     <!-- زر التقديم -->
                     <div class="text-center" style="margin-top: 40px;">
                         <button type="submit" class="btn-submit">
-                            <i class="fa fa-paper-plane"></i> تقديم الطلب
+                            <i class="fa fa-paper-plane"></i> <?= t('تقديم الطلب') ?>
                         </button>
                         <a href="<?= e(url('students:dashboard')) ?>" class="btn btn-default btn-lg" style="margin-inline-start: 10px;">
-                            <i class="fa fa-times"></i> إلغاء
+                            <i class="fa fa-times"></i> <?= t('إلغاء') ?>
                         </a>
                     </div>
                     
@@ -288,7 +288,7 @@ function addDocumentField() {
                     <input type="text" 
                            name="document_names[]" 
                            class="form-control" 
-                           placeholder="اسم الوثيقة"
+                           placeholder="<?= t('اسم الوثيقة') ?>"
                            required>
                 </div>
                 <div class="col-md-7">
@@ -322,7 +322,7 @@ document.getElementById('applicationForm').addEventListener('submit', function(e
     
     if (!appType) {
         e.preventDefault();
-        alert('يرجى اختيار نوع الطلب');
+        alert(<?= js_t('يرجى اختيار نوع الطلب') ?>);
         return false;
     }
 });

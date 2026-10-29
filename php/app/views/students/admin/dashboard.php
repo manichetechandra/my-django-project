@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -138,10 +138,10 @@
 <div class="admin-header">
     <div class="container">
         <h1 style="margin: 0; font-size: 36px;">
-            <i class="fa fa-dashboard"></i> لوحة تحكم المشرف
+            <i class="fa fa-dashboard"></i> <?= t('لوحة تحكم المشرف') ?>
         </h1>
         <p style="margin-top: 10px; opacity: 0.9;">
-            مرحباً <?= e((($user ? $user->get_full_name() : '') ?: ($user['username'] ?? ''))) ?>
+            <?= t('مرحباً') ?> <?= e((($user ? $user->get_full_name() : '') ?: ($user['username'] ?? ''))) ?>
         </p>
     </div>
 </div>
@@ -154,17 +154,17 @@
     <div class="quick-actions">
         <a href="<?= e(url('students:admin_applications_list')) ?>" class="quick-action-btn" style="background: #3498db;">
             <i class="fa fa-list" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
-            عرض كل الطلبات
+            <?= t('عرض كل الطلبات') ?>
         </a>
         
         <a href="<?= e(url('students:admin_applications_list')) ?>?status=pending" class="quick-action-btn" style="background: #f39c12;">
             <i class="fa fa-clock-o" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
-            الطلبات المعلقة
+            <?= t('الطلبات المعلقة') ?>
         </a>
         
         <a href="<?= e(url('admin:index')) ?>" class="quick-action-btn" style="background: #9b59b6;">
             <i class="fa fa-cog" style="font-size: 24px; display: block; margin-bottom: 10px;"></i>
-            إعدادات النظام
+            <?= t('إعدادات النظام') ?>
         </a>
     </div>
     
@@ -183,7 +183,7 @@
                 <i class="fa fa-files-o"></i>
             </div>
             <div class="number"><?= e($total_applications) ?></div>
-            <div class="label">إجمالي الطلبات</div>
+            <div class="label"><?= t('إجمالي الطلبات') ?></div>
         </div>
         
         <!-- قيد الانتظار -->
@@ -192,7 +192,7 @@
                 <i class="fa fa-clock-o"></i>
             </div>
             <div class="number"><?= e($pending_count) ?></div>
-            <div class="label">قيد الانتظار</div>
+            <div class="label"><?= t('قيد الانتظار') ?></div>
         </div>
         
         <!-- قيد المراجعة -->
@@ -201,7 +201,7 @@
                 <i class="fa fa-search"></i>
             </div>
             <div class="number"><?= e($under_review_count) ?></div>
-            <div class="label">قيد المراجعة</div>
+            <div class="label"><?= t('قيد المراجعة') ?></div>
         </div>
         
         <!-- معتمدة -->
@@ -210,7 +210,7 @@
                 <i class="fa fa-check-circle"></i>
             </div>
             <div class="number"><?= e($approved_count) ?></div>
-            <div class="label">معتمدة</div>
+            <div class="label"><?= t('معتمدة') ?></div>
         </div>
         
         <!-- مرفوضة -->
@@ -219,7 +219,7 @@
                 <i class="fa fa-times-circle"></i>
             </div>
             <div class="number"><?= e($rejected_count) ?></div>
-            <div class="label">مرفوضة</div>
+            <div class="label"><?= t('مرفوضة') ?></div>
         </div>
     </div>
     
@@ -229,19 +229,19 @@
     <div class="row" style="margin-bottom: 30px;">
         <div class="col-md-4">
             <div class="stat-card" style="border-inline-start-color: #1abc9c;">
-                <div class="label">طلبات اليوم</div>
+                <div class="label"><?= t('طلبات اليوم') ?></div>
                 <div class="number" style="font-size: 32px;"><?= e($today_applications) ?></div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card" style="border-inline-start-color: #e67e22;">
-                <div class="label">طلبات الأسبوع</div>
+                <div class="label"><?= t('طلبات الأسبوع') ?></div>
                 <div class="number" style="font-size: 32px;"><?= e($week_applications) ?></div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card" style="border-inline-start-color: #8e44ad;">
-                <div class="label">طلبات الشهر</div>
+                <div class="label"><?= t('طلبات الشهر') ?></div>
                 <div class="number" style="font-size: 32px;"><?= e($month_applications) ?></div>
             </div>
         </div>
@@ -256,18 +256,18 @@
          - كل صف clickable (قابل للنقر)
          ======================================== -->
     <div class="recent-table">
-        <h3><i class="fa fa-history"></i> آخر الطلبات المقدمة</h3>
+        <h3><i class="fa fa-history"></i> <?= t('آخر الطلبات المقدمة') ?></h3>
         
         <?php if (!empty($recent_applications)): ?>
         <table class="table table-hover" style="margin: 0;">
             <thead style="background: #ecf0f1;">
                 <tr>
-                    <th>رقم الطلب</th>
-                    <th>الطالب</th>
-                    <th>نوع الطلب</th>
-                    <th>الحالة</th>
-                    <th>التاريخ</th>
-                    <th>الإجراءات</th>
+                    <th><?= t('رقم الطلب') ?></th>
+                    <th><?= t('الطالب') ?></th>
+                    <th><?= t('نوع الطلب') ?></th>
+                    <th><?= t('الحالة') ?></th>
+                    <th><?= t('التاريخ') ?></th>
+                    <th><?= t('الإجراءات') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -291,7 +291,7 @@
                     <td><?= e(format_date($app['submitted_at'], 'd/m/Y H:i')) ?></td>
                     <td>
                         <a href="<?= e(url('students:admin_application_detail', $app['id'])) ?>" class="btn btn-sm btn-primary">
-                            <i class="fa fa-eye"></i> عرض
+                            <i class="fa fa-eye"></i> <?= t('عرض') ?>
                         </a>
                     </td>
                 </tr>
@@ -301,14 +301,14 @@
         <?php else: ?>
         <!-- إذا لم توجد طلبات -->
         <p style="text-align: center; padding: 40px; color: #7f8c8d;">
-            لا توجد طلبات بعد
+            <?= t('لا توجد طلبات بعد') ?>
         </p>
         <?php endif; ?>
         
         <!-- زر عرض الكل -->
         <div style="padding: 15px; background: #f8f9fa; text-align: center;">
             <a href="<?= e(url('students:admin_applications_list')) ?>" class="btn btn-default">
-                <i class="fa fa-list"></i> عرض كل الطلبات
+                <i class="fa fa-list"></i> <?= t('عرض كل الطلبات') ?>
             </a>
         </div>
     </div>
@@ -321,7 +321,7 @@
     <div class="row" style="margin-top: 40px;">
         <div class="col-md-12">
             <h2 style="color: #2c3e50; margin-bottom: 30px; border-bottom: 3px solid #e74c3c; padding-bottom: 10px;">
-                <i class="fa fa-bar-chart"></i> الرسوم البيانية
+                <i class="fa fa-bar-chart"></i> <?= t('الرسوم البيانية') ?>
             </h2>
         </div>
     </div>
@@ -333,7 +333,7 @@
         <div class="col-md-6" style="margin-bottom: 30px;">
             <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 15px rgba(0,0,0,0.1);">
                 <h4 style="margin-top: 0; color: #34495e; text-align: center;">
-                    <i class="fa fa-pie-chart"></i> توزيع الطلبات حسب الحالة
+                    <i class="fa fa-pie-chart"></i> <?= t('توزيع الطلبات حسب الحالة') ?>
                 </h4>
                 <canvas id="statusChart" style="max-height: 300px;"></canvas>
             </div>
@@ -345,7 +345,7 @@
         <div class="col-md-6" style="margin-bottom: 30px;">
             <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 15px rgba(0,0,0,0.1);">
                 <h4 style="margin-top: 0; color: #34495e; text-align: center;">
-                    <i class="fa fa-bar-chart"></i> عدد الطلبات حسب النوع
+                    <i class="fa fa-bar-chart"></i> <?= t('عدد الطلبات حسب النوع') ?>
                 </h4>
                 <canvas id="typeChart" style="max-height: 300px;"></canvas>
             </div>
@@ -359,7 +359,7 @@
         <div class="col-md-12" style="margin-bottom: 30px;">
             <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 15px rgba(0,0,0,0.1);">
                 <h4 style="margin-top: 0; color: #34495e; text-align: center;">
-                    <i class="fa fa-line-chart"></i> الطلبات المقدمة خلال آخر 7 أيام
+                    <i class="fa fa-line-chart"></i> <?= t('الطلبات المقدمة خلال آخر 7 أيام') ?>
                 </h4>
                 <canvas id="daysChart" style="max-height: 250px;"></canvas>
             </div>
@@ -388,9 +388,9 @@ const statusCtx = document.getElementById('statusChart').getContext('2d');
 const statusChart = new Chart(statusCtx, {
     type: 'pie',  // نوع الرسم: دائري
     data: {
-        labels: <?= json_js($chart_status_labels) ?>,  // ['قيد الانتظار', 'قيد المراجعة', ...]
+        labels: <?= json_js($chart_status_labels) ?>,  // [<?= js_t('قيد الانتظار') ?>, <?= js_t('قيد المراجعة') ?>, ...]
         datasets: [{
-            label: 'عدد الطلبات',
+            label: <?= js_t('عدد الطلبات') ?>,
             data: <?= json_js($chart_status_data) ?>,  // [5, 3, 10, 2]
             backgroundColor: <?= json_js($chart_status_colors) ?>,  // ألوان
             borderWidth: 2,
@@ -420,7 +420,7 @@ const statusChart = new Chart(statusCtx, {
                         let value = context.parsed || 0;
                         let total = context.dataset.data.reduce((a, b) => a + b, 0);
                         let percentage = ((value / total) * 100).toFixed(1);
-                        return label + ': ' + value + ' طلب (' + percentage + '%)';
+                        return label + ': ' + value + ' ' + <?= js_t('طلب') ?> + ' (' + percentage + '%)';
                     }
                 }
             }
@@ -438,7 +438,7 @@ const typeChart = new Chart(typeCtx, {
     data: {
         labels: <?= json_js($chart_type_labels) ?>,
         datasets: [{
-            label: 'عدد الطلبات',
+            label: <?= js_t('عدد الطلبات') ?>,
             data: <?= json_js($chart_type_data) ?>,
             backgroundColor: <?= json_js($chart_type_colors) ?>,
             borderWidth: 2,
@@ -474,7 +474,7 @@ const typeChart = new Chart(typeCtx, {
                 rtl: true,
                 callbacks: {
                     label: function(context) {
-                        return 'العدد: ' + context.parsed.y + ' طلب';
+                        return <?= js_t('العدد: {count} طلب') ?>.replace('{count}', context.parsed.y);
                     }
                 }
             }
@@ -492,7 +492,7 @@ const daysChart = new Chart(daysCtx, {
     data: {
         labels: <?= json_js($chart_days_labels) ?>,
         datasets: [{
-            label: 'عدد الطلبات',
+            label: <?= js_t('عدد الطلبات') ?>,
             data: <?= json_js($chart_days_data) ?>,
             fill: true,  // تعبئة المنطقة تحت الخط
             backgroundColor: 'rgba(52, 152, 219, 0.2)',  // لون شفاف
@@ -538,7 +538,7 @@ const daysChart = new Chart(daysCtx, {
                         return context[0].label;
                     },
                     label: function(context) {
-                        return 'عدد الطلبات: ' + context.parsed.y;
+                        return <?= js_t('عدد الطلبات: ') ?> + context.parsed.y;
                     }
                 }
             }

@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?>كلمة المدير - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= t('كلمة المدير - مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -106,9 +106,9 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="#">المديرية</a></li>
-        <li class="active">كلمة المدير</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="#"><?= t('المديرية') ?></a></li>
+        <li class="active"><?= t('كلمة المدير') ?></li>
     </ol>
 
     <div class="row">
@@ -142,7 +142,7 @@
                         <div class="signature-section">
                             <?php if (!empty($director_word['signature'])): ?>
                                 <img src="<?= e(media_url($director_word['signature'])) ?>" 
-                                     alt="التوقيع" 
+                                     alt="<?= t('التوقيع') ?>" 
                                      class="signature-image">
                             <?php endif; ?>
                             
@@ -166,10 +166,10 @@
         <div class="col-md-12">
             <div class="alert alert-warning text-center" style="padding: 40px; font-size: 18px;">
                 <i class="fa fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
-                <h3>لا توجد كلمة للمدير حالياً</h3>
-                <p>سيتم إضافة كلمة المدير قريباً</p>
+                <h3><?= t('لا توجد كلمة للمدير حالياً') ?></h3>
+                <p><?= t('سيتم إضافة كلمة المدير قريباً') ?></p>
                 <a href="<?= e(url('homepage:index')) ?>" class="btn btn-success">
-                    <i class="fa fa-home"></i> العودة للرئيسية
+                    <i class="fa fa-home"></i> <?= t('العودة للرئيسية') ?>
                 </a>
             </div>
         </div>

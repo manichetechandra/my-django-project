@@ -1,13 +1,13 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?>النشاطات - مديرية الخدمات الجامعية<?php endblock(); ?>
+<?php block('title'); ?><?= t('النشاطات - مديرية الخدمات الجامعية') ?><?php endblock(); ?>
 
 <?php block('content'); ?>
 <div class="container" style="margin-top: 80px;">
     <!-- العنوان -->
     <div class="page-header">
         <h1 style="color: #2c3e50;">
-            <i class="fa fa-star"></i> النشاطات الثقافية والرياضية
-            <small>(<?= e($activities['paginator']['count']) ?> نشاط)</small>
+            <i class="fa fa-star"></i> <?= t('النشاطات الثقافية والرياضية') ?>
+            <small><?= t('({count} نشاط)', ['count' => $activities['paginator']['count']]) ?></small>
         </h1>
     </div>
     
@@ -19,14 +19,14 @@
                 <div class="col-md-6">
                     <form method="get" class="form-inline">
                         <div class="form-group">
-                            <input type="text" name="q" class="form-control" placeholder="ابحث في النشاطات..." value="<?= e($search_query) ?>" style="width: 300px;">
+                            <input type="text" name="q" class="form-control" placeholder="<?= t('ابحث في النشاطات...') ?>" value="<?= e($search_query) ?>" style="width: 300px;">
                         </div>
                         <button type="submit" class="btn btn-success">
-                            <i class="fa fa-search"></i> بحث
+                            <i class="fa fa-search"></i> <?= t('بحث') ?>
                         </button>
                         <?php if (!empty($search_query) || !empty($selected_type)): ?>
                         <a href="<?= e(url('activities:activity_list')) ?>" class="btn btn-default">
-                            <i class="fa fa-times"></i> إلغاء
+                            <i class="fa fa-times"></i> <?= t('إلغاء') ?>
                         </a>
                         <?php endif; ?>
                     </form>
@@ -36,7 +36,7 @@
                 <div class="col-md-6">
                     <div class="btn-group pull-left">
                         <a href="<?= e(url('activities:activity_list')) ?>" class="btn btn-default <?php if (empty($selected_type)): ?>active<?php endif; ?>">
-                            الكل
+                            <?= t('الكل') ?>
                         </a>
                         <?php foreach ($activity_types as [$type_value, $type_label]): ?>
                         <a href="?type=<?= e($type_value) ?>" class="btn btn-default <?php if ($selected_type == $type_value): ?>active<?php endif; ?>">
@@ -84,13 +84,12 @@
                         &nbsp;&nbsp;
                         <i class="fa fa-map-marker"></i> <?= e(truncatewords($activity['location'], 3)) ?>
                         <br>
-                        <i class="fa fa-users"></i> <?= e($activity['participants_count']) ?> مشارك
-                        &nbsp;&nbsp;
+                        <i class="fa fa-users"></i> <?= t('{count} مشارك', ['count' => $activity['participants_count']]) ?> &nbsp;&nbsp;
                         <i class="fa fa-eye"></i> <?= e($activity['views_count']) ?>
                     </small>
                     <br><br>
                     <a href="<?= e($activity->get_absolute_url()) ?>" class="btn btn-success btn-block">
-                        <i class="fa fa-arrow-left"></i> التفاصيل
+                        <i class="fa fa-arrow-left"></i> <?= t('التفاصيل') ?>
                     </a>
                 </div>
             </div>
@@ -98,7 +97,7 @@
         <?php endforeach; ?><?php else: ?>
         <div class="col-md-12">
             <div class="alert alert-info text-center">
-                <i class="fa fa-info-circle"></i> لا توجد نشاطات
+                <i class="fa fa-info-circle"></i> <?= t('لا توجد نشاطات') ?>
             </div>
         </div>
         <?php endif; ?>
@@ -109,7 +108,7 @@
     <div class="text-center">
         <ul class="pagination">
             <?php if (!empty($activities->has_previous())): ?>
-            <li><a href="?page=<?= e($activities->previous_page_number()) ?><?php if (!empty($selected_type)): ?>&type=<?= e($selected_type) ?><?php endif; ?><?php if (!empty($search_query)): ?>&q=<?= e($search_query) ?><?php endif; ?>">السابق</a></li>
+            <li><a href="?page=<?= e($activities->previous_page_number()) ?><?php if (!empty($selected_type)): ?>&type=<?= e($selected_type) ?><?php endif; ?><?php if (!empty($search_query)): ?>&q=<?= e($search_query) ?><?php endif; ?>"><?= t('السابق') ?></a></li>
             <?php endif; ?>
             
             <?php foreach ($activities['paginator']['page_range'] as $num): ?>
@@ -121,7 +120,7 @@
             <?php endforeach; ?>
             
             <?php if (!empty($activities->has_next())): ?>
-            <li><a href="?page=<?= e($activities->next_page_number()) ?><?php if (!empty($selected_type)): ?>&type=<?= e($selected_type) ?><?php endif; ?><?php if (!empty($search_query)): ?>&q=<?= e($search_query) ?><?php endif; ?>">التالي</a></li>
+            <li><a href="?page=<?= e($activities->next_page_number()) ?><?php if (!empty($selected_type)): ?>&type=<?= e($selected_type) ?><?php endif; ?><?php if (!empty($search_query)): ?>&q=<?= e($search_query) ?><?php endif; ?>"><?= t('التالي') ?></a></li>
             <?php endif; ?>
         </ul>
     </div>

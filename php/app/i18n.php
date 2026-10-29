@@ -121,7 +121,7 @@ function js_t(string $text, array $params = []): string
 function i18n_missing(string $text, string $code): void
 {
     static $seen = [];
-    if (!is_debug() || isset($seen[$code][$text])) {
+    if (!is_debug() || isset($seen[$code][$text]) || !preg_match('/\p{Arabic}/u', $text)) {
         return;
     }
     $seen[$code][$text] = true;
@@ -141,6 +141,12 @@ function lang_url(string $code, bool $absolute = false): string
     }
     $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
     return ($https ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $path;
+}
+
+/** لغة تنسيق الأرقام والتواريخ في JavaScript (toLocaleString) */
+function intl_locale(string $arabic = 'ar-DZ'): string
+{
+    return ['fr' => 'fr-FR', 'en' => 'en-GB'][lang()] ?? $arabic;
 }
 
 /** الحقل المترجم من صف مصفوفة (للاستعلامات التي لا ترجع كائنات Model) */

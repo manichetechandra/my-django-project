@@ -5,6 +5,7 @@
  * - كل صف من قاعدة البيانات يصبح كائناً يمكن قراءته كمصفوفة:  $news['title']
  * - العلاقات (ForeignKey) تُحمَّل عند الحاجة:                  $app['application_type']['name']
  * - get_FIELD_display() تعمل تلقائياً مع $choices مثل Django:   $app->get_status_display()
+ * - الحقول المترجمة ($translatable) تُقرأ بلغة الصفحة:          $news['title'] = title_fr في /fr/
  */
 abstract class Model implements ArrayAccess, JsonSerializable
 {
@@ -19,6 +20,12 @@ abstract class Model implements ArrayAccess, JsonSerializable
 
     /** علاقات عكسية : 'images' => [NewsImage::class, 'news_id', 'ORDER BY `order`'] */
     protected static array $hasMany = [];
+
+    /**
+     * الحقول المترجمة: لكل حقل عمودان إضافيان بنفس الاسم + _fr و _en (مثل title_fr و title_en).
+     * $news['title'] يرجع الترجمة حسب لغة الصفحة، ويرجع العربية إن كانت الترجمة فارغة.
+     */
+    protected static array $translatable = [];
 
     /** الحقول المنطقية (تُحوَّل إلى true/false) */
     protected static array $booleans = [];
@@ -56,6 +63,9 @@ abstract class Model implements ArrayAccess, JsonSerializable
     public function offsetGet($key)
     {
         if (array_key_exists($key, $this->attributes)) {
+            if (static::$translatable && lang() !== default_lang() && in_array($key, static::$translatable, true)) {
+                return $this->tr($key);
+            }
             return $this->attributes[$key];
         }
         if (array_key_exists($key, $this->loaded)) {
@@ -101,6 +111,33 @@ abstract class Model implements ArrayAccess, JsonSerializable
         return $this->offsetExists($key);
     }
 
+    /**
+     * قيمة حقل مترجم بلغة معينة (أو بلغة الصفحة)، مع الرجوع إلى العربية إن كانت الترجمة فارغة:
+     *   $news->tr('title', 'en')
+     */
+    public function tr(string $field, ?string $code = null)
+    {
+        $code = $code ?? lang();
+        $original = $this->attributes[$field] ?? null;
+        if ($code !== default_lang()) {
+            $value = $this->attributes[$field . '_' . $code] ?? null;
+            if ($value !== null && trim((string) $value) !== '') {
+                return $value;
+            }
+            // نص قصير بلا ترجمة في القاعدة (مثل القيمة الافتراضية «المزيد»): نبحث عنه في ملف اللغة
+            if (is_string($original) && $original !== '' && mb_strlen($original) <= 120) {
+                return translations($code)[$original] ?? $original;
+            }
+        }
+        return $original;
+    }
+
+    /** أسماء الحقول المترجمة لهذا النموذج */
+    public static function translatable(): array
+    {
+        return static::$translatable;
+    }
+
     /** تعيين علاقة محمّلة مسبقاً (لتجنب استعلامات إضافية) */
     public function setRelation(string $name, $value): void
     {
@@ -113,7 +150,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
         if (preg_match('/^get_(\w+)_display$/', $name, $m)) {
             $field = $m[1];
             $value = $this->attributes[$field] ?? '';
-            return static::$choices[$field][(string) $value] ?? (string) $value;
+            return isset(static::$choices[$field][(string) $value]) ? __(static::$choices[$field][(string) $value]) : (string) $value;
         }
         throw new BadMethodCallException(static::class . '::' . $name . '() غير موجودة');
     }
@@ -123,7 +160,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
     {
         foreach (['title', 'name', 'username', 'question', 'full_name_arabic', 'application_number', 'director_name'] as $f) {
             if (isset($this->attributes[$f]) && $this->attributes[$f] !== '') {
-                return (string) $this->attributes[$f];
+                return (string) $this->offsetGet($f);
             }
         }
         return static::class . ' #' . ($this->attributes['id'] ?? '?');
@@ -151,7 +188,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
     {
         $out = [];
         foreach (static::$choices[$field] ?? [] as $value => $label) {
-            $out[] = [$value, $label];
+            $out[] = [$value, __($label)];
         }
         return $out;
     }
@@ -159,7 +196,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /** خيارات حقل كمصفوفة value => label */
     public static function choiceMap(string $field): array
     {
-        return static::$choices[$field] ?? [];
+        return array_map(fn($label) => __($label), static::$choices[$field] ?? []);
     }
 
     /** تحويل صفوف إلى كائنات */

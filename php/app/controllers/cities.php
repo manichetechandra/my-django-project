@@ -7,7 +7,7 @@ function cite_list(): void
 {
     render('cities/cite_list', [
         'cites'      => Cite::paginate('is_active = 1', [], '`order`, name', 12),
-        'page_title' => 'الإقامات الجامعية',
+        'page_title' => __('الإقامات الجامعية'),
     ]);
 }
 

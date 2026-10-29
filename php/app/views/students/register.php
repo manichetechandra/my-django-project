@@ -1,6 +1,6 @@
 <?php extend('base/base'); ?>
 <?php block('inline_messages'); ?>1<?php endblock(); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -97,10 +97,10 @@
 <div class="register-header">
     <div class="container">
         <h1 class="text-center" style="margin: 0; font-size: 42px;">
-            <i class="fa fa-user-plus"></i> تسجيل طالب جديد
+            <i class="fa fa-user-plus"></i> <?= t('تسجيل طالب جديد') ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            أنشئ حسابك للاستفادة من الخدمات الجامعية
+            <?= t('أنشئ حسابك للاستفادة من الخدمات الجامعية') ?>
         </p>
     </div>
 </div>
@@ -108,8 +108,8 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li class="active">تسجيل طالب جديد</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li class="active"><?= t('تسجيل طالب جديد') ?></li>
     </ol>
     
     <div class="row">
@@ -121,18 +121,18 @@
                     
                     <!-- معلومات الحساب -->
                     <div class="form-section">
-                        <h4><i class="fa fa-key"></i> معلومات الحساب</h4>
+                        <h4><i class="fa fa-key"></i> <?= t('معلومات الحساب') ?></h4>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">رقم التسجيل الجامعي</label>
+                                    <label class="required"><?= t('رقم التسجيل الجامعي') ?></label>
                                     <?= $form->widget('registration_number') ?>
                                     <?= $form->errors_html('registration_number') ?>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">البريد الإلكتروني</label>
+                                    <label class="required"><?= t('البريد الإلكتروني') ?></label>
                                     <?= $form->widget('email') ?>
                                     <?= $form->errors_html('email') ?>
                                 </div>
@@ -141,14 +141,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">كلمة المرور</label>
+                                    <label class="required"><?= t('كلمة المرور') ?></label>
                                     <?= $form->widget('password1') ?>
                                     <?= $form->errors_html('password1') ?>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">تأكيد كلمة المرور</label>
+                                    <label class="required"><?= t('تأكيد كلمة المرور') ?></label>
                                     <?= $form->widget('password2') ?>
                                     <?= $form->errors_html('password2') ?>
                                 </div>
@@ -158,11 +158,11 @@
                     
                     <!-- معلومات شخصية -->
                     <div class="form-section">
-                        <h4><i class="fa fa-user"></i> المعلومات الشخصية</h4>
+                        <h4><i class="fa fa-user"></i> <?= t('المعلومات الشخصية') ?></h4>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label class="required">الاسم الكامل بالعربية</label>
+                                    <label class="required"><?= t('الاسم الكامل بالعربية') ?></label>
                                     <?= $form->widget('full_name_arabic') ?>
                                     <?= $form->errors_html('full_name_arabic') ?>
                                 </div>
@@ -171,14 +171,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">تاريخ الميلاد</label>
+                                    <label class="required"><?= t('تاريخ الميلاد') ?></label>
                                     <?= $form->widget('birth_date') ?>
                                     <?= $form->errors_html('birth_date') ?>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">مكان الميلاد</label>
+                                    <label class="required"><?= t('مكان الميلاد') ?></label>
                                     <?= $form->widget('birth_place') ?>
                                     <?= $form->errors_html('birth_place') ?>
                                 </div>
@@ -187,7 +187,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">الجنس</label>
+                                    <label class="required"><?= t('الجنس') ?></label>
                                     <?= $form->widget('gender') ?>
                                     <?= $form->errors_html('gender') ?>
                                 </div>
@@ -197,18 +197,18 @@
                     
                     <!-- معلومات الاتصال -->
                     <div class="form-section">
-                        <h4><i class="fa fa-phone"></i> معلومات الاتصال</h4>
+                        <h4><i class="fa fa-phone"></i> <?= t('معلومات الاتصال') ?></h4>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">رقم الهاتف</label>
+                                    <label class="required"><?= t('رقم الهاتف') ?></label>
                                     <?= $form->widget('phone') ?>
                                     <?= $form->errors_html('phone') ?>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">الولاية</label>
+                                    <label class="required"><?= t('الولاية') ?></label>
                                     <?= $form->widget('wilaya') ?>
                                     <?= $form->errors_html('wilaya') ?>
                                 </div>
@@ -217,7 +217,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label class="required">العنوان الكامل</label>
+                                    <label class="required"><?= t('العنوان الكامل') ?></label>
                                     <?= $form->widget('address') ?>
                                     <?= $form->errors_html('address') ?>
                                 </div>
@@ -227,18 +227,18 @@
                     
                     <!-- معلومات أكاديمية -->
                     <div class="form-section">
-                        <h4><i class="fa fa-graduation-cap"></i> المعلومات الأكاديمية</h4>
+                        <h4><i class="fa fa-graduation-cap"></i> <?= t('المعلومات الأكاديمية') ?></h4>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">الكلية</label>
+                                    <label class="required"><?= t('الكلية') ?></label>
                                     <?= $form->widget('faculty') ?>
                                     <?= $form->errors_html('faculty') ?>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">القسم/التخصص</label>
+                                    <label class="required"><?= t('القسم/التخصص') ?></label>
                                     <?= $form->widget('department') ?>
                                     <?= $form->errors_html('department') ?>
                                 </div>
@@ -247,7 +247,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">السنة الدراسية</label>
+                                    <label class="required"><?= t('السنة الدراسية') ?></label>
                                     <?= $form->widget('current_year') ?>
                                     <?= $form->errors_html('current_year') ?>
                                 </div>
@@ -258,15 +258,15 @@
                     <!-- زر التسجيل -->
                     <div class="text-center" style="margin-top: 30px;">
                         <button type="submit" class="btn-register">
-                            <i class="fa fa-check"></i> إنشاء الحساب
+                            <i class="fa fa-check"></i> <?= t('إنشاء الحساب') ?>
                         </button>
                     </div>
                     
                     <!-- رابط تسجيل الدخول -->
                     <div class="login-link">
-                        <p>لديك حساب بالفعل؟ 
+                        <p><?= t('لديك حساب بالفعل؟') ?> 
                             <a href="<?= e(url('students:login')) ?>" style="color: #3498db; font-weight: bold;">
-                                سجّل الدخول من هنا
+                                <?= t('سجّل الدخول من هنا') ?>
                             </a>
                         </p>
                     </div>
@@ -291,13 +291,13 @@
             </button>
             <strong>
                 <?php if ($message['tags'] == 'error'): ?>
-                    <i class="fa fa-exclamation-circle"></i> خطأ!
+                    <i class="fa fa-exclamation-circle"></i> <?= t('خطأ!') ?>
                 <?php elseif ($message['tags'] == 'success'): ?>
-                    <i class="fa fa-check-circle"></i> نجاح!
+                    <i class="fa fa-check-circle"></i> <?= t('نجاح!') ?>
                 <?php elseif ($message['tags'] == 'warning'): ?>
-                    <i class="fa fa-warning"></i> تحذير!
+                    <i class="fa fa-warning"></i> <?= t('تحذير!') ?>
                 <?php else: ?>
-                    <i class="fa fa-info-circle"></i> معلومة!
+                    <i class="fa fa-info-circle"></i> <?= t('معلومة!') ?>
                 <?php endif; ?>
             </strong>
             <?= e($message['message']) ?>
@@ -312,7 +312,7 @@
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
-        <strong><i class="fa fa-exclamation-circle"></i> أخطاء في النموذج:</strong>
+        <strong><i class="fa fa-exclamation-circle"></i> <?= t('أخطاء في النموذج:') ?></strong>
         <?= $form->non_field_errors_html() ?>
     </div>
     <?php endif; ?>

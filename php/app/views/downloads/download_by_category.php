@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مركز التحميلات - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مركز التحميلات - مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <?php include view_path('downloads/_styles'); ?>
@@ -13,15 +13,15 @@
             <i class="fa fa-folder-open"></i> <?= e($page_title) ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            <?= e(count($files)) ?> ملف في هذا التصنيف
+            <?= e(count($files)) ?> <?= t('ملف في هذا التصنيف') ?>
         </p>
     </div>
 </div>
 
 <div class="container">
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('downloads:download_center')) ?>">مركز التحميلات</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('downloads:download_center')) ?>"><?= t('مركز التحميلات') ?></a></li>
         <li class="active"><?= e($page_title) ?></li>
     </ol>
 
@@ -35,8 +35,8 @@
                 <?php else: ?>
                     <div class="empty-state">
                         <i class="fa fa-folder-open-o"></i>
-                        <h3>لا توجد ملفات في هذا التصنيف حالياً</h3>
-                        <a href="<?= e(url('downloads:download_center')) ?>" class="btn btn-download"><i class="fa fa-arrow-right"></i> العودة لمركز التحميلات</a>
+                        <h3><?= t('لا توجد ملفات في هذا التصنيف حالياً') ?></h3>
+                        <a href="<?= e(url('downloads:download_center')) ?>" class="btn btn-download"><i class="fa fa-arrow-right"></i> <?= t('العودة لمركز التحميلات') ?></a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -44,7 +44,7 @@
 
         <div class="col-md-4">
             <div class="sidebar-box">
-                <h4><i class="fa fa-th-list"></i> التصنيفات</h4>
+                <h4><i class="fa fa-th-list"></i> <?= t('التصنيفات') ?></h4>
                 <ul class="category-list">
                     <?php foreach ($categories as [$code, $name]): ?>
                         <li>
@@ -56,7 +56,7 @@
                     <?php endforeach; ?>
                 </ul>
             </div>
-            <a href="<?= e(url('downloads:download_center')) ?>" class="btn btn-default btn-block"><i class="fa fa-arrow-right"></i> كل الملفات</a>
+            <a href="<?= e(url('downloads:download_center')) ?>" class="btn btn-default btn-block"><i class="fa fa-arrow-right"></i> <?= t('كل الملفات') ?></a>
         </div>
     </div>
 </div>

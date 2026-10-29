@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?>الصفحة الرئيسية - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= t('الصفحة الرئيسية - مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -250,10 +250,10 @@
             </div>
         <?php endforeach; ?><?php else: ?>
             <div class="item active">
-                <img src="<?= asset('images/default-slide.svg') ?>" alt="مرحباً بكم" style="width: 100%; height: 500px; object-fit: cover; background-color: #2c3e50;">
+                <img src="<?= asset('images/default-slide.svg') ?>" alt="<?= t('مرحباً بكم') ?>" style="width: 100%; height: 500px; object-fit: cover; background-color: #2c3e50;">
                 <div class="carousel-caption">
-                    <h3>مرحباً بكم في مديرية الخدمات الجامعية</h3>
-                    <p>في خدمتكم دائماً</p>
+                    <h3><?= t('مرحباً بكم في مديرية الخدمات الجامعية') ?></h3>
+                    <p><?= t('في خدمتكم دائماً') ?></p>
                 </div>
             </div>
         <?php endif; ?>
@@ -288,7 +288,7 @@
                 <?php endforeach; ?><?php else: ?>
                     <li>
                         <a href="<?= e(url('news:news_list')) ?>" style="font-size:21px;">
-                            <i class="fa fa-newspaper-o"></i> آخر المستجدات
+                            <i class="fa fa-newspaper-o"></i> <?= t('آخر المستجدات') ?>
                         </a>
                     </li>
                 <?php endif; ?>
@@ -302,9 +302,9 @@
     <div class="row">
         <div class="col-lg-12">
             <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
-                <i class="fa fa-newspaper-o"></i> آخر الأخبـــار
+                <i class="fa fa-newspaper-o"></i> <?= t('آخر الأخبـــار') ?>
                 <a href="<?= e(url('news:news_list')) ?>" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
-                    <i class="fa fa-arrow-left"></i> عرض الكل
+                    <i class="fa fa-arrow-left"></i> <?= t('عرض الكل') ?>
                 </a>
             </h3>
         </div>
@@ -317,7 +317,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <span class="glyphicon glyphicon-list-alt"></span>
-            <b>أخر الأخبار</b>
+            <b><?= t('أخر الأخبار') ?></b>
         </div>
         <div class="panel-body">
             <div class="row">
@@ -352,7 +352,7 @@
                         <?php endforeach; ?><?php else: ?>
                             <li class="news-item text-center">
                                 <p class="text-muted">
-                                    <i class="fa fa-info-circle"></i> لا توجد أخبار حالياً
+                                    <i class="fa fa-info-circle"></i> <?= t('لا توجد أخبار حالياً') ?>
                                 </p>
                             </li>
                         <?php endif; ?>
@@ -368,9 +368,9 @@
     <div class="row">
         <div class="col-lg-12">
             <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
-                <i class="fa fa-calendar-check-o"></i> آخر النشاطـــات
+                <i class="fa fa-calendar-check-o"></i> <?= t('آخر النشاطـــات') ?>
                 <a href="<?= e(url('activities:activity_list')) ?>" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
-                    <i class="fa fa-arrow-left"></i> عرض الكل
+                    <i class="fa fa-arrow-left"></i> <?= t('عرض الكل') ?>
                 </a>
             </h3>
         </div>
@@ -406,11 +406,11 @@
                         <br>
                         <i class="fa fa-tag"></i> <?= e($activity->get_activity_type_display()) ?>
                         &nbsp;&nbsp;
-                        <i class="fa fa-users"></i> <?= e($activity['participants_count']) ?> مشارك
+                        <i class="fa fa-users"></i> <?= e($activity['participants_count']) ?> <?= t('مشارك') ?>
                     </small>
                     <br><br>
                     <a class="btn btn-success" href="<?= e($activity->get_absolute_url()) ?>" style="margin: 0;">
-                        المزيد <i class="fa fa-arrow-left"></i>
+                        <?= t('المزيد') ?> <i class="fa fa-arrow-left"></i>
                     </a>
                 </div>
             </div>
@@ -418,7 +418,7 @@
         <?php endforeach; ?><?php else: ?>
         <div class="col-md-12">
             <div class="alert alert-info text-center">
-                <i class="fa fa-info-circle"></i> لا توجد نشاطات حالياً
+                <i class="fa fa-info-circle"></i> <?= t('لا توجد نشاطات حالياً') ?>
             </div>
         </div>
         <?php endif; ?>
@@ -431,7 +431,7 @@
         <div class="row text-center">
             <div class="col-md-12">
                 <h2 style="margin-bottom: 40px; color: #2c3e50;">
-                    <i class="fa fa-bar-chart"></i> إحصائيات الموقع
+                    <i class="fa fa-bar-chart"></i> <?= t('إحصائيات الموقع') ?>
                 </h2>
             </div>
         </div>
@@ -442,7 +442,7 @@
                 <div class="stat-box">
                     <i class="fa fa-users stat-icon"></i>
                     <h3 class="stat-number" data-count="<?= e($site_stats['total_visitors']) ?>">0</h3>
-                    <p class="stat-label">زائر</p>
+                    <p class="stat-label"><?= t('زائر') ?></p>
                 </div>
             </div>
             
@@ -451,7 +451,7 @@
                 <div class="stat-box">
                     <i class="fa fa-eye stat-icon"></i>
                     <h3 class="stat-number" data-count="<?= e($site_stats['total_page_views']) ?>">0</h3>
-                    <p class="stat-label">مشاهدة</p>
+                    <p class="stat-label"><?= t('مشاهدة') ?></p>
                 </div>
             </div>
             
@@ -460,7 +460,7 @@
                 <div class="stat-box">
                     <i class="fa fa-newspaper-o stat-icon"></i>
                     <h3 class="stat-number" data-count="<?= e($site_stats['total_news']) ?>">0</h3>
-                    <p class="stat-label">خبر</p>
+                    <p class="stat-label"><?= t('خبر') ?></p>
                 </div>
             </div>
             
@@ -469,7 +469,7 @@
                 <div class="stat-box">
                     <i class="fa fa-cogs stat-icon"></i>
                     <h3 class="stat-number" data-count="<?= e($site_stats['total_services']) ?>">0</h3>
-                    <p class="stat-label">خدمة</p>
+                    <p class="stat-label"><?= t('خدمة') ?></p>
                 </div>
             </div>
         </div>
@@ -480,7 +480,7 @@
                 <div class="stat-box">
                     <i class="fa fa-download stat-icon"></i>
                     <h3 class="stat-number" data-count="<?= e($site_stats['total_downloads']) ?>">0</h3>
-                    <p class="stat-label">ملف للتحميل</p>
+                    <p class="stat-label"><?= t('ملف للتحميل') ?></p>
                 </div>
             </div>
             
@@ -489,7 +489,7 @@
                 <div class="stat-box">
                     <i class="fa fa-question-circle stat-icon"></i>
                     <h3 class="stat-number" data-count="<?= e($site_stats['total_faqs']) ?>">0</h3>
-                    <p class="stat-label">سؤال شائع</p>
+                    <p class="stat-label"><?= t('سؤال شائع') ?></p>
                 </div>
             </div>
             
@@ -498,7 +498,7 @@
                 <div class="stat-box">
                     <i class="fa fa-university stat-icon"></i>
                     <h3 class="stat-number" data-count="<?= e($site_stats['total_cites']) ?>">0</h3>
-                    <p class="stat-label">إقامة جامعية</p>
+                    <p class="stat-label"><?= t('إقامة جامعية') ?></p>
                 </div>
             </div>
         </div>
@@ -560,10 +560,10 @@
             const timer = setInterval(() => {
                 current += step;
                 if (current >= target) {
-                    counter.textContent = target.toLocaleString('ar-EG');
+                    counter.textContent = target.toLocaleString(<?= json_encode(intl_locale('ar-EG')) ?>);
                     clearInterval(timer);
                 } else {
-                    counter.textContent = Math.floor(current).toLocaleString('ar-EG');
+                    counter.textContent = Math.floor(current).toLocaleString(<?= json_encode(intl_locale('ar-EG')) ?>);
                 }
             }, 16);
         });
@@ -579,28 +579,28 @@
                 <div class="panel panel-default outer">
                     <div class="panel-heading" style="background-color: #2c3e50; color: white;">
                         <h4 class="text-center" style="font-size:24px; margin: 10px 0;">
-                            <i class="fa fa-link"></i> مــواقــع مهمـــــة
+                            <i class="fa fa-link"></i> <?= t('مــواقــع مهمـــــة') ?>
                         </h4>
                     </div>
                     <div class="panel-body">
                         <a class="btn btn-md btn-success" target="_blank" rel="noopener noreferrer" 
                            href="https://arabe.univ-setif.dz/" 
                            style="font-size:18px; font-weight:bold; margin: 5px;">
-                            <i class="fa fa-university"></i> جامعة فرحات عباس
+                            <i class="fa fa-university"></i> <?= t('جامعة فرحات عباس') ?>
                         </a>
                     </div>
                     <div class="panel-body">
                         <a class="btn btn-md btn-success" target="_blank" rel="noopener noreferrer" 
                            href="https://www.mesrs.dz/" 
                            style="font-size:18px; font-weight:bold; margin: 5px;">
-                            <i class="fa fa-graduation-cap"></i> وزارة التعليم العالي والبحث العلمي
+                            <i class="fa fa-graduation-cap"></i> <?= t('وزارة التعليم العالي والبحث العلمي') ?>
                         </a>
                     </div>
                     <div class="panel-body">
                         <a class="btn btn-md btn-success" target="_blank" rel="noopener noreferrer" 
                            href="https://progres.mesrs.dz/webonou/" 
                            style="font-size:18px; font-weight:bold; margin: 5px;">
-                            <i class="fa fa-external-link"></i> منصة PROGRES
+                            <i class="fa fa-external-link"></i> <?= t('منصة PROGRES') ?>
                         </a>
                     </div>
                 </div>
@@ -614,7 +614,7 @@
     <div class="row">
         <div class="col-lg-12">
             <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
-                <i class="fa fa-sitemap"></i> أقسام المديرية
+                <i class="fa fa-sitemap"></i> <?= t('أقسام المديرية') ?>
             </h3>
         </div>
     </div>
@@ -633,7 +633,7 @@
                     <div class="panel-body text-justify">
                         <p><?= e(truncatewords($dept['description'], 20)) ?></p>
                         <a class="btn btn-md btn-success" href="<?= e(url('departements:departement_detail', $dept['slug'])) ?>" style="float: right; float: inline-start;">
-                            المزيد <i class="fa fa-arrow-left"></i>
+                            <?= t('المزيد') ?> <i class="fa fa-arrow-left"></i>
                         </a>
                     </div>
                 </div>
@@ -641,7 +641,7 @@
         <?php endforeach; ?><?php else: ?>
             <div class="col-md-12">
                 <div class="alert alert-info text-center">
-                    <i class="fa fa-info-circle"></i> لا توجد أقسام معروضة حالياً
+                    <i class="fa fa-info-circle"></i> <?= t('لا توجد أقسام معروضة حالياً') ?>
                 </div>
             </div>
         <?php endif; ?>
@@ -653,9 +653,9 @@
         <div class="row">
             <div class="col-lg-12">
                 <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
-                    <i class="fa fa-building"></i> الإقامات الجامعية
+                    <i class="fa fa-building"></i> <?= t('الإقامات الجامعية') ?>
                     <a href="<?= e(url('cities:cite_list')) ?>" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
-                        <i class="fa fa-arrow-left"></i> عرض الكل
+                        <i class="fa fa-arrow-left"></i> <?= t('عرض الكل') ?>
                     </a>
                 </h3>
             </div>
@@ -691,12 +691,12 @@
 <div class="caption-box">
     <h4><?= e($cite['name']) ?></h4>
     <p>
-        <?php if (!empty($cite['phone'])): ?>الهاتف: <?= e($cite['phone']) ?><br><?php endif; ?>
+        <?php if (!empty($cite['phone'])): ?><?= t('الهاتف:') ?> <?= e($cite['phone']) ?><br><?php endif; ?>
         <?php if (!empty($cite['address'])): ?><?= e(truncatewords($cite['address'], 5)) ?><?php endif; ?>
     </p>
     <div style="text-align: center;">
         <a class="btn btn-success btn-sm" href="<?= e(url('cities:cite_detail', $cite['slug'])) ?>">
-            المزيد <i class="fa fa-arrow-left"></i>
+            <?= t('المزيد') ?> <i class="fa fa-arrow-left"></i>
         </a>
     </div>
 </div>
@@ -723,11 +723,11 @@
                                     <div class="caption-box">
                                         <h4><?= e($cite['name']) ?></h4>
                                         <p>
-                                            <?php if (!empty($cite['phone'])): ?>الهاتف: <?= e($cite['phone']) ?><br><?php endif; ?>
+                                            <?php if (!empty($cite['phone'])): ?><?= t('الهاتف:') ?> <?= e($cite['phone']) ?><br><?php endif; ?>
                                             <?php if (!empty($cite['address'])): ?><?= e(truncatewords($cite['address'], 5)) ?><?php endif; ?>
                                         </p>
                                         <a class="btn btn-success btn-sm" href="<?= e(url('cities:cite_detail', $cite['slug'])) ?>">
-                                            <i class="fa fa-arrow-left"></i> المزيد
+                                            <i class="fa fa-arrow-left"></i> <?= t('المزيد') ?>
                                         </a>
                                     </div>
                                 </li>

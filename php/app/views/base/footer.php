@@ -3,15 +3,15 @@
         <div class="container">
             <div class="row">
                 <div class="footer-col col-md-4">
-                    <h4><i class="fa fa-map-marker"></i> العنوان</h4>
+                    <h4><i class="fa fa-map-marker"></i> <?= t('العنوان') ?></h4>
                     <p>
-                        مديرية الخدمات الجامعية لولاية سطيف<br>
-                        سطيف، الجزائر
+                        <?= t('مديرية الخدمات الجامعية لولاية سطيف') ?><br>
+                        <?= t('سطيف، الجزائر') ?>
                     </p>
                 </div>
                 
                 <div class="footer-col col-md-4">
-                    <h4><i class="fa fa-share-alt"></i> تواصل معنا</h4>
+                    <h4><i class="fa fa-share-alt"></i> <?= t('تواصل معنا') ?></h4>
                     <ul class="social-network social-circle" style="list-style: none; padding: 0;">
                         <li style="display: inline-block; margin: 0 10px;">
                             <a href="#" style="color: #fff; font-size: 24px;">
@@ -37,8 +37,8 @@
                 </div>
                 
                 <div class="footer-col col-md-4">
-                    <h4><i class="fa fa-info-circle"></i> حول الموقع</h4>
-                    <p>الموقع الرسمي لمديرية الخدمات الجامعية</p>
+                    <h4><i class="fa fa-info-circle"></i> <?= t('حول الموقع') ?></h4>
+                    <p><?= t('الموقع الرسمي لمديرية الخدمات الجامعية') ?></p>
                     <p style="font-size: 12px; color: #bdc3c7;">
                         Created by Sellam Miloud<br>
                         sellammiloud06@gmail.com
@@ -51,6 +51,6 @@
 
 <div class="container-fluid" style="background-color: #1a252f; color: #bdc3c7; padding: 15px 0; text-align: center;">
     <p style="margin: 0;">
-        <i class="fa fa-copyright"></i> جميع الحقوق محفوظة © <?= e(($current_year ?: '2024')) ?> - مديرية الخدمات الجامعية لولاية سطيف
+        <i class="fa fa-copyright"></i> <?= t('جميع الحقوق محفوظة ©') ?> <?= e(($current_year ?: '2024')) ?> <?= t('- مديرية الخدمات الجامعية لولاية سطيف') ?>
     </p>
 </div>

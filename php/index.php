@@ -35,7 +35,7 @@ if (preg_match('#^/' . default_lang() . '(/.*)?$#', $path, $m)) {
 // حماية CSRF لكل طلبات POST (مثل CsrfViewMiddleware)
 if ($method === 'POST' && !verify_csrf()) {
     if (is_ajax() || str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) {
-        json_response(['success' => false, 'error' => 'انتهت صلاحية الجلسة. أعد تحميل الصفحة.'], 403);
+        json_response(['success' => false, 'error' => __('انتهت صلاحية الجلسة. أعد تحميل الصفحة.')], 403);
     }
     render('errors/403_csrf', [], 403);
     exit;

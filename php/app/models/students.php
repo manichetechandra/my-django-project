@@ -68,21 +68,33 @@ class StudentProfile extends Model
     }
 
     /** إنشاء إشعار للطالب */
-    public function notify(string $title, string $message, ?string $link = null, string $type = 'info'): StudentNotification
+    /**
+     * إشعار للطالب يُحفظ بالعربية والفرنسية والإنجليزية معاً، فيقرؤه بلغة تصفحه:
+     *   $student->notify('مرحباً {name}', '...', '/students/dashboard/', 'info', ['name' => $name]);
+     * النصوص عربية (مفاتيح ملفات app/lang)، وقيمة المتغير يمكن أن تكون مصفوفة لكل لغة:
+     *   ['type' => ['ar' => 'منحة', 'fr' => 'Bourse', 'en' => 'Grant']]
+     */
+    public function notify(string $title, string $message, ?string $link = null, string $type = 'info', array $params = []): StudentNotification
     {
-        return StudentNotification::create([
+        $data = [
             'student_id' => (int) $this->attributes['id'],
-            'title' => $title,
-            'message' => $message,
             'link' => $link,
             'notification_type' => $type,
-        ]);
+        ];
+        foreach (array_keys(languages()) as $code) {
+            $p = array_map(fn($v) => is_array($v) ? ($v[$code] ?? $v[default_lang()] ?? '') : $v, $params);
+            $suffix = $code === default_lang() ? '' : '_' . $code;
+            $data['title' . $suffix] = __($title, $p, $code);
+            $data['message' . $suffix] = __($message, $p, $code);
+        }
+        return StudentNotification::create($data);
     }
 }
 
 class ApplicationType extends Model
 {
     protected static string $table = 'application_types';
+    protected static array $translatable = ['name', 'description', 'required_documents'];
     protected static array $booleans = ['is_active'];
     protected static array $defaults = ['icon' => 'fa-file-text', 'color' => '#3498db', 'required_documents' => '', 'is_active' => 1, 'order' => 0];
 
@@ -178,19 +190,23 @@ class StudentApplication extends Model
     public function notify_status_change(): void
     {
         $type = $this->application_type;
-        $typeName = $type ? $type['name'] : '';
-        $number = $this->attributes['application_number'];
+        // اسم نوع الطلب بكل لغة (من حقول الترجمة في جدول application_types)
+        $typeNames = [];
+        foreach (array_keys(languages()) as $code) {
+            $typeNames[$code] = $type ? (string) $type->tr('name', $code) : '';
+        }
+        $params = ['type' => $typeNames, 'number' => $this->attributes['application_number']];
         $messages = [
-            'approved'     => ['تم اعتماد طلبك ✅', "تم اعتماد طلب $typeName برقم $number", 'success'],
-            'rejected'     => ['تم رفض طلبك ❌', "تم رفض طلب $typeName برقم $number. يرجى مراجعة الملاحظات.", 'error'],
-            'under_review' => ['طلبك قيد المراجعة 📝', "طلب $typeName برقم $number قيد المراجعة من قبل الإدارة.", 'info'],
-            'pending'      => ['تم تغيير حالة طلبك ⏳', "تم تغيير حالة طلب $typeName برقم $number إلى \"قيد الانتظار\".", 'warning'],
-            'cancelled'    => ['تم إلغاء طلبك 🚫', "تم إلغاء طلب $typeName برقم $number.", 'warning'],
+            'approved'     => ['تم اعتماد طلبك ✅', 'تم اعتماد طلب {type} برقم {number}', 'success'],
+            'rejected'     => ['تم رفض طلبك ❌', 'تم رفض طلب {type} برقم {number}. يرجى مراجعة الملاحظات.', 'error'],
+            'under_review' => ['طلبك قيد المراجعة 📝', 'طلب {type} برقم {number} قيد المراجعة من قبل الإدارة.', 'info'],
+            'pending'      => ['تم تغيير حالة طلبك ⏳', 'تم تغيير حالة طلب {type} برقم {number} إلى "قيد الانتظار".', 'warning'],
+            'cancelled'    => ['تم إلغاء طلبك 🚫', 'تم إلغاء طلب {type} برقم {number}.', 'warning'],
         ];
-        [$title, $msg, $ntype] = $messages[$this->attributes['status'] ?? ''] ?? ['تحديث على طلبك 📢', "تم تحديث حالة طلب $typeName برقم $number.", 'info'];
+        [$title, $msg, $ntype] = $messages[$this->attributes['status'] ?? ''] ?? ['تحديث على طلبك 📢', 'تم تحديث حالة طلب {type} برقم {number}.', 'info'];
         $student = $this->student;
         if ($student) {
-            $student->notify($title, $msg, '/students/applications/' . $this->attributes['id'] . '/', $ntype);
+            $student->notify($title, $msg, '/students/applications/' . $this->attributes['id'] . '/', $ntype, $params);
         }
     }
 }
@@ -227,6 +243,7 @@ class ApplicationDocument extends Model
 class StudentNotification extends Model
 {
     protected static string $table = 'student_notifications';
+    protected static array $translatable = ['title', 'message'];
     protected static array $choices = [
         'notification_type' => ['info' => 'معلومة', 'success' => 'نجاح', 'warning' => 'تحذير', 'error' => 'خطأ'],
     ];

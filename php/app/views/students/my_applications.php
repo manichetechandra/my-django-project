@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -170,10 +170,10 @@
 <div class="applications-header">
     <div class="container">
         <h1 class="text-center" style="margin: 0; font-size: 42px;">
-            <i class="fa fa-list"></i> طلباتي
+            <i class="fa fa-list"></i> <?= t('طلباتي') ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            عرض وإدارة كل الطلبات المقدمة
+            <?= t('عرض وإدارة كل الطلبات المقدمة') ?>
         </p>
     </div>
 </div>
@@ -181,65 +181,65 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:dashboard')) ?>">لوحة التحكم</a></li>
-        <li class="active">طلباتي</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:dashboard')) ?>"><?= t('لوحة التحكم') ?></a></li>
+        <li class="active"><?= t('طلباتي') ?></li>
     </ol>
     
     <!-- إحصائيات سريعة -->
     <div class="quick-stats">
         <div class="stat-box total">
             <h3><?= e($total_count) ?></h3>
-            <p>إجمالي الطلبات</p>
+            <p><?= t('إجمالي الطلبات') ?></p>
         </div>
         
         <div class="stat-box pending">
             <h3><?= e($pending_count) ?></h3>
-            <p>قيد الانتظار</p>
+            <p><?= t('قيد الانتظار') ?></p>
         </div>
         
         <div class="stat-box review">
             <h3><?= e($under_review_count) ?></h3>
-            <p>قيد المراجعة</p>
+            <p><?= t('قيد المراجعة') ?></p>
         </div>
         
         <div class="stat-box approved">
             <h3><?= e($approved_count) ?></h3>
-            <p>معتمدة</p>
+            <p><?= t('معتمدة') ?></p>
         </div>
         
         <div class="stat-box rejected">
             <h3><?= e($rejected_count) ?></h3>
-            <p>مرفوضة</p>
+            <p><?= t('مرفوضة') ?></p>
         </div>
     </div>
     <a href="<?= e(url('students:print_all_applications')) ?>" 
        class="btn btn-lg btn-info" 
        target="_blank"
        style="margin: 5px;">
-        <i class="fa fa-print"></i> طباعة كل الطلبات
+        <i class="fa fa-print"></i> <?= t('طباعة كل الطلبات') ?>
     </a>
     <!-- الفلترة -->
     <div class="filter-section">
-        <h4><i class="fa fa-filter"></i> تصفية الطلبات</h4>
+        <h4><i class="fa fa-filter"></i> <?= t('تصفية الطلبات') ?></h4>
         
         <form method="get" class="form-inline">
             <div class="form-group" style="margin-inline-end: 15px;">
-                <label style="margin-inline-end: 5px;">الحالة:</label>
+                <label style="margin-inline-end: 5px;"><?= t('الحالة:') ?></label>
                 <select name="status" class="form-control">
-                    <option value="">الكل</option>
-                    <option value="pending" <?php if ($status_filter == 'pending'): ?>selected<?php endif; ?>>قيد الانتظار</option>
-                    <option value="under_review" <?php if ($status_filter == 'under_review'): ?>selected<?php endif; ?>>قيد المراجعة</option>
-                    <option value="approved" <?php if ($status_filter == 'approved'): ?>selected<?php endif; ?>>معتمد</option>
-                    <option value="rejected" <?php if ($status_filter == 'rejected'): ?>selected<?php endif; ?>>مرفوض</option>
-                    <option value="cancelled" <?php if ($status_filter == 'cancelled'): ?>selected<?php endif; ?>>ملغي</option>
+                    <option value=""><?= t('الكل') ?></option>
+                    <option value="pending" <?php if ($status_filter == 'pending'): ?>selected<?php endif; ?>><?= t('قيد الانتظار') ?></option>
+                    <option value="under_review" <?php if ($status_filter == 'under_review'): ?>selected<?php endif; ?>><?= t('قيد المراجعة') ?></option>
+                    <option value="approved" <?php if ($status_filter == 'approved'): ?>selected<?php endif; ?>><?= t('معتمد') ?></option>
+                    <option value="rejected" <?php if ($status_filter == 'rejected'): ?>selected<?php endif; ?>><?= t('مرفوض') ?></option>
+                    <option value="cancelled" <?php if ($status_filter == 'cancelled'): ?>selected<?php endif; ?>><?= t('ملغي') ?></option>
                 </select>
             </div>
             
             <div class="form-group" style="margin-inline-end: 15px;">
-                <label style="margin-inline-end: 5px;">النوع:</label>
+                <label style="margin-inline-end: 5px;"><?= t('النوع:') ?></label>
                 <select name="type" class="form-control">
-                    <option value="">الكل</option>
+                    <option value=""><?= t('الكل') ?></option>
                     <?php foreach ($application_types as $app_type): ?>
                     <option value="<?= e($app_type['id']) ?>" <?php if ($type_filter == (string)($app_type['id'])): ?>selected<?php endif; ?>>
                         <?= e($app_type['name']) ?>
@@ -249,15 +249,15 @@
             </div>
             
             <button type="submit" class="btn btn-primary">
-                <i class="fa fa-search"></i> بحث
+                <i class="fa fa-search"></i> <?= t('بحث') ?>
             </button>
             
             <a href="<?= e(url('students:my_applications')) ?>" class="btn btn-default">
-                <i class="fa fa-refresh"></i> إعادة تعيين
+                <i class="fa fa-refresh"></i> <?= t('إعادة تعيين') ?>
             </a>
             
             <a href="<?= e(url('students:create_application')) ?>" class="btn btn-success" style="float: left; float: inline-end;">
-                <i class="fa fa-plus"></i> طلب جديد
+                <i class="fa fa-plus"></i> <?= t('طلب جديد') ?>
             </a>
         </form>
     </div>
@@ -294,37 +294,37 @@
                 
                 <div class="app-details">
                     <div class="app-meta">
-                        <i class="fa fa-calendar"></i> تاريخ التقديم: <?= e(format_date($app['submitted_at'], 'd/m/Y H:i')) ?>
+                        <i class="fa fa-calendar"></i> <?= t('تاريخ التقديم:') ?> <?= e(format_date($app['submitted_at'], 'd/m/Y H:i')) ?>
                         <?php if (!empty($app['reviewed_at'])): ?>
-                        | <i class="fa fa-check"></i> تاريخ المراجعة: <?= e(format_date($app['reviewed_at'], 'd/m/Y')) ?>
+                        | <i class="fa fa-check"></i> <?= t('تاريخ المراجعة:') ?> <?= e(format_date($app['reviewed_at'], 'd/m/Y')) ?>
                         <?php endif; ?>
                     </div>
                     
                     <div class="app-actions">
     <a href="<?= e(url('students:application_detail', $app['id'])) ?>" class="btn btn-sm btn-primary">
-        <i class="fa fa-eye"></i> التفاصيل
+        <i class="fa fa-eye"></i> <?= t('التفاصيل') ?>
     </a>
     
     <!-- ← جديد! زر الطباعة -->
     <a href="<?= e(url('students:application_print', $app['id'])) ?>" 
        class="btn btn-sm btn-info" target="_blank"
-       title="طباعة الطلب">
-        <i class="fa fa-print"></i> طباعة
+       title="<?= t('طباعة الطلب') ?>">
+        <i class="fa fa-print"></i> <?= t('طباعة') ?>
     </a>
     
     <!-- ← جديد! زر تحميل PDF -->
     <a href="<?= e(url('students:download_application_pdf', $app['id'])) ?>" 
        class="btn btn-sm btn-success"
-       title="تحميل PDF">
+       title="<?= t('تحميل PDF') ?>">
         <i class="fa fa-file-pdf-o"></i> PDF
     </a>
     
     <?php if ($app['status'] == 'pending'): ?>
     <form method="post" action="<?= e(url('students:cancel_application', $app['id'])) ?>" style="display: inline;" 
-          onsubmit="return confirm('هل أنت متأكد من إلغاء هذا الطلب؟');">
+          onsubmit="return confirm(<?= e(js_t('هل أنت متأكد من إلغاء هذا الطلب؟')) ?>);">
         <?= csrf_field() ?>
         <button type="submit" class="btn btn-sm btn-danger">
-            <i class="fa fa-times"></i> إلغاء
+            <i class="fa fa-times"></i> <?= t('إلغاء') ?>
         </button>
     </form>
     <?php endif; ?>
@@ -335,10 +335,10 @@
         <?php else: ?>
             <div class="empty-state">
                 <i class="fa fa-inbox"></i>
-                <h3 style="color: #7f8c8d;">لا توجد طلبات</h3>
-                <p>لم تقدم أي طلبات بعد</p>
+                <h3 style="color: #7f8c8d;"><?= t('لا توجد طلبات') ?></h3>
+                <p><?= t('لم تقدم أي طلبات بعد') ?></p>
                 <a href="<?= e(url('students:create_application')) ?>" class="btn btn-primary btn-lg" style="margin-top: 20px;">
-                    <i class="fa fa-plus"></i> تقديم طلب جديد
+                    <i class="fa fa-plus"></i> <?= t('تقديم طلب جديد') ?>
                 </a>
             </div>
         <?php endif; ?>

@@ -34,31 +34,31 @@ final class Upload
     public static function validate(?array $file, array $allowedExt, float $maxMb): ?string
     {
         if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
-            return 'لم يتم اختيار ملف.';
+            return __('لم يتم اختيار ملف.');
         }
         if ($file['error'] !== UPLOAD_ERR_OK) {
             return self::errorMessage((int) $file['error']);
         }
         if (!is_uploaded_file($file['tmp_name']) && PHP_SAPI !== 'cli') {
-            return 'ملف غير صالح.';
+            return __('ملف غير صالح.');
         }
         if ($file['size'] > $maxMb * 1024 * 1024) {
-            return 'حجم الملف كبير جداً. الحد الأقصى ' . rtrim(rtrim(number_format($maxMb, 1), '0'), '.') . ' ميغابايت.';
+            return __('حجم الملف كبير جداً. الحد الأقصى {mb} ميغابايت.', ['mb' => rtrim(rtrim(number_format($maxMb, 1), '0'), '.')]);
         }
         $ext = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, $allowedExt, true)) {
-            return 'نوع الملف غير مسموح. الأنواع المسموحة: ' . implode(', ', $allowedExt);
+            return __('نوع الملف غير مسموح. الأنواع المسموحة: {types}', ['types' => implode(', ', $allowedExt)]);
         }
         if (class_exists('finfo')) {
             $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']);
             $okMimes = self::MIME[$ext] ?? [];
             if ($okMimes && !in_array($mime, $okMimes, true)) {
-                return 'محتوى الملف لا يطابق امتداده (' . $mime . ').';
+                return __('محتوى الملف لا يطابق امتداده ({mime}).', ['mime' => $mime]);
             }
         }
         if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true) && function_exists('getimagesize')) {
             if (@getimagesize($file['tmp_name']) === false) {
-                return 'الملف ليس صورة صالحة.';
+                return __('الملف ليس صورة صالحة.');
             }
         }
         return null;
@@ -111,13 +111,13 @@ final class Upload
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
             case UPLOAD_ERR_FORM_SIZE:
-                return 'حجم الملف يتجاوز الحد المسموح به في الخادم.';
+                return __('حجم الملف يتجاوز الحد المسموح به في الخادم.');
             case UPLOAD_ERR_PARTIAL:
-                return 'تم رفع جزء من الملف فقط. حاول مجدداً.';
+                return __('تم رفع جزء من الملف فقط. حاول مجدداً.');
             case UPLOAD_ERR_NO_FILE:
-                return 'لم يتم اختيار ملف.';
+                return __('لم يتم اختيار ملف.');
             default:
-                return 'حدث خطأ أثناء رفع الملف (رمز ' . $code . ').';
+                return __('حدث خطأ أثناء رفع الملف (رمز {code}).', ['code' => $code]);
         }
     }
 

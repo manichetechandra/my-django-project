@@ -13,22 +13,22 @@ function service_list(): void
         'housing_services'     => $byType('housing'),
         'catering_services'    => $byType('catering'),
         'scholarship_services' => $byType('scholarship'),
-        'page_title'           => 'الخدمات الجامعية',
+        'page_title'           => __('الخدمات الجامعية'),
     ]);
 }
 
 function service_by_type(string $serviceType): void
 {
     $typeNames = [
-        'transport'   => 'خدمات النقل',
-        'housing'     => 'خدمات الإيواء',
-        'catering'    => 'خدمات الإطعام',
-        'scholarship' => 'المنح والإعانات',
+        'transport'   => __('خدمات النقل'),
+        'housing'     => __('خدمات الإيواء'),
+        'catering'    => __('خدمات الإطعام'),
+        'scholarship' => __('المنح والإعانات'),
     ];
     render('services/service_by_type', [
         'services'     => Service::where('service_type = ? AND is_active = 1', [$serviceType], 'display_order, created_at DESC'),
         'service_type' => $serviceType,
-        'page_title'   => $typeNames[$serviceType] ?? 'الخدمات الجامعية',
+        'page_title'   => $typeNames[$serviceType] ?? __('الخدمات الجامعية'),
     ]);
 }
 

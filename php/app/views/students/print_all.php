@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>طباعة كل الطلبات - <?= e($student['full_name_arabic']) ?></title>
+    <title><?= t('طباعة كل الطلبات -') ?> <?= e($student['full_name_arabic']) ?></title>
     <style>
         * {
             margin: 0;
@@ -283,40 +283,40 @@
 
     <!-- صفحة الغلاف -->
     <div class="cover-page no-print">
-        <h1>🏛️ مديرية الخدمات الجامعية لولاية سطيف</h1>
-        <h2>ملف الطلبات الكامل</h2>
+        <h1><?= t('🏛️ مديرية الخدمات الجامعية لولاية سطيف') ?></h1>
+        <h2><?= t('ملف الطلبات الكامل') ?></h2>
         
         <div class="cover-info">
             <table>
                 <tr>
-                    <td>اسم الطالب:</td>
+                    <td><?= t('اسم الطالب:') ?></td>
                     <td><?= e($student['full_name_arabic']) ?></td>
                 </tr>
                 <tr>
-                    <td>رقم التسجيل:</td>
+                    <td><?= t('رقم التسجيل:') ?></td>
                     <td><strong><?= e($student['registration_number']) ?></strong></td>
                 </tr>
                 <tr>
-                    <td>الكلية:</td>
+                    <td><?= t('الكلية:') ?></td>
                     <td><?= e($student['faculty']) ?></td>
                 </tr>
                 <tr>
-                    <td>القسم:</td>
+                    <td><?= t('القسم:') ?></td>
                     <td><?= e($student['department']) ?></td>
                 </tr>
                 <tr>
-                    <td>عدد الطلبات:</td>
+                    <td><?= t('عدد الطلبات:') ?></td>
                     <td><strong><?= e(count($applications)) ?></strong></td>
                 </tr>
                 <tr>
-                    <td>تاريخ الطباعة:</td>
+                    <td><?= t('تاريخ الطباعة:') ?></td>
                     <td id="printDate"></td>
                 </tr>
             </table>
         </div>
         
         <p style="color: #7f8c8d; margin-top: 30px;">
-            يحتوي هذا الملف على تفاصيل كاملة لجميع الطلبات المقدمة
+            <?= t('يحتوي هذا الملف على تفاصيل كاملة لجميع الطلبات المقدمة') ?>
         </p>
     </div>
 
@@ -326,9 +326,9 @@
         
         <!-- Header -->
         <div class="header">
-            <h1>🏛️ مديرية الخدمات الجامعية لولاية سطيف</h1>
-            <p>استمارة طلب - <?= e($app['application_type']['name']) ?></p>
-            <p class="app-number">رقم الطلب: <?= e($app['application_number']) ?></p>
+            <h1><?= t('🏛️ مديرية الخدمات الجامعية لولاية سطيف') ?></h1>
+            <p><?= t('استمارة طلب -') ?> <?= e($app['application_type']['name']) ?></p>
+            <p class="app-number"><?= t('رقم الطلب:') ?> <?= e($app['application_number']) ?></p>
         </div>
         
         <!-- Barcode -->
@@ -340,18 +340,18 @@
         
         <!-- معلومات الطلب -->
         <div class="section">
-            <h2>📋 معلومات الطلب</h2>
+            <h2><?= t('📋 معلومات الطلب') ?></h2>
             <table class="info-table">
                 <tr>
-                    <td>نوع الطلب</td>
+                    <td><?= t('نوع الطلب') ?></td>
                     <td><?= e($app['application_type']['name']) ?></td>
                 </tr>
                 <tr>
-                    <td>رقم الطلب</td>
+                    <td><?= t('رقم الطلب') ?></td>
                     <td><strong><?= e($app['application_number']) ?></strong></td>
                 </tr>
                 <tr>
-                    <td>الحالة</td>
+                    <td><?= t('الحالة') ?></td>
                     <td>
                         <span class="status <?= e($app['status']) ?>">
                             <?= e($app->get_status_display()) ?>
@@ -359,18 +359,18 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>تاريخ التقديم</td>
+                    <td><?= t('تاريخ التقديم') ?></td>
                     <td><?= e(format_date($app['submitted_at'], 'd/m/Y - H:i')) ?></td>
                 </tr>
                 <?php if (!empty($app['reviewed_at'])): ?>
                 <tr>
-                    <td>تاريخ المراجعة</td>
+                    <td><?= t('تاريخ المراجعة') ?></td>
                     <td><?= e(format_date($app['reviewed_at'], 'd/m/Y - H:i')) ?></td>
                 </tr>
                 <?php endif; ?>
                 <?php if (!empty($app['reviewed_by'])): ?>
                 <tr>
-                    <td>تمت المراجعة بواسطة</td>
+                    <td><?= t('تمت المراجعة بواسطة') ?></td>
                     <td><?= e(($app['reviewed_by']->get_full_name() ?: $app['reviewed_by']['username'])) ?></td>
                 </tr>
                 <?php endif; ?>
@@ -379,30 +379,30 @@
         
         <!-- معلومات الطالب -->
         <div class="section">
-            <h2>👤 معلومات الطالب</h2>
+            <h2><?= t('👤 معلومات الطالب') ?></h2>
             <table class="info-table">
                 <tr>
-                    <td>الاسم الكامل</td>
+                    <td><?= t('الاسم الكامل') ?></td>
                     <td><?= e($student['full_name_arabic']) ?></td>
                 </tr>
                 <tr>
-                    <td>رقم التسجيل</td>
+                    <td><?= t('رقم التسجيل') ?></td>
                     <td><strong><?= e($student['registration_number']) ?></strong></td>
                 </tr>
                 <tr>
-                    <td>الكلية</td>
+                    <td><?= t('الكلية') ?></td>
                     <td><?= e($student['faculty']) ?></td>
                 </tr>
                 <tr>
-                    <td>القسم</td>
+                    <td><?= t('القسم') ?></td>
                     <td><?= e($student['department']) ?></td>
                 </tr>
                 <tr>
-                    <td>السنة الدراسية</td>
+                    <td><?= t('السنة الدراسية') ?></td>
                     <td><?= e($student->get_current_year_display()) ?></td>
                 </tr>
                 <tr>
-                    <td>رقم الهاتف</td>
+                    <td><?= t('رقم الهاتف') ?></td>
                     <td><?= e($student['phone']) ?></td>
                 </tr>
             </table>
@@ -411,7 +411,7 @@
         <!-- تفاصيل الطلب -->
         <?php if (!empty($app['details'])): ?>
         <div class="section">
-            <h2>📝 تفاصيل الطلب</h2>
+            <h2><?= t('📝 تفاصيل الطلب') ?></h2>
             <div style="padding: 15px; border: 1px solid #ddd; background: #f8f9fa; border-radius: 5px;">
                 <?= linebreaks($app['details']) ?>
             </div>
@@ -421,13 +421,13 @@
         <!-- الوثائق المرفقة -->
         <?php if (!empty($app['documents'])): ?>
         <div class="section">
-            <h2>📎 الوثائق المرفقة</h2>
+            <h2><?= t('📎 الوثائق المرفقة') ?></h2>
             <ul class="documents">
                 <?php $__docs = array_values($app['documents']); foreach ($__docs as $__j => $doc): ?>
                 <li>
                     <strong><?= e(($__j + 1)) ?>. <?= e($doc['document_name']) ?></strong><br>
                     <small style="color: #6c757d;">
-                        📅 تاريخ الرفع: <?= e(format_date($doc['uploaded_at'], 'd/m/Y - H:i')) ?>
+                        <?= t('📅 تاريخ الرفع:') ?> <?= e(format_date($doc['uploaded_at'], 'd/m/Y - H:i')) ?>
                     </small>
                 </li>
                 <?php endforeach; ?>
@@ -438,7 +438,7 @@
         <!-- ملاحظات الإدارة -->
         <?php if (!empty($app['admin_notes'])): ?>
         <div class="section">
-            <h2>⚠️ ملاحظات الإدارة</h2>
+            <h2><?= t('⚠️ ملاحظات الإدارة') ?></h2>
             <div class="admin-notes">
                 <?= linebreaks($app['admin_notes']) ?>
             </div>
@@ -448,42 +448,42 @@
         <!-- التوقيعات -->
         <div class="signatures">
             <div class="signature-box">
-                <p>توقيع الطالب</p>
+                <p><?= t('توقيع الطالب') ?></p>
                 <div class="signature-line"></div>
             </div>
             <div class="signature-box">
-                <p>توقيع المسؤول</p>
+                <p><?= t('توقيع المسؤول') ?></p>
                 <div class="signature-line"></div>
             </div>
         </div>
         
         <!-- Footer -->
         <div class="footer">
-            <p><strong>مديرية الخدمات الجامعية لولاية سطيف</strong></p>
-            <p>www.dsu-setif.dz | الهاتف: 036 XX XX XX</p>
+            <p><strong><?= t('مديرية الخدمات الجامعية لولاية سطيف') ?></strong></p>
+            <p><?= t('www.dsu-setif.dz | الهاتف: 036 XX XX XX') ?></p>
             <p style="margin-top: 5px; font-style: italic;">
-                الطلب <?= e(($__i + 1)) ?> من <?= e(count($applications)) ?>
+                <?= t('الطلب') ?> <?= e(($__i + 1)) ?> <?= t('من') ?> <?= e(count($applications)) ?>
             </p>
         </div>
         
     </div>
     <?php endforeach; ?><?php else: ?>
     <div style="text-align: center; padding: 100px; color: #7f8c8d;">
-        <h2>لا توجد طلبات</h2>
-        <p>لم تقدم أي طلبات بعد</p>
+        <h2><?= t('لا توجد طلبات') ?></h2>
+        <p><?= t('لم تقدم أي طلبات بعد') ?></p>
     </div>
     <?php endif; ?>
 
     <!-- زر الطباعة -->
     <button class="print-button no-print" onclick="window.print()">
-        🖨️ طباعة الملف الكامل (<?= e(count($applications)) ?> طلب)
+        <?= t('🖨️ طباعة الملف الكامل ({count} طلب)', ['count' => count($applications)]) ?>
     </button>
     
     <script>
         // إضافة تاريخ الطباعة
         const printDateElement = document.getElementById('printDate');
         if (printDateElement) {
-            printDateElement.textContent = new Date().toLocaleString('ar-DZ', {
+            printDateElement.textContent = new Date().toLocaleString(<?= json_encode(intl_locale()) ?>, {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',

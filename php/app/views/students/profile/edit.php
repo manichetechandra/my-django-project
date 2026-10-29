@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -70,7 +70,7 @@
 <div class="profile-header">
     <div class="container">
         <h1 style="margin: 0; font-size: 36px;">
-            <i class="fa fa-edit"></i> تعديل معلوماتي الشخصية
+            <i class="fa fa-edit"></i> <?= t('تعديل معلوماتي الشخصية') ?>
         </h1>
     </div>
 </div>
@@ -78,10 +78,10 @@
 <div class="container">
     
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:dashboard')) ?>">لوحة التحكم</a></li>
-        <li><a href="<?= e(url('students:profile_view')) ?>">معلوماتي</a></li>
-        <li class="active">تعديل المعلومات</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:dashboard')) ?>"><?= t('لوحة التحكم') ?></a></li>
+        <li><a href="<?= e(url('students:profile_view')) ?>"><?= t('معلوماتي') ?></a></li>
+        <li class="active"><?= t('تعديل المعلومات') ?></li>
     </ol>
     
     <div class="row">
@@ -94,62 +94,62 @@
                 <!-- قسم الصورة الشخصية -->
                 <div class="form-section">
                     <h3 class="form-section-title">
-                        <i class="fa fa-camera"></i> الصورة الشخصية
+                        <i class="fa fa-camera"></i> <?= t('الصورة الشخصية') ?>
                     </h3>
                     
                     <div class="image-preview-section">
                         <?php if (!empty($student['photo'])): ?>
-                        <img src="<?= e(media_url($student['photo'])) ?>" alt="الصورة الحالية" class="current-image" id="currentImage">
+                        <img src="<?= e(media_url($student['photo'])) ?>" alt="<?= t('الصورة الحالية') ?>" class="current-image" id="currentImage">
                         <br>
                         <button type="button" class="btn-delete-image" onclick="deleteImage()">
-                            <i class="fa fa-trash"></i> حذف الصورة
+                            <i class="fa fa-trash"></i> <?= t('حذف الصورة') ?>
                         </button>
                         <?php else: ?>
                         <div class="current-image" style="background: #bdc3c7; display: flex; align-items: center; justify-content: center; font-size: 60px; color: white;">
                             <i class="fa fa-user"></i>
                         </div>
-                        <p style="color: #7f8c8d;">لا توجد صورة شخصية</p>
+                        <p style="color: #7f8c8d;"><?= t('لا توجد صورة شخصية') ?></p>
                         <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
-                        <label>رفع صورة جديدة:</label>
+                        <label><?= t('رفع صورة جديدة:') ?></label>
                         <?= $profile_form->widget('photo') ?>
-                        <small class="help-block">الصيغ المدعومة: JPG, PNG (الحد الأقصى: 2MB)</small>
+                        <small class="help-block"><?= t('الصيغ المدعومة: JPG, PNG (الحد الأقصى: 2MB)') ?></small>
                     </div>
                 </div>
                 
                 <!-- المعلومات الشخصية -->
                 <div class="form-section">
                     <h3 class="form-section-title">
-                        <i class="fa fa-user"></i> المعلومات الشخصية
+                        <i class="fa fa-user"></i> <?= t('المعلومات الشخصية') ?>
                     </h3>
                     
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>الاسم الكامل بالعربية: <span class="text-danger">*</span></label>
+                                <label><?= t('الاسم الكامل بالعربية:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('full_name_arabic') ?>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>تاريخ الميلاد: <span class="text-danger">*</span></label>
+                                <label><?= t('تاريخ الميلاد:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('birth_date') ?>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>مكان الميلاد: <span class="text-danger">*</span></label>
+                                <label><?= t('مكان الميلاد:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('birth_place') ?>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>الجنس: <span class="text-danger">*</span></label>
+                                <label><?= t('الجنس:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('gender') ?>
                             </div>
                         </div>
@@ -159,34 +159,34 @@
                 <!-- معلومات الاتصال -->
                 <div class="form-section">
                     <h3 class="form-section-title">
-                        <i class="fa fa-phone"></i> معلومات الاتصال
+                        <i class="fa fa-phone"></i> <?= t('معلومات الاتصال') ?>
                     </h3>
                     
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>رقم الهاتف: <span class="text-danger">*</span></label>
+                                <label><?= t('رقم الهاتف:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('phone') ?>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>البريد الإلكتروني:</label>
+                                <label><?= t('البريد الإلكتروني:') ?></label>
                                 <?= $email_form->widget('email') ?>
                             </div>
                         </div>
                         
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>العنوان: <span class="text-danger">*</span></label>
+                                <label><?= t('العنوان:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('address') ?>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>الولاية: <span class="text-danger">*</span></label>
+                                <label><?= t('الولاية:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('wilaya') ?>
                             </div>
                         </div>
@@ -196,27 +196,27 @@
                 <!-- المعلومات الأكاديمية -->
                 <div class="form-section">
                     <h3 class="form-section-title">
-                        <i class="fa fa-graduation-cap"></i> المعلومات الأكاديمية
+                        <i class="fa fa-graduation-cap"></i> <?= t('المعلومات الأكاديمية') ?>
                     </h3>
                     
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>الكلية: <span class="text-danger">*</span></label>
+                                <label><?= t('الكلية:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('faculty') ?>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>القسم/التخصص: <span class="text-danger">*</span></label>
+                                <label><?= t('القسم/التخصص:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('department') ?>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>السنة الدراسية: <span class="text-danger">*</span></label>
+                                <label><?= t('السنة الدراسية:') ?> <span class="text-danger">*</span></label>
                                 <?= $profile_form->widget('current_year') ?>
                             </div>
                         </div>
@@ -226,11 +226,11 @@
                 <!-- أزرار الحفظ -->
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #ecf0f1;">
                     <button type="submit" class="btn btn-primary btn-lg" style="padding: 12px 50px;">
-                        <i class="fa fa-save"></i> حفظ التعديلات
+                        <i class="fa fa-save"></i> <?= t('حفظ التعديلات') ?>
                     </button>
                     
                     <a href="<?= e(url('students:profile_view')) ?>" class="btn btn-default btn-lg" style="padding: 12px 50px;">
-                        <i class="fa fa-times"></i> إلغاء
+                        <i class="fa fa-times"></i> <?= t('إلغاء') ?>
                     </a>
                 </div>
                 
@@ -250,7 +250,7 @@
 <script>
 // حذف الصورة الشخصية
 function deleteImage() {
-    if (!confirm('هل أنت متأكد من حذف الصورة الشخصية؟')) {
+    if (!confirm(<?= js_t('هل أنت متأكد من حذف الصورة الشخصية؟') ?>)) {
         return;
     }
     
@@ -265,14 +265,14 @@ function deleteImage() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('تم حذف الصورة بنجاح');
+            alert(<?= js_t('تم حذف الصورة بنجاح') ?>);
             location.reload();
         } else {
-            alert('خطأ: ' + data.error);
+            alert(<?= js_t('خطأ: ') ?> + data.error);
         }
     })
     .catch(error => {
-        alert('حدث خطأ في الاتصال');
+        alert(<?= js_t('حدث خطأ في الاتصال') ?>);
         console.error(error);
     });
 }

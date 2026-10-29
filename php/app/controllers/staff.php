@@ -34,7 +34,7 @@ function staff_fetch_applications(string $where, array $params, string $limit = 
             s.id AS s_id, s.user_id AS s_user_id, s.registration_number AS s_registration_number, s.full_name_arabic AS s_full_name_arabic,
             s.phone AS s_phone, s.faculty AS s_faculty, s.department AS s_department, s.current_year AS s_current_year, s.wilaya AS s_wilaya, s.photo AS s_photo,
             u.email AS u_email,
-            t.id AS t_id, t.name AS t_name, t.icon AS t_icon, t.color AS t_color,
+            t.id AS t_id, t.name AS t_name, t.name_fr AS t_name_fr, t.name_en AS t_name_en, t.icon AS t_icon, t.color AS t_color,
             r.id AS r_id, r.username AS r_username, r.first_name AS r_first_name, r.last_name AS r_last_name
         FROM student_applications a
         JOIN student_profiles s ON s.id = a.student_id
@@ -92,7 +92,7 @@ function staff_dashboard(): void
     $dayNames = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
     for ($i = 6; $i >= 0; $i--) {
         $ts = strtotime("-$i days");
-        $daysLabels[] = $dayNames[(int) date('w', $ts)] . ' ' . date('d/m', $ts);
+        $daysLabels[] = __($dayNames[(int) date('w', $ts)]) . ' ' . date('d/m', $ts);
         $daysData[] = $daily[date('Y-m-d', $ts)] ?? 0;
     }
 
@@ -108,8 +108,8 @@ function staff_dashboard(): void
         'recent_applications'  => staff_fetch_applications('1', [], 'LIMIT 10'),
         'applications_by_type' => $byType,
         'total_students'       => StudentProfile::count('is_active = 1'),
-        'page_title'           => 'لوحة تحكم المشرف',
-        'chart_status_labels'  => ['قيد الانتظار', 'قيد المراجعة', 'معتمد', 'مرفوض'],
+        'page_title'           => __('لوحة تحكم المشرف'),
+        'chart_status_labels'  => [__('قيد الانتظار'), __('قيد المراجعة'), __('معتمد'), __('مرفوض')],
         'chart_status_data'    => [(int) $c['pending'], (int) $c['under_review'], (int) $c['approved'], (int) $c['rejected']],
         'chart_status_colors'  => ['#f39c12', '#3498db', '#2ecc71', '#e74c3c'],
         'chart_type_labels'    => array_map(fn($t) => $t['name'], $byType),
@@ -130,9 +130,9 @@ function staff_applications_list(): void
         $action = (string) ($_POST['bulk_action'] ?? '');
         $ids = array_values(array_filter(array_map('intval', (array) ($_POST['selected_applications'] ?? []))));
         if (!$ids) {
-            flash('warning', 'لم تقم بتحديد أي طلبات!');
+            flash('warning', __('لم تقم بتحديد أي طلبات!'));
         } elseif ($action === '') {
-            flash('warning', 'لم تقم باختيار إجراء!');
+            flash('warning', __('لم تقم باختيار إجراء!'));
         } else {
             $selected = StudentApplication::where('id IN (' . DB::in($ids) . ')', $ids);
             $count = count($selected);
@@ -142,27 +142,27 @@ function staff_applications_list(): void
                         foreach ($selected as $app) {
                             $app->change_status('approved', $staff);
                         }
-                        flash('success', "✅ تم اعتماد $count طلب بنجاح!");
+                        flash('success', __('✅ تم اعتماد {count} طلب بنجاح!', ['count' => $count]));
                         break;
                     case 'reject':
-                        $notes = (string) ($_POST['bulk_notes'] ?? 'تم رفض الطلب');
+                        $notes = (string) ($_POST['bulk_notes'] ?? __('تم رفض الطلب'));
                         foreach ($selected as $app) {
                             $app->update(['admin_notes' => $notes]);
                             $app->change_status('rejected', $staff);
                         }
-                        flash('warning', "⚠️ تم رفض $count طلب");
+                        flash('warning', __('⚠️ تم رفض {count} طلب', ['count' => $count]));
                         break;
                     case 'review':
                         foreach ($selected as $app) {
                             $app->change_status('under_review');
                         }
-                        flash('info', "📝 تم تغيير حالة $count طلب إلى \"قيد المراجعة\"");
+                        flash('info', __('📝 تم تغيير حالة {count} طلب إلى "قيد المراجعة"', ['count' => $count]));
                         break;
                     case 'pending':
                         foreach ($selected as $app) {
                             $app->change_status('pending');
                         }
-                        flash('info', "⏳ تم تغيير حالة $count طلب إلى \"قيد الانتظار\"");
+                        flash('info', __('⏳ تم تغيير حالة {count} طلب إلى "قيد الانتظار"', ['count' => $count]));
                         break;
                     case 'delete':
                         foreach ($selected as $app) {
@@ -171,10 +171,10 @@ function staff_applications_list(): void
                             }
                             $app->delete();
                         }
-                        flash('success', "🗑️ تم حذف $count طلب");
+                        flash('success', __('🗑️ تم حذف {count} طلب', ['count' => $count]));
                         break;
                     default:
-                        flash('warning', 'إجراء غير معروف: ' . $action);
+                        flash('warning', __('إجراء غير معروف: {action}', ['action' => $action]));
                 }
             });
             redirect(url('students:admin_applications_list') . ($_GET ? '?' . http_build_query($_GET) : ''));
@@ -189,7 +189,7 @@ function staff_applications_list(): void
         'status_filter'     => $status,
         'type_filter'       => $type,
         'search_query'      => $search,
-        'page_title'        => 'إدارة الطلبات',
+        'page_title'        => __('إدارة الطلبات'),
     ]);
 }
 
@@ -211,26 +211,26 @@ function staff_application_detail($pk): void
         switch ($action) {
             case 'approve':
                 $app->change_status('approved', $staff, $notes);
-                flash('success', 'تم اعتماد الطلب بنجاح وإرسال إشعار للطالب');
+                flash('success', __('تم اعتماد الطلب بنجاح وإرسال إشعار للطالب'));
                 break;
             case 'reject':
                 $app->update(['admin_notes' => $notes]);
                 $app->change_status('rejected', $staff);
-                flash('warning', 'تم رفض الطلب وإرسال إشعار للطالب');
+                flash('warning', __('تم رفض الطلب وإرسال إشعار للطالب'));
                 break;
             case 'pending':
                 $app->change_status('pending', null, $notes);
-                flash('info', 'تم تغيير حالة الطلب إلى "قيد الانتظار" وإرسال إشعار للطالب');
+                flash('info', __('تم تغيير حالة الطلب إلى "قيد الانتظار" وإرسال إشعار للطالب'));
                 break;
             case 'review':
                 $app->change_status('under_review', null, $notes);
-                flash('info', 'تم تغيير حالة الطلب إلى "قيد المراجعة" وإرسال إشعار للطالب');
+                flash('info', __('تم تغيير حالة الطلب إلى "قيد المراجعة" وإرسال إشعار للطالب'));
                 break;
             case '':
-                flash('warning', 'لم يتم تحديد الإجراء المطلوب');
+                flash('warning', __('لم يتم تحديد الإجراء المطلوب'));
                 break;
             default:
-                flash('warning', 'إجراء غير معروف: ' . $action);
+                flash('warning', __('إجراء غير معروف: {action}', ['action' => $action]));
         }
         redirect($back);
     }
@@ -239,7 +239,7 @@ function staff_application_detail($pk): void
         'application' => $application,
         'student'     => $application['student'],
         'documents'   => ApplicationDocument::where('application_id = ?', [(int) $application['id']], 'uploaded_at DESC'),
-        'page_title'  => 'تفاصيل الطلب - ' . $application['application_number'],
+        'page_title'  => __('تفاصيل الطلب - {number}', ['number' => $application['application_number']]),
     ]);
 }
 
@@ -249,8 +249,8 @@ function staff_export_applications_excel(): void
     $staff = require_staff();
     [$where, $params] = staff_applications_filter();
     $apps = staff_fetch_applications($where, $params);
-    $headers = ['#', 'رقم الطلب', 'اسم الطالب', 'رقم التسجيل', 'نوع الطلب', 'الحالة', 'تاريخ التقديم', 'تاريخ المراجعة',
-                'راجعه', 'الهاتف', 'البريد الإلكتروني', 'الكلية', 'القسم', 'السنة الدراسية'];
+    $headers = ['#', __('رقم الطلب'), __('اسم الطالب'), __('رقم التسجيل'), __('نوع الطلب'), __('الحالة'), __('تاريخ التقديم'), __('تاريخ المراجعة'),
+                __('راجعه'), __('الهاتف'), __('البريد الإلكتروني'), __('الكلية'), __('القسم'), __('السنة الدراسية')];
     $rows = [];
     foreach ($apps as $i => $app) {
         $s = $app['student'];
@@ -289,14 +289,14 @@ function staff_export_applications_excel(): void
             fputcsv($out, $row);
         }
         fputcsv($out, []);
-        fputcsv($out, ['الإجمالي:', count($rows)]);
-        fputcsv($out, ['تاريخ التصدير:', date('Y-m-d H:i')]);
-        fputcsv($out, ['صُدّر بواسطة:', $exportedBy]);
+        fputcsv($out, [__('الإجمالي:'), count($rows)]);
+        fputcsv($out, [__('تاريخ التصدير:'), date('Y-m-d H:i')]);
+        fputcsv($out, [__('صُدّر بواسطة:'), $exportedBy]);
         fclose($out);
         exit;
     }
 
-    $x = new XlsxWriter('الطلبات');
+    $x = new XlsxWriter(__('الطلبات'), is_rtl());
     $head = $x->style(['bold' => true, 'size' => 12, 'color' => 'FFFFFF', 'fill' => '2C3E50', 'align' => 'center', 'border' => true]);
     $statusFills = ['pending' => 'FFF3CD', 'under_review' => 'D1ECF1', 'approved' => 'D4EDDA', 'rejected' => 'F8D7DA', 'cancelled' => 'E2E3E5'];
     foreach ($headers as $col => $h) {
@@ -309,7 +309,7 @@ function staff_export_applications_excel(): void
         foreach ($row as $col => $value) {
             $c = $col + 1;
             $cellFill = $c === 6 ? ($statusFills[$apps[$i]['status']] ?? $fill) : $fill;
-            $x->setCell($r, $c, $value, $x->style(['border' => true, 'fill' => $cellFill, 'align' => $c > 1 ? 'right' : 'center']));
+            $x->setCell($r, $c, $value, $x->style(['border' => true, 'fill' => $cellFill, 'align' => $c > 1 ? (is_rtl() ? 'right' : 'left') : 'center']));
         }
     }
     foreach ([8, 15, 25, 15, 20, 15, 18, 18, 20, 15, 25, 25, 25, 15] as $col => $w) {
@@ -317,11 +317,11 @@ function staff_export_applications_excel(): void
     }
     $bold = $x->style(['bold' => true]);
     $sr = count($rows) + 3;
-    $x->setCell($sr, 1, 'الإجمالي:', $bold);
+    $x->setCell($sr, 1, __('الإجمالي:'), $bold);
     $x->setCell($sr, 2, count($rows), $bold);
-    $x->setCell($sr + 1, 1, 'تاريخ التصدير:');
+    $x->setCell($sr + 1, 1, __('تاريخ التصدير:'));
     $x->setCell($sr + 1, 2, date('Y-m-d H:i'));
-    $x->setCell($sr + 2, 1, 'صُدّر بواسطة:');
+    $x->setCell($sr + 2, 1, __('صُدّر بواسطة:'));
     $x->setCell($sr + 2, 2, $exportedBy);
     $x->download('applications_' . $stamp . '.xlsx');
 }

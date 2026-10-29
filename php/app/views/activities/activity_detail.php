@@ -1,12 +1,12 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($activity['title']) ?> - مديرية الخدمات الجامعية<?php endblock(); ?>
+<?php block('title'); ?><?= e($activity['title']) ?> <?= t('- مديرية الخدمات الجامعية') ?><?php endblock(); ?>
 
 <?php block('content'); ?>
 <div class="container" style="margin-top: 80px;">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('activities:activity_list')) ?>">النشاطات</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('activities:activity_list')) ?>"><?= t('النشاطات') ?></a></li>
         <li class="active"><?= e($activity['title']) ?></li>
     </ol>
 
@@ -29,28 +29,28 @@
                     <div class="col-sm-6">
                         <p style="margin: 5px 0;">
                             <i class="fa fa-calendar" style="color: #8cc040;"></i>
-                            <strong>التاريخ:</strong> <?= e(format_date($activity['date'], 'd/m/Y')) ?>
+                            <strong><?= t('التاريخ:') ?></strong> <?= e(format_date($activity['date'], 'd/m/Y')) ?>
                         </p>
                         <p style="margin: 5px 0;">
                             <i class="fa fa-map-marker" style="color: #e74c3c;"></i>
-                            <strong>المكان:</strong> <?= e($activity['location']) ?>
+                            <strong><?= t('المكان:') ?></strong> <?= e($activity['location']) ?>
                         </p>
                     </div>
                     <div class="col-sm-6">
                         <p style="margin: 5px 0;">
                             <i class="fa fa-tag" style="color: #3498db;"></i>
-                            <strong>النوع:</strong> <?= e($activity->get_activity_type_display()) ?>
+                            <strong><?= t('النوع:') ?></strong> <?= e($activity->get_activity_type_display()) ?>
                         </p>
                         <p style="margin: 5px 0;">
                             <i class="fa fa-users" style="color: #9b59b6;"></i>
-                            <strong>المشاركون:</strong> <?= e($activity['participants_count']) ?> شخص
+                            <strong><?= t('المشاركون:') ?></strong> <?= e($activity['participants_count']) ?> <?= t('شخص') ?>
                         </p>
                     </div>
                 </div>
                 <?php if (!empty($activity['organizer'])): ?>
                 <p style="margin: 5px 0;">
                     <i class="fa fa-building" style="color: #f39c12;"></i>
-                    <strong>المنظم:</strong> <?= e($activity['organizer']) ?>
+                    <strong><?= t('المنظم:') ?></strong> <?= e($activity['organizer']) ?>
                 </p>
                 <?php endif; ?>
             </div>
@@ -58,7 +58,7 @@
             <!-- الوصف -->
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">عن النشاط</h3>
+                    <h3 class="panel-title"><?= t('عن النشاط') ?></h3>
                 </div>
                 <div class="panel-body">
                     <p style="line-height: 1.8; font-size: 16px;"><?= linebreaks($activity['description']) ?></p>
@@ -69,7 +69,7 @@
             <?php if (!empty($gallery_images)): ?>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">معرض الصور</h3>
+                    <h3 class="panel-title"><?= t('معرض الصور') ?></h3>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -95,7 +95,7 @@
             <?php if (!empty($related_activities)): ?>
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">نشاطات مشابهة</h3>
+                    <h3 class="panel-title"><?= t('نشاطات مشابهة') ?></h3>
                 </div>
                 <div class="panel-body">
                     <?php foreach ($related_activities as $related): ?>
@@ -113,7 +113,7 @@
                 </div>
                 <div class="panel-footer">
                     <a href="<?= e(url('activities:activity_list')) ?>?type=<?= e($activity['activity_type']) ?>" class="btn btn-sm btn-success btn-block">
-                        عرض كل النشاطات <?= e($activity->get_activity_type_display()) ?>ة
+                        <?= t('عرض كل النشاطات {type}ة', ['type' => $activity->get_activity_type_display()]) ?>
                     </a>
                 </div>
             </div>
@@ -122,10 +122,10 @@
             <!-- مشاركة -->
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">مشاركة النشاط</h3>
+                    <h3 class="panel-title"><?= t('مشاركة النشاط') ?></h3>
                 </div>
                 <div class="panel-body text-center">
-                    <p>شارك هذا النشاط مع الآخرين:</p>
+                    <p><?= t('شارك هذا النشاط مع الآخرين:') ?></p>
                     <div class="btn-group btn-group-justified">
                         <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(current_url()) ?>" target="_blank" class="btn btn-primary">
                             <i class="fa fa-facebook"></i> Facebook

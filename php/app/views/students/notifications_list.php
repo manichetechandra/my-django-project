@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -128,10 +128,10 @@
 <div class="notifications-header">
     <div class="container">
         <h1 style="margin: 0; font-size: 36px;">
-            <i class="fa fa-bell"></i> إشعاراتي
+            <i class="fa fa-bell"></i> <?= t('إشعاراتي') ?>
         </h1>
         <p style="margin-top: 10px; opacity: 0.9;">
-            تتبع كل الإشعارات والتحديثات الخاصة بك
+            <?= t('تتبع كل الإشعارات والتحديثات الخاصة بك') ?>
         </p>
     </div>
 </div>
@@ -139,9 +139,9 @@
 <div class="container">
     
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:dashboard')) ?>">لوحة التحكم</a></li>
-        <li class="active">إشعاراتي</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:dashboard')) ?>"><?= t('لوحة التحكم') ?></a></li>
+        <li class="active"><?= t('إشعاراتي') ?></li>
     </ol>
     
     <!-- ========================================
@@ -153,28 +153,28 @@
                 <div class="btn-group" role="group">
                     <a href="<?= e(url('students:notifications_list')) ?>" 
                        class="btn <?php if ($filter_type == 'all'): ?>btn-primary<?php else: ?>btn-default<?php endif; ?>">
-                        <i class="fa fa-list"></i> الكل (<?= e($total_count) ?>)
+                        <i class="fa fa-list"></i> <?= t('الكل') ?> (<?= e($total_count) ?>)
                     </a>
                     <a href="<?= e(url('students:notifications_list')) ?>?filter=unread" 
                        class="btn <?php if ($filter_type == 'unread'): ?>btn-warning<?php else: ?>btn-default<?php endif; ?>">
-                        <i class="fa fa-envelope"></i> غير مقروء (<?= e($unread_count) ?>)
+                        <i class="fa fa-envelope"></i> <?= t('غير مقروء') ?> (<?= e($unread_count) ?>)
                     </a>
                     <a href="<?= e(url('students:notifications_list')) ?>?filter=read" 
                        class="btn <?php if ($filter_type == 'read'): ?>btn-success<?php else: ?>btn-default<?php endif; ?>">
-                        <i class="fa fa-envelope-open"></i> مقروء (<?= e($read_count) ?>)
+                        <i class="fa fa-envelope-open"></i> <?= t('مقروء') ?> (<?= e($read_count) ?>)
                     </a>
                 </div>
             </div>
             <div class="col-md-4 text-left">
                 <?php if ($unread_count > 0): ?>
                 <button type="button" class="btn btn-info" id="markAllReadBtn">
-                    <i class="fa fa-check-double"></i> تمييز الكل كمقروء
+                    <i class="fa fa-check-double"></i> <?= t('تمييز الكل كمقروء') ?>
                 </button>
                 <?php endif; ?>
                 
                 <?php if ($read_count > 0): ?>
                 <button type="button" class="btn btn-danger" id="deleteReadBtn">
-                    <i class="fa fa-trash"></i> حذف المقروءة
+                    <i class="fa fa-trash"></i> <?= t('حذف المقروءة') ?>
                 </button>
                 <?php endif; ?>
             </div>
@@ -191,7 +191,7 @@
              data-id="<?= e($notification['id']) ?>">
             
             <?php if (empty($notification['is_read'])): ?>
-            <span class="unread-badge">جديد</span>
+            <span class="unread-badge"><?= t('جديد') ?></span>
             <?php endif; ?>
             
             <div style="display: flex; align-items: flex-start;">
@@ -206,14 +206,14 @@
                         <i class="fa fa-clock-o"></i>
                         <?= e(format_date($notification['created_at'], 'd/m/Y H:i')) ?>
                         <?php if (!empty($notification['is_read']) && !empty($notification['read_at'])): ?>
-                        - قُرئ في <?= e(format_date($notification['read_at'], 'd/m/Y H:i')) ?>
+                        <?= t('- قُرئ في') ?> <?= e(format_date($notification['read_at'], 'd/m/Y H:i')) ?>
                         <?php endif; ?>
                     </div>
                 </div>
                 
                 <div class="notification-actions">
                     <?php if (!empty($notification['link'])): ?>
-                    <a href="<?= e(link_url($notification['link'])) ?>" class="btn btn-sm btn-primary" title="عرض التفاصيل">
+                    <a href="<?= e(link_url($notification['link'])) ?>" class="btn btn-sm btn-primary" title="<?= t('عرض التفاصيل') ?>">
                         <i class="fa fa-eye"></i>
                     </a>
                     <?php endif; ?>
@@ -222,7 +222,7 @@
                     <button type="button" 
                             class="btn btn-sm btn-success mark-read-btn" 
                             data-id="<?= e($notification['id']) ?>"
-                            title="تمييز كمقروء">
+                            title="<?= t('تمييز كمقروء') ?>">
                         <i class="fa fa-check"></i>
                     </button>
                     <?php endif; ?>
@@ -230,7 +230,7 @@
                     <button type="button" 
                             class="btn btn-sm btn-danger delete-btn" 
                             data-id="<?= e($notification['id']) ?>"
-                            title="حذف">
+                            title="<?= t('حذف') ?>">
                         <i class="fa fa-trash"></i>
                     </button>
                 </div>
@@ -241,10 +241,10 @@
     <?php else: ?>
     <div class="empty-state">
         <i class="fa fa-bell-slash"></i>
-        <h3>لا توجد إشعارات</h3>
-        <p><?php if ($filter_type == 'unread'): ?>لا توجد إشعارات غير مقروءة<?php elseif ($filter_type == 'read'): ?>لا توجد إشعارات مقروءة<?php else: ?>لم تستلم أي إشعارات بعد<?php endif; ?></p>
+        <h3><?= t('لا توجد إشعارات') ?></h3>
+        <p><?php if ($filter_type == 'unread'): ?><?= t('لا توجد إشعارات غير مقروءة') ?><?php elseif ($filter_type == 'read'): ?><?= t('لا توجد إشعارات مقروءة') ?><?php else: ?><?= t('لم تستلم أي إشعارات بعد') ?><?php endif; ?></p>
         <a href="<?= e(url('students:dashboard')) ?>" class="btn btn-primary" style="margin-top: 20px;">
-            <i class="fa fa-arrow-right"></i> العودة للوحة التحكم
+            <i class="fa fa-arrow-right"></i> <?= t('العودة للوحة التحكم') ?>
         </a>
     </div>
     <?php endif; ?>
@@ -286,12 +286,12 @@ document.querySelectorAll('.mark-read-btn').forEach(btn => {
                 // إعادة تحميل الصفحة
                 location.reload();
             } else {
-                alert('حدث خطأ: ' + data.error);
+                alert(<?= js_t('حدث خطأ: ') ?> + data.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('حدث خطأ في الاتصال');
+            alert(<?= js_t('حدث خطأ في الاتصال') ?>);
         });
     });
 });
@@ -302,7 +302,7 @@ document.querySelectorAll('.mark-read-btn').forEach(btn => {
 const markAllReadBtn = document.getElementById('markAllReadBtn');
 if (markAllReadBtn) {
     markAllReadBtn.addEventListener('click', function() {
-        if (!confirm('هل تريد تمييز كل الإشعارات كمقروءة؟')) {
+        if (!confirm(<?= js_t('هل تريد تمييز كل الإشعارات كمقروءة؟') ?>)) {
             return;
         }
         
@@ -320,12 +320,12 @@ if (markAllReadBtn) {
                 alert(data.message);
                 location.reload();
             } else {
-                alert('حدث خطأ: ' + data.error);
+                alert(<?= js_t('حدث خطأ: ') ?> + data.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('حدث خطأ في الاتصال');
+            alert(<?= js_t('حدث خطأ في الاتصال') ?>);
         });
     });
 }
@@ -335,7 +335,7 @@ if (markAllReadBtn) {
 // ========================================
 document.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        if (!confirm('هل تريد حذف هذا الإشعار؟')) {
+        if (!confirm(<?= js_t('هل تريد حذف هذا الإشعار؟') ?>)) {
             return;
         }
         
@@ -363,12 +363,12 @@ document.querySelectorAll('.delete-btn').forEach(btn => {
                     }
                 }, 300);
             } else {
-                alert('حدث خطأ: ' + data.error);
+                alert(<?= js_t('حدث خطأ: ') ?> + data.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('حدث خطأ في الاتصال');
+            alert(<?= js_t('حدث خطأ في الاتصال') ?>);
         });
     });
 });
@@ -379,7 +379,7 @@ document.querySelectorAll('.delete-btn').forEach(btn => {
 const deleteReadBtn = document.getElementById('deleteReadBtn');
 if (deleteReadBtn) {
     deleteReadBtn.addEventListener('click', function() {
-        if (!confirm('هل تريد حذف كل الإشعارات المقروءة؟')) {
+        if (!confirm(<?= js_t('هل تريد حذف كل الإشعارات المقروءة؟') ?>)) {
             return;
         }
         
@@ -397,12 +397,12 @@ if (deleteReadBtn) {
                 alert(data.message);
                 location.reload();
             } else {
-                alert('حدث خطأ: ' + data.error);
+                alert(<?= js_t('حدث خطأ: ') ?> + data.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('حدث خطأ في الاتصال');
+            alert(<?= js_t('حدث خطأ في الاتصال') ?>);
         });
     });
 }

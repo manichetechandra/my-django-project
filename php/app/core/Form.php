@@ -116,10 +116,10 @@ class Form
     {
         $type = $f['type'] ?? 'text';
         if (isset($f['max_length']) && mb_strlen($value) > $f['max_length']) {
-            return 'تأكد أن هذه القيمة تحتوي على ' . $f['max_length'] . ' حرفًا على الأكثر (حاليًا ' . mb_strlen($value) . ').';
+            return __('تأكد أن هذه القيمة تحتوي على {max} حرفًا على الأكثر (حاليًا {count}).', ['max' => $f['max_length'], 'count' => mb_strlen($value)]);
         }
         if (isset($f['min_length']) && mb_strlen($value) < $f['min_length']) {
-            return 'تأكد أن هذه القيمة تحتوي على ' . $f['min_length'] . ' حرفًا على الأقل.';
+            return __('تأكد أن هذه القيمة تحتوي على {min} حرفًا على الأقل.', ['min' => $f['min_length']]);
         }
         switch ($type) {
             case 'email':
@@ -130,7 +130,7 @@ class Form
             case 'select':
                 $valid = array_map('strval', array_keys($this->choiceMap($name)));
                 if (!in_array($value, $valid, true)) {
-                    return 'اختر خياراً صالحاً. ' . $value . ' ليست واحدة من الخيارات المتاحة.';
+                    return __('اختر خياراً صالحاً. {value} ليست واحدة من الخيارات المتاحة.', ['value' => $value]);
                 }
                 break;
             case 'date':
@@ -151,19 +151,20 @@ class Form
                 break;
         }
         if (isset($f['min']) && is_numeric($value) && $value < $f['min']) {
-            return 'تأكد أن هذه القيمة أكبر من أو تساوي ' . $f['min'] . '.';
+            return __('تأكد أن هذه القيمة أكبر من أو تساوي {min}.', ['min' => $f['min']]);
         }
         if (isset($f['max']) && is_numeric($value) && $value > $f['max']) {
-            return 'تأكد أن هذه القيمة أصغر من أو تساوي ' . $f['max'] . '.';
+            return __('تأكد أن هذه القيمة أصغر من أو تساوي {max}.', ['max' => $f['max']]);
         }
         if (isset($f['pattern']) && !preg_match($f['pattern'], $value)) {
-            return $f['pattern_message'] ?? 'أدخل قيمة صالحة.';
+            return __($f['pattern_message'] ?? 'أدخل قيمة صالحة.');
         }
         return null;
     }
 
     public function add_error(?string $field, string $message): void
     {
+        $message = __($message); // رسائل الأخطاء بلغة الصفحة
         if ($field === null || !isset($this->fields[$field])) {
             $this->nonFieldErrors[] = $message;
         } else {
@@ -205,12 +206,12 @@ class Form
 
     public function label(string $field): string
     {
-        return $this->fields[$field]['label'] ?? $field;
+        return __($this->fields[$field]['label'] ?? $field);
     }
 
     public function help_text(string $field): string
     {
-        return $this->fields[$field]['help_text'] ?? '';
+        return __($this->fields[$field]['help_text'] ?? '');
     }
 
     public function id(string $field): string
@@ -245,6 +246,9 @@ class Form
         $f = $this->fields[$field];
         $type = $f['type'] ?? 'text';
         $attrs = ['name' => $field, 'id' => $this->id($field)] + ($f['attrs'] ?? []);
+        if (isset($attrs['placeholder'])) {
+            $attrs['placeholder'] = __($attrs['placeholder']);
+        }
         if (($f['required'] ?? true) && $type !== 'checkbox' && !isset($attrs['required'])) {
             $attrs['required'] = true;
         }
@@ -264,7 +268,7 @@ class Form
                 }
                 foreach ($choices as $val => $label) {
                     $sel = (string) $val === (string) $value ? ' selected' : '';
-                    $html .= '<option value="' . e($val) . '"' . $sel . '>' . e($label) . '</option>';
+                    $html .= '<option value="' . e($val) . '"' . $sel . '>' . e(__((string) $label)) . '</option>';
                 }
                 return $html . '</select>';
             case 'checkbox':

@@ -35,7 +35,7 @@ function faq_list(): void
         'total_faqs'       => count($faqs),
         'total_categories' => count($faqsByCategory),
         'search_query'     => $searchQuery,
-        'page_title'       => 'الأسئلة الشائعة',
+        'page_title'       => __('الأسئلة الشائعة'),
     ]);
 }
 

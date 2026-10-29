@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -46,8 +46,8 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="#">المديرية</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="#"><?= t('المديرية') ?></a></li>
         <li class="active"><?= e($organization['title']) ?></li>
     </ol>
 
@@ -56,7 +56,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 style="margin: 10px 0;">
-                <i class="fa fa-info-circle"></i> نبذة
+                <i class="fa fa-info-circle"></i> <?= t('نبذة') ?>
             </h3>
         </div>
         <div class="panel-body content-section">
@@ -69,10 +69,10 @@
     <?php if (!empty($organization['organization_chart'])): ?>
     <div class="text-center" style="margin: 40px 0;">
         <h3 style="color: #2c3e50; margin-bottom: 30px;">
-            <i class="fa fa-sitemap"></i> مخطط الهيكل التنظيمي
+            <i class="fa fa-sitemap"></i> <?= t('مخطط الهيكل التنظيمي') ?>
         </h3>
         <img src="<?= e(media_url($organization['organization_chart'])) ?>" 
-             alt="الهيكل التنظيمي" 
+             alt="<?= t('الهيكل التنظيمي') ?>" 
              class="org-chart-img">
     </div>
     <?php endif; ?>
@@ -82,7 +82,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 style="margin: 10px 0;">
-                <i class="fa fa-list-alt"></i> التفاصيل
+                <i class="fa fa-list-alt"></i> <?= t('التفاصيل') ?>
             </h3>
         </div>
         <div class="panel-body content-section">
@@ -98,10 +98,10 @@
 <div class="container" style="margin-top: 100px;">
     <div class="alert alert-warning text-center" style="padding: 40px;">
         <i class="fa fa-exclamation-triangle" style="font-size: 48px; color: #f39c12;"></i>
-        <h3 style="margin: 20px 0;">لا توجد معلومات عن الهيكل التنظيمي حالياً</h3>
-        <p>سيتم إضافة المعلومات قريباً</p>
+        <h3 style="margin: 20px 0;"><?= t('لا توجد معلومات عن الهيكل التنظيمي حالياً') ?></h3>
+        <p><?= t('سيتم إضافة المعلومات قريباً') ?></p>
         <a href="<?= e(url('homepage:index')) ?>" class="btn btn-success">
-            <i class="fa fa-home"></i> العودة للرئيسية
+            <i class="fa fa-home"></i> <?= t('العودة للرئيسية') ?>
         </a>
     </div>
 </div>

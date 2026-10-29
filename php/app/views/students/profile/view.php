@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -99,7 +99,7 @@
 <div class="profile-header">
     <div class="container">
         <h1 style="margin: 0; font-size: 36px;">
-            <i class="fa fa-user-circle"></i> معلوماتي الشخصية
+            <i class="fa fa-user-circle"></i> <?= t('معلوماتي الشخصية') ?>
         </h1>
     </div>
 </div>
@@ -107,9 +107,9 @@
 <div class="container">
     
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:dashboard')) ?>">لوحة التحكم</a></li>
-        <li class="active">معلوماتي الشخصية</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:dashboard')) ?>"><?= t('لوحة التحكم') ?></a></li>
+        <li class="active"><?= t('معلوماتي الشخصية') ?></li>
     </ol>
     
     <div class="row">
@@ -132,10 +132,10 @@
         
         <div style="margin-top: 20px;">
             <a href="<?= e(url('students:profile_edit')) ?>" class="btn btn-primary btn-block">
-                <i class="fa fa-edit"></i> تعديل المعلومات
+                <i class="fa fa-edit"></i> <?= t('تعديل المعلومات') ?>
             </a>
             <a href="<?= e(url('students:change_password')) ?>" class="btn btn-default btn-block">
-                <i class="fa fa-lock"></i> تغيير كلمة المرور
+                <i class="fa fa-lock"></i> <?= t('تغيير كلمة المرور') ?>
             </a>
         </div>
     </div>
@@ -145,19 +145,19 @@
             <div class="stats-box total" style="margin-bottom: 15px;">
                 <i class="fa fa-files-o" style="font-size: 30px; color: #3498db; opacity: 0.5;"></i>
                 <div class="stats-number" style="color: #3498db;"><?= e($total_applications) ?></div>
-                <div class="stats-label">إجمالي الطلبات</div>
+                <div class="stats-label"><?= t('إجمالي الطلبات') ?></div>
             </div>
             
             <div class="stats-box approved" style="margin-bottom: 15px;">
                 <i class="fa fa-check-circle" style="font-size: 30px; color: #2ecc71; opacity: 0.5;"></i>
                 <div class="stats-number" style="color: #2ecc71;"><?= e($approved_count) ?></div>
-                <div class="stats-label">طلبات معتمدة</div>
+                <div class="stats-label"><?= t('طلبات معتمدة') ?></div>
             </div>
             
             <div class="stats-box pending">
                 <i class="fa fa-clock-o" style="font-size: 30px; color: #f39c12; opacity: 0.5;"></i>
                 <div class="stats-number" style="color: #f39c12;"><?= e($pending_count) ?></div>
-                <div class="stats-label">طلبات معلقة</div>
+                <div class="stats-label"><?= t('طلبات معلقة') ?></div>
             </div>
         </div>
         
@@ -166,23 +166,23 @@
             <!-- المعلومات الشخصية -->
             <div class="profile-card">
                 <div class="profile-card-header">
-                    <i class="fa fa-user"></i> المعلومات الشخصية
+                    <i class="fa fa-user"></i> <?= t('المعلومات الشخصية') ?>
                 </div>
                 <div class="profile-card-body">
                     <div class="info-row">
-                        <div class="info-label">الاسم الكامل:</div>
+                        <div class="info-label"><?= t('الاسم الكامل:') ?></div>
                         <div class="info-value"><?= e($student['full_name_arabic']) ?></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">تاريخ الميلاد:</div>
+                        <div class="info-label"><?= t('تاريخ الميلاد:') ?></div>
                         <div class="info-value"><?= e(format_date($student['birth_date'], 'd/m/Y')) ?></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">مكان الميلاد:</div>
+                        <div class="info-label"><?= t('مكان الميلاد:') ?></div>
                         <div class="info-value"><?= e($student['birth_place']) ?></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">الجنس:</div>
+                        <div class="info-label"><?= t('الجنس:') ?></div>
                         <div class="info-value"><?= e($student->get_gender_display()) ?></div>
                     </div>
                 </div>
@@ -191,28 +191,28 @@
             <!-- معلومات الاتصال -->
             <div class="profile-card">
                 <div class="profile-card-header">
-                    <i class="fa fa-phone"></i> معلومات الاتصال
+                    <i class="fa fa-phone"></i> <?= t('معلومات الاتصال') ?>
                 </div>
                 <div class="profile-card-body">
                     <div class="info-row">
-                        <div class="info-label">رقم الهاتف:</div>
+                        <div class="info-label"><?= t('رقم الهاتف:') ?></div>
                         <div class="info-value">
                             <i class="fa fa-phone" style="color: #2ecc71;"></i> <?= e($student['phone']) ?>
                         </div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">البريد الإلكتروني:</div>
+                        <div class="info-label"><?= t('البريد الإلكتروني:') ?></div>
                         <div class="info-value">
                             <i class="fa fa-envelope" style="color: #3498db;"></i> 
-                            <?= e(($student['user']['email'] ?: 'غير محدد')) ?>
+                            <?= e(($student['user']['email'] ?: __('غير محدد'))) ?>
                         </div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">العنوان:</div>
+                        <div class="info-label"><?= t('العنوان:') ?></div>
                         <div class="info-value"><?= e($student['address']) ?></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">الولاية:</div>
+                        <div class="info-label"><?= t('الولاية:') ?></div>
                         <div class="info-value"><?= e($student['wilaya']) ?></div>
                     </div>
                 </div>
@@ -221,29 +221,29 @@
             <!-- المعلومات الأكاديمية -->
             <div class="profile-card">
                 <div class="profile-card-header">
-                    <i class="fa fa-graduation-cap"></i> المعلومات الأكاديمية
+                    <i class="fa fa-graduation-cap"></i> <?= t('المعلومات الأكاديمية') ?>
                 </div>
                 <div class="profile-card-body">
                     <div class="info-row">
-                        <div class="info-label">رقم التسجيل:</div>
+                        <div class="info-label"><?= t('رقم التسجيل:') ?></div>
                         <div class="info-value">
                             <strong style="color: #3498db;"><?= e($student['registration_number']) ?></strong>
                         </div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">الكلية:</div>
+                        <div class="info-label"><?= t('الكلية:') ?></div>
                         <div class="info-value"><?= e($student['faculty']) ?></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">القسم:</div>
+                        <div class="info-label"><?= t('القسم:') ?></div>
                         <div class="info-value"><?= e($student['department']) ?></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">السنة الدراسية:</div>
+                        <div class="info-label"><?= t('السنة الدراسية:') ?></div>
                         <div class="info-value"><?= e($student->get_current_year_display()) ?></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">تاريخ التسجيل:</div>
+                        <div class="info-label"><?= t('تاريخ التسجيل:') ?></div>
                         <div class="info-value"><?= e(format_date($student['created_at'], 'd/m/Y')) ?></div>
                     </div>
                 </div>

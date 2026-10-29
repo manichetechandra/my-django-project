@@ -24,7 +24,7 @@ function activity_list(): void
         'activity_types' => Activity::choices('activity_type'),
         'selected_type'  => $activityType,
         'search_query'   => $searchQuery,
-        'page_title'     => 'النشاطات الثقافية والرياضية',
+        'page_title'     => __('النشاطات الثقافية والرياضية'),
     ]);
 }
 

@@ -30,7 +30,7 @@
         <button type="button" 
                 class="close" 
                 data-dismiss="alert" 
-                aria-label="إغلاق"
+                aria-label="<?= t('إغلاق') ?>"
                 style="position: absolute; inset-inline-end: 15px; top: 12px; font-size: 24px; opacity: 0.8;">
             <span aria-hidden="true">&times;</span>
         </button>

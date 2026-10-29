@@ -80,7 +80,7 @@ function search_view(): void
         'search_type'  => $searchType,
         'results'      => $results,
         'counts'       => $counts,
-        'page_title'   => $query !== '' ? 'نتائج البحث عن: ' . $query : 'البحث',
+        'page_title'   => $query !== '' ? __('نتائج البحث عن: {query}', ['query' => $query]) : __('البحث'),
         'search_terms' => $searchTerms,
     ]);
 }

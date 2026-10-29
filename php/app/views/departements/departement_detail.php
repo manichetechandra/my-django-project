@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($departement['name']) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($departement['name']) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -102,8 +102,8 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('departements:departement_list')) ?>">الأقسام</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('departements:departement_list')) ?>"><?= t('الأقسام') ?></a></li>
         <li class="active"><?= e($departement['name']) ?></li>
     </ol>
 
@@ -119,7 +119,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <i class="fa fa-info-circle"></i> عن القسم
+                        <i class="fa fa-info-circle"></i> <?= t('عن القسم') ?>
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -136,14 +136,14 @@
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <i class="fa fa-info"></i> معلومات الاتصال
+                        <i class="fa fa-info"></i> <?= t('معلومات الاتصال') ?>
                     </h3>
                 </div>
                 <div class="panel-body">
                     <?php if (!empty($departement['head_of_department'])): ?>
                     <div class="info-item">
                         <i class="fa fa-user"></i>
-                        <strong>رئيس القسم:</strong><br>
+                        <strong><?= t('رئيس القسم:') ?></strong><br>
                         <?= e($departement['head_of_department']) ?>
                     </div>
                     <?php endif; ?>
@@ -151,7 +151,7 @@
                     <?php if (!empty($departement['email'])): ?>
                     <div class="info-item">
                         <i class="fa fa-envelope"></i>
-                        <strong>البريد الإلكتروني:</strong><br>
+                        <strong><?= t('البريد الإلكتروني:') ?></strong><br>
                         <a href="mailto:<?= e($departement['email']) ?>"><?= e($departement['email']) ?></a>
                     </div>
                     <?php endif; ?>
@@ -159,7 +159,7 @@
                     <?php if (!empty($departement['phone'])): ?>
                     <div class="info-item">
                         <i class="fa fa-phone"></i>
-                        <strong>الهاتف:</strong><br>
+                        <strong><?= t('الهاتف:') ?></strong><br>
                         <span dir="ltr"><?= e($departement['phone']) ?></span>
                     </div>
                     <?php endif; ?>
@@ -167,9 +167,9 @@
                     <?php if (!empty($departement['website'])): ?>
                     <div class="info-item">
                         <i class="fa fa-globe"></i>
-                        <strong>الموقع الإلكتروني:</strong><br>
+                        <strong><?= t('الموقع الإلكتروني:') ?></strong><br>
                         <a href="<?= e($departement['website']) ?>" target="_blank" rel="noopener noreferrer">
-                            زيارة الموقع <i class="fa fa-external-link"></i>
+                            <?= t('زيارة الموقع') ?> <i class="fa fa-external-link"></i>
                         </a>
                     </div>
                     <?php endif; ?>
@@ -177,7 +177,7 @@
                     <?php if (empty($departement['head_of_department']) && empty($departement['email']) && empty($departement['phone']) && empty($departement['website'])): ?>
                     <p class="text-muted text-center">
                         <i class="fa fa-info-circle"></i><br>
-                        لا توجد معلومات اتصال متاحة حالياً
+                        <?= t('لا توجد معلومات اتصال متاحة حالياً') ?>
                     </p>
                     <?php endif; ?>
                 </div>
@@ -188,7 +188,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <i class="fa fa-sitemap"></i> أقسام أخرى
+                        <i class="fa fa-sitemap"></i> <?= t('أقسام أخرى') ?>
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -206,7 +206,7 @@
                 </div>
                 <div class="panel-footer text-center">
                     <a href="<?= e(url('departements:departement_list')) ?>" class="btn btn-sm btn-success">
-                        عرض كل الأقسام
+                        <?= t('عرض كل الأقسام') ?>
                     </a>
                 </div>
             </div>

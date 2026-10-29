@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -239,10 +239,10 @@
 <div class="faq-header">
     <div class="container">
         <h1 class="text-center" style="margin: 0; font-size: 42px;">
-            <i class="fa fa-question-circle"></i> الأسئلة الشائعة
+            <i class="fa fa-question-circle"></i> <?= t('الأسئلة الشائعة') ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            إجابات سريعة على أكثر الأسئلة تكراراً
+            <?= t('إجابات سريعة على أكثر الأسئلة تكراراً') ?>
         </p>
     </div>
 </div>
@@ -250,8 +250,8 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li class="active">الأسئلة الشائعة</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li class="active"><?= t('الأسئلة الشائعة') ?></li>
     </ol>
     
     <!-- الإحصائيات -->
@@ -260,14 +260,14 @@
             <div class="stats-box">
                 <i class="fa fa-question"></i>
                 <h3><?= e($total_faqs) ?></h3>
-                <p>سؤال وجواب</p>
+                <p><?= t('سؤال وجواب') ?></p>
             </div>
         </div>
         <div class="col-md-6">
             <div class="stats-box">
                 <i class="fa fa-folder-open"></i>
                 <h3><?= e($total_categories) ?></h3>
-                <p>تصنيف</p>
+                <p><?= t('تصنيف') ?></p>
             </div>
         </div>
     </div>
@@ -280,12 +280,12 @@
                     <input type="text" 
                            name="q" 
                            class="form-control" 
-                           placeholder="ابحث في الأسئلة... (مثال: كيف أحصل على المنحة؟)"
+                           placeholder="<?= t('ابحث في الأسئلة... (مثال: كيف أحصل على المنحة؟)') ?>"
                            value="<?= e(($search_query ?: '')) ?>">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-block" style="background: #16a085; color: white; padding: 12px;">
-                        <i class="fa fa-search"></i> بحث
+                        <i class="fa fa-search"></i> <?= t('بحث') ?>
                     </button>
                 </div>
             </div>
@@ -301,7 +301,7 @@
                     <div class="category-header" style="background-color: <?= e($category->get_color()) ?>;">
                         <i class="fa <?= e($category['icon']) ?>" style="font-size: 28px; margin-inline-end: 15px;"></i>
                         <h3 style="display: inline;"><?= e($category['name']) ?></h3>
-                        <span class="badge"><?= e(count($faqs)) ?> سؤال</span>
+                        <span class="badge"><?= e(count($faqs)) ?> <?= t('سؤال') ?></span>
                     </div>
                     
                     <?php foreach ($faqs as $faq): ?>
@@ -314,10 +314,10 @@
                             <p><?= linebreaks($faq['answer']) ?></p>
                             <div class="faq-meta">
                                 <span>
-                                    <i class="fa fa-eye"></i> <?= e($faq['views_count']) ?> مشاهدة
+                                    <i class="fa fa-eye"></i> <?= e($faq['views_count']) ?> <?= t('مشاهدة') ?>
                                 </span>
                                 <span>
-                                    <i class="fa fa-calendar"></i> آخر تحديث: <?= e(format_date($faq['updated_at'], 'd/m/Y')) ?>
+                                    <i class="fa fa-calendar"></i> <?= t('آخر تحديث:') ?> <?= e(format_date($faq['updated_at'], 'd/m/Y')) ?>
                                 </span>
                             </div>
                         </div>
@@ -328,10 +328,10 @@
             <?php else: ?>
                 <div class="alert alert-info text-center" style="padding: 60px;">
                     <i class="fa fa-info-circle" style="font-size: 48px; display: block; margin-bottom: 20px;"></i>
-                    <h3>لا توجد أسئلة <?php if (!empty($search_query)): ?>تطابق بحثك<?php endif; ?></h3>
+                    <h3><?= t('لا توجد أسئلة') ?> <?php if (!empty($search_query)): ?><?= t('تطابق بحثك') ?><?php endif; ?></h3>
                     <?php if (!empty($search_query)): ?>
-                    <p>حاول البحث بكلمات أخرى</p>
-                    <a href="<?= e(url('faq:faq_list')) ?>" class="btn btn-primary">عرض كل الأسئلة</a>
+                    <p><?= t('حاول البحث بكلمات أخرى') ?></p>
+                    <a href="<?= e(url('faq:faq_list')) ?>" class="btn btn-primary"><?= t('عرض كل الأسئلة') ?></a>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
@@ -342,7 +342,7 @@
             <!-- الأكثر مشاهدة -->
             <?php if (!empty($popular_faqs)): ?>
             <div class="popular-faq">
-                <h4><i class="fa fa-fire"></i> الأكثر مشاهدة</h4>
+                <h4><i class="fa fa-fire"></i> <?= t('الأكثر مشاهدة') ?></h4>
                 <?php $__list = array_values($popular_faqs); $__n = count($__list); foreach ($__list as $__i => $faq): ?>
 <div class="popular-item">
     <a href="#faq-<?= e($faq['id']) ?>" onclick="scrollToFAQ(<?= e($faq['id']) ?>); return false;">
@@ -356,23 +356,23 @@
             
             <!-- روابط مفيدة -->
             <div class="popular-faq">
-                <h4><i class="fa fa-link"></i> روابط مفيدة</h4>
+                <h4><i class="fa fa-link"></i> <?= t('روابط مفيدة') ?></h4>
                 <div class="popular-item">
                     <a href="<?= e(url('contact:contact')) ?>">
                         <i class="fa fa-envelope" style="margin-inline-end: 10px; color: #16a085;"></i>
-                        اتصل بنا
+                        <?= t('اتصل بنا') ?>
                     </a>
                 </div>
                 <div class="popular-item">
                     <a href="<?= e(url('downloads:download_center')) ?>">
                         <i class="fa fa-download" style="margin-inline-end: 10px; color: #16a085;"></i>
-                        مركز التحميلات
+                        <?= t('مركز التحميلات') ?>
                     </a>
                 </div>
                 <div class="popular-item">
                     <a href="<?= e(url('services:service_list')) ?>">
                         <i class="fa fa-cogs" style="margin-inline-end: 10px; color: #16a085;"></i>
-                        الخدمات الجامعية
+                        <?= t('الخدمات الجامعية') ?>
                     </a>
                 </div>
             </div>

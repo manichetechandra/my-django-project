@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -55,7 +55,7 @@
 <div class="profile-header">
     <div class="container">
         <h1 style="margin: 0; font-size: 36px;">
-            <i class="fa fa-lock"></i> تغيير كلمة المرور
+            <i class="fa fa-lock"></i> <?= t('تغيير كلمة المرور') ?>
         </h1>
     </div>
 </div>
@@ -63,10 +63,10 @@
 <div class="container">
     
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('students:dashboard')) ?>">لوحة التحكم</a></li>
-        <li><a href="<?= e(url('students:profile_view')) ?>">معلوماتي</a></li>
-        <li class="active">تغيير كلمة المرور</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('students:dashboard')) ?>"><?= t('لوحة التحكم') ?></a></li>
+        <li><a href="<?= e(url('students:profile_view')) ?>"><?= t('معلوماتي') ?></a></li>
+        <li class="active"><?= t('تغيير كلمة المرور') ?></li>
     </ol>
     
     <div class="row">
@@ -77,15 +77,15 @@
                 
                 <div class="security-icon">
                     <i class="fa fa-shield"></i>
-                    <h3 style="margin-top: 15px; color: #2c3e50;">تأمين حسابك</h3>
+                    <h3 style="margin-top: 15px; color: #2c3e50;"><?= t('تأمين حسابك') ?></h3>
                 </div>
                 
                 <div class="password-requirements">
-                    <strong><i class="fa fa-info-circle"></i> متطلبات كلمة المرور:</strong>
+                    <strong><i class="fa fa-info-circle"></i> <?= t('متطلبات كلمة المرور:') ?></strong>
                     <ul>
-                        <li>يجب أن تحتوي على 8 أحرف على الأقل</li>
-                        <li>لا تستخدم معلومات شخصية واضحة</li>
-                        <li>استخدم مزيج من الأحرف والأرقام</li>
+                        <li><?= t('يجب أن تحتوي على 8 أحرف على الأقل') ?></li>
+                        <li><?= t('لا تستخدم معلومات شخصية واضحة') ?></li>
+                        <li><?= t('استخدم مزيج من الأحرف والأرقام') ?></li>
                     </ul>
                 </div>
                 
@@ -120,11 +120,11 @@
                     
                     <div style="text-align: center; margin-top: 30px;">
                         <button type="submit" class="btn btn-danger btn-lg" style="padding: 12px 50px;">
-                            <i class="fa fa-lock"></i> تغيير كلمة المرور
+                            <i class="fa fa-lock"></i> <?= t('تغيير كلمة المرور') ?>
                         </button>
                         
                         <a href="<?= e(url('students:profile_view')) ?>" class="btn btn-default btn-lg" style="padding: 12px 50px;">
-                            <i class="fa fa-times"></i> إلغاء
+                            <i class="fa fa-times"></i> <?= t('إلغاء') ?>
                         </a>
                     </div>
                     

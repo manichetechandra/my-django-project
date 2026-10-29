@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?>أقسام المديرية - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= t('أقسام المديرية - مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -85,15 +85,15 @@
 <div class="container" style="margin-top: 80px;">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li class="active">أقسام المديرية</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li class="active"><?= t('أقسام المديرية') ?></li>
     </ol>
 
     <!-- العنوان -->
     <div class="page-header">
         <h1>
-            <i class="fa fa-sitemap"></i> أقسام المديرية
-            <small>(<?= e(count($departements)) ?> قسم)</small>
+            <i class="fa fa-sitemap"></i> <?= t('أقسام المديرية') ?>
+            <small><?= t('({count} قسم)', ['count' => count($departements)]) ?></small>
         </h1>
     </div>
 
@@ -123,19 +123,19 @@
                         <?php if (!empty($dept['head_of_department'])): ?>
                         <p>
                             <i class="fa fa-user"></i>
-                            <strong>رئيس القسم:</strong> <?= e($dept['head_of_department']) ?>
+                            <strong><?= t('رئيس القسم:') ?></strong> <?= e($dept['head_of_department']) ?>
                         </p>
                         <?php endif; ?>
                         <?php if (!empty($dept['email'])): ?>
                         <p>
                             <i class="fa fa-envelope"></i>
-                            <strong>البريد:</strong> <?= e(truncatechars($dept['email'], 30)) ?>
+                            <strong><?= t('البريد:') ?></strong> <?= e(truncatechars($dept['email'], 30)) ?>
                         </p>
                         <?php endif; ?>
                         <?php if (!empty($dept['phone'])): ?>
                         <p>
                             <i class="fa fa-phone"></i>
-                            <strong>الهاتف:</strong> <?= e($dept['phone']) ?>
+                            <strong><?= t('الهاتف:') ?></strong> <?= e($dept['phone']) ?>
                         </p>
                         <?php endif; ?>
                     </div>
@@ -145,7 +145,7 @@
                 <!-- الزر -->
                 <div class="panel-footer text-center">
                     <a href="<?= e(url('departements:departement_detail', $dept['slug'])) ?>" class="btn btn-success">
-                        عرض التفاصيل <i class="fa fa-arrow-left"></i>
+                        <?= t('عرض التفاصيل') ?> <i class="fa fa-arrow-left"></i>
                     </a>
                 </div>
             </div>
@@ -153,7 +153,7 @@
         <?php endforeach; ?><?php else: ?>
         <div class="col-md-12">
             <div class="alert alert-info text-center">
-                <i class="fa fa-info-circle"></i> لا توجد أقسام حالياً
+                <i class="fa fa-info-circle"></i> <?= t('لا توجد أقسام حالياً') ?>
             </div>
         </div>
         <?php endif; ?>

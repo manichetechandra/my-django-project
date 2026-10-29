@@ -17,14 +17,14 @@ function contact_view(): void
                 'message'    => $data['message'],
                 'ip_address' => client_ip(),
             ]);
-            flash('success', 'شكراً لك ' . $data['full_name'] . '! تم إرسال رسالتك بنجاح. سنتواصل معك في أقرب وقت ممكن.');
+            flash('success', __('شكراً لك {name}! تم إرسال رسالتك بنجاح. سنتواصل معك في أقرب وقت ممكن.', ['name' => $data['full_name']]));
             redirect_to('contact:contact');
         }
-        flash('error', 'يرجى تصحيح الأخطاء في النموذج');
+        flash('error', __('يرجى تصحيح الأخطاء في النموذج'));
     }
     render('contact/contact', [
         'form'           => $form,
-        'page_title'     => 'اتصل بنا',
+        'page_title'     => __('اتصل بنا'),
         'total_messages' => ContactMessage::count(),
     ]);
 }

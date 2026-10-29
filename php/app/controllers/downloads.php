@@ -42,7 +42,7 @@ function download_center(): void
         'total_downloads'  => array_sum(array_map(fn($f) => (int) $f['downloads_count'], $files)),
         'current_category' => $category,
         'search_query'     => $searchQuery,
-        'page_title'       => 'مركز التحميلات',
+        'page_title'       => __('مركز التحميلات'),
     ]);
 }
 
@@ -53,7 +53,7 @@ function download_by_category(string $category): void
         'files'      => DownloadFile::where('category = ? AND is_active = 1', [$category], 'display_order, created_at DESC'),
         'category'   => $category,
         'categories' => DownloadFile::choices('category'),
-        'page_title' => $names[$category] ?? 'ملفات',
+        'page_title' => $names[$category] ?? __('ملفات'),
     ]);
 }
 
@@ -65,7 +65,7 @@ function download_file(string $slug): void
     }
     $path = UPLOAD_PATH . '/' . ltrim((string) $file['file'], '/');
     if (!is_file($path)) {
-        abort(404, 'الملف غير موجود');
+        abort(404, __('الملف غير موجود'));
     }
     $file->increment_downloads();
     Upload::send($path, basename((string) $file['file']));

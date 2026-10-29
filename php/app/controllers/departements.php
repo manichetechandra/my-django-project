@@ -7,7 +7,7 @@ function departement_list(): void
 {
     render('departements/departement_list', [
         'departements' => Departement::where('is_active = 1', [], '`order`, name'),
-        'page_title'   => 'أقسام المديرية',
+        'page_title'   => __('أقسام المديرية'),
     ]);
 }
 

@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($page_title) ?> - مديرية الخدمات الجامعية سطيف<?php endblock(); ?>
+<?php block('title'); ?><?= e($page_title) ?> <?= t('- مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -136,7 +136,7 @@
             <i class="fa fa-cogs"></i> <?= e($page_title) ?>
         </h1>
         <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
-            نوفر لكم مجموعة شاملة من الخدمات لتسهيل حياتكم الجامعية
+            <?= t('نوفر لكم مجموعة شاملة من الخدمات لتسهيل حياتكم الجامعية') ?>
         </p>
     </div>
 </div>
@@ -144,39 +144,39 @@
 <div class="container">
     <!-- Breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li class="active">الخدمات الجامعية</li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li class="active"><?= t('الخدمات الجامعية') ?></li>
     </ol>
     
     <!-- التبويبات -->
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active">
             <a href="#all" data-toggle="tab">
-                <i class="fa fa-th"></i> كل الخدمات
+                <i class="fa fa-th"></i> <?= t('كل الخدمات') ?>
                 <span class="badge" style="background-color: #8cc040;"><?= e(count($services)) ?></span>
             </a>
         </li>
         <li role="presentation">
             <a href="#transport" data-toggle="tab">
-                <i class="fa fa-bus"></i> النقل
+                <i class="fa fa-bus"></i> <?= t('النقل') ?>
                 <span class="badge" style="background-color: #3498db;"><?= e(count($transport_services)) ?></span>
             </a>
         </li>
         <li role="presentation">
             <a href="#housing" data-toggle="tab">
-                <i class="fa fa-home"></i> الإيواء
+                <i class="fa fa-home"></i> <?= t('الإيواء') ?>
                 <span class="badge" style="background-color: #e74c3c;"><?= e(count($housing_services)) ?></span>
             </a>
         </li>
         <li role="presentation">
             <a href="#catering" data-toggle="tab">
-                <i class="fa fa-cutlery"></i> الإطعام
+                <i class="fa fa-cutlery"></i> <?= t('الإطعام') ?>
                 <span class="badge" style="background-color: #f39c12;"><?= e(count($catering_services)) ?></span>
             </a>
         </li>
         <li role="presentation">
             <a href="#scholarship" data-toggle="tab">
-                <i class="fa fa-money"></i> المنح
+                <i class="fa fa-money"></i> <?= t('المنح') ?>
                 <span class="badge" style="background-color: #2ecc71;"><?= e(count($scholarship_services)) ?></span>
             </a>
         </li>
@@ -198,8 +198,8 @@
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fa fa-inbox"></i>
-                    <h3>لا توجد خدمات حالياً</h3>
-                    <p>يتم العمل على إضافة الخدمات قريباً</p>
+                    <h3><?= t('لا توجد خدمات حالياً') ?></h3>
+                    <p><?= t('يتم العمل على إضافة الخدمات قريباً') ?></p>
                 </div>
             <?php endif; ?>
         </div>
@@ -217,7 +217,7 @@
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fa fa-bus"></i>
-                    <h3>لا توجد خدمات نقل حالياً</h3>
+                    <h3><?= t('لا توجد خدمات نقل حالياً') ?></h3>
                 </div>
             <?php endif; ?>
         </div>
@@ -235,7 +235,7 @@
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fa fa-home"></i>
-                    <h3>لا توجد خدمات إيواء حالياً</h3>
+                    <h3><?= t('لا توجد خدمات إيواء حالياً') ?></h3>
                 </div>
             <?php endif; ?>
         </div>
@@ -253,7 +253,7 @@
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fa fa-cutlery"></i>
-                    <h3>لا توجد خدمات إطعام حالياً</h3>
+                    <h3><?= t('لا توجد خدمات إطعام حالياً') ?></h3>
                 </div>
             <?php endif; ?>
         </div>
@@ -271,7 +271,7 @@
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fa fa-money"></i>
-                    <h3>لا توجد معلومات عن المنح حالياً</h3>
+                    <h3><?= t('لا توجد معلومات عن المنح حالياً') ?></h3>
                 </div>
             <?php endif; ?>
         </div>

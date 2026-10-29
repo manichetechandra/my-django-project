@@ -349,11 +349,11 @@ function require_staff(): User
 {
     $u = Auth::user();
     if (!$u) {
-        flash('warning', 'يجب تسجيل الدخول أولاً');
+        flash('warning', __('يجب تسجيل الدخول أولاً'));
         redirect(url('students:login') . '?next=' . rawurlencode(lang_prefix() . request_path()));
     }
     if (!is_staff()) {
-        flash('error', 'ليس لديك صلاحية للوصول لهذه الصفحة. هذه الصفحة للإداريين فقط.');
+        flash('error', __('ليس لديك صلاحية للوصول لهذه الصفحة. هذه الصفحة للإداريين فقط.'));
         redirect_to('homepage:index');
     }
     return $u;
@@ -385,7 +385,19 @@ function now(): string
 const AR_MONTHS = [1 => 'جانفي', 'فيفري', 'مارس', 'أفريل', 'ماي', 'جوان', 'جويلية', 'أوت', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 const AR_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
-/** فلتر date في Django: format_date($news['published_date'], 'd/m/Y') — مع أسماء الأشهر والأيام بالعربية */
+/** أسماء الأشهر والأيام بكل لغة (العربية كما تُكتب في الجزائر) */
+const MONTH_NAMES = [
+    'ar' => AR_MONTHS,
+    'fr' => [1 => 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+    'en' => [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+];
+const DAY_NAMES = [
+    'ar' => AR_DAYS,
+    'fr' => ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
+    'en' => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+];
+
+/** فلتر date في Django: format_date($news['published_date'], 'd/m/Y') — مع أسماء الأشهر والأيام بلغة الصفحة */
 function format_date($value, string $format = 'd/m/Y'): string
 {
     $dt = to_datetime($value);
@@ -405,15 +417,15 @@ function format_date($value, string $format = 'd/m/Y'): string
             case 'N':
             case 'M':
             case 'E':
-                $out .= AR_MONTHS[(int) $dt->format('n')];
+                $out .= (MONTH_NAMES[lang()] ?? AR_MONTHS)[(int) $dt->format('n')];
                 break;
             case 'l':
             case 'D':
-                $out .= AR_DAYS[(int) $dt->format('w')];
+                $out .= (DAY_NAMES[lang()] ?? AR_DAYS)[(int) $dt->format('w')];
                 break;
             case 'A':
             case 'a':
-                $out .= $dt->format('H') < 12 ? 'ص' : 'م';
+                $out .= is_rtl() ? ($dt->format('H') < 12 ? 'ص' : 'م') : $dt->format('A');
                 break;
             default:
                 $out .= preg_match('/[a-zA-Z]/', $ch) ? $dt->format($ch) : $ch;
@@ -447,29 +459,37 @@ function timesince($value, $now = null): string
     }
     $now = $now ? to_datetime($now) : new DateTimeImmutable();
     $seconds = max(0, $now->getTimestamp() - $dt->getTimestamp());
-    $units = [
-        [365 * 86400, ['سنة', 'سنتان', 'سنوات']],
-        [30 * 86400, ['شهر', 'شهران', 'أشهر']],
-        [7 * 86400, ['أسبوع', 'أسبوعان', 'أسابيع']],
-        [86400, ['يوم', 'يومان', 'أيام']],
-        [3600, ['ساعة', 'ساعتان', 'ساعات']],
-        [60, ['دقيقة', 'دقيقتان', 'دقائق']],
+    $names = [
+        'ar' => [['سنة', 'سنتان', 'سنوات'], ['شهر', 'شهران', 'أشهر'], ['أسبوع', 'أسبوعان', 'أسابيع'], ['يوم', 'يومان', 'أيام'], ['ساعة', 'ساعتان', 'ساعات'], ['دقيقة', 'دقيقتان', 'دقائق']],
+        'fr' => [['an', 'ans'], ['mois', 'mois'], ['semaine', 'semaines'], ['jour', 'jours'], ['heure', 'heures'], ['minute', 'minutes']],
+        'en' => [['year', 'years'], ['month', 'months'], ['week', 'weeks'], ['day', 'days'], ['hour', 'hours'], ['minute', 'minutes']],
     ];
-    foreach ($units as $idx => [$size, $forms]) {
+    $forms = $names[lang()] ?? $names['ar'];
+    $sep = is_rtl() ? '، ' : ', ';
+    $sizes = [365 * 86400, 30 * 86400, 7 * 86400, 86400, 3600, 60];
+    foreach ($sizes as $idx => $size) {
         $count = intdiv($seconds, $size);
         if ($count > 0) {
-            $result = ar_plural($count, $forms);
-            if (isset($units[$idx + 1])) {
-                [$size2, $forms2] = $units[$idx + 1];
-                $count2 = intdiv($seconds - $count * $size, $size2);
+            $result = plural_unit($count, $forms[$idx]);
+            if (isset($sizes[$idx + 1])) {
+                $count2 = intdiv($seconds - $count * $size, $sizes[$idx + 1]);
                 if ($count2 > 0) {
-                    $result .= '، ' . ar_plural($count2, $forms2);
+                    $result .= $sep . plural_unit($count2, $forms[$idx + 1]);
                 }
             }
             return $result;
         }
     }
-    return '0 دقيقة';
+    return lang() === 'en' ? '0 minutes' : (is_rtl() ? '0 دقيقة' : '0 minute');
+}
+
+/** عدد + وحدة بصيغة اللغة: العربية (مفرد، مثنى، جمع) أو الفرنسية والإنجليزية (مفرد، جمع) */
+function plural_unit(int $n, array $forms): string
+{
+    if (count($forms) === 3) {
+        return ar_plural($n, $forms);
+    }
+    return $n . ' ' . ($n === 1 || ($n === 0 && lang() === 'fr') ? $forms[0] : $forms[1]);
 }
 
 // ====================================================================== النصوص (فلاتر Django)

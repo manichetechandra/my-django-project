@@ -43,9 +43,9 @@
                 '<div style="display: flex; gap: 10px;"><div style="flex-shrink: 0;">' +
                 '<i class="fa ' + esc(n.icon) + '" style="color: ' + esc(n.color) + '; font-size: 20px;"></i></div>' +
                 '<div style="flex: 1;"><strong style="display: block; font-size: 13px; color: #2c3e50;">' + esc(n.title) +
-                (n.is_read ? '' : ' <span class="badge badge-primary" style="font-size: 9px;">جديد</span>') + '</strong>' +
+                (n.is_read ? '' : ' <span class="badge badge-primary" style="font-size: 9px;">' + <?= js_t('جديد') ?> + '</span>') + '</strong>' +
                 '<small style="display: block; color: #7f8c8d; margin-top: 3px;">' + esc(truncateWords(n.message, 10)) + '</small>' +
-                '<small style="display: block; color: #95a5a6; margin-top: 3px;"><i class="fa fa-clock-o"></i> ' + esc(n.time_ago) + ' مضت</small>' +
+                '<small style="display: block; color: #95a5a6; margin-top: 3px;"><i class="fa fa-clock-o"></i> ' + <?= js_t('{time} مضت') ?>.replace('{time}', esc(n.time_ago)) + '</small>' +
                 '</div></div></a>';
             menu.insertBefore(li, anchor);
         });
@@ -104,7 +104,7 @@
                 renderList(data.notifications);
                 lastUnread = data.unread_count;
             })
-            .catch(function (err) { console.error('خطأ في جلب الإشعارات:', err); });
+            .catch(function (err) { console.error(<?= js_t('خطأ في جلب الإشعارات:') ?>, err); });
     }
 
     function start() {

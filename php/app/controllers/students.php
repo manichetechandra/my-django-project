@@ -10,9 +10,9 @@ function require_student(): StudentProfile
     $student = current_student();
     if (!$student) {
         if (is_ajax()) {
-            json_response(['success' => false, 'error' => 'لا يوجد ملف طالب']);
+            json_response(['success' => false, 'error' => __('لا يوجد ملف طالب')]);
         }
-        flash('error', 'لا يوجد ملف طالب لهذا المستخدم');
+        flash('error', __('لا يوجد ملف طالب لهذا المستخدم'));
         redirect_to('homepage:index');
     }
     return $student;
@@ -61,15 +61,15 @@ function student_register(): void
                         'current_year'        => $d['current_year'],
                         'is_verified'         => 1,
                     ]);
-                    $student->notify('مرحباً بك!', 'مرحباً ' . $d['full_name_arabic'] . '، تم إنشاء حسابك بنجاح. يمكنك الآن تقديم الطلبات.', '/students/dashboard/');
+                    $student->notify('مرحباً بك!', 'مرحباً {name}، تم إنشاء حسابك بنجاح. يمكنك الآن تقديم الطلبات.', '/students/dashboard/', 'info', ['name' => $d['full_name_arabic']]);
                     return $user;
                 });
                 Auth::login($user);
-                flash('success', 'تم إنشاء حسابك بنجاح! مرحباً بك');
+                flash('success', __('تم إنشاء حسابك بنجاح! مرحباً بك'));
                 redirect_to('students:dashboard');
             } catch (PDOException $e) {
                 error_log((string) $e);
-                flash('error', 'حدث خطأ أثناء إنشاء الحساب. حاول مرة أخرى.');
+                flash('error', __('حدث خطأ أثناء إنشاء الحساب. حاول مرة أخرى.'));
             }
         } else {
             foreach ($form->all_errors() as $errors) {
@@ -79,7 +79,7 @@ function student_register(): void
             }
         }
     }
-    render('students/register', ['form' => $form, 'page_title' => 'تسجيل طالب جديد']);
+    render('students/register', ['form' => $form, 'page_title' => __('تسجيل طالب جديد')]);
 }
 
 function student_login(): void
@@ -97,32 +97,32 @@ function student_login(): void
             $student = $user->student_profile();
             if ($user['is_staff'] || $user['is_superuser']) {
                 Auth::login($user, (bool) $d['remember_me']);
-                flash('success', 'مرحباً! تم تسجيل الدخول كمشرف');
+                flash('success', __('مرحباً! تم تسجيل الدخول كمشرف'));
                 redirect(safe_next($next, url('students:admin_dashboard')));
             }
             if ($student) {
                 if (!$student['is_active']) {
-                    flash('error', 'حسابك غير نشط. يرجى الاتصال بالإدارة');
+                    flash('error', __('حسابك غير نشط. يرجى الاتصال بالإدارة'));
                     redirect_to('students:login');
                 }
                 Auth::login($user, (bool) $d['remember_me']);
-                flash('success', 'مرحباً ' . $student['full_name_arabic'] . '!');
+                flash('success', __('مرحباً {name}!', ['name' => $student['full_name_arabic']]));
                 redirect(safe_next($next, url('students:dashboard')));
             }
             Auth::login($user, (bool) $d['remember_me']);
-            flash('warning', 'لا يوجد ملف طالب. يمكنك الوصول للوحة الإدارة فقط');
+            flash('warning', __('لا يوجد ملف طالب. يمكنك الوصول للوحة الإدارة فقط'));
             redirect_to('homepage:index');
         }
-        flash('error', 'اسم المستخدم أو كلمة المرور غير صحيحة');
+        flash('error', __('اسم المستخدم أو كلمة المرور غير صحيحة'));
     }
-    render('students/login', ['form' => $form, 'page_title' => 'تسجيل الدخول']);
+    render('students/login', ['form' => $form, 'page_title' => __('تسجيل الدخول')]);
 }
 
 function student_logout(): void
 {
     never_cache();
     Auth::logout();
-    flash('success', 'تم تسجيل الخروج بنجاح');
+    flash('success', __('تم تسجيل الخروج بنجاح'));
     redirect_to('students:login');
 }
 
@@ -147,7 +147,7 @@ function student_dashboard(): void
         'recent_applications'         => StudentApplication::where('student_id = ?', [$sid], 'submitted_at DESC', 5),
         'unread_notifications'        => StudentNotification::where('student_id = ? AND is_read = 0', [$sid], 'created_at DESC', 5),
         'available_application_types' => ApplicationType::active(),
-        'page_title'                  => 'لوحة التحكم',
+        'page_title'                  => __('لوحة التحكم'),
     ]);
 }
 
@@ -210,19 +210,24 @@ function student_create_application($appTypeId = null): void
                             'document_file'  => $path,
                         ]);
                     }
-                    $student->notify('تم تقديم طلبك بنجاح',
-                        'تم تقديم طلب ' . $app->application_type['name'] . ' برقم ' . $app['application_number'],
-                        '/students/applications/' . $app['id'] . '/');
+                    $type = $app->application_type;
+                    $typeNames = [];
+                    foreach (array_keys(languages()) as $code) {
+                        $typeNames[$code] = $type ? (string) $type->tr('name', $code) : '';
+                    }
+                    $student->notify('تم تقديم طلبك بنجاح', 'تم تقديم طلب {type} برقم {number}',
+                        '/students/applications/' . $app['id'] . '/', 'info',
+                        ['type' => $typeNames, 'number' => $app['application_number']]);
                     return $app;
                 });
-                flash('success', 'تم تقديم طلبك بنجاح! رقم الطلب: ' . $app['application_number']);
+                flash('success', __('تم تقديم طلبك بنجاح! رقم الطلب: {number}', ['number' => $app['application_number']]));
                 redirect_to('students:application_detail', $app['id']);
             } catch (RuntimeException | PDOException $e) {
                 foreach ($saved as $p) {
                     Upload::delete($p, true);
                 }
                 error_log((string) $e);
-                flash('error', 'حدث خطأ: ' . ($e instanceof RuntimeException ? $e->getMessage() : 'تعذر حفظ الطلب'));
+                flash('error', __('حدث خطأ: {error}', ['error' => $e instanceof RuntimeException ? $e->getMessage() : __('تعذر حفظ الطلب')]));
             }
         } else {
             foreach (array_merge($form->non_field_errors(), ...array_values($form->all_errors())) as $error) {
@@ -234,7 +239,7 @@ function student_create_application($appTypeId = null): void
     render('students/create_application', [
         'form'              => $form,
         'application_types' => ApplicationType::active(),
-        'page_title'        => 'تقديم طلب جديد',
+        'page_title'        => __('تقديم طلب جديد'),
         'selected_type'     => $selectedType,
     ]);
 }
@@ -272,7 +277,7 @@ function student_my_applications(): void
         'application_types'  => ApplicationType::active(),
         'status_filter'      => $statusFilter,
         'type_filter'        => $typeFilter,
-        'page_title'         => 'طلباتي',
+        'page_title'         => __('طلباتي'),
     ]);
 }
 
@@ -285,7 +290,7 @@ function student_application_detail($pk): void
         'student'     => $student,
         'application' => $application,
         'documents'   => $application['documents'],
-        'page_title'  => 'تفاصيل الطلب - ' . $application['application_number'],
+        'page_title'  => __('تفاصيل الطلب - {number}', ['number' => $application['application_number']]),
     ]);
 }
 
@@ -295,9 +300,9 @@ function student_cancel_application($pk): void
     $application = student_application_or_404($student, $pk);
     if ($application['status'] === 'pending') {
         $application->change_status('cancelled');
-        flash('success', 'تم إلغاء الطلب بنجاح');
+        flash('success', __('تم إلغاء الطلب بنجاح'));
     } else {
-        flash('error', 'لا يمكن إلغاء هذا الطلب');
+        flash('error', __('لا يمكن إلغاء هذا الطلب'));
     }
     redirect_to('students:my_applications');
 }
@@ -317,7 +322,7 @@ function student_application_print($pk): void
 function student_download_application_pdf($pk): void
 {
     require_student();
-    flash('info', 'استخدم "طباعة" من المتصفح واختر "حفظ كـ PDF"');
+    flash('info', __('استخدم "طباعة" من المتصفح واختر "حفظ كـ PDF"'));
     redirect_to('students:application_print', $pk);
 }
 
@@ -328,14 +333,14 @@ function student_print_all_applications(): void
     render('students/print_all', [
         'student'      => $student,
         'applications' => StudentApplication::where('student_id = ?', [(int) $student['id']], 'submitted_at DESC'),
-        'page_title'   => 'طباعة كل الطلبات',
+        'page_title'   => __('طباعة كل الطلبات'),
     ]);
 }
 
 function student_export_all_pdf(): void
 {
     require_student();
-    flash('info', 'استخدم "طباعة" من المتصفح واختر "حفظ كـ PDF"');
+    flash('info', __('استخدم "طباعة" من المتصفح واختر "حفظ كـ PDF"'));
     redirect_to('students:print_all_applications');
 }
 
@@ -352,7 +357,7 @@ function student_document_download($pk): void
     }
     $path = $doc->full_path();
     if (!$path) {
-        abort(404, 'الملف غير موجود على الخادم');
+        abort(404, __('الملف غير موجود على الخادم'));
     }
     $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
     $name = slugify($doc['document_name']) ?: 'document';
@@ -381,7 +386,7 @@ function student_notifications_list(): void
         'unread_count'  => (int) $c['unread'],
         'read_count'    => (int) $c['readc'],
         'filter_type'   => $filterType,
-        'page_title'    => 'إشعاراتي',
+        'page_title'    => __('إشعاراتي'),
     ]);
 }
 
@@ -390,7 +395,7 @@ function student_mark_notification_read($pk): void
     $student = require_student();
     $n = StudentNotification::firstWhere('id = ? AND student_id = ?', [(int) $pk, (int) $student['id']]);
     if (!$n) {
-        json_response(['success' => false, 'error' => 'الإشعار غير موجود'], 404);
+        json_response(['success' => false, 'error' => __('الإشعار غير موجود')], 404);
     }
     $n->mark_as_read();
     json_response(['success' => true, 'unread_count' => $student->get_unread_notifications_count()]);
@@ -400,7 +405,7 @@ function student_mark_all_notifications_read(): void
 {
     $student = require_student();
     $count = DB::query('UPDATE student_notifications SET is_read = 1, read_at = ? WHERE student_id = ? AND is_read = 0', [now(), (int) $student['id']])->rowCount();
-    json_response(['success' => true, 'count' => $count, 'message' => "تم تمييز $count إشعار كمقروء"]);
+    json_response(['success' => true, 'count' => $count, 'message' => __('تم تمييز {count} إشعار كمقروء', ['count' => $count])]);
 }
 
 function student_delete_notification($pk): void
@@ -408,17 +413,17 @@ function student_delete_notification($pk): void
     $student = require_student();
     $n = StudentNotification::firstWhere('id = ? AND student_id = ?', [(int) $pk, (int) $student['id']]);
     if (!$n) {
-        json_response(['success' => false, 'error' => 'الإشعار غير موجود'], 404);
+        json_response(['success' => false, 'error' => __('الإشعار غير موجود')], 404);
     }
     $n->delete();
-    json_response(['success' => true, 'unread_count' => $student->get_unread_notifications_count(), 'message' => 'تم حذف الإشعار']);
+    json_response(['success' => true, 'unread_count' => $student->get_unread_notifications_count(), 'message' => __('تم حذف الإشعار')]);
 }
 
 function student_delete_read_notifications(): void
 {
     $student = require_student();
     $count = DB::delete('student_notifications', 'student_id = ? AND is_read = 1', [(int) $student['id']]);
-    json_response(['success' => true, 'count' => $count, 'message' => "تم حذف $count إشعار مقروء"]);
+    json_response(['success' => true, 'count' => $count, 'message' => __('تم حذف {count} إشعار مقروء', ['count' => $count])]);
 }
 
 /** واجهة JSON يستدعيها شريط التنقل دورياً لتحديث الإشعارات */
@@ -426,11 +431,11 @@ function student_notifications_api(): void
 {
     never_cache();
     if (!is_authenticated()) {
-        json_response(['success' => false, 'error' => 'غير مسجل الدخول'], 401);
+        json_response(['success' => false, 'error' => __('غير مسجل الدخول')], 401);
     }
     $student = current_student();
     if (!$student) {
-        json_response(['success' => false, 'error' => 'لا يوجد ملف طالب']);
+        json_response(['success' => false, 'error' => __('لا يوجد ملف طالب')]);
     }
     $data = [];
     foreach ($student->get_recent_notifications() as $n) {
@@ -467,7 +472,7 @@ function student_profile_view(): void
         'total_applications' => StudentApplication::count('student_id = ?', [$sid]),
         'approved_count'     => StudentApplication::count("student_id = ? AND status = 'approved'", [$sid]),
         'pending_count'      => StudentApplication::count("student_id = ? AND status = 'pending'", [$sid]),
-        'page_title'         => 'معلوماتي الشخصية',
+        'page_title'         => __('معلوماتي الشخصية'),
     ]);
 }
 
@@ -498,10 +503,10 @@ function student_profile_edit(): void
                 $student->update($data);
                 $user->update(['email' => $emailForm->cleaned['email']]);
                 $student->notify('تم تحديث معلوماتك ✅', 'تم تحديث معلوماتك الشخصية بنجاح.', '/students/profile/', 'success');
-                flash('success', '✅ تم تحديث معلوماتك بنجاح!');
+                flash('success', __('✅ تم تحديث معلوماتك بنجاح!'));
                 redirect_to('students:profile_view');
             } catch (RuntimeException $e) {
-                flash('error', '❌ حدث خطأ: ' . $e->getMessage());
+                flash('error', __('❌ حدث خطأ: {error}', ['error' => $e->getMessage()]));
             }
         } else {
             foreach ([$profileForm, $emailForm] as $f) {
@@ -518,7 +523,7 @@ function student_profile_edit(): void
         'student'      => $student,
         'profile_form' => $profileForm,
         'email_form'   => $emailForm,
-        'page_title'   => 'تعديل معلوماتي',
+        'page_title'   => __('تعديل معلوماتي'),
     ]);
 }
 
@@ -531,12 +536,12 @@ function student_change_password(): void
     if (is_post()) {
         if ($form->is_valid()) {
             if (!$user->check_password($form->cleaned['old_password'])) {
-                flash('error', '❌ كلمة المرور القديمة غير صحيحة');
+                flash('error', __('❌ كلمة المرور القديمة غير صحيحة'));
             } else {
                 $user->update(['password' => Auth::hashPassword($form->cleaned['new_password1'])]);
                 Auth::refreshSession($user);
                 $student->notify('تم تغيير كلمة المرور 🔒', 'تم تغيير كلمة المرور الخاصة بك بنجاح.', null, 'success');
-                flash('success', '✅ تم تغيير كلمة المرور بنجاح!');
+                flash('success', __('✅ تم تغيير كلمة المرور بنجاح!'));
                 redirect_to('students:profile_view');
             }
         } else {
@@ -545,18 +550,18 @@ function student_change_password(): void
             }
         }
     }
-    render('students/profile/change_password', ['student' => $student, 'form' => $form, 'page_title' => 'تغيير كلمة المرور']);
+    render('students/profile/change_password', ['student' => $student, 'form' => $form, 'page_title' => __('تغيير كلمة المرور')]);
 }
 
 function student_delete_profile_image(): void
 {
     $student = require_student();
     if (empty($student['photo'])) {
-        json_response(['success' => false, 'error' => 'لا توجد صورة لحذفها']);
+        json_response(['success' => false, 'error' => __('لا توجد صورة لحذفها')]);
     }
     Upload::delete($student['photo']);
     $student->update(['photo' => null, 'updated_at' => now()]);
-    json_response(['success' => true, 'message' => 'تم حذف الصورة بنجاح']);
+    json_response(['success' => true, 'message' => __('تم حذف الصورة بنجاح')]);
 }
 
 function student_card(): void
@@ -566,6 +571,6 @@ function student_card(): void
     render('students/profile/student_card', [
         'student'    => $student,
         'qr_data'    => 'Student:' . $student['registration_number'] . '|Name:' . $student['full_name_arabic'] . '|Faculty:' . $student['faculty'],
-        'page_title' => 'بطاقة الطالب الرقمية',
+        'page_title' => __('بطاقة الطالب الرقمية'),
     ]);
 }

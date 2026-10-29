@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($faq['question']) ?> - الأسئلة الشائعة<?php endblock(); ?>
+<?php block('title'); ?><?= e($faq['question']) ?> <?= t('- الأسئلة الشائعة') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
 <style>
@@ -82,23 +82,23 @@
 
 <div class="container">
     <ol class="breadcrumb">
-        <li><a href="<?= e(url('homepage:index')) ?>">الرئيسية</a></li>
-        <li><a href="<?= e(url('faq:faq_list')) ?>">الأسئلة الشائعة</a></li>
+        <li><a href="<?= e(url('homepage:index')) ?>"><?= t('الرئيسية') ?></a></li>
+        <li><a href="<?= e(url('faq:faq_list')) ?>"><?= t('الأسئلة الشائعة') ?></a></li>
         <li class="active"><?= e(truncatewords($faq['question'], 5)) ?></li>
     </ol>
     
     <div class="row">
         <div class="col-md-8">
             <div class="answer-box">
-                <h3><i class="fa fa-check-circle" style="color: #16a085;"></i> الإجابة:</h3>
+                <h3><i class="fa fa-check-circle" style="color: #16a085;"></i> <?= t('الإجابة:') ?></h3>
                 <p><?= linebreaks($faq['answer']) ?></p>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
                     <span style="color: #999;">
-                        <i class="fa fa-eye"></i> <?= e($faq['views_count']) ?> مشاهدة
+                        <i class="fa fa-eye"></i> <?= e($faq['views_count']) ?> <?= t('مشاهدة') ?>
                     </span>
                     <span style="color: #999; margin-inline-start: 20px;">
-                        <i class="fa fa-calendar"></i> آخر تحديث: <?= e(format_date($faq['updated_at'], 'd/m/Y')) ?>
+                        <i class="fa fa-calendar"></i> <?= t('آخر تحديث:') ?> <?= e(format_date($faq['updated_at'], 'd/m/Y')) ?>
                     </span>
                 </div>
             </div>
@@ -107,7 +107,7 @@
         <div class="col-md-4">
             <?php if (!empty($related_faqs)): ?>
             <div class="related-faq">
-                <h4><i class="fa fa-link"></i> أسئلة ذات صلة</h4>
+                <h4><i class="fa fa-link"></i> <?= t('أسئلة ذات صلة') ?></h4>
                 <?php foreach ($related_faqs as $related): ?>
                 <div class="related-item">
                     <a href="<?= e(url('faq:faq_detail', $related['id'])) ?>">
@@ -121,7 +121,7 @@
             
             <br>
             <a href="<?= e(url('faq:faq_list')) ?>" class="btn btn-default btn-block">
-                <i class="fa fa-arrow-right"></i> العودة لكل الأسئلة
+                <i class="fa fa-arrow-right"></i> <?= t('العودة لكل الأسئلة') ?>
             </a>
         </div>
     </div>

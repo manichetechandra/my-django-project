@@ -261,8 +261,8 @@
     
     <!-- الهيدر -->
     <div class="card-header">
-        <h3>جامعة سطيف</h3>
-        <p>بطاقة طالب - Student Card</p>
+        <h3><?= t('جامعة سطيف') ?></h3>
+        <p><?= t('بطاقة طالب - Student Card') ?></p>
     </div>
     
     <!-- الجسم -->
@@ -299,27 +299,27 @@
             <!-- التفاصيل -->
             <div class="student-details">
                 <div class="detail-row">
-                    <span class="detail-label">الكلية:</span>
+                    <span class="detail-label"><?= t('الكلية:') ?></span>
                     <span class="detail-value"><?= e(truncatewords($student['faculty'], 3)) ?></span>
                 </div>
                 
                 <div class="detail-row">
-                    <span class="detail-label">القسم:</span>
+                    <span class="detail-label"><?= t('القسم:') ?></span>
                     <span class="detail-value"><?= e(truncatewords($student['department'], 3)) ?></span>
                 </div>
                 
                 <div class="detail-row">
-                    <span class="detail-label">السنة:</span>
+                    <span class="detail-label"><?= t('السنة:') ?></span>
                     <span class="detail-value"><?= e($student->get_current_year_display()) ?></span>
                 </div>
                 
                 <div class="detail-row">
-                    <span class="detail-label">تاريخ الميلاد:</span>
+                    <span class="detail-label"><?= t('تاريخ الميلاد:') ?></span>
                     <span class="detail-value"><?= e(format_date($student['birth_date'], 'd/m/Y')) ?></span>
                 </div>
                 
                 <div class="detail-row">
-                    <span class="detail-label">صالحة حتى:</span>
+                    <span class="detail-label"><?= t('صالحة حتى:') ?></span>
                     <span class="detail-value">30/09/<?= e(format_date($student['created_at'], 'Y')) ?></span>
                 </div>
             </div>
@@ -330,7 +330,7 @@
     
     <!-- التذييل -->
     <div class="card-footer">
-        مديرية الخدمات الجامعية - ولاية سطيف | www.dsu-setif.dz
+        <?= t('مديرية الخدمات الجامعية - ولاية سطيف | www.dsu-setif.dz') ?>
     </div>
     
 </div>
@@ -338,21 +338,21 @@
 <!-- أزرار التحكم -->
 <div class="no-print print-controls">
     <button onclick="window.print()" class="btn btn-primary">
-        <i class="fa fa-print"></i> طباعة البطاقة
+        <i class="fa fa-print"></i> <?= t('طباعة البطاقة') ?>
     </button>
     
     <a href="<?= e(url('students:dashboard')) ?>" class="btn btn-secondary">
-        <i class="fa fa-arrow-right"></i> رجوع للوحة التحكم
+        <i class="fa fa-arrow-right"></i> <?= t('رجوع للوحة التحكم') ?>
     </a>
     
     <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px; max-width: 600px; margin-inline-end: auto; margin-inline-start: auto;">
-        <strong><i class="fa fa-info-circle"></i> نصائح للطباعة:</strong>
+        <strong><i class="fa fa-info-circle"></i> <?= t('نصائح للطباعة:') ?></strong>
         <ul style="text-align: start; margin: 10px 0 0 0; padding-inline-start: 20px; font-size: 13px; color: #856404;">
-            <li>استخدم ورق مقوى (Cardstock) للحصول على بطاقة متينة</li>
-            <li>تأكد من تفعيل خيار "طباعة الخلفيات" في إعدادات الطباعة</li>
-            <li>القياس: 8.5 سم × 5.3 سم (حجم بطاقة ائتمانية)</li>
-            <li>يمكنك حفظها كـ PDF من خيارات الطباعة</li>
-            <li>الباركود يحتوي على رقم التسجيل للمسح السريع</li>
+            <li><?= t('استخدم ورق مقوى (Cardstock) للحصول على بطاقة متينة') ?></li>
+            <li><?= t('تأكد من تفعيل خيار "طباعة الخلفيات" في إعدادات الطباعة') ?></li>
+            <li><?= t('القياس: 8.5 سم × 5.3 سم (حجم بطاقة ائتمانية)') ?></li>
+            <li><?= t('يمكنك حفظها كـ PDF من خيارات الطباعة') ?></li>
+            <li><?= t('الباركود يحتوي على رقم التسجيل للمسح السريع') ?></li>
         </ul>
     </div>
 </div>

@@ -7,37 +7,37 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="<?= e(url('homepage:index')) ?>">مديرية الخدمات الجامعية لولاية سطيف</a>
+            <a class="navbar-brand" href="<?= e(url('homepage:index')) ?>"><?= t('مديرية الخدمات الجامعية لولاية سطيف') ?></a>
         </div>
         
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav navbar-right">
                 <li class="active">
                     <a href="<?= e(url('homepage:index')) ?>">
-                        <i class="fa fa-home"></i> الرئيسية
+                        <i class="fa fa-home"></i> <?= t('الرئيسية') ?>
                     </a>
                 </li>
                 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                        <i class="fa fa-building"></i> المديرية <span class="caret"></span>
+                        <i class="fa fa-building"></i> <?= t('المديرية') ?> <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-right" style="width: 300px; max-height: 450px; overflow-y: auto; inset-inline-end: auto; inset-inline-start: 0;">
                         <li><a href="<?= e(url('homepage:director_word')) ?>">
-                            <i class="fa fa-quote-left"></i> كلمة المدير
+                            <i class="fa fa-quote-left"></i> <?= t('كلمة المدير') ?>
                         </a></li>
                         <li><a href="<?= e(url('homepage:organization')) ?>">
-                            <i class="fa fa-sitemap"></i> الهيكل التنظيمي
+                            <i class="fa fa-sitemap"></i> <?= t('الهيكل التنظيمي') ?>
                         </a></li>
                         <li><a href="<?= e(url('homepage:history')) ?>">
-                            <i class="fa fa-history"></i> تاريخ المديرية
+                            <i class="fa fa-history"></i> <?= t('تاريخ المديرية') ?>
                         </a></li>
                     </ul>
                 </li>
                 
                 <li>
                     <a href="#cite">
-                        <i class="fa fa-university"></i> الإقامات الجامعية
+                        <i class="fa fa-university"></i> <?= t('الإقامات الجامعية') ?>
                     </a>
                 </li>
                 
@@ -47,35 +47,35 @@
                     </a>
                 </li>
                 
-                <li><a href="<?= e(url('news:news_list')) ?>"><i class="fa fa-newspaper-o"></i> الأخبار</a></li>
+                <li><a href="<?= e(url('news:news_list')) ?>"><i class="fa fa-newspaper-o"></i> <?= t('الأخبار') ?></a></li>
                 
                 <li>
                     <a href="#">
-                        <i class="fa fa-trophy"></i> المسابقات
+                        <i class="fa fa-trophy"></i> <?= t('المسابقات') ?>
                     </a>
                 </li>
                 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-cogs"></i> الخدمات الجامعية <span class="caret"></span>
+                        <i class="fa fa-cogs"></i> <?= t('الخدمات الجامعية') ?> <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="<?= e(url('services:service_by_type', 'transport')) ?>"><i class="fa fa-bus"></i> النقل</a></li>
-                        <li><a href="<?= e(url('services:service_by_type', 'housing')) ?>"><i class="fa fa-bed"></i> الإيواء</a></li>
-                        <li><a href="<?= e(url('services:service_by_type', 'catering')) ?>"><i class="fa fa-cutlery"></i> الإطعام</a></li>
-                        <li><a href="<?= e(url('services:service_by_type', 'scholarship')) ?>"><i class="fa fa-money"></i> المنح</a></li>
+                        <li><a href="<?= e(url('services:service_by_type', 'transport')) ?>"><i class="fa fa-bus"></i> <?= t('النقل') ?></a></li>
+                        <li><a href="<?= e(url('services:service_by_type', 'housing')) ?>"><i class="fa fa-bed"></i> <?= t('الإيواء') ?></a></li>
+                        <li><a href="<?= e(url('services:service_by_type', 'catering')) ?>"><i class="fa fa-cutlery"></i> <?= t('الإطعام') ?></a></li>
+                        <li><a href="<?= e(url('services:service_by_type', 'scholarship')) ?>"><i class="fa fa-money"></i> <?= t('المنح') ?></a></li>
                     </ul>
                 </li>
                 
                 <li>
                     <a href="<?= e(url('downloads:download_center')) ?>">
-                        <i class="fa fa-download"></i> التحميلات
+                        <i class="fa fa-download"></i> <?= t('التحميلات') ?>
                     </a>
                 </li>
                 
                 <li>
                     <a href="<?= e(url('faq:faq_list')) ?>">
-                        <i class="fa fa-question-circle"></i> الأسئلة الشائعة
+                        <i class="fa fa-question-circle"></i> <?= t('الأسئلة الشائعة') ?>
                     </a>
                 </li>
 
@@ -83,31 +83,31 @@
                     <?php if (!empty($user['is_staff'])): ?>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                                <i class="fa fa-shield"></i> لوحة المشرف <span class="caret"></span>
+                                <i class="fa fa-shield"></i> <?= t('لوحة المشرف') ?> <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="<?= e(url('students:admin_dashboard')) ?>">
-                                    <i class="fa fa-dashboard"></i> لوحة المشرف
+                                    <i class="fa fa-dashboard"></i> <?= t('لوحة المشرف') ?>
                                 </a></li>
                                 <li><a href="<?= e(url('students:admin_applications_list')) ?>">
-                                    <i class="fa fa-list"></i> إدارة الطلبات
+                                    <i class="fa fa-list"></i> <?= t('إدارة الطلبات') ?>
                                 </a></li>
                                 <li><a href="<?= e(url('students:admin_applications_list')) ?>?status=pending">
-                                    <i class="fa fa-clock-o"></i> الطلبات المعلقة
+                                    <i class="fa fa-clock-o"></i> <?= t('الطلبات المعلقة') ?>
                                 </a></li>
                                 <li><a href="<?= e(url('admin:index')) ?>">
-                                    <i class="fa fa-cog"></i> إعدادات النظام
+                                    <i class="fa fa-cog"></i> <?= t('إعدادات النظام') ?>
                                 </a></li>
                                 <li class="divider"></li>
                                 <?php if (!empty($student_profile)): ?>
                                 <li><a href="<?= e(url('students:dashboard')) ?>">
-                                    <i class="fa fa-user"></i> حسابي كطالب
+                                    <i class="fa fa-user"></i> <?= t('حسابي كطالب') ?>
                                 </a></li>
                                  
                                 <li class="divider"></li>
                                 <?php endif; ?>
                                 <li><a href="<?= e(url('students:logout')) ?>">
-                                    <i class="fa fa-sign-out"></i> تسجيل الخروج
+                                    <i class="fa fa-sign-out"></i> <?= t('تسجيل الخروج') ?>
                                 </a></li>
                             </ul>
                         </li>
@@ -121,31 +121,31 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="<?= e(url('students:dashboard')) ?>">
-                                    <i class="fa fa-dashboard"></i> لوحة التحكم
+                                    <i class="fa fa-dashboard"></i> <?= t('لوحة التحكم') ?>
                                 </a></li>
                                 <li><a href="<?= e(url('students:my_applications')) ?>">
-                                    <i class="fa fa-list"></i> طلباتي
+                                    <i class="fa fa-list"></i> <?= t('طلباتي') ?>
                                 </a></li>
                                 <li><a href="<?= e(url('students:create_application')) ?>">
-                                    <i class="fa fa-plus"></i> طلب جديد
+                                    <i class="fa fa-plus"></i> <?= t('طلب جديد') ?>
                                 </a></li>
                                 <li><a href="<?= e(url('students:profile_view')) ?>">
-                                <i class="fa fa-user"></i> معلوماتي الشخصية
+                                <i class="fa fa-user"></i> <?= t('معلوماتي الشخصية') ?>
                                 </a></li>
                                  <!-- ← جديد! البطاقة الرقمية -->
                                 <li><a href="<?= e(url('students:student_card')) ?>"target="_blank">
-                                 <i class="fa fa-id-card"></i> بطاقتي الرقمية
+                                 <i class="fa fa-id-card"></i> <?= t('بطاقتي الرقمية') ?>
                                  </a></li>
                                 <li class="divider"></li>
                                 <li><a href="<?= e(url('students:logout')) ?>">
-                                    <i class="fa fa-sign-out"></i> تسجيل الخروج
+                                    <i class="fa fa-sign-out"></i> <?= t('تسجيل الخروج') ?>
                                 </a></li>
                             </ul>
                         </li>
                         
                         <li class="dropdown notifications-dropdown">
                             <?php $unread_count_nav = $student_profile->get_unread_notifications_count(); ?>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" style="position: relative;" title="الإشعارات">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" style="position: relative;" title="<?= t('الإشعارات') ?>">
                                 <i class="fa fa-bell" style="font-size: 18px;"></i>
                                 <span class="badge badge-danger notifications-badge" style="position: absolute; top: 5px; inset-inline-start: 8px; font-size: 10px; padding: 2px 5px;<?= $unread_count_nav ? '' : ' display: none;' ?>"><?= e($unread_count_nav) ?></span>
                                 <span class="caret"></span>
@@ -153,7 +153,7 @@
 
                             <ul class="dropdown-menu notifications-menu" style="width: 280px; max-height: 360px; overflow-y: auto;">
                                 <li class="dropdown-header" style="background: #34495e; color: white; font-weight: bold;">
-                                    <i class="fa fa-bell"></i> الإشعارات
+                                    <i class="fa fa-bell"></i> <?= t('الإشعارات') ?>
                                     <span class="badge badge-danger pull-left notifications-count" style="<?= $unread_count_nav ? '' : 'display: none;' ?>"><?= e($unread_count_nav) ?></span>
                                 </li>
                                 <li class="divider"></li>
@@ -170,14 +170,14 @@
                                                 <strong style="display: block; font-size: 13px; color: #2c3e50;">
                                                     <?= e($notif['title']) ?>
                                                     <?php if (empty($notif['is_read'])): ?>
-                                                    <span class="badge badge-primary" style="font-size: 9px;">جديد</span>
+                                                    <span class="badge badge-primary" style="font-size: 9px;"><?= t('جديد') ?></span>
                                                     <?php endif; ?>
                                                 </strong>
                                                 <small style="display: block; color: #7f8c8d; margin-top: 3px;">
                                                     <?= e(truncatewords($notif['message'], 10)) ?>
                                                 </small>
                                                 <small style="display: block; color: #95a5a6; margin-top: 3px;">
-                                                    <i class="fa fa-clock-o"></i> <?= e(timesince($notif['created_at'])) ?> مضت
+                                                    <i class="fa fa-clock-o"></i> <?= e(timesince($notif['created_at'])) ?> <?= t('مضت') ?>
                                                 </small>
                                             </div>
                                         </div>
@@ -186,12 +186,12 @@
                                 <?php endforeach; ?>
                                 <li class="text-center notif-empty" style="padding: 30px;<?= $recent_notifications ? ' display: none;' : '' ?>">
                                     <i class="fa fa-bell-slash" style="font-size: 40px; color: #bdc3c7; display: block; margin-bottom: 10px;"></i>
-                                    <span style="color: #7f8c8d;">لا توجد إشعارات</span>
+                                    <span style="color: #7f8c8d;"><?= t('لا توجد إشعارات') ?></span>
                                 </li>
                                 <li class="divider notif-footer-divider"></li>
                                 <li class="text-center notif-footer">
                                     <a href="<?= e(url('students:notifications_list')) ?>" style="font-weight: bold; color: #3498db;">
-                                        <i class="fa fa-list"></i> عرض كل الإشعارات
+                                        <i class="fa fa-list"></i> <?= t('عرض كل الإشعارات') ?>
                                     </a>
                                 </li>
                             </ul>
@@ -200,14 +200,14 @@
                 <?php else: ?>
                     <li>
                         <a href="<?= e(url('students:login')) ?>">
-                            <i class="fa fa-sign-in"></i> فضاء الطالب
+                            <i class="fa fa-sign-in"></i> <?= t('فضاء الطالب') ?>
                         </a>
                     </li>
                 <?php endif; ?>
 
                 <li>
                     <a href="<?= e(url('contact:contact')) ?>">
-                        <i class="fa fa-envelope"></i> إتصل بنا
+                        <i class="fa fa-envelope"></i> <?= t('إتصل بنا') ?>
                     </a>
                 </li>
             </ul>
@@ -227,7 +227,7 @@
                     </ul>
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="q" value="<?= e($_GET['q'] ?? '') ?>" placeholder="ابحث في الموقع..." style="width: 250px;">
+                    <input type="text" class="form-control" name="q" value="<?= e($_GET['q'] ?? '') ?>" placeholder="<?= t('ابحث في الموقع...') ?>" style="width: 250px;">
                 </div>
                 <button type="submit" class="btn btn-default">
                     <i class="fa fa-search"></i>

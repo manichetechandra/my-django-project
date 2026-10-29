@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?><?= e($news['title']) ?> - مديرية الخدمات الجامعية<?php endblock(); ?>
+<?php block('title'); ?><?= e($news['title']) ?> <?= t('- مديرية الخدمات الجامعية') ?><?php endblock(); ?>
 
 <?php block('content'); ?>
 
@@ -17,19 +17,19 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <i class="fa fa-calendar"></i> 
-                        <strong>تاريخ النشر:</strong> 
+                        <strong><?= t('تاريخ النشر:') ?></strong> 
                         <?= e(format_date($news['published_date'], 'd/m/Y - H:i')) ?>
                     </div>
                     <div class="col-sm-6 text-left">
                         <i class="fa fa-eye"></i> 
-                        <strong>المشاهدات:</strong> 
+                        <strong><?= t('المشاهدات:') ?></strong> 
                         <?= e($news['views_count']) ?>
                     </div>
                 </div>
                 <?php if (!empty($news['author'])): ?>
                 <div style="margin-top: 10px;">
                     <i class="fa fa-user"></i> 
-                    <strong>الكاتب:</strong> 
+                    <strong><?= t('الكاتب:') ?></strong> 
                     <?= e($news['author']['username']) ?>
                 </div>
                 <?php endif; ?>
@@ -46,7 +46,7 @@
             <!-- ملخص الخبر -->
             <?php if (!empty($news['summary'])): ?>
             <div class="alert alert-info" style="border-inline-start: 4px solid #8cc040;">
-                <h4><i class="fa fa-info-circle"></i> ملخص:</h4>
+                <h4><i class="fa fa-info-circle"></i> <?= t('ملخص:') ?></h4>
                 <p style="font-size: 16px; line-height: 1.8;"><?= e($news['summary']) ?></p>
             </div>
             <?php endif; ?>
@@ -60,7 +60,7 @@
             <?php if (!empty($news['images'])): ?>
             <div style="margin-top: 40px;">
                 <h3 style="color: #2c3e50; border-bottom: 2px solid #8cc040; padding-bottom: 10px;">
-                    <i class="fa fa-images"></i> صور إضافية
+                    <i class="fa fa-images"></i> <?= t('صور إضافية') ?>
                 </h3>
                 <div class="row" style="margin-top: 20px;">
                     <?php foreach ($news['images'] as $image): ?>
@@ -82,7 +82,7 @@
             
             <!-- أزرار المشاركة -->
             <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
-                <h4><i class="fa fa-share-alt"></i> شارك الخبر:</h4>
+                <h4><i class="fa fa-share-alt"></i> <?= t('شارك الخبر:') ?></h4>
                 <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(current_url()) ?>" 
                    target="_blank" class="btn btn-primary" style="margin: 5px;">
                     <i class="fa fa-facebook"></i> Facebook
@@ -107,7 +107,7 @@
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <i class="fa fa-newspaper-o"></i> أخبار ذات صلة
+                        <i class="fa fa-newspaper-o"></i> <?= t('أخبار ذات صلة') ?>
                     </h3>
                 </div>
                 <div class="panel-body" style="padding: 0;">
@@ -131,7 +131,7 @@
             
             <!-- زر العودة للأخبار -->
             <a href="<?= e(url('news:news_list')) ?>" class="btn btn-success btn-block btn-lg">
-                <i class="fa fa-arrow-right"></i> العودة لكل الأخبار
+                <i class="fa fa-arrow-right"></i> <?= t('العودة لكل الأخبار') ?>
             </a>
             
         </div>

@@ -23,11 +23,11 @@
         
         <div class="service-meta">
             <small style="color: #999;">
-                <i class="fa fa-clock-o"></i> آخر تحديث: <?= e(format_date($service['updated_at'], 'd/m/Y')) ?>
+                <i class="fa fa-clock-o"></i> <?= t('آخر تحديث:') ?> <?= e(format_date($service['updated_at'], 'd/m/Y')) ?>
             </small>
             <br><br>
             <a href="<?= e($service->get_absolute_url()) ?>" class="btn btn-success btn-block">
-                <i class="fa fa-arrow-left"></i> التفاصيل الكاملة
+                <i class="fa fa-arrow-left"></i> <?= t('التفاصيل الكاملة') ?>
             </a>
         </div>
     </div>

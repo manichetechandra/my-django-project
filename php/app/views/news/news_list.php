@@ -1,5 +1,5 @@
 <?php extend('base/base'); ?>
-<?php block('title'); ?>الأخبار - مديرية الخدمات الجامعية<?php endblock(); ?>
+<?php block('title'); ?><?= t('الأخبار - مديرية الخدمات الجامعية') ?><?php endblock(); ?>
 
 <?php block('content'); ?>
 
@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-12">
             <h2 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 15px; margin-bottom: 30px;">
-                <i class="fa fa-newspaper-o"></i> جميع الأخبار
+                <i class="fa fa-newspaper-o"></i> <?= t('جميع الأخبار') ?>
             </h2>
         </div>
     </div>
@@ -32,7 +32,7 @@
                     <!-- Badge للأخبار المميزة -->
                     <?php if (!empty($item['is_featured'])): ?>
                     <span style="position: absolute; top: 10px; inset-inline-end: 10px; background-color: #e74c3c; color: white; padding: 5px 10px; border-radius: 3px; font-size: 12px;">
-                        <i class="fa fa-star"></i> مميز
+                        <i class="fa fa-star"></i> <?= t('مميز') ?>
                     </span>
                     <?php endif; ?>
                 </div>
@@ -61,7 +61,7 @@
                     <a href="<?= e(url('news:news_detail', $item['slug'])) ?>" 
                        class="btn btn-success btn-sm" 
                        style="margin-top: 10px;">
-                        <i class="fa fa-arrow-left"></i> قراءة المزيد
+                        <i class="fa fa-arrow-left"></i> <?= t('قراءة المزيد') ?>
                     </a>
                 </div>
             </div>
@@ -70,7 +70,7 @@
         <?php endforeach; ?><?php else: ?>
         <div class="col-md-12">
             <div class="alert alert-info text-center">
-                <h4><i class="fa fa-info-circle"></i> لا توجد أخبار منشورة حالياً</h4>
+                <h4><i class="fa fa-info-circle"></i> <?= t('لا توجد أخبار منشورة حالياً') ?></h4>
             </div>
         </div>
         <?php endif; ?>

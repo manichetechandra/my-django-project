@@ -1,0 +1,707 @@
+k001	app/controllers/activities.php:27	النشاطات الثقافية والرياضية
+k002	app/controllers/cities.php:10	الإقامات الجامعية
+k003	app/controllers/contact.php:20	شكراً لك {name}! تم إرسال رسالتك بنجاح. سنتواصل معك في أقرب وقت ممكن.
+k004	app/controllers/contact.php:23	يرجى تصحيح الأخطاء في النموذج
+k005	app/controllers/contact.php:27	اتصل بنا
+k006	app/controllers/departements.php:10	أقسام المديرية
+k007	app/controllers/downloads.php:45	مركز التحميلات
+k008	app/controllers/downloads.php:56	ملفات
+k009	app/controllers/downloads.php:68	الملف غير موجود
+k010	app/controllers/faq.php:38	الأسئلة الشائعة
+k011	app/controllers/homepage.php:26	كلمة المدير
+k012	app/controllers/homepage.php:34	الهيكل التنظيمي
+k013	app/controllers/homepage.php:42	تاريخ المديرية
+k014	app/controllers/news.php:10	الأخبار
+k015	app/controllers/search.php:83	نتائج البحث عن: {query}
+k016	app/controllers/search.php:83	البحث
+k017	app/controllers/services.php:16	الخدمات الجامعية
+k018	app/controllers/services.php:23	خدمات النقل
+k019	app/controllers/services.php:24	خدمات الإيواء
+k020	app/controllers/services.php:25	خدمات الإطعام
+k021	app/controllers/services.php:26	المنح والإعانات
+k022	app/controllers/staff.php:92	أحد
+k023	app/controllers/staff.php:92	إثنين
+k024	app/controllers/staff.php:92	ثلاثاء
+k025	app/controllers/staff.php:92	أربعاء
+k026	app/controllers/staff.php:92	خميس
+k027	app/controllers/staff.php:92	جمعة
+k028	app/controllers/staff.php:92	سبت
+k029	app/controllers/staff.php:111	لوحة تحكم المشرف
+k030	app/controllers/staff.php:112	قيد الانتظار
+k031	app/controllers/staff.php:112	قيد المراجعة
+k032	app/controllers/staff.php:112	معتمد
+k033	app/controllers/staff.php:112	مرفوض
+k034	app/controllers/staff.php:133	لم تقم بتحديد أي طلبات!
+k035	app/controllers/staff.php:135	لم تقم باختيار إجراء!
+k036	app/controllers/staff.php:145	✅ تم اعتماد {count} طلب بنجاح!
+k037	app/controllers/staff.php:148	تم رفض الطلب
+k038	app/controllers/staff.php:153	⚠️ تم رفض {count} طلب
+k039	app/controllers/staff.php:159	📝 تم تغيير حالة {count} طلب إلى "قيد المراجعة"
+k040	app/controllers/staff.php:165	⏳ تم تغيير حالة {count} طلب إلى "قيد الانتظار"
+k041	app/controllers/staff.php:174	🗑️ تم حذف {count} طلب
+k042	app/controllers/staff.php:177	إجراء غير معروف: {action}
+k043	app/controllers/staff.php:192	إدارة الطلبات
+k044	app/controllers/staff.php:214	تم اعتماد الطلب بنجاح وإرسال إشعار للطالب
+k045	app/controllers/staff.php:219	تم رفض الطلب وإرسال إشعار للطالب
+k046	app/controllers/staff.php:223	تم تغيير حالة الطلب إلى "قيد الانتظار" وإرسال إشعار للطالب
+k047	app/controllers/staff.php:227	تم تغيير حالة الطلب إلى "قيد المراجعة" وإرسال إشعار للطالب
+k048	app/controllers/staff.php:230	لم يتم تحديد الإجراء المطلوب
+k049	app/controllers/staff.php:242	تفاصيل الطلب - {number}
+k050	app/controllers/staff.php:252	رقم الطلب
+k051	app/controllers/staff.php:252	اسم الطالب
+k052	app/controllers/staff.php:252	رقم التسجيل
+k053	app/controllers/staff.php:252	نوع الطلب
+k054	app/controllers/staff.php:252	الحالة
+k055	app/controllers/staff.php:252	تاريخ التقديم
+k056	app/controllers/staff.php:252	تاريخ المراجعة
+k057	app/controllers/staff.php:253	راجعه
+k058	app/controllers/staff.php:253	الهاتف
+k059	app/controllers/staff.php:253	البريد الإلكتروني
+k060	app/controllers/staff.php:253	الكلية
+k061	app/controllers/staff.php:253	القسم
+k062	app/controllers/staff.php:253	السنة الدراسية
+k063	app/controllers/staff.php:292	الإجمالي:
+k064	app/controllers/staff.php:293	تاريخ التصدير:
+k065	app/controllers/staff.php:294	صُدّر بواسطة:
+k066	app/controllers/staff.php:299	الطلبات
+k067	app/controllers/students.php:13	لا يوجد ملف طالب
+k068	app/controllers/students.php:15	لا يوجد ملف طالب لهذا المستخدم
+k069	app/controllers/students.php:64	مرحباً بك!
+k070	app/controllers/students.php:64	مرحباً {name}، تم إنشاء حسابك بنجاح. يمكنك الآن تقديم الطلبات.
+k071	app/controllers/students.php:68	تم إنشاء حسابك بنجاح! مرحباً بك
+k072	app/controllers/students.php:72	حدث خطأ أثناء إنشاء الحساب. حاول مرة أخرى.
+k073	app/controllers/students.php:82	تسجيل طالب جديد
+k074	app/controllers/students.php:100	مرحباً! تم تسجيل الدخول كمشرف
+k075	app/controllers/students.php:105	حسابك غير نشط. يرجى الاتصال بالإدارة
+k076	app/controllers/students.php:109	مرحباً {name}!
+k077	app/controllers/students.php:113	لا يوجد ملف طالب. يمكنك الوصول للوحة الإدارة فقط
+k078	app/controllers/students.php:116	اسم المستخدم أو كلمة المرور غير صحيحة
+k079	app/controllers/students.php:118	تسجيل الدخول
+k080	app/controllers/students.php:125	تم تسجيل الخروج بنجاح
+k081	app/controllers/students.php:150	لوحة التحكم
+k082	app/controllers/students.php:218	تم تقديم طلبك بنجاح
+k083	app/controllers/students.php:218	تم تقديم طلب {type} برقم {number}
+k084	app/controllers/students.php:223	تم تقديم طلبك بنجاح! رقم الطلب: {number}
+k085	app/controllers/students.php:230	حدث خطأ: {error}
+k086	app/controllers/students.php:230	تعذر حفظ الطلب
+k087	app/controllers/students.php:242	تقديم طلب جديد
+k088	app/controllers/students.php:280	طلباتي
+k089	app/controllers/students.php:303	تم إلغاء الطلب بنجاح
+k090	app/controllers/students.php:305	لا يمكن إلغاء هذا الطلب
+k091	app/controllers/students.php:325	استخدم "طباعة" من المتصفح واختر "حفظ كـ PDF"
+k092	app/controllers/students.php:336	طباعة كل الطلبات
+k093	app/controllers/students.php:360	الملف غير موجود على الخادم
+k094	app/controllers/students.php:389	إشعاراتي
+k095	app/controllers/students.php:398	الإشعار غير موجود
+k096	app/controllers/students.php:408	تم تمييز {count} إشعار كمقروء
+k097	app/controllers/students.php:419	تم حذف الإشعار
+k098	app/controllers/students.php:426	تم حذف {count} إشعار مقروء
+k099	app/controllers/students.php:434	غير مسجل الدخول
+k100	app/controllers/students.php:475	معلوماتي الشخصية
+k101	app/controllers/students.php:505	تم تحديث معلوماتك ✅
+k102	app/controllers/students.php:505	تم تحديث معلوماتك الشخصية بنجاح.
+k103	app/controllers/students.php:506	✅ تم تحديث معلوماتك بنجاح!
+k104	app/controllers/students.php:509	❌ حدث خطأ: {error}
+k105	app/controllers/students.php:526	تعديل معلوماتي
+k106	app/controllers/students.php:539	❌ كلمة المرور القديمة غير صحيحة
+k107	app/controllers/students.php:543	تم تغيير كلمة المرور 🔒
+k108	app/controllers/students.php:543	تم تغيير كلمة المرور الخاصة بك بنجاح.
+k109	app/controllers/students.php:544	✅ تم تغيير كلمة المرور بنجاح!
+k110	app/controllers/students.php:553	تغيير كلمة المرور
+k111	app/controllers/students.php:560	لا توجد صورة لحذفها
+k112	app/controllers/students.php:564	تم حذف الصورة بنجاح
+k113	app/controllers/students.php:574	بطاقة الطالب الرقمية
+k114	app/core/Form.php:67	هذا الحقل مطلوب.
+k115	app/core/Form.php:119	تأكد أن هذه القيمة تحتوي على {max} حرفًا على الأكثر (حاليًا {count}).
+k116	app/core/Form.php:122	تأكد أن هذه القيمة تحتوي على {min} حرفًا على الأقل.
+k117	app/core/Form.php:127	أدخل عنوان بريد إلكتروني صالح.
+k118	app/core/Form.php:133	اختر خياراً صالحاً. {value} ليست واحدة من الخيارات المتاحة.
+k119	app/core/Form.php:139	أدخل تاريخاً صالحاً.
+k120	app/core/Form.php:144	أدخل رقماً صحيحاً.
+k121	app/core/Form.php:149	أدخل رقماً.
+k122	app/core/Form.php:154	تأكد أن هذه القيمة أكبر من أو تساوي {min}.
+k123	app/core/Form.php:157	تأكد أن هذه القيمة أصغر من أو تساوي {max}.
+k124	app/core/Form.php:160	أدخل قيمة صالحة.
+k125	app/core/Upload.php:37	لم يتم اختيار ملف.
+k126	app/core/Upload.php:43	ملف غير صالح.
+k127	app/core/Upload.php:46	حجم الملف كبير جداً. الحد الأقصى {mb} ميغابايت.
+k128	app/core/Upload.php:50	نوع الملف غير مسموح. الأنواع المسموحة: {types}
+k129	app/core/Upload.php:56	محتوى الملف لا يطابق امتداده ({mime}).
+k130	app/core/Upload.php:61	الملف ليس صورة صالحة.
+k131	app/core/Upload.php:114	حجم الملف يتجاوز الحد المسموح به في الخادم.
+k132	app/core/Upload.php:116	تم رفع جزء من الملف فقط. حاول مجدداً.
+k133	app/core/Upload.php:120	حدث خطأ أثناء رفع الملف (رمز {code}).
+k134	app/forms.php:13	كلمة المرور هذه قصيرة جدا. يجب أن تتكون من 8 أحرف على الأقل.
+k135	app/forms.php:16	كلمة المرور هذه تتكون بالكامل من أرقام.
+k136	app/forms.php:21	كلمة المرور هذه شائعة جدا.
+k137	app/forms.php:24	كلمة المرور مشابهة جداً لـ اسم المستخدم.
+k138	app/forms.php:34	الاسم الكامل
+k139	app/forms.php:36	الاسم يجب أن يكون 3 أحرف على الأقل
+k140	app/forms.php:39	رقم الهاتف
+k141	app/forms.php:40	0555123456 (اختياري)
+k142	app/forms.php:44	رقم الهاتف يجب أن يحتوي على أرقام فقط
+k143	app/forms.php:47	رقم الهاتف غير صحيح
+k144	app/forms.php:51	الموضوع
+k145	app/forms.php:53	الرسالة
+k146	app/forms.php:54	اكتب رسالتك أو استفسارك هنا...
+k147	app/forms.php:55	الرسالة يجب أن تكون 10 أحرف على الأقل
+k148	app/forms.php:64	رقم التسجيل الجامعي
+k149	app/forms.php:68	رقم التسجيل هذا مسجل مسبقاً
+k150	app/forms.php:73	البريد الإلكتروني الجامعي
+k151	app/forms.php:74	البريد الإلكتروني مسجل مسبقاً
+k152	app/forms.php:75	الاسم الكامل بالعربية
+k153	app/forms.php:77	تاريخ الميلاد
+k154	app/forms.php:78	مكان الميلاد
+k155	app/forms.php:80	الجنس
+k156	app/forms.php:84	العنوان
+k157	app/forms.php:84	العنوان الكامل
+k158	app/forms.php:85	الولاية
+k159	app/forms.php:87	القسم/التخصص
+k160	app/forms.php:89	كلمة المرور
+k161	app/forms.php:90	تأكيد كلمة المرور
+k162	app/forms.php:96	حقلا كلمة المرور غير متطابقين.
+k163	app/forms.php:109	رقم التسجيل أو اسم المستخدم
+k164	app/forms.php:113	تذكرني
+k165	app/forms.php:125	تفاصيل الطلب
+k166	app/forms.php:126	اكتب تفاصيل إضافية عن الطلب (اختياري)
+k167	app/forms.php:150	الصورة الشخصية
+k168	app/forms.php:159	البريد الإلكتروني (اختياري)
+k169	app/forms.php:167	كلمة المرور القديمة
+k170	app/forms.php:167	أدخل كلمة المرور الحالية
+k171	app/forms.php:168	كلمة المرور الجديدة
+k172	app/forms.php:168	يجب أن تحتوي على 8 أحرف على الأقل
+k173	app/forms.php:169	أدخل كلمة المرور الجديدة
+k174	app/forms.php:170	تأكيد كلمة المرور الجديدة
+k175	app/forms.php:170	أعد إدخال كلمة المرور الجديدة
+k176	app/forms.php:175	كلمات المرور الجديدة غير متطابقة
+k177	app/helpers.php:352	يجب تسجيل الدخول أولاً
+k178	app/helpers.php:356	ليس لديك صلاحية للوصول لهذه الصفحة. هذه الصفحة للإداريين فقط.
+k179	app/models/content.php:13	مسودة
+k180	app/models/content.php:13	منشور
+k181	app/models/content.php:13	مؤرشف
+k182	app/models/content.php:60	رياضي
+k183	app/models/content.php:60	ثقافي
+k184	app/models/content.php:60	علمي
+k185	app/models/content.php:60	اجتماعي
+k186	app/models/content.php:60	فني
+k187	app/models/content.php:60	أخرى
+k188	app/models/content.php:180	النقل
+k189	app/models/content.php:180	الإيواء
+k190	app/models/content.php:180	الإطعام
+k191	app/models/content.php:180	المنح
+k192	app/models/content.php:219	استفسار عام
+k193	app/models/content.php:219	النقل الجامعي
+k194	app/models/content.php:219	الإقامة الجامعية
+k195	app/models/content.php:220	المطاعم والإطعام
+k196	app/models/content.php:220	شكوى
+k197	app/models/content.php:221	اقتراح
+k198	app/models/content.php:232	تم الرد ✓
+k199	app/models/content.php:234	مقروءة
+k200	app/models/content.php:234	جديدة
+k201	app/models/content.php:253	نماذج المنح والإعانات
+k202	app/models/content.php:253	نماذج السكن الجامعي
+k203	app/models/content.php:254	نماذج النقل
+k204	app/models/content.php:254	نماذج المطاعم
+k205	app/models/content.php:254	دلائل إرشادية
+k206	app/models/content.php:255	لوائح وقوانين
+k207	app/models/content.php:255	تقارير وإحصائيات
+k208	app/models/content.php:304	{n} بايت
+k209	app/models/content.php:338	عام
+k210	app/models/content.php:338	السكن
+k211	app/models/content.php:372	معلومة
+k212	app/models/content.php:372	نجاح
+k213	app/models/content.php:372	تحذير
+k214	app/models/content.php:372	عاجل/خطر
+k215	app/models/content.php:372	عادي
+k216	app/models/content.php:375	المزيد
+k217	app/models/homepage.php:28	مدير الخدمات الجامعية
+k218	app/models/students.php:44	ذكر
+k219	app/models/students.php:44	أنثى
+k220	app/models/students.php:45	السنة الأولى
+k221	app/models/students.php:45	السنة الثانية
+k222	app/models/students.php:45	السنة الثالثة
+k223	app/models/students.php:45	ماستر 1
+k224	app/models/students.php:45	ماستر 2
+k225	app/models/students.php:45	دكتوراه
+k226	app/models/students.php:53	جامعة سطيف
+k227	app/models/students.php:58	رقم الهاتف يجب أن يبدأ بـ 05 أو 06 أو 07 ويحتوي على 10 أرقام
+k228	app/models/students.php:111	ملغي
+k229	app/models/students.php:200	تم اعتماد طلبك ✅
+k230	app/models/students.php:200	تم اعتماد طلب {type} برقم {number}
+k231	app/models/students.php:201	تم رفض طلبك ❌
+k232	app/models/students.php:201	تم رفض طلب {type} برقم {number}. يرجى مراجعة الملاحظات.
+k233	app/models/students.php:202	طلبك قيد المراجعة 📝
+k234	app/models/students.php:202	طلب {type} برقم {number} قيد المراجعة من قبل الإدارة.
+k235	app/models/students.php:203	تم تغيير حالة طلبك ⏳
+k236	app/models/students.php:203	تم تغيير حالة طلب {type} برقم {number} إلى "قيد الانتظار".
+k237	app/models/students.php:204	تم إلغاء طلبك 🚫
+k238	app/models/students.php:204	تم إلغاء طلب {type} برقم {number}.
+k239	app/models/students.php:206	تحديث على طلبك 📢
+k240	app/models/students.php:206	تم تحديث حالة طلب {type} برقم {number}.
+k241	app/models/students.php:248	خطأ
+k242	app/views/activities/activity_detail.php:2	- مديرية الخدمات الجامعية
+k243	app/views/activities/activity_detail.php:8	الرئيسية
+k244	app/views/activities/activity_detail.php:9	النشاطات
+k245	app/views/activities/activity_detail.php:32	التاريخ:
+k246	app/views/activities/activity_detail.php:36	المكان:
+k247	app/views/activities/activity_detail.php:42	النوع:
+k248	app/views/activities/activity_detail.php:46	المشاركون:
+k249	app/views/activities/activity_detail.php:46	شخص
+k250	app/views/activities/activity_detail.php:53	المنظم:
+k251	app/views/activities/activity_detail.php:61	عن النشاط
+k252	app/views/activities/activity_detail.php:72	معرض الصور
+k253	app/views/activities/activity_detail.php:98	نشاطات مشابهة
+k254	app/views/activities/activity_detail.php:116	عرض كل النشاطات {type}ة
+k255	app/views/activities/activity_detail.php:125	مشاركة النشاط
+k256	app/views/activities/activity_detail.php:128	شارك هذا النشاط مع الآخرين:
+k257	app/views/activities/activity_list.php:2	النشاطات - مديرية الخدمات الجامعية
+k258	app/views/activities/activity_list.php:10	نشاط)
+k259	app/views/activities/activity_list.php:22	ابحث في النشاطات...
+k260	app/views/activities/activity_list.php:25	بحث
+k261	app/views/activities/activity_list.php:29	إلغاء
+k262	app/views/activities/activity_list.php:39	الكل
+k263	app/views/activities/activity_list.php:87	مشارك   
+k264	app/views/activities/activity_list.php:92	التفاصيل
+k265	app/views/activities/activity_list.php:100	لا توجد نشاطات
+k266	app/views/activities/activity_list.php:111	السابق
+k267	app/views/activities/activity_list.php:123	التالي
+k268	app/views/base/base.php:6	مديرية الخدمات الجامعية سطيف, الخدمات الجامعية, الإقامات
+k269	app/views/base/base.php:7	الموقع الرسمي لمديرية الخدمات الجامعية سطيف
+k270	app/views/base/base.php:9	مديرية الخدمات الجامعية سطيف
+k271	app/views/base/footer.php:8	مديرية الخدمات الجامعية لولاية سطيف
+k272	app/views/base/footer.php:9	سطيف، الجزائر
+k273	app/views/base/footer.php:14	تواصل معنا
+k274	app/views/base/footer.php:40	حول الموقع
+k275	app/views/base/footer.php:41	الموقع الرسمي لمديرية الخدمات الجامعية
+k276	app/views/base/footer.php:54	جميع الحقوق محفوظة ©
+k277	app/views/base/footer.php:54	- مديرية الخدمات الجامعية لولاية سطيف
+k278	app/views/base/navbar.php:23	المديرية
+k279	app/views/base/navbar.php:54	المسابقات
+k280	app/views/base/navbar.php:72	التحميلات
+k281	app/views/base/navbar.php:86	لوحة المشرف
+k282	app/views/base/navbar.php:96	الطلبات المعلقة
+k283	app/views/base/navbar.php:99	إعدادات النظام
+k284	app/views/base/navbar.php:104	حسابي كطالب
+k285	app/views/base/navbar.php:110	تسجيل الخروج
+k286	app/views/base/navbar.php:130	طلب جديد
+k287	app/views/base/navbar.php:137	بطاقتي الرقمية
+k288	app/views/base/navbar.php:148	الإشعارات
+k289	app/views/base/navbar.php:173	جديد
+k290	app/views/base/navbar.php:180	مضت
+k291	app/views/base/navbar.php:189	لا توجد إشعارات
+k292	app/views/base/navbar.php:194	عرض كل الإشعارات
+k293	app/views/base/navbar.php:203	فضاء الطالب
+k294	app/views/base/navbar.php:210	إتصل بنا
+k295	app/views/base/navbar.php:218	اللغة
+k296	app/views/base/navbar.php:230	ابحث في الموقع...
+k297	app/views/base/notifications_js.php:48	{time} مضت
+k298	app/views/base/notifications_js.php:107	خطأ في جلب الإشعارات:
+k299	app/views/cities/cite_detail.php:2	- مديرية الخدمات الجامعية سطيف
+k300	app/views/cities/cite_detail.php:121	عن الإقامة
+k301	app/views/cities/cite_detail.php:162	معلومات الإقامة
+k302	app/views/cities/cite_detail.php:169	السعة الاستيعابية:
+k303	app/views/cities/cite_detail.php:170	طالب
+k304	app/views/cities/cite_detail.php:177	العنوان:
+k305	app/views/cities/cite_detail.php:185	الهاتف:
+k306	app/views/cities/cite_detail.php:193	لا توجد معلومات إضافية متاحة حالياً
+k307	app/views/cities/cite_detail.php:204	إقامات أخرى
+k308	app/views/cities/cite_detail.php:226	عرض كل الإقامات
+k309	app/views/cities/cite_list.php:2	الإقامات الجامعية - مديرية الخدمات الجامعية سطيف
+k310	app/views/cities/cite_list.php:57	إقامة)
+k311	app/views/cities/cite_list.php:83	السعة:
+k312	app/views/cities/cite_list.php:90	عرض التفاصيل
+k313	app/views/cities/cite_list.php:98	لا توجد إقامات جامعية حالياً
+k314	app/views/contact/contact.php:191	نحن هنا للإجابة على استفساراتكم ومساعدتكم
+k315	app/views/contact/contact.php:225	أرسل لنا رسالة
+k316	app/views/contact/contact.php:259	(اختياري)
+k317	app/views/contact/contact.php:285	رسالتك
+k318	app/views/contact/contact.php:298	إرسال الرسالة
+k319	app/views/contact/contact.php:302	معلوماتك آمنة ولن تُستخدم إلا للرد على استفسارك
+k320	app/views/contact/contact.php:315	رسالة تم استقبالها
+k321	app/views/contact/contact.php:324	مديرية الخدمات الجامعية
+k322	app/views/contact/contact.php:325	جامعة فرحات عباس - سطيف 1
+k323	app/views/contact/contact.php:335	الخط الرئيسي:
+k324	app/views/contact/contact.php:336	الفاكس:
+k325	app/views/contact/contact.php:353	ساعات العمل
+k326	app/views/contact/contact.php:355	الأحد - الخميس:
+k327	app/views/contact/contact.php:355	8:00 صباحاً - 4:00 مساءً
+k328	app/views/contact/contact.php:356	الجمعة والسبت:
+k329	app/views/contact/contact.php:356	مغلق
+k330	app/views/contact/contact.php:363	روابط مفيدة
+k331	app/views/contact/contact.php:369	آخر الأخبار
+k332	app/views/contact/contact.php:381	موقعنا على الخريطة
+k333	app/views/contact/contact.php:395	يمكنك استخدام الخريطة للوصول إلينا بسهولة
+k334	app/views/contact/contact.php:419	يرجى كتابة رسالة أطول (10 أحرف على الأقل)
+k335	app/views/contact/contact.php:430	حرف
+k336	app/views/departements/departement_detail.php:106	الأقسام
+k337	app/views/departements/departement_detail.php:122	عن القسم
+k338	app/views/departements/departement_detail.php:139	معلومات الاتصال
+k339	app/views/departements/departement_detail.php:146	رئيس القسم:
+k340	app/views/departements/departement_detail.php:154	البريد الإلكتروني:
+k341	app/views/departements/departement_detail.php:170	الموقع الإلكتروني:
+k342	app/views/departements/departement_detail.php:172	زيارة الموقع
+k343	app/views/departements/departement_detail.php:180	لا توجد معلومات اتصال متاحة حالياً
+k344	app/views/departements/departement_detail.php:191	أقسام أخرى
+k345	app/views/departements/departement_detail.php:209	عرض كل الأقسام
+k346	app/views/departements/departement_list.php:2	أقسام المديرية - مديرية الخدمات الجامعية سطيف
+k347	app/views/departements/departement_list.php:96	قسم)
+k348	app/views/departements/departement_list.php:132	البريد:
+k349	app/views/departements/departement_list.php:156	لا توجد أقسام حالياً
+k350	app/views/downloads/_file_card.php:9	مميز
+k351	app/views/downloads/_file_card.php:18	تحميل
+k352	app/views/downloads/download_by_category.php:2	- مركز التحميلات - مديرية الخدمات الجامعية سطيف
+k353	app/views/downloads/download_by_category.php:16	ملف في هذا التصنيف
+k354	app/views/downloads/download_by_category.php:38	لا توجد ملفات في هذا التصنيف حالياً
+k355	app/views/downloads/download_by_category.php:39	العودة لمركز التحميلات
+k356	app/views/downloads/download_by_category.php:47	التصنيفات
+k357	app/views/downloads/download_by_category.php:59	كل الملفات
+k358	app/views/downloads/download_center.php:15	استمارات، دلائل، لوائح وتقارير المديرية في مكان واحد
+k359	app/views/downloads/download_center.php:32	ملف متاح
+k360	app/views/downloads/download_center.php:39	تصنيف
+k361	app/views/downloads/download_center.php:46	عملية تحميل
+k362	app/views/downloads/download_center.php:56	ابحث عن ملف... (مثال: استمارة المنحة)
+k363	app/views/downloads/download_center.php:60	كل التصنيفات
+k364	app/views/downloads/download_center.php:74	إلغاء الفلترة
+k365	app/views/downloads/download_center.php:86	ملفات مميزة
+k366	app/views/downloads/download_center.php:100	ملف
+k367	app/views/downloads/download_center.php:108	عرض كل ملفات "{name}" ({count})
+k368	app/views/downloads/download_center.php:117	لا توجد ملفات
+k369	app/views/downloads/download_center.php:118	لم نجد ملفات تطابق بحثك.
+k370	app/views/downloads/download_center.php:118	لم تتم إضافة ملفات بعد.
+k371	app/views/downloads/download_center.php:138	تحتاج مساعدة؟
+k372	app/views/downloads/download_center.php:139	إذا لم تجد الملف الذي تبحث عنه، يمكنك التواصل معنا أو الاطلاع على الأسئلة الشائعة.
+k373	app/views/errors/403.php:4	غير مسموح
+k374	app/views/errors/403.php:5	ليس لديك صلاحية للوصول إلى هذه الصفحة.
+k375	app/views/errors/403_csrf.php:4	انتهت صلاحية النموذج
+k376	app/views/errors/403_csrf.php:5	انتهت صلاحية الجلسة أو تم إرسال النموذج من مصدر غير موثوق. أعد تحميل الصفحة وحاول مرة أخرى.
+k377	app/views/errors/404.php:4	الصفحة غير موجودة
+k378	app/views/errors/404.php:5	عذراً، الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
+k379	app/views/errors/405.php:4	طريقة الطلب غير مسموحة
+k380	app/views/errors/405.php:5	لا يمكن الوصول إلى هذه الصفحة بهذه الطريقة.
+k381	app/views/errors/500.php:6	خطأ في الخادم - مديرية الخدمات الجامعية سطيف
+k382	app/views/errors/500.php:19	حدث خطأ في الخادم
+k383	app/views/errors/500.php:20	نعتذر، حدث خطأ غير متوقع. يرجى المحاولة لاحقاً.
+k384	app/views/errors/500.php:21	العودة للرئيسية
+k385	app/views/errors/500.php:24	تفاصيل الخطأ (تظهر فقط في وضع التطوير):
+k386	app/views/errors/_error.php:10	رجوع
+k387	app/views/faq/faq_detail.php:2	- الأسئلة الشائعة
+k388	app/views/faq/faq_detail.php:93	الإجابة:
+k389	app/views/faq/faq_detail.php:98	مشاهدة
+k390	app/views/faq/faq_detail.php:101	آخر تحديث:
+k391	app/views/faq/faq_detail.php:110	أسئلة ذات صلة
+k392	app/views/faq/faq_detail.php:124	العودة لكل الأسئلة
+k393	app/views/faq/faq_list.php:245	إجابات سريعة على أكثر الأسئلة تكراراً
+k394	app/views/faq/faq_list.php:263	سؤال وجواب
+k395	app/views/faq/faq_list.php:283	ابحث في الأسئلة... (مثال: كيف أحصل على المنحة؟)
+k396	app/views/faq/faq_list.php:304	سؤال
+k397	app/views/faq/faq_list.php:331	لا توجد أسئلة
+k398	app/views/faq/faq_list.php:331	تطابق بحثك
+k399	app/views/faq/faq_list.php:333	حاول البحث بكلمات أخرى
+k400	app/views/faq/faq_list.php:334	عرض كل الأسئلة
+k401	app/views/faq/faq_list.php:345	الأكثر مشاهدة
+k402	app/views/homepage/director_word.php:2	كلمة المدير - مديرية الخدمات الجامعية سطيف
+k403	app/views/homepage/director_word.php:145	التوقيع
+k404	app/views/homepage/director_word.php:169	لا توجد كلمة للمدير حالياً
+k405	app/views/homepage/director_word.php:170	سيتم إضافة كلمة المدير قريباً
+k406	app/views/homepage/directorate_history.php:58	تأسست عام
+k407	app/views/homepage/directorate_history.php:88	نبذة تاريخية
+k408	app/views/homepage/directorate_history.php:110	التاريخ التفصيلي
+k409	app/views/homepage/directorate_history.php:140	عذراً، لا توجد معلومات متاحة حالياً
+k410	app/views/homepage/directorate_history.php:141	يتم العمل على إضافة تاريخ المديرية قريباً.
+k411	app/views/homepage/index.php:2	الصفحة الرئيسية - مديرية الخدمات الجامعية سطيف
+k412	app/views/homepage/index.php:253	مرحباً بكم
+k413	app/views/homepage/index.php:255	مرحباً بكم في مديرية الخدمات الجامعية
+k414	app/views/homepage/index.php:256	في خدمتكم دائماً
+k415	app/views/homepage/index.php:291	آخر المستجدات
+k416	app/views/homepage/index.php:305	آخر الأخبـــار
+k417	app/views/homepage/index.php:307	عرض الكل
+k418	app/views/homepage/index.php:320	أخر الأخبار
+k419	app/views/homepage/index.php:355	لا توجد أخبار حالياً
+k420	app/views/homepage/index.php:371	آخر النشاطـــات
+k421	app/views/homepage/index.php:409	مشارك
+k422	app/views/homepage/index.php:421	لا توجد نشاطات حالياً
+k423	app/views/homepage/index.php:434	إحصائيات الموقع
+k424	app/views/homepage/index.php:445	زائر
+k425	app/views/homepage/index.php:463	خبر
+k426	app/views/homepage/index.php:472	خدمة
+k427	app/views/homepage/index.php:483	ملف للتحميل
+k428	app/views/homepage/index.php:492	سؤال شائع
+k429	app/views/homepage/index.php:501	إقامة جامعية
+k430	app/views/homepage/index.php:582	مــواقــع مهمـــــة
+k431	app/views/homepage/index.php:589	جامعة فرحات عباس
+k432	app/views/homepage/index.php:596	وزارة التعليم العالي والبحث العلمي
+k433	app/views/homepage/index.php:603	منصة PROGRES
+k434	app/views/homepage/index.php:644	لا توجد أقسام معروضة حالياً
+k435	app/views/homepage/organization_structure.php:59	نبذة
+k436	app/views/homepage/organization_structure.php:72	مخطط الهيكل التنظيمي
+k437	app/views/homepage/organization_structure.php:101	لا توجد معلومات عن الهيكل التنظيمي حالياً
+k438	app/views/homepage/organization_structure.php:102	سيتم إضافة المعلومات قريباً
+k439	app/views/news/news_detail.php:20	تاريخ النشر:
+k440	app/views/news/news_detail.php:25	المشاهدات:
+k441	app/views/news/news_detail.php:32	الكاتب:
+k442	app/views/news/news_detail.php:49	ملخص:
+k443	app/views/news/news_detail.php:63	صور إضافية
+k444	app/views/news/news_detail.php:85	شارك الخبر:
+k445	app/views/news/news_detail.php:110	أخبار ذات صلة
+k446	app/views/news/news_detail.php:134	العودة لكل الأخبار
+k447	app/views/news/news_list.php:2	الأخبار - مديرية الخدمات الجامعية
+k448	app/views/news/news_list.php:12	جميع الأخبار
+k449	app/views/news/news_list.php:64	قراءة المزيد
+k450	app/views/news/news_list.php:73	لا توجد أخبار منشورة حالياً
+k451	app/views/notifications/notification_bar.php:33	إغلاق
+k452	app/views/search/search_results.php:240	البحث في الموقع
+k453	app/views/search/search_results.php:251	ابحث في الأخبار، الخدمات، الملفات، الأسئلة...
+k454	app/views/search/search_results.php:279	نتيجة للبحث عن:
+k455	app/views/search/search_results.php:284	الكلمات المفتاحية:
+k456	app/views/search/search_results.php:302	أخبار
+k457	app/views/search/search_results.php:308	خدمات
+k458	app/views/search/search_results.php:314	أسئلة
+k459	app/views/search/search_results.php:352	الخدمات
+k460	app/views/search/search_results.php:390	ملفات التحميل
+k461	app/views/search/search_results.php:438	كلمة
+k462	app/views/search/search_results.php:457	تاريخ
+k463	app/views/search/search_results.php:478	هيكل
+k464	app/views/search/search_results.php:494	إقامة
+k465	app/views/search/search_results.php:515	قسم
+k466	app/views/search/search_results.php:534	لم نجد أي نتائج لـ "{query}"
+k467	app/views/search/search_results.php:535	جرّب البحث بكلمات أخرى
+k468	app/views/search/search_results.php:538	اقتراحات:
+k469	app/views/search/search_results.php:540	تحقق من الإملاء
+k470	app/views/search/search_results.php:541	استخدم كلمات أقل
+k471	app/views/search/search_results.php:542	جرب كلمات مرادفة
+k472	app/views/search/search_results.php:545	روابط سريعة:
+k473	app/views/search/search_results.php:560	ابدأ البحث في الموقع
+k474	app/views/search/search_results.php:561	اكتب ما تبحث عنه في الأعلى
+k475	app/views/search/search_results.php:564	أمثلة على البحث:
+k476	app/views/search/search_results.php:566	منحة
+k477	app/views/search/search_results.php:566	- للبحث عن معلومات المنح
+k478	app/views/search/search_results.php:567	سكن
+k479	app/views/search/search_results.php:567	- للبحث عن الإقامات الجامعية
+k480	app/views/search/search_results.php:568	نقل
+k481	app/views/search/search_results.php:568	- للبحث عن النقل الجامعي
+k482	app/views/search/search_results.php:569	نموذج
+k483	app/views/search/search_results.php:569	- للبحث في الملفات والوثائق
+k484	app/views/services/service_by_type.php:74	لا توجد خدمات في هذا القسم حالياً
+k485	app/views/services/service_by_type.php:77	العودة لكل الخدمات
+k486	app/views/services/service_card.php:30	التفاصيل الكاملة
+k487	app/views/services/service_detail.php:154	نبذة عن الخدمة
+k488	app/views/services/service_detail.php:161	الشروط والمتطلبات
+k489	app/views/services/service_detail.php:169	كيفية التقديم
+k490	app/views/services/service_detail.php:189	معلومات عامة
+k491	app/views/services/service_detail.php:204	خدمات ذات صلة
+k492	app/views/services/service_detail.php:225	العودة لقائمة الخدمات
+k493	app/views/services/service_list.php:139	نوفر لكم مجموعة شاملة من الخدمات لتسهيل حياتكم الجامعية
+k494	app/views/services/service_list.php:155	كل الخدمات
+k495	app/views/services/service_list.php:201	لا توجد خدمات حالياً
+k496	app/views/services/service_list.php:202	يتم العمل على إضافة الخدمات قريباً
+k497	app/views/services/service_list.php:220	لا توجد خدمات نقل حالياً
+k498	app/views/services/service_list.php:238	لا توجد خدمات إيواء حالياً
+k499	app/views/services/service_list.php:256	لا توجد خدمات إطعام حالياً
+k500	app/views/services/service_list.php:274	لا توجد معلومات عن المنح حالياً
+k501	app/views/students/admin/application_detail.php:177	مراجعة الطلب
+k502	app/views/students/admin/application_detail.php:180	رقم الطلب:
+k503	app/views/students/admin/application_detail.php:208	إجراءات سريعة
+k504	app/views/students/admin/application_detail.php:230	هل أنت متأكد من اعتماد هذا الطلب؟
+k505	app/views/students/admin/application_detail.php:231	اعتماد الطلب
+k506	app/views/students/admin/application_detail.php:245	رفض الطلب
+k507	app/views/students/admin/application_detail.php:264	معلومات الطلب
+k508	app/views/students/admin/application_detail.php:319	معلومات الطالب
+k509	app/views/students/admin/application_detail.php:399	الوثائق المرفقة
+k510	app/views/students/admin/application_detail.php:425	معاينة
+k511	app/views/students/admin/application_detail.php:434	لا توجد وثائق مرفقة
+k512	app/views/students/admin/application_detail.php:444	ملاحظات الإدارة
+k513	app/views/students/admin/application_detail.php:462	تغيير الحالة
+k514	app/views/students/admin/application_detail.php:489	اعتماد هذا الطلب؟
+k515	app/views/students/admin/application_detail.php:490	اعتماد
+k516	app/views/students/admin/application_detail.php:498	رفض
+k517	app/views/students/admin/application_detail.php:509	العودة للقائمة
+k518	app/views/students/admin/application_detail.php:515	طباعة
+k519	app/views/students/admin/application_detail.php:552	هل أنت متأكد من رفض هذا الطلب؟
+k520	app/views/students/admin/application_detail.php:556	سبب الرفض
+k521	app/views/students/admin/application_detail.php:560	اكتب سبب رفض الطلب ليتمكن الطالب من معرفته...
+k522	app/views/students/admin/application_detail.php:573	ملاحظة:
+k523	app/views/students/admin/application_detail.php:574	سيتم إرسال إشعار تلقائي للطالب مع سبب الرفض.
+k524	app/views/students/admin/application_detail.php:584	تأكيد الرفض
+k525	app/views/students/admin/applications_list.php:167	عرض وإدارة كل طلبات الطلبة
+k526	app/views/students/admin/applications_list.php:184	تصفية وبحث
+k527	app/views/students/admin/applications_list.php:188	الحالة:
+k528	app/views/students/admin/applications_list.php:223	بحث:
+k529	app/views/students/admin/applications_list.php:227	رقم الطلب أو اسم الطالب
+k530	app/views/students/admin/applications_list.php:237	إعادة تعيين
+k531	app/views/students/admin/applications_list.php:256	تم تحديد
+k532	app/views/students/admin/applications_list.php:256	طلب
+k533	app/views/students/admin/applications_list.php:262	-- اختر الإجراء --
+k534	app/views/students/admin/applications_list.php:263	✅ اعتماد الكل
+k535	app/views/students/admin/applications_list.php:264	❌ رفض الكل
+k536	app/views/students/admin/applications_list.php:265	📝 قيد المراجعة
+k537	app/views/students/admin/applications_list.php:266	⏳ قيد الانتظار
+k538	app/views/students/admin/applications_list.php:267	🗑️ حذف
+k539	app/views/students/admin/applications_list.php:273	تطبيق
+k540	app/views/students/admin/applications_list.php:277	إلغاء التحديد
+k541	app/views/students/admin/applications_list.php:289	قائمة الطلبات
+k542	app/views/students/admin/applications_list.php:291	طلب)
+k543	app/views/students/admin/applications_list.php:304	تصدير إلى Excel
+k544	app/views/students/admin/applications_list.php:305	تصدير Excel
+k545	app/views/students/admin/applications_list.php:309	العودة
+k546	app/views/students/admin/applications_list.php:322	تحديد الكل
+k547	app/views/students/admin/applications_list.php:325	الطالب
+k548	app/views/students/admin/applications_list.php:329	التاريخ
+k549	app/views/students/admin/applications_list.php:330	الإجراءات
+k550	app/views/students/admin/applications_list.php:390	مراجعة
+k551	app/views/students/admin/applications_list.php:402	عرض
+k552	app/views/students/admin/applications_list.php:402	طلب من أصل
+k553	app/views/students/admin/applications_list.php:409	لا توجد طلبات
+k554	app/views/students/admin/applications_list.php:410	لا توجد طلبات تطابق معايير البحث
+k555	app/views/students/admin/applications_list.php:412	عرض كل الطلبات
+k556	app/views/students/admin/applications_list.php:514	يرجى اختيار إجراء!
+k557	app/views/students/admin/applications_list.php:520	يرجى تحديد طلب واحد على الأقل!
+k558	app/views/students/admin/applications_list.php:528	هل أنت متأكد من اعتماد {count} طلب؟
+k559	app/views/students/admin/applications_list.php:530	هل أنت متأكد من رفض {count} طلب؟\n\nملاحظة: يمكنك إضافة سبب الرفض في الخطوة التالية.
+k560	app/views/students/admin/applications_list.php:532	⚠️ تحذير!\n\nهل أنت متأكد من حذف {count} طلب نهائياً؟\n\nلا يمكن التراجع عن هذا الإجراء!
+k561	app/views/students/admin/applications_list.php:534	هل أنت متأكد من تطبيق هذا الإجراء على {count} طلب؟
+k562	app/views/students/admin/applications_list.php:544	أدخل سبب الرفض (اختياري):
+k563	app/views/students/admin/dashboard.php:144	مرحباً
+k564	app/views/students/admin/dashboard.php:186	إجمالي الطلبات
+k565	app/views/students/admin/dashboard.php:213	معتمدة
+k566	app/views/students/admin/dashboard.php:222	مرفوضة
+k567	app/views/students/admin/dashboard.php:232	طلبات اليوم
+k568	app/views/students/admin/dashboard.php:238	طلبات الأسبوع
+k569	app/views/students/admin/dashboard.php:244	طلبات الشهر
+k570	app/views/students/admin/dashboard.php:259	آخر الطلبات المقدمة
+k571	app/views/students/admin/dashboard.php:304	لا توجد طلبات بعد
+k572	app/views/students/admin/dashboard.php:324	الرسوم البيانية
+k573	app/views/students/admin/dashboard.php:336	توزيع الطلبات حسب الحالة
+k574	app/views/students/admin/dashboard.php:348	عدد الطلبات حسب النوع
+k575	app/views/students/admin/dashboard.php:362	الطلبات المقدمة خلال آخر 7 أيام
+k576	app/views/students/admin/dashboard.php:393	عدد الطلبات
+k577	app/views/students/admin/dashboard.php:477	العدد: 
+k578	app/views/students/admin/dashboard.php:477	 طلب
+k579	app/views/students/admin/dashboard.php:541	عدد الطلبات: 
+k580	app/views/students/application_detail.php:223	تاريخ الطباعة: 
+k581	app/views/students/application_detail.php:406	هل أنت متأكد من إلغاء هذا الطلب؟
+k582	app/views/students/application_detail.php:409	إلغاء الطلب
+k583	app/views/students/application_print.php:6	طباعة الطلب -
+k584	app/views/students/application_print.php:241	🏛️ مديرية الخدمات الجامعية لولاية سطيف
+k585	app/views/students/application_print.php:242	استمارة طلب -
+k586	app/views/students/application_print.php:255	📋 معلومات الطلب
+k587	app/views/students/application_print.php:285	تمت المراجعة بواسطة
+k588	app/views/students/application_print.php:294	👤 معلومات الطالب
+k589	app/views/students/application_print.php:326	📝 تفاصيل الطلب
+k590	app/views/students/application_print.php:336	📎 الوثائق المرفقة
+k591	app/views/students/application_print.php:342	📅 تاريخ الرفع:
+k592	app/views/students/application_print.php:353	⚠️ ملاحظات الإدارة
+k593	app/views/students/application_print.php:363	توقيع الطالب
+k594	app/views/students/application_print.php:367	توقيع المسؤول
+k595	app/views/students/application_print.php:375	www.dsu-setif.dz | الهاتف: 036 XX XX XX
+k596	app/views/students/application_print.php:376	تاريخ الطباعة: ...
+k597	app/views/students/application_print.php:381	🖨️ طباعة الطلب
+k598	app/views/students/create_application.php:140	اختر نوع الطلب وأرفق الوثائق المطلوبة
+k599	app/views/students/create_application.php:165	اختر نوع الطلب
+k600	app/views/students/create_application.php:173	الوثائق المطلوبة لهذا الطلب:
+k601	app/views/students/create_application.php:181	تفاصيل الطلب (اختياري)
+k602	app/views/students/create_application.php:184	أضف تفاصيل أو ملاحظات إضافية
+k603	app/views/students/create_application.php:192	رفع الوثائق
+k604	app/views/students/create_application.php:197	أرفق الوثائق المطلوبة (PDF, JPG, PNG)
+k605	app/views/students/create_application.php:200	إضافة وثيقة
+k606	app/views/students/create_application.php:210	تقديم الطلب
+k607	app/views/students/create_application.php:291	اسم الوثيقة
+k608	app/views/students/create_application.php:325	يرجى اختيار نوع الطلب
+k609	app/views/students/dashboard.php:239	مرحباً،
+k610	app/views/students/dashboard.php:241	رقم التسجيل:
+k611	app/views/students/dashboard.php:251	إحصائيات الطلبات
+k612	app/views/students/dashboard.php:290	الخيارات السريعة
+k613	app/views/students/dashboard.php:324	آخر الطلبات
+k614	app/views/students/dashboard.php:352	لم تقدم أي طلبات بعد
+k615	app/views/students/dashboard.php:354	قدّم طلبك الأول
+k616	app/views/students/dashboard.php:388	لا توجد إشعارات جديدة
+k617	app/views/students/dashboard.php:398	الطلبات المتاحة
+k618	app/views/students/login.php:117	سجّل دخولك للوصول إلى لوحة التحكم
+k619	app/views/students/login.php:167	نسيت كلمة المرور؟
+k620	app/views/students/login.php:175	ليس لديك حساب؟
+k621	app/views/students/login.php:179	سجّل الآن مجاناً
+k622	app/views/students/my_applications.php:176	عرض وإدارة كل الطلبات المقدمة
+k623	app/views/students/my_applications.php:224	تصفية الطلبات
+k624	app/views/students/my_applications.php:297	تاريخ التقديم:
+k625	app/views/students/my_applications.php:299	تاريخ المراجعة:
+k626	app/views/students/my_applications.php:311	طباعة الطلب
+k627	app/views/students/my_applications.php:318	تحميل PDF
+k628	app/views/students/notifications_list.php:134	تتبع كل الإشعارات والتحديثات الخاصة بك
+k629	app/views/students/notifications_list.php:160	غير مقروء
+k630	app/views/students/notifications_list.php:164	مقروء
+k631	app/views/students/notifications_list.php:171	تمييز الكل كمقروء
+k632	app/views/students/notifications_list.php:177	حذف المقروءة
+k633	app/views/students/notifications_list.php:209	- قُرئ في
+k634	app/views/students/notifications_list.php:225	تمييز كمقروء
+k635	app/views/students/notifications_list.php:233	حذف
+k636	app/views/students/notifications_list.php:245	لا توجد إشعارات غير مقروءة
+k637	app/views/students/notifications_list.php:245	لا توجد إشعارات مقروءة
+k638	app/views/students/notifications_list.php:245	لم تستلم أي إشعارات بعد
+k639	app/views/students/notifications_list.php:247	العودة للوحة التحكم
+k640	app/views/students/notifications_list.php:289	حدث خطأ: 
+k641	app/views/students/notifications_list.php:294	حدث خطأ في الاتصال
+k642	app/views/students/notifications_list.php:305	هل تريد تمييز كل الإشعارات كمقروءة؟
+k643	app/views/students/notifications_list.php:338	هل تريد حذف هذا الإشعار؟
+k644	app/views/students/notifications_list.php:382	هل تريد حذف كل الإشعارات المقروءة؟
+k645	app/views/students/print_all.php:6	طباعة كل الطلبات -
+k646	app/views/students/print_all.php:287	ملف الطلبات الكامل
+k647	app/views/students/print_all.php:292	اسم الطالب:
+k648	app/views/students/print_all.php:300	الكلية:
+k649	app/views/students/print_all.php:304	القسم:
+k650	app/views/students/print_all.php:308	عدد الطلبات:
+k651	app/views/students/print_all.php:312	تاريخ الطباعة:
+k652	app/views/students/print_all.php:319	يحتوي هذا الملف على تفاصيل كاملة لجميع الطلبات المقدمة
+k653	app/views/students/print_all.php:465	الطلب
+k654	app/views/students/print_all.php:479	🖨️ طباعة الملف الكامل ({count} طلب)
+k655	app/views/students/profile/change_password.php:68	معلوماتي
+k656	app/views/students/profile/change_password.php:80	تأمين حسابك
+k657	app/views/students/profile/change_password.php:84	متطلبات كلمة المرور:
+k658	app/views/students/profile/change_password.php:87	لا تستخدم معلومات شخصية واضحة
+k659	app/views/students/profile/change_password.php:88	استخدم مزيج من الأحرف والأرقام
+k660	app/views/students/profile/edit.php:73	تعديل معلوماتي الشخصية
+k661	app/views/students/profile/edit.php:84	تعديل المعلومات
+k662	app/views/students/profile/edit.php:102	الصورة الحالية
+k663	app/views/students/profile/edit.php:105	حذف الصورة
+k664	app/views/students/profile/edit.php:111	لا توجد صورة شخصية
+k665	app/views/students/profile/edit.php:116	رفع صورة جديدة:
+k666	app/views/students/profile/edit.php:118	الصيغ المدعومة: JPG, PNG (الحد الأقصى: 2MB)
+k667	app/views/students/profile/edit.php:125	المعلومات الشخصية
+k668	app/views/students/profile/edit.php:131	الاسم الكامل بالعربية:
+k669	app/views/students/profile/edit.php:138	تاريخ الميلاد:
+k670	app/views/students/profile/edit.php:145	مكان الميلاد:
+k671	app/views/students/profile/edit.php:152	الجنس:
+k672	app/views/students/profile/edit.php:168	رقم الهاتف:
+k673	app/views/students/profile/edit.php:189	الولاية:
+k674	app/views/students/profile/edit.php:199	المعلومات الأكاديمية
+k675	app/views/students/profile/edit.php:212	القسم/التخصص:
+k676	app/views/students/profile/edit.php:219	السنة الدراسية:
+k677	app/views/students/profile/edit.php:229	حفظ التعديلات
+k678	app/views/students/profile/edit.php:253	هل أنت متأكد من حذف الصورة الشخصية؟
+k679	app/views/students/profile/edit.php:271	خطأ: 
+k680	app/views/students/profile/student_card.php:265	بطاقة طالب - Student Card
+k681	app/views/students/profile/student_card.php:312	السنة:
+k682	app/views/students/profile/student_card.php:322	صالحة حتى:
+k683	app/views/students/profile/student_card.php:333	مديرية الخدمات الجامعية - ولاية سطيف | www.dsu-setif.dz
+k684	app/views/students/profile/student_card.php:341	طباعة البطاقة
+k685	app/views/students/profile/student_card.php:345	رجوع للوحة التحكم
+k686	app/views/students/profile/student_card.php:349	نصائح للطباعة:
+k687	app/views/students/profile/student_card.php:351	استخدم ورق مقوى (Cardstock) للحصول على بطاقة متينة
+k688	app/views/students/profile/student_card.php:352	تأكد من تفعيل خيار "طباعة الخلفيات" في إعدادات الطباعة
+k689	app/views/students/profile/student_card.php:353	القياس: 8.5 سم × 5.3 سم (حجم بطاقة ائتمانية)
+k690	app/views/students/profile/student_card.php:354	يمكنك حفظها كـ PDF من خيارات الطباعة
+k691	app/views/students/profile/student_card.php:355	الباركود يحتوي على رقم التسجيل للمسح السريع
+k692	app/views/students/profile/view.php:154	طلبات معتمدة
+k693	app/views/students/profile/view.php:160	طلبات معلقة
+k694	app/views/students/profile/view.php:173	الاسم الكامل:
+k695	app/views/students/profile/view.php:207	غير محدد
+k696	app/views/students/profile/view.php:246	تاريخ التسجيل:
+k697	app/views/students/register.php:103	أنشئ حسابك للاستفادة من الخدمات الجامعية
+k698	app/views/students/register.php:124	معلومات الحساب
+k699	app/views/students/register.php:261	إنشاء الحساب
+k700	app/views/students/register.php:267	لديك حساب بالفعل؟
+k701	app/views/students/register.php:269	سجّل الدخول من هنا
+k702	app/views/students/register.php:294	خطأ!
+k703	app/views/students/register.php:296	نجاح!
+k704	app/views/students/register.php:298	تحذير!
+k705	app/views/students/register.php:300	معلومة!
+k706	app/views/students/register.php:315	أخطاء في النموذج:
+k707	index.php:38	انتهت صلاحية الجلسة. أعد تحميل الصفحة.
