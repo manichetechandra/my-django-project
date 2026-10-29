@@ -154,11 +154,11 @@ const shots = SET === 'stages' ? stageShots : [
     },
   },
   { name: '34-detail', url: '/students/admin/applications/{id:202600009}/', login: STAFF, h: 1250 },
-  { name: '25-index', url: '/admin/', login: STAFF, h: 900 },
-  { name: '25-list', url: '/admin/news/', login: STAFF, h: 760 },
-  { name: '25-edit', url: '/admin/sliders/1/', login: STAFF, h: 940 },
-  { name: '25-app-edit', url: '/admin/student_applications/{id:202600007}/', login: STAFF, h: 1180 },
-  { name: '25-applications', url: '/admin/student_applications/', login: STAFF, h: 820 },
+  { name: '37-index', url: '/admin/', login: STAFF, h: 900 },
+  { name: '37-list', url: '/admin/news/', login: STAFF, h: 760 },
+  { name: '37-edit', url: '/admin/sliders/1/', login: STAFF, h: 940 },
+  { name: '37-app-edit', url: '/admin/student_applications/{id:202600007}/', login: STAFF, h: 1420 },
+  { name: '37-applications', url: '/admin/student_applications/', login: STAFF, h: 820 },
 ];
 
 async function login(page, [user, pass]) {
