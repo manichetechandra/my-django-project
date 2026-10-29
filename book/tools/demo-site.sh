@@ -7,8 +7,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 SITE=${1:-/tmp/site}
-rm -rf "$SITE"
+# نفرّغ المجلد دون حذفه، حتى يبقى خادم php -S الذي يعمل فيه صالحاً
 mkdir -p "$SITE"
+find "$SITE" -mindepth 1 -delete
 SRC=${SRC_DIR:-$(node tools/project.mjs)}
 cp -r "$SRC/." "$SITE/"
 rm -rf "$SITE/storage/sessions/"*

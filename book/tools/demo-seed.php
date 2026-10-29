@@ -2,7 +2,7 @@
 /**
  * بيانات تجريبية كاملة للقطات شاشة الكتاب (ليست جزءاً من الموقع).
  *   php demo-seed.php /tmp/site
- * 1) تعيد إنشاء قاعدة dou_setif من database/schema.sql في مجلد الموقع المعطى
+ * 1) تعيد إنشاء قاعدة dou_setif (أو DB_NAME من البيئة) من database/schema.sql في مجلد الموقع المعطى
  * 2) تنفّذ book/demo/demo-content.sql (محتوى الموقع العام: نفس بيانات الفصل 14 + بقية الجداول)
  * 3) تضيف الحسابات: المدير miloudsellam / AdminDemo2026، الموظف hicham41 / StaffDemo2026،
  *    والطلبة (كلمة المرور Talib2026x) مع طلبات بحالات مختلفة وإشعارات
@@ -14,9 +14,10 @@ $site = rtrim($argv[1] ?? '/tmp/site', '/');
 $book = realpath(__DIR__ . '/..');
 $m = new mysqli('127.0.0.1', 'root', '', '', 3306);
 $m->set_charset('utf8mb4');
-$m->query('DROP DATABASE IF EXISTS dou_setif');
-$m->query('CREATE DATABASE dou_setif CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
-$m->select_db('dou_setif');
+$db = getenv('DB_NAME') ?: 'dou_setif';
+$m->query("DROP DATABASE IF EXISTS `$db`");
+$m->query("CREATE DATABASE `$db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+$m->select_db($db);
 foreach (["$site/database/schema.sql", "$book/demo/demo-content.sql"] as $f) {
     $m->multi_query(file_get_contents($f));
     do {
@@ -122,4 +123,4 @@ foreach (['202600007', '202600009'] as $num) {
 
 $t = array_map(fn($r) => $r[0], $m->query('SHOW TABLES')->fetch_all());
 $n = $m->query('SELECT COUNT(*) FROM student_applications')->fetch_row()[0];
-echo 'dou_setif: ', count($t), " جدول، $n طلب\n";
+echo "$db: ", count($t), " جدول، $n طلب\n";
