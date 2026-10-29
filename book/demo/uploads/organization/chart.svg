@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="1000" height="480" font-family="Tahoma, Arial">
+  <rect width="1000" height="480" fill="#ffffff"/>
+  <g stroke="#2c3e50" stroke-width="3" fill="none">
+    <path d="M500 120 V200 M140 200 H860 M140 200 V250 M380 200 V250 M620 200 V250 M860 200 V250"/>
+    <path d="M370 80 H250"/>
+    <path d="M140 330 V380 M860 330 V380"/>
+  </g>
+  <g text-anchor="middle">
+    <rect x="370" y="40" width="260" height="80" rx="12" fill="#2c3e50"/>
+    <text x="500" y="90" font-size="26" font-weight="bold" fill="#fff">المدير</text>
+    <rect x="50" y="45" width="200" height="70" rx="12" fill="#ecf0f1" stroke="#95a5a6"/>
+    <text x="150" y="88" font-size="19" fill="#2c3e50">الأمانة العامة</text>
+    <rect x="40" y="250" width="200" height="80" rx="12" fill="#8cc040"/>
+    <text x="140" y="298" font-size="22" font-weight="bold" fill="#fff">مصلحة المنح</text>
+    <rect x="280" y="250" width="200" height="80" rx="12" fill="#8cc040"/>
+    <text x="380" y="298" font-size="22" font-weight="bold" fill="#fff">مصلحة الإيواء</text>
+    <rect x="520" y="250" width="200" height="80" rx="12" fill="#8cc040"/>
+    <text x="620" y="298" font-size="22" font-weight="bold" fill="#fff">مصلحة الإطعام</text>
+    <rect x="760" y="250" width="200" height="80" rx="12" fill="#8cc040"/>
+    <text x="860" y="298" font-size="22" font-weight="bold" fill="#fff">مصلحة النقل</text>
+    <rect x="40" y="380" width="200" height="70" rx="12" fill="#ecf0f1" stroke="#95a5a6"/>
+    <text x="140" y="423" font-size="19" fill="#2c3e50">مكتب الطعون</text>
+    <rect x="760" y="380" width="200" height="70" rx="12" fill="#ecf0f1" stroke="#95a5a6"/>
+    <text x="860" y="423" font-size="19" fill="#2c3e50">مكتب الحافلات</text>
+  </g>
+</svg>
