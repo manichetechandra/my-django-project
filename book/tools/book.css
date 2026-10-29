@@ -146,6 +146,20 @@ th code { background: rgba(255,255,255,.15); color: #fff; }
 .code-head .badge.new { background: var(--accent); color: #17320a; font-weight: 700; }
 .code-head .badge.cont { background: #f0b429; color: #3d2b00; font-weight: 700; }
 .code-head .badge.ex { background: #9fb3c8; color: #102a43; font-weight: 700; }
+.code-head .badge.ins { background: #f7c873; color: #3d2b00; font-weight: 700; }
+.code-head .badge.tmp { background: #ff9f68; color: #3a1300; font-weight: 700; }
+.code-head .badge.fin { background: var(--accent); color: #17320a; font-weight: 700; }
+.code-head .badge.mv { background: #b9c7d6; color: #102a43; font-weight: 700; }
+/* كتلة كود مؤقتة (ستتغير لاحقاً): رأس برتقالي داكن */
+.code:has(.badge.tmp) .code-head { background: #7a3e1d; }
+/* الكود المنقول: صندوق مختصر بدل إعادة الكود */
+.code.moved { background: #f4f7fa; border-style: dashed; break-inside: avoid; }
+.code.moved .code-head { background: #5b6b7b; }
+.moved-body { padding: 2mm 3.5mm 2.2mm; direction: rtl; text-align: right; font-family: 'Noto Naskh Arabic', sans-serif; font-size: 9.6pt; line-height: 1.7; color: #243b53; }
+.moved-edges { display: flex; flex-direction: column; gap: .6mm; margin-top: 1.4mm; direction: ltr; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 7.6pt; color: #52606d; }
+.moved-edges .edge b { display: inline-block; min-width: 8mm; color: #9aa5b1; font-weight: 400; }
+.moved-edges code { background: none; color: #24292e; padding: 0; font-size: 7.6pt; white-space: pre; }
+.moved-edges .dots { padding-left: 8mm; color: #9aa5b1; line-height: .8; }
 .code-head .range { background: rgba(255,255,255,.14); }
 .code-body { padding: 1.6mm 0; }
 .code .l { display: flex; break-inside: avoid; }

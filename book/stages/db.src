@@ -1,0 +1,13 @@
+@@file database/schema.sql 14
+@@block s-head 14 from=database/schema.sql:1-43
+@@end
+@@block s-users-home 14 from=database/schema.sql:44-88
+@@end
+@@block s-news 14 from=database/schema.sql:126-150
+@@end
+@@block s-activities 14 from=database/schema.sql:174-199
+@@end
+@@block s-cites 14 from=database/schema.sql:212-232
+@@end
+@@block s-departements 14 from=database/schema.sql:245-266
+@@end

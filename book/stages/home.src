@@ -1,0 +1,1304 @@
+@@file index.html 2
+@@file index.php 10
+@@block php-top 10 until=11
+<?php
+// متغيرات الصفحة: نكتب القيمة مرة واحدة ونستعملها في أكثر من مكان
+$site_name  = 'مديرية الخدمات الجامعية سطيف';
+$page_title = 'الصفحة الرئيسية';
+?>
+@@end
+@@block php-open 11
+<?php
+// =============================================================
+//  بيانات الصفحة الرئيسية
+// =============================================================
+$site_name  = 'مديرية الخدمات الجامعية سطيف';
+$page_title = 'الصفحة الرئيسية';
+
+@@end
+@@block php-arrays 11
+// صور السلايدر
+$slider_images = [
+    ['title' => 'مرحباً بكم في مديرية الخدمات الجامعية سطيف', 'subtitle' => 'في خدمة الطالب: الإيواء، الإطعام، النقل والمنح', 'image' => 'slider/slide-1.jpg'],
+    ['title' => 'انطلاق التسجيلات في الإقامات الجامعية', 'subtitle' => 'الموسم الجامعي 2026/2027 — قدّم طلبك من فضاء الطالب', 'image' => 'slider/slide-2.jpg'],
+    ['title' => 'مطاعم جامعية بوجبات متوازنة', 'subtitle' => 'ثلاث وجبات يومياً بأسعار رمزية', 'image' => 'slider/slide-3.jpg'],
+];
+
+// كل الأخبار (من الأحدث إلى الأقدم)
+$latest_news = [
+    [
+        'title'          => 'صرف الشطر الأول من المنحة الجامعية',
+        'slug'           => 'sarf-al-minha',
+        'main_image'     => 'news/main/bourse.jpg',
+        'published_date' => '2026-10-12 09:00:00',
+        'views_count'    => 512,
+        'show_in_ticker' => 1,
+    ],
+    [
+        'title'          => 'تدشين مكتبة جديدة بالإقامة الجامعية دباغين',
+        'slug'           => 'maktaba-jadida',
+        'main_image'     => 'news/main/bibliotheque.jpg',
+        'published_date' => '2026-10-05 10:30:00',
+        'views_count'    => 130,
+        'show_in_ticker' => 0,
+    ],
+    [
+        'title'          => 'تعزيز خطوط النقل الجامعي نحو القطب الجامعي الباز',
+        'slug'           => 'naql-jamii',
+        'main_image'     => 'news/main/transport.jpg',
+        'published_date' => '2026-09-20 08:00:00',
+        'views_count'    => 98,
+        'show_in_ticker' => 0,
+    ],
+    [
+        'title'          => 'قائمة الوجبات الأسبوعية في المطاعم الجامعية',
+        'slug'           => 'qaimat-al-wajabat',
+        'main_image'     => 'news/main/menu.jpg',
+        'published_date' => '2026-09-15 12:00:00',
+        'views_count'    => 76,
+        'show_in_ticker' => 0,
+    ],
+    [
+        'title'          => 'انطلاق التسجيلات في الإقامات الجامعية للموسم 2026/2027',
+        'slug'           => 'tasjilat-al-iqamat',
+        'main_image'     => 'news/main/inscription.jpg',
+        'published_date' => '2026-09-01 08:30:00',
+        'views_count'    => 245,
+        'show_in_ticker' => 1,
+    ],
+];
+
+// أخبار الشريط المتحرك: الأخبار التي قيمة show_in_ticker فيها 1
+$ticker_news = [];
+foreach ($latest_news as $news) {
+    if ($news['show_in_ticker'] == 1) {
+        $ticker_news[] = $news;
+    }
+}
+
+// النشاطات المميزة
+$featured_activities = [
+    [
+        'title'              => 'دورة كرة القدم بين الإقامات الجامعية',
+        'slug'               => 'dawrat-korat-al-qadam',
+        'activity_type'      => 'sport',
+        'short_description'  => 'دورة رياضية تجمع فرق الإقامات الجامعية لولاية سطيف في أجواء أخوية بمشاركة أكثر من عشرين فريقاً.',
+        'main_image'         => 'activities/main/football.jpg',
+        'date'               => '2026-10-20',
+        'location'           => 'الملعب الجامعي الباز',
+        'participants_count' => 240,
+    ],
+    [
+        'title'              => 'أمسية شعرية بمناسبة يوم الطالب',
+        'slug'               => 'umsiya-shiriya',
+        'activity_type'      => 'culture',
+        'short_description'  => 'أمسية أدبية يلقي فيها الطلبة قصائدهم ويتنافسون على جائزة أفضل قصيدة.',
+        'main_image'         => 'activities/main/poesie.jpg',
+        'date'               => '2026-10-02',
+        'location'           => 'قاعة المحاضرات، إقامة دباغين',
+        'participants_count' => 150,
+    ],
+    [
+        'title'              => 'معرض الكتاب الجامعي',
+        'slug'               => 'maarad-al-kitab',
+        'activity_type'      => 'scientific',
+        'short_description'  => 'معرض يضم آلاف العناوين في مختلف التخصصات بأسعار مخفضة للطلبة.',
+        'main_image'         => 'activities/main/salon-livre.jpg',
+        'date'               => '2026-09-28',
+        'location'           => 'المكتبة المركزية',
+        'participants_count' => 400,
+    ],
+];
+
+// أقسام المديرية
+$departements_list = [
+    ['name' => 'مصلحة المنح', 'slug' => 'maslahat-al-minah',
+     'description' => 'تتكفل بدراسة ملفات المنحة الجامعية وصرفها للطلبة المستحقين، ومتابعة الطعون والتحويلات بين الولايات.'],
+    ['name' => 'مصلحة الإيواء', 'slug' => 'maslahat-al-iwaa',
+     'description' => 'تنظم عملية الإيواء في الإقامات الجامعية: التسجيل، توزيع الغرف، ومتابعة ظروف الإقامة.'],
+    ['name' => 'مصلحة الإطعام', 'slug' => 'maslahat-al-itaam',
+     'description' => 'تشرف على المطاعم الجامعية وتسهر على جودة الوجبات المقدمة وتوازنها الغذائي.'],
+    ['name' => 'مصلحة النقل', 'slug' => 'maslahat-al-naql',
+     'description' => 'تسيّر خطوط النقل الجامعي التي تربط الأحياء والإقامات بالأقطاب الجامعية.'],
+];
+
+// الإقامات الجامعية
+$cites_list = [
+    ['name' => 'دباغين', 'slug' => 'debaghine', 'main_image' => 'cites/main/debaghine.jpg', 'phone' => '036 00 00 01', 'address' => 'القطب الجامعي الباز، سطيف'],
+    ['name' => 'هاشمي حسين', 'slug' => 'hachemi-hocine', 'main_image' => 'cites/main/hachemi-hocine.jpg', 'phone' => '036 00 00 02', 'address' => 'حي الهضاب، سطيف'],
+    ['name' => 'بوخريصة', 'slug' => 'boukhrissa', 'main_image' => 'cites/main/boukhrissa.jpg', 'phone' => '036 00 00 03', 'address' => 'طريق بجاية، سطيف'],
+    ['name' => 'روابح', 'slug' => 'rouabah', 'main_image' => 'cites/main/rouabah.jpg', 'phone' => '036 00 00 04', 'address' => 'حي 1014 مسكن، سطيف'],
+    ['name' => 'فضيلة', 'slug' => 'fadila', 'main_image' => 'cites/main/fadila.jpg', 'phone' => '036 00 00 05', 'address' => 'حي المعبودة، سطيف'],
+    ['name' => '19 ماي 1956', 'slug' => '19-mai-1956', 'main_image' => 'cites/main/19-mai-1956.jpg', 'phone' => '036 00 00 06', 'address' => 'القطب الجامعي الباز، سطيف'],
+    ['name' => '24 أفريل', 'slug' => '24-avril', 'main_image' => 'cites/main/24-avril.jpg', 'phone' => '036 00 00 07', 'address' => 'حي كعبوب، سطيف'],
+];
+
+// أرقام قسم الإحصائيات
+$site_stats = [
+    'total_visitors' => 15230,
+    'total_page_views' => 48975,
+    'total_news' => 5,
+    'total_services' => 12,
+    'total_downloads' => 8,
+    'total_faqs' => 15,
+    'total_cites' => 7,
+];
+@@end
+@@block php-db 15 replaces=php-arrays
+// ---------------------------------------------- الاتصال بقاعدة البيانات
+$config = require __DIR__ . '/config.php';
+$db = $config['db'];
+
+$pdo = new PDO(
+    "mysql:host={$db['host']};port={$db['port']};dbname={$db['name']};charset={$db['charset']}",
+    $db['user'],
+    $db['password'],
+    [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]
+);
+
+// ---------------------------------------------- جلب بيانات كل قسم
+$slider_images = $pdo->query(
+    "SELECT * FROM sliders WHERE is_active = 1 ORDER BY `order`, created_at DESC LIMIT 4"
+)->fetchAll();
+
+$ticker_news = $pdo->query(
+    "SELECT * FROM news WHERE status = 'published' AND show_in_ticker = 1 ORDER BY `order` LIMIT 2"
+)->fetchAll();
+
+$latest_news = $pdo->query(
+    "SELECT * FROM news WHERE status = 'published' ORDER BY published_date DESC LIMIT 5"
+)->fetchAll();
+
+$featured_activities = $pdo->query(
+    "SELECT * FROM activities WHERE is_active = 1 AND is_featured = 1 ORDER BY `date` DESC LIMIT 3"
+)->fetchAll();
+
+$departements_list = $pdo->query(
+    "SELECT * FROM departements WHERE is_active = 1 ORDER BY `order`, name LIMIT 4"
+)->fetchAll();
+
+$cites_list = $pdo->query(
+    "SELECT * FROM cites WHERE is_active = 1 ORDER BY `order`, name LIMIT 12"
+)->fetchAll();
+
+// أرقام الإحصائيات: نعدّ الأخبار والإقامات من قاعدة البيانات، والباقي مؤقتاً كما كان
+$site_stats = [
+    'total_visitors'   => 15230,
+    'total_page_views' => 48975,
+    'total_news'       => (int) $pdo->query("SELECT COUNT(*) FROM news WHERE status = 'published'")->fetchColumn(),
+    'total_services'   => 12,
+    'total_downloads'  => 8,
+    'total_faqs'       => 15,
+    'total_cites'      => (int) $pdo->query("SELECT COUNT(*) FROM cites WHERE is_active = 1")->fetchColumn(),
+];
+@@end
+@@block php-year 12
+
+// السنة الحالية: يستعملها التذييل (footer.php)
+$current_year = date('Y');
+@@end
+@@block php-func 11
+
+// أسماء أنواع النشاطات بالعربية
+$activity_types = [
+    'sport'      => 'رياضي',
+    'culture'    => 'ثقافي',
+    'scientific' => 'علمي',
+    'social'     => 'اجتماعي',
+    'artistic'   => 'فني',
+    'other'      => 'أخرى',
+];
+
+/** تهريب النص قبل طباعته داخل HTML (حماية من XSS) */
+function e($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
+?>
+@@end
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+@@block head-meta 3
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="مديرية الخدمات الجامعية سطيف, الخدمات الجامعية, الإقامات">
+    <meta name="description" content="الموقع الرسمي لمديرية الخدمات الجامعية سطيف">
+
+@@end
+@@block title 2
+    <title>الصفحة الرئيسية - مديرية الخدمات الجامعية سطيف</title>
+@@end
+@@block title-php 10 replaces=title
+    <title><?= $page_title ?> - <?= $site_name ?></title>
+@@end
+@@block favicon 2
+
+    <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
+@@end
+@@block css-links 3
+
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rtl@3.4.0/dist/css/bootstrap-rtl.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+@@end
+@@block base-css 3 from=app/views/base/base.php:21-218
+@@end
+@@block home-css-open 5 from=app/views/homepage/index.php:5-12
+@@end
+@@block home-css-news 6 from=app/views/homepage/index.php:13-65
+@@end
+@@block home-css-act 7 from=app/views/homepage/index.php:66-135
+@@end
+@@block home-css-depcite 8 from=app/views/homepage/index.php:136-215
+@@end
+@@block home-css-close 5 from=app/views/homepage/index.php:216-216
+@@end
+</head>
+<body>
+@@block hello 2 until=3
+    <h1>مديرية الخدمات الجامعية لولاية سطيف</h1>
+    <p>هذه أول صفحة في موقعنا. سنبنيها قطعة قطعة حتى تصبح الموقع كاملاً.</p>
+    <img src="assets/images/logo.svg" alt="شعار المديرية" width="120">
+@@end
+@@block hello-bs 3 until=4
+    <div class="container">
+        <div class="alert alert-success">
+            <i class="fa fa-check-circle"></i> مكتبتا Bootstrap و Font Awesome تعملان!
+        </div>
+        <div class="row">
+            <div class="col-md-4"><div class="well">العمود الأول</div></div>
+            <div class="col-md-4"><div class="well">العمود الثاني</div></div>
+            <div class="col-md-4"><div class="well">العمود الثالث</div></div>
+        </div>
+        <a href="#" class="btn btn-success"><i class="fa fa-home"></i> زر أخضر</a>
+        <a href="#" class="btn btn-default">زر عادي</a>
+    </div>
+@@end
+@@block inc-nav 12
+    <?php include __DIR__ . '/app/views/base/navbar.php'; ?>
+@@end
+@@block nav-html 4 file=app/views/base/navbar.php@12
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">مديرية الخدمات الجامعية لولاية سطيف</a>
+        </div>
+        
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="active">
+                    <a href="#">
+                        <i class="fa fa-home"></i> الرئيسية
+                    </a>
+                </li>
+                
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                        <i class="fa fa-building"></i> المديرية <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right" style="width: 300px; max-height: 450px; overflow-y: auto; left: auto; right: 0;">
+                        <li><a href="#">
+                            <i class="fa fa-quote-left"></i> كلمة المدير
+                        </a></li>
+                        <li><a href="#">
+                            <i class="fa fa-sitemap"></i> الهيكل التنظيمي
+                        </a></li>
+                        <li><a href="#">
+                            <i class="fa fa-history"></i> تاريخ المديرية
+                        </a></li>
+                    </ul>
+                </li>
+                
+                <li>
+                    <a href="#cite">
+                        <i class="fa fa-university"></i> الإقامات الجامعية
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://progres.mesrs.dz/webonou/" target="_blank" rel="noopener noreferrer">
+                        <i class="fa fa-external-link"></i> webonou
+                    </a>
+                </li>
+                
+                <li><a href="#"><i class="fa fa-newspaper-o"></i> الأخبار</a></li>
+                
+                <li>
+                    <a href="#">
+                        <i class="fa fa-trophy"></i> المسابقات
+                    </a>
+                </li>
+                
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-cogs"></i> الخدمات الجامعية <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><i class="fa fa-bus"></i> النقل</a></li>
+                        <li><a href="#"><i class="fa fa-bed"></i> الإيواء</a></li>
+                        <li><a href="#"><i class="fa fa-cutlery"></i> الإطعام</a></li>
+                        <li><a href="#"><i class="fa fa-money"></i> المنح</a></li>
+                    </ul>
+                </li>
+                
+                <li>
+                    <a href="#">
+                        <i class="fa fa-download"></i> التحميلات
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="#">
+                        <i class="fa fa-question-circle"></i> الأسئلة الشائعة
+                    </a>
+                </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-sign-in"></i> فضاء الطالب
+                        </a>
+                    </li>
+
+                <li>
+                    <a href="#">
+                        <i class="fa fa-envelope"></i> إتصل بنا
+                    </a>
+                </li>
+            </ul>
+            
+            <form class="navbar-form navbar-left" role="search" method="get" action="#">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="q" value="" placeholder="ابحث في الموقع..." style="width: 250px;">
+                </div>
+                <button type="submit" class="btn btn-default">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+@@end
+@@block nav-css 4 from=app/views/base/navbar.php:226-575 file=app/views/base/navbar.php@12
+@@end
+@@block slider 5
+
+<!-- السلايدر الرئيسي -->
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#myCarousel" data-slide-to="1"></li>
+        <li data-target="#myCarousel" data-slide-to="2"></li>
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+        <div class="item active">
+            <img src="uploads/slider/slide-1.jpg" alt="مرحباً بكم في مديرية الخدمات الجامعية سطيف">
+            <div class="carousel-caption">
+                <h3>مرحباً بكم في مديرية الخدمات الجامعية سطيف</h3>
+                <p>في خدمة الطالب: الإيواء، الإطعام، النقل والمنح</p>
+            </div>
+        </div>
+        <div class="item">
+            <img src="uploads/slider/slide-2.jpg" alt="انطلاق التسجيلات في الإقامات الجامعية">
+            <div class="carousel-caption">
+                <h3>انطلاق التسجيلات في الإقامات الجامعية</h3>
+                <p>الموسم الجامعي 2026/2027 — قدّم طلبك من فضاء الطالب</p>
+            </div>
+        </div>
+        <div class="item">
+            <img src="uploads/slider/slide-3.jpg" alt="مطاعم جامعية بوجبات متوازنة">
+            <div class="carousel-caption">
+                <h3>مطاعم جامعية بوجبات متوازنة</h3>
+                <p>ثلاث وجبات يومياً بأسعار رمزية</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+@@end
+@@block slider-php 11 replaces=slider
+
+<!-- السلايدر الرئيسي -->
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+        <?php foreach ($slider_images as $i => $slide): ?>
+            <li data-target="#myCarousel" data-slide-to="<?= $i ?>" <?php if ($i == 0): ?>class="active"<?php endif; ?>></li>
+        <?php endforeach; ?>
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+        <?php foreach ($slider_images as $i => $slide): ?>
+            <div class="item <?php if ($i == 0): ?>active<?php endif; ?>">
+                <img src="uploads/<?= e($slide['image']) ?>" alt="<?= e($slide['title']) ?>">
+                <div class="carousel-caption">
+                    <h3><?= e($slide['title']) ?></h3>
+                    <p><?= e($slide['subtitle']) ?></p>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- Controls -->
+    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+@@end
+@@block ticker 6
+<!-- شريط الأخبار المتحرك -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-1"></div>
+        <div class="col-lg-11">
+            <ul id="list-news">
+                <li class="blink_me">
+                    <a href="#" title="صرف الشطر الأول من المنحة الجامعية">
+                        <i class="fa fa-newspaper-o"></i> صرف الشطر الأول من المنحة الجامعية
+                    </a>
+                </li>
+                <span id="separation" style="line-height: 35px;"> | </span>
+                <li class="blink_me">
+                    <a href="#" title="انطلاق التسجيلات في الإقامات الجامعية للموسم 2026/2027">
+                        <i class="fa fa-newspaper-o"></i> انطلاق التسجيلات في الإقامات الجامعية للموسم 2026/2027
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@@end
+@@block ticker-php 11 replaces=ticker
+<!-- شريط الأخبار المتحرك -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-1"></div>
+        <div class="col-lg-11">
+            <ul id="list-news">
+                <?php foreach ($ticker_news as $i => $news): ?>
+                    <li class="blink_me">
+                        <a href="#" title="<?= e($news['title']) ?>">
+                            <i class="fa fa-newspaper-o"></i> <?= e($news['title']) ?>
+                        </a>
+                    </li>
+                    <?php if ($i < count($ticker_news) - 1): ?>
+                        <span id="separation" style="line-height: 35px;"> | </span>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@@end
+@@block news-head 6
+<!-- عنوان آخر الأخبار -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
+                <i class="fa fa-newspaper-o"></i> آخر الأخبـــار
+                <a href="#" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                    <i class="fa fa-arrow-left"></i> عرض الكل
+                </a>
+            </h3>
+        </div>
+    </div>
+</div>
+<br>
+
+@@end
+@@block news-box 6
+<!-- صندوق آخر الأخبار -->
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-list-alt"></span>
+            <b>أخر الأخبار</b>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul class="demo" id="latest-news-ticker">
+                        <li class="news-item">
+                            <table cellpadding="4" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 80px;">
+                                        <img src="uploads/news/main/bourse.jpg" width="60" class="img-circle" alt="صرف الشطر الأول من المنحة الجامعية"/>
+                                    </td>
+                                    <td>
+                                        <a href="#" style="text-decoration: none; color: #2c3e50;">
+                                            <h4 style="margin: 0;">صرف الشطر الأول من المنحة الجامعية</h4>
+                                            <small style="color: #999;">
+                                                <i class="fa fa-calendar"></i> 12/10/2026
+                                                &nbsp;&nbsp;
+                                                <i class="fa fa-eye"></i> 512
+                                            </small>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </li>
+                        <li class="news-item">
+                            <table cellpadding="4" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 80px;">
+                                        <img src="uploads/news/main/bibliotheque.jpg" width="60" class="img-circle" alt="تدشين مكتبة جديدة بالإقامة الجامعية دباغين"/>
+                                    </td>
+                                    <td>
+                                        <a href="#" style="text-decoration: none; color: #2c3e50;">
+                                            <h4 style="margin: 0;">تدشين مكتبة جديدة بالإقامة الجامعية دباغين</h4>
+                                            <small style="color: #999;">
+                                                <i class="fa fa-calendar"></i> 05/10/2026
+                                                &nbsp;&nbsp;
+                                                <i class="fa fa-eye"></i> 130
+                                            </small>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </li>
+                        <li class="news-item">
+                            <table cellpadding="4" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 80px;">
+                                        <img src="uploads/news/main/transport.jpg" width="60" class="img-circle" alt="تعزيز خطوط النقل الجامعي نحو القطب الجامعي الباز"/>
+                                    </td>
+                                    <td>
+                                        <a href="#" style="text-decoration: none; color: #2c3e50;">
+                                            <h4 style="margin: 0;">تعزيز خطوط النقل الجامعي نحو القطب الجامعي الباز</h4>
+                                            <small style="color: #999;">
+                                                <i class="fa fa-calendar"></i> 20/09/2026
+                                                &nbsp;&nbsp;
+                                                <i class="fa fa-eye"></i> 98
+                                            </small>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+</div>
+@@end
+@@block news-box-php 11 replaces=news-box
+<!-- صندوق آخر الأخبار -->
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-list-alt"></span>
+            <b>أخر الأخبار</b>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul class="demo" id="latest-news-ticker">
+                        <?php foreach ($latest_news as $news_item): ?>
+                            <li class="news-item">
+                                <table cellpadding="4" style="width: 100%;">
+                                    <tr>
+                                        <td style="width: 80px;">
+                                            <img src="uploads/<?= e($news_item['main_image']) ?>" width="60" class="img-circle" alt="<?= e($news_item['title']) ?>"/>
+                                        </td>
+                                        <td>
+                                            <a href="#" style="text-decoration: none; color: #2c3e50;">
+                                                <h4 style="margin: 0;"><?= e($news_item['title']) ?></h4>
+                                                <small style="color: #999;">
+                                                    <i class="fa fa-calendar"></i> <?= date('d/m/Y', strtotime($news_item['published_date'])) ?>
+                                                    &nbsp;&nbsp;
+                                                    <i class="fa fa-eye"></i> <?= e($news_item['views_count']) ?>
+                                                </small>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+</div>
+@@end
+@@block act-head 7
+<!-- عنوان النشاطات -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
+                <i class="fa fa-calendar-check-o"></i> آخر النشاطـــات
+                <a href="#" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                    <i class="fa fa-arrow-left"></i> عرض الكل
+                </a>
+            </h3>
+        </div>
+    </div>
+</div>
+<br>
+@@end
+@@block act-cards 7
+<!-- النشاطات -->
+<div class="container">
+    <div class="row activities-row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="inner">
+                    <img src="uploads/activities/main/football.jpg" alt="دورة كرة القدم بين الإقامات الجامعية" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <h4>
+                    <a href="#">دورة كرة القدم بين الإقامات الجامعية</a>
+                </h4>
+                <p>دورة رياضية تجمع فرق الإقامات الجامعية لولاية سطيف في أجواء أخوية بمشاركة أكثر من عشرين فريقاً.</p>
+                <div style="padding: 0 15px 15px;">
+                    <small style="color: #999;">
+                        <i class="fa fa-calendar"></i> 20/10/2026
+                        &nbsp;&nbsp;
+                        <i class="fa fa-map-marker"></i> الملعب الجامعي الباز
+                        <br>
+                        <i class="fa fa-tag"></i> رياضي
+                        &nbsp;&nbsp;
+                        <i class="fa fa-users"></i> 240 مشارك
+                    </small>
+                    <br><br>
+                    <a class="btn btn-success" href="#" style="margin: 0;">
+                        المزيد <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="inner">
+                    <img src="uploads/activities/main/poesie.jpg" alt="أمسية شعرية بمناسبة يوم الطالب" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <h4>
+                    <a href="#">أمسية شعرية بمناسبة يوم الطالب</a>
+                </h4>
+                <p>أمسية أدبية يلقي فيها الطلبة قصائدهم ويتنافسون على جائزة أفضل قصيدة.</p>
+                <div style="padding: 0 15px 15px;">
+                    <small style="color: #999;">
+                        <i class="fa fa-calendar"></i> 02/10/2026
+                        &nbsp;&nbsp;
+                        <i class="fa fa-map-marker"></i> قاعة المحاضرات، إقامة دباغين
+                        <br>
+                        <i class="fa fa-tag"></i> ثقافي
+                        &nbsp;&nbsp;
+                        <i class="fa fa-users"></i> 150 مشارك
+                    </small>
+                    <br><br>
+                    <a class="btn btn-success" href="#" style="margin: 0;">
+                        المزيد <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="inner">
+                    <img src="uploads/activities/main/salon-livre.jpg" alt="معرض الكتاب الجامعي" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <h4>
+                    <a href="#">معرض الكتاب الجامعي</a>
+                </h4>
+                <p>معرض يضم آلاف العناوين في مختلف التخصصات بأسعار مخفضة للطلبة.</p>
+                <div style="padding: 0 15px 15px;">
+                    <small style="color: #999;">
+                        <i class="fa fa-calendar"></i> 28/09/2026
+                        &nbsp;&nbsp;
+                        <i class="fa fa-map-marker"></i> المكتبة المركزية
+                        <br>
+                        <i class="fa fa-tag"></i> علمي
+                        &nbsp;&nbsp;
+                        <i class="fa fa-users"></i> 400 مشارك
+                    </small>
+                    <br><br>
+                    <a class="btn btn-success" href="#" style="margin: 0;">
+                        المزيد <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+@@end
+@@block act-cards-php 11 replaces=act-cards
+<!-- النشاطات -->
+<div class="container">
+    <div class="row activities-row">
+        <?php foreach ($featured_activities as $activity): ?>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="inner">
+                        <img src="uploads/<?= e($activity['main_image']) ?>" alt="<?= e($activity['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <h4>
+                        <a href="#"><?= e($activity['title']) ?></a>
+                    </h4>
+                    <p><?= e($activity['short_description']) ?></p>
+                    <div style="padding: 0 15px 15px;">
+                        <small style="color: #999;">
+                            <i class="fa fa-calendar"></i> <?= date('d/m/Y', strtotime($activity['date'])) ?>
+                            &nbsp;&nbsp;
+                            <i class="fa fa-map-marker"></i> <?= e($activity['location']) ?>
+                            <br>
+                            <i class="fa fa-tag"></i> <?= e($activity_types[$activity['activity_type']]) ?>
+                            &nbsp;&nbsp;
+                            <i class="fa fa-users"></i> <?= e($activity['participants_count']) ?> مشارك
+                        </small>
+                        <br><br>
+                        <a class="btn btn-success" href="#" style="margin: 0;">
+                            المزيد <i class="fa fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<br>
+@@end
+@@block stats 7
+<!-- الإحصائيات الحية -->
+<section class="statistics-section" style="background: #f8f9fa; padding: 60px 0; margin: 40px 0;">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-12">
+                <h2 style="margin-bottom: 40px; color: #2c3e50;">
+                    <i class="fa fa-bar-chart"></i> إحصائيات الموقع
+                </h2>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- الزوار -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-users stat-icon"></i>
+                    <h3 class="stat-number" data-count="15230">0</h3>
+                    <p class="stat-label">زائر</p>
+                </div>
+            </div>
+            
+            <!-- المشاهدات -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-eye stat-icon"></i>
+                    <h3 class="stat-number" data-count="48975">0</h3>
+                    <p class="stat-label">مشاهدة</p>
+                </div>
+            </div>
+            
+            <!-- الأخبار -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-newspaper-o stat-icon"></i>
+                    <h3 class="stat-number" data-count="5">0</h3>
+                    <p class="stat-label">خبر</p>
+                </div>
+            </div>
+            
+            <!-- الخدمات -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-cogs stat-icon"></i>
+                    <h3 class="stat-number" data-count="12">0</h3>
+                    <p class="stat-label">خدمة</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row" style="margin-top: 30px;">
+            <!-- الملفات -->
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-download stat-icon"></i>
+                    <h3 class="stat-number" data-count="8">0</h3>
+                    <p class="stat-label">ملف للتحميل</p>
+                </div>
+            </div>
+            
+            <!-- الأسئلة -->
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-question-circle stat-icon"></i>
+                    <h3 class="stat-number" data-count="15">0</h3>
+                    <p class="stat-label">سؤال شائع</p>
+                </div>
+            </div>
+            
+            <!-- الإقامات -->
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-university stat-icon"></i>
+                    <h3 class="stat-number" data-count="7">0</h3>
+                    <p class="stat-label">إقامة جامعية</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@@end
+@@block stats-php 11 replaces=stats
+<!-- الإحصائيات الحية -->
+<section class="statistics-section" style="background: #f8f9fa; padding: 60px 0; margin: 40px 0;">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-12">
+                <h2 style="margin-bottom: 40px; color: #2c3e50;">
+                    <i class="fa fa-bar-chart"></i> إحصائيات الموقع
+                </h2>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- الزوار -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-users stat-icon"></i>
+                    <h3 class="stat-number" data-count="<?= $site_stats['total_visitors'] ?>">0</h3>
+                    <p class="stat-label">زائر</p>
+                </div>
+            </div>
+            
+            <!-- المشاهدات -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-eye stat-icon"></i>
+                    <h3 class="stat-number" data-count="<?= $site_stats['total_page_views'] ?>">0</h3>
+                    <p class="stat-label">مشاهدة</p>
+                </div>
+            </div>
+            
+            <!-- الأخبار -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-newspaper-o stat-icon"></i>
+                    <h3 class="stat-number" data-count="<?= $site_stats['total_news'] ?>">0</h3>
+                    <p class="stat-label">خبر</p>
+                </div>
+            </div>
+            
+            <!-- الخدمات -->
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-cogs stat-icon"></i>
+                    <h3 class="stat-number" data-count="<?= $site_stats['total_services'] ?>">0</h3>
+                    <p class="stat-label">خدمة</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row" style="margin-top: 30px;">
+            <!-- الملفات -->
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-download stat-icon"></i>
+                    <h3 class="stat-number" data-count="<?= $site_stats['total_downloads'] ?>">0</h3>
+                    <p class="stat-label">ملف للتحميل</p>
+                </div>
+            </div>
+            
+            <!-- الأسئلة -->
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-question-circle stat-icon"></i>
+                    <h3 class="stat-number" data-count="<?= $site_stats['total_faqs'] ?>">0</h3>
+                    <p class="stat-label">سؤال شائع</p>
+                </div>
+            </div>
+            
+            <!-- الإقامات -->
+            <div class="col-md-4 col-sm-6">
+                <div class="stat-box">
+                    <i class="fa fa-university stat-icon"></i>
+                    <h3 class="stat-number" data-count="<?= $site_stats['total_cites'] ?>">0</h3>
+                    <p class="stat-label">إقامة جامعية</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@@end
+@@block stats-css-js 7 from=app/views/homepage/index.php:511-575
+@@end
+@@block sites-dephead 8 from=app/views/homepage/index.php:576-627
+@@end
+@@block dept-list 8
+
+<!-- أقسام المديرية -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-default outer">
+                <div class="panel-heading" style="background-color: #2c3e50; color: white;">
+                    <h4 class="text-center">مصلحة المنح</h4>
+                </div>
+                <div class="panel-body text-justify">
+                    <p>تتكفل بدراسة ملفات المنحة الجامعية وصرفها للطلبة المستحقين، ومتابعة الطعون والتحويلات بين الولايات.</p>
+                    <a class="btn btn-md btn-success" href="#" style="float: right;">
+                        المزيد <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default outer">
+                <div class="panel-heading" style="background-color: #2c3e50; color: white;">
+                    <h4 class="text-center">مصلحة الإيواء</h4>
+                </div>
+                <div class="panel-body text-justify">
+                    <p>تنظم عملية الإيواء في الإقامات الجامعية: التسجيل، توزيع الغرف، ومتابعة ظروف الإقامة.</p>
+                    <a class="btn btn-md btn-success" href="#" style="float: right;">
+                        المزيد <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default outer">
+                <div class="panel-heading" style="background-color: #2c3e50; color: white;">
+                    <h4 class="text-center">مصلحة الإطعام</h4>
+                </div>
+                <div class="panel-body text-justify">
+                    <p>تشرف على المطاعم الجامعية وتسهر على جودة الوجبات المقدمة وتوازنها الغذائي.</p>
+                    <a class="btn btn-md btn-success" href="#" style="float: right;">
+                        المزيد <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default outer">
+                <div class="panel-heading" style="background-color: #2c3e50; color: white;">
+                    <h4 class="text-center">مصلحة النقل</h4>
+                </div>
+                <div class="panel-body text-justify">
+                    <p>تسيّر خطوط النقل الجامعي التي تربط الأحياء والإقامات بالأقطاب الجامعية.</p>
+                    <a class="btn btn-md btn-success" href="#" style="float: right;">
+                        المزيد <i class="fa fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@@end
+@@block dept-list-php 11 replaces=dept-list
+
+<!-- أقسام المديرية -->
+<div class="container">
+    <div class="row">
+        <?php foreach ($departements_list as $dept): ?>
+            <div class="col-md-3">
+                <div class="panel panel-default outer">
+                    <div class="panel-heading" style="background-color: #2c3e50; color: white;">
+                        <h4 class="text-center"><?= e($dept['name']) ?></h4>
+                    </div>
+                    <div class="panel-body text-justify">
+                        <p><?= e($dept['description']) ?></p>
+                        <a class="btn btn-md btn-success" href="#" style="float: right;">
+                            المزيد <i class="fa fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+@@end
+@@block cite-head 8
+<!-- عنوان الإقامات -->
+<div class="cite" id="cite">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
+                    <i class="fa fa-building"></i> الإقامات الجامعية
+                    <a href="#" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                        <i class="fa fa-arrow-left"></i> عرض الكل
+                    </a>
+                </h3>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+@@end
+@@block cite-carousel 8
+<!-- سلايدر الإقامات -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="carousel slide media-carousel" id="media" data-ride="carousel">
+
+                <!-- Wrapper for slides -->
+                <div class="carousel-inner">
+
+                    <!-- Slide 1 -->
+                    <div class="item active">
+                        <ul class="thumbnails row">
+                            <li class="col-sm-2">
+                                <div class="thumbnail">
+                                    <img src="uploads/cites/main/debaghine.jpg" alt="دباغين">
+                                </div>
+                                <div class="caption-box">
+                                    <h4>دباغين</h4>
+                                    <p>الهاتف: 036 00 00 01<br>القطب الجامعي الباز، سطيف</p>
+                                    <div style="text-align: center;">
+                                        <a class="btn btn-success btn-sm" href="#">
+                                            المزيد <i class="fa fa-arrow-left"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-sm-2">
+                                <div class="thumbnail">
+                                    <img src="uploads/cites/main/hachemi-hocine.jpg" alt="هاشمي حسين">
+                                </div>
+                                <div class="caption-box">
+                                    <h4>هاشمي حسين</h4>
+                                    <p>الهاتف: 036 00 00 02<br>حي الهضاب، سطيف</p>
+                                    <div style="text-align: center;">
+                                        <a class="btn btn-success btn-sm" href="#">
+                                            المزيد <i class="fa fa-arrow-left"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-sm-2">
+                                <div class="thumbnail">
+                                    <img src="uploads/cites/main/boukhrissa.jpg" alt="بوخريصة">
+                                </div>
+                                <div class="caption-box">
+                                    <h4>بوخريصة</h4>
+                                    <p>الهاتف: 036 00 00 03<br>طريق بجاية، سطيف</p>
+                                    <div style="text-align: center;">
+                                        <a class="btn btn-success btn-sm" href="#">
+                                            المزيد <i class="fa fa-arrow-left"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-sm-2">
+                                <div class="thumbnail">
+                                    <img src="uploads/cites/main/rouabah.jpg" alt="روابح">
+                                </div>
+                                <div class="caption-box">
+                                    <h4>روابح</h4>
+                                    <p>الهاتف: 036 00 00 04<br>حي 1014 مسكن، سطيف</p>
+                                    <div style="text-align: center;">
+                                        <a class="btn btn-success btn-sm" href="#">
+                                            المزيد <i class="fa fa-arrow-left"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-sm-2">
+                                <div class="thumbnail">
+                                    <img src="uploads/cites/main/fadila.jpg" alt="فضيلة">
+                                </div>
+                                <div class="caption-box">
+                                    <h4>فضيلة</h4>
+                                    <p>الهاتف: 036 00 00 05<br>حي المعبودة، سطيف</p>
+                                    <div style="text-align: center;">
+                                        <a class="btn btn-success btn-sm" href="#">
+                                            المزيد <i class="fa fa-arrow-left"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-sm-2">
+                                <div class="thumbnail">
+                                    <img src="uploads/cites/main/19-mai-1956.jpg" alt="19 ماي 1956">
+                                </div>
+                                <div class="caption-box">
+                                    <h4>19 ماي 1956</h4>
+                                    <p>الهاتف: 036 00 00 06<br>القطب الجامعي الباز، سطيف</p>
+                                    <div style="text-align: center;">
+                                        <a class="btn btn-success btn-sm" href="#">
+                                            المزيد <i class="fa fa-arrow-left"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="item">
+                        <ul class="thumbnails row">
+                            <li class="col-sm-2">
+                                <div class="thumbnail">
+                                    <img src="uploads/cites/main/24-avril.jpg" alt="24 أفريل">
+                                </div>
+                                <div class="caption-box">
+                                    <h4>24 أفريل</h4>
+                                    <p>الهاتف: 036 00 00 07<br>حي كعبوب، سطيف</p>
+                                    <div style="text-align: center;">
+                                        <a class="btn btn-success btn-sm" href="#">
+                                            المزيد <i class="fa fa-arrow-left"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- Controls -->
+                <a data-slide="prev" href="#media" class="left carousel-control">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                </a>
+                <a data-slide="next" href="#media" class="right carousel-control">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+
+@@end
+@@block cite-carousel-php 11 replaces=cite-carousel
+<!-- سلايدر الإقامات -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="carousel slide media-carousel" id="media" data-ride="carousel">
+
+                <!-- Wrapper for slides -->
+                <div class="carousel-inner">
+
+                    <!-- Slide 1 -->
+                    <div class="item active">
+                        <ul class="thumbnails row">
+                            <?php foreach (array_slice($cites_list, 0, 6) as $cite): ?>
+                                <li class="col-sm-2">
+                                    <div class="thumbnail">
+                                        <img src="uploads/<?= e($cite['main_image']) ?>" alt="<?= e($cite['name']) ?>">
+                                    </div>
+                                    <div class="caption-box">
+                                        <h4><?= e($cite['name']) ?></h4>
+                                        <p>الهاتف: <?= e($cite['phone']) ?><br><?= e($cite['address']) ?></p>
+                                        <div style="text-align: center;">
+                                            <a class="btn btn-success btn-sm" href="#">
+                                                المزيد <i class="fa fa-arrow-left"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                    <!-- Slide 2 -->
+                    <?php if (count($cites_list) > 6): ?>
+                    <div class="item">
+                        <ul class="thumbnails row">
+                            <?php foreach (array_slice($cites_list, 6, 6) as $cite): ?>
+                                <li class="col-sm-2">
+                                    <div class="thumbnail">
+                                        <img src="uploads/<?= e($cite['main_image']) ?>" alt="<?= e($cite['name']) ?>">
+                                    </div>
+                                    <div class="caption-box">
+                                        <h4><?= e($cite['name']) ?></h4>
+                                        <p>الهاتف: <?= e($cite['phone']) ?><br><?= e($cite['address']) ?></p>
+                                        <div style="text-align: center;">
+                                            <a class="btn btn-success btn-sm" href="#">
+                                                المزيد <i class="fa fa-arrow-left"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                    <?php endif; ?>
+
+                </div>
+
+                <!-- Controls -->
+                <a data-slide="prev" href="#media" class="left carousel-control">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                </a>
+                <a data-slide="next" href="#media" class="right carousel-control">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+
+@@end
+@@block inc-footer 12
+    <?php include __DIR__ . '/app/views/base/footer.php'; ?>
+@@end
+@@block footer-a 9 from=app/views/base/footer.php:1-53 file=app/views/base/footer.php@12
+@@end
+@@block footer-year 9
+        <i class="fa fa-copyright"></i> جميع الحقوق محفوظة © 2026 - مديرية الخدمات الجامعية لولاية سطيف
+@@end
+@@block footer-year-php 10 replaces=footer-year
+        <i class="fa fa-copyright"></i> جميع الحقوق محفوظة © <?= date('Y') ?> - مديرية الخدمات الجامعية لولاية سطيف
+@@end
+@@block footer-year-final 12 replaces=footer-year-php from=app/views/base/footer.php:54-54 file=app/views/base/footer.php@12
+@@end
+@@block footer-b 9 from=app/views/base/footer.php:55-56 file=app/views/base/footer.php@12
+@@end
+@@block js-libs 3
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+
+@@end
+@@block home-js 5 from=app/views/homepage/index.php:763-792
+@@end
+</body>
+</html>

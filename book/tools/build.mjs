@@ -12,6 +12,9 @@
 //  تعليمات خاصة داخل ملفات الفصول:
 //    @file app/core/DB.php 10-40     تضمين أسطر من ملف في مجلد php/ (يُلوَّن تلقائياً)
 //    @file app/core/DB.php 41-$      حتى نهاية الملف        @file config.php   الملف كاملاً
+//    @file database/schema.sql 89-102 insert   قطعة تُدرج في وسط ملف كُتب جزء منه (خارج الترتيب)
+//    @stage home nav-html [STEP]     كتلة من ملف مؤقت (stages/home.src) بأرقام أسطرها في تلك الخطوة
+//    @moved app/views/base/base.php 22-218 | نص   أسطر نهائية سبق كتابتها في ملف مؤقت: «انقلها كما هي»
 //    @shot images/home.png | تعليق   صورة مع تعليق
 //    @pagebreak                      صفحة جديدة
 //    ::: tip|warning|note|info|try|why|summary [عنوان] ... :::   صناديق ملوّنة
@@ -24,6 +27,7 @@ import MarkdownIt from 'markdown-it';
 import mdContainer from 'markdown-it-container';
 import hljs from 'highlight.js';
 import puppeteer from 'puppeteer-core';
+import { stageBlock } from './stages.mjs';
 
 const BOOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.resolve(BOOK, '..', 'php');
@@ -46,7 +50,9 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const ORD = ['', 'الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر',
   'الحادي عشر', 'الثاني عشر', 'الثالث عشر', 'الرابع عشر', 'الخامس عشر', 'السادس عشر', 'السابع عشر', 'الثامن عشر',
   'التاسع عشر', 'العشرون', 'الحادي والعشرون', 'الثاني والعشرون', 'الثالث والعشرون', 'الرابع والعشرون', 'الخامس والعشرون',
-  'السادس والعشرون', 'السابع والعشرون'];
+  'السادس والعشرون', 'السابع والعشرون', 'الثامن والعشرون', 'التاسع والعشرون', 'الثلاثون', 'الحادي والثلاثون',
+  'الثاني والثلاثون', 'الثالث والثلاثون', 'الرابع والثلاثون', 'الخامس والثلاثون', 'السادس والثلاثون', 'السابع والثلاثون',
+  'الثامن والثلاثون', 'التاسع والثلاثون', 'الأربعون'];
 const APPX = { A: 'أ', B: 'ب', C: 'ج', D: 'د', E: 'هـ' };
 
 const chapterFiles = fs.readdirSync(path.join(BOOK, 'chapters'))
@@ -204,7 +210,8 @@ function codeBlock({ code, lang, start = 1, head = '', badge = '', badgeClass = 
 // ------------------------------------------------------------------ تضمين ملفات المشروع + تتبّع التغطية
 const coverage = new Map(); // file -> [[s,e,chapter]]
 function includeFile(spec, chapter) {
-  const [file, rangeSpec, ...noteParts] = spec.trim().split(/\s+/);
+  const [file, rangeSpec, ...flags] = spec.trim().split(/\s+/);
+  const insert = flags.includes('insert');
   const abs = path.join(SRC, file);
   if (!fs.existsSync(abs)) throw new Error(`@file: الملف غير موجود: ${file} (${chapter})`);
   const all = fs.readFileSync(abs, 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
@@ -217,15 +224,55 @@ function includeFile(spec, chapter) {
   }
   if (s < 1 || e > all.length || s > e) throw new Error(`@file: المدى ${s}-${e} خارج الملف ${file} (${all.length} سطر) في ${chapter}`);
   if (!coverage.has(file)) coverage.set(file, []);
-  coverage.get(file).push([s, e, chapter]);
+  coverage.get(file).push([s, e, chapter, insert ? 'insert' : 'file']);
   const whole = s === 1 && e === all.length;
-  const badge = s === 1 ? 'ملف جديد' : 'تابع الملف';
+  const badge = s === 1 ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف');
   const range = whole ? `الملف كاملاً — ${all.length} سطر` : `الأسطر ${s}–${e} من ${all.length}`;
   const foot = e === all.length && !whole ? 'نهاية الملف' : (whole ? '' : `يتبع الملف من السطر ${e + 1}`);
   return codeBlock({
     code: all.slice(s - 1, e).join('\n'), lang: langFor(file), start: s,
-    head: file, badge, badgeClass: s === 1 ? 'new' : 'cont', range, foot,
+    head: file, badge, badgeClass: s === 1 ? 'new' : (insert ? 'ins' : 'cont'), range, foot,
   });
+}
+
+// ------------------------------------------------------------------ الملفات المؤقتة (المراحل) والكود المنقول
+function includeStage(spec, chapter) {
+  const [name, blockName, step] = spec.trim().split(/\s+/);
+  const b = stageBlock(name, blockName, step);
+  const fin = b.block.fromFile;
+  if (fin) {
+    if (!coverage.has(fin)) coverage.set(fin, []);
+    coverage.get(fin).push([b.block.fromStart, b.block.fromEnd, chapter, 'stage']);
+  }
+  const range = b.start === b.end ? `السطر ${b.start}` : `الأسطر ${b.start}–${b.end}`;
+  const foot = fin && fin !== b.file
+    ? `نص نهائي: سيُنقل لاحقاً كما هو إلى ${fin} (الأسطر ${b.block.fromStart}–${b.block.fromEnd})`
+    : '';
+  return codeBlock({
+    code: b.lines.join('\n'), lang: langFor(b.file), start: b.start, head: b.file,
+    badge: fin ? 'نهائي' : 'مؤقت', badgeClass: fin ? 'fin' : 'tmp', range, foot,
+  });
+}
+
+function movedBlock(spec, chapter) {
+  const [left, ...noteParts] = spec.split('|');
+  const [file, rangeSpec] = left.trim().split(/\s+/);
+  const m = (rangeSpec || '').match(/^(\d+)-(\d+)$/);
+  if (!m) throw new Error(`@moved: مدى غير صالح في ${chapter}: ${spec}`);
+  const s = +m[1], e = +m[2];
+  const seen = new Set();
+  for (const [a, b, , kind] of coverage.get(file) || []) if (kind === 'stage') for (let i = a; i <= b; i++) seen.add(i);
+  const all = fs.readFileSync(path.join(SRC, file), 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
+  const missing = [];
+  for (let i = s; i <= e; i++) if (!seen.has(i)) missing.push(i);
+  if (missing.length) throw new Error(`@moved ${file} ${s}-${e} في ${chapter}: الأسطر ${missing.slice(0, 5).join(',')}… لم تُعرض من قبل في ملف مؤقت`);
+  const note = noteParts.join('|').trim();
+  const range = `الأسطر ${s}–${e} من ${all.length}`;
+  const first = all[s - 1].trim();
+  const last = all[e - 1].trim();
+  return `<div class="code moved"><div class="code-head"><span class="badge mv">منقول</span><span class="path">${esc(file)}</span><span class="range">${range}</span></div>`
+    + `<div class="moved-body"><div class="moved-note">${md.renderInline(note)}</div>`
+    + `<div class="moved-edges"><span class="edge"><b>${s}</b> <code>${esc(first)}</code></span><span class="dots">…</span><span class="edge"><b>${e}</b> <code>${esc(last)}</code></span></div></div></div>`;
 }
 
 // ------------------------------------------------------------------ Markdown
@@ -262,8 +309,8 @@ for (const [name, label] of Object.entries(BOXES)) {
 function renderChapter(file) {
   const raw = fs.readFileSync(path.join(BOOK, 'chapters', file), 'utf8').replace(/\r\n/g, '\n');
   const blocks = [];
-  let text = raw.replace(/^@file\s+(.+)$/gm, (_, spec) => {
-    blocks.push(includeFile(spec, file));
+  let text = raw.replace(/^@(file|stage|moved)\s+(.+)$/gm, (_, kind, spec) => {
+    blocks.push(kind === 'file' ? includeFile(spec, file) : kind === 'stage' ? includeStage(spec, file) : movedBlock(spec, file));
     return `\n<div data-ph="${blocks.length - 1}"></div>\n`;
   });
   text = text.replace(/^@shot\s+(\S+)\s*(?:\|\s*(.*))?$/gm, (_, img, cap) => {
@@ -374,9 +421,9 @@ function coverageReport() {
     const n = src.length;
     const cov = new Array(n + 1).fill(0);
     let prevEnd = 0;
-    for (const [s, e, chap] of coverage.get(f) || []) {
-      if (s <= prevEnd) console.warn(`تحذير ترتيب: ${f} ${s}-${e} في ${chap} يأتي قبل/داخل قطعة سابقة تنتهي عند ${prevEnd}`);
-      prevEnd = Math.max(prevEnd, e);
+    for (const [s, e, chap, kind] of coverage.get(f) || []) {
+      if (kind === 'file' && s <= prevEnd) console.warn(`تحذير ترتيب: ${f} ${s}-${e} في ${chap} يأتي قبل/داخل قطعة سابقة تنتهي عند ${prevEnd}`);
+      if (kind === 'file') prevEnd = Math.max(prevEnd, e);
       for (let i = s; i <= e; i++) cov[i]++;
     }
     const missing = [], dup = [];
