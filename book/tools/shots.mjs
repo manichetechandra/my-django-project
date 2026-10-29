@@ -118,7 +118,7 @@ const shots = SET === 'stages' ? stageShots : [
   },
   { name: '30-downloads', url: '/downloads/', h: 900 },
   { name: '30-search', url: '/search/?q=' + encodeURIComponent('المنحة الجامعية'), h: 900 },
-  { name: '21-login', url: '/students/login/', h: 860 },
+  { name: '31-login', url: '/students/login/', h: 860 },
   { name: '22-dashboard', url: '/students/dashboard/', login: STUDENT, h: 1000 },
   { name: '22-create', url: '/students/applications/create/1/', login: STUDENT, h: 1100 },
   { name: '23-card', url: '/students/student-card/', login: STUDENT, w: 900, h: 470, scale: 2 },
