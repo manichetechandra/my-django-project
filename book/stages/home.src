@@ -16,135 +16,15 @@ $site_name  = 'مديرية الخدمات الجامعية سطيف';
 $page_title = 'الصفحة الرئيسية';
 
 @@end
-@@block php-arrays 11
-// صور السلايدر
-$slider_images = [
-    ['title' => 'مرحباً بكم في مديرية الخدمات الجامعية سطيف', 'subtitle' => 'في خدمة الطالب: الإيواء، الإطعام، النقل والمنح', 'image' => 'slider/slide-1.jpg'],
-    ['title' => 'انطلاق التسجيلات في الإقامات الجامعية', 'subtitle' => 'الموسم الجامعي 2026/2027 — قدّم طلبك من فضاء الطالب', 'image' => 'slider/slide-2.jpg'],
-    ['title' => 'مطاعم جامعية بوجبات متوازنة', 'subtitle' => 'ثلاث وجبات يومياً بأسعار رمزية', 'image' => 'slider/slide-3.jpg'],
-];
-
-// كل الأخبار (من الأحدث إلى الأقدم)
-$latest_news = [
-    [
-        'title'          => 'صرف الشطر الأول من المنحة الجامعية',
-        'slug'           => 'sarf-al-minha',
-        'main_image'     => 'news/main/bourse.jpg',
-        'published_date' => '2026-10-12 09:00:00',
-        'views_count'    => 512,
-        'show_in_ticker' => 1,
-    ],
-    [
-        'title'          => 'تدشين مكتبة جديدة بالإقامة الجامعية دباغين',
-        'slug'           => 'maktaba-jadida',
-        'main_image'     => 'news/main/bibliotheque.jpg',
-        'published_date' => '2026-10-05 10:30:00',
-        'views_count'    => 130,
-        'show_in_ticker' => 0,
-    ],
-    [
-        'title'          => 'تعزيز خطوط النقل الجامعي نحو القطب الجامعي الباز',
-        'slug'           => 'naql-jamii',
-        'main_image'     => 'news/main/transport.jpg',
-        'published_date' => '2026-09-20 08:00:00',
-        'views_count'    => 98,
-        'show_in_ticker' => 0,
-    ],
-    [
-        'title'          => 'قائمة الوجبات الأسبوعية في المطاعم الجامعية',
-        'slug'           => 'qaimat-al-wajabat',
-        'main_image'     => 'news/main/menu.jpg',
-        'published_date' => '2026-09-15 12:00:00',
-        'views_count'    => 76,
-        'show_in_ticker' => 0,
-    ],
-    [
-        'title'          => 'انطلاق التسجيلات في الإقامات الجامعية للموسم 2026/2027',
-        'slug'           => 'tasjilat-al-iqamat',
-        'main_image'     => 'news/main/inscription.jpg',
-        'published_date' => '2026-09-01 08:30:00',
-        'views_count'    => 245,
-        'show_in_ticker' => 1,
-    ],
-];
-
-// أخبار الشريط المتحرك: الأخبار التي قيمة show_in_ticker فيها 1
-$ticker_news = [];
-foreach ($latest_news as $news) {
-    if ($news['show_in_ticker'] == 1) {
-        $ticker_news[] = $news;
-    }
+@@block php-func 11
+/** تهريب النص قبل طباعته داخل HTML (حماية من XSS) */
+function e($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
-// النشاطات المميزة
-$featured_activities = [
-    [
-        'title'              => 'دورة كرة القدم بين الإقامات الجامعية',
-        'slug'               => 'dawrat-korat-al-qadam',
-        'activity_type'      => 'sport',
-        'short_description'  => 'دورة رياضية تجمع فرق الإقامات الجامعية لولاية سطيف في أجواء أخوية بمشاركة أكثر من عشرين فريقاً.',
-        'main_image'         => 'activities/main/football.jpg',
-        'date'               => '2026-10-20',
-        'location'           => 'الملعب الجامعي الباز',
-        'participants_count' => 240,
-    ],
-    [
-        'title'              => 'أمسية شعرية بمناسبة يوم الطالب',
-        'slug'               => 'umsiya-shiriya',
-        'activity_type'      => 'culture',
-        'short_description'  => 'أمسية أدبية يلقي فيها الطلبة قصائدهم ويتنافسون على جائزة أفضل قصيدة.',
-        'main_image'         => 'activities/main/poesie.jpg',
-        'date'               => '2026-10-02',
-        'location'           => 'قاعة المحاضرات، إقامة دباغين',
-        'participants_count' => 150,
-    ],
-    [
-        'title'              => 'معرض الكتاب الجامعي',
-        'slug'               => 'maarad-al-kitab',
-        'activity_type'      => 'scientific',
-        'short_description'  => 'معرض يضم آلاف العناوين في مختلف التخصصات بأسعار مخفضة للطلبة.',
-        'main_image'         => 'activities/main/salon-livre.jpg',
-        'date'               => '2026-09-28',
-        'location'           => 'المكتبة المركزية',
-        'participants_count' => 400,
-    ],
-];
-
-// أقسام المديرية
-$departements_list = [
-    ['name' => 'مصلحة المنح', 'slug' => 'maslahat-al-minah',
-     'description' => 'تتكفل بدراسة ملفات المنحة الجامعية وصرفها للطلبة المستحقين، ومتابعة الطعون والتحويلات بين الولايات.'],
-    ['name' => 'مصلحة الإيواء', 'slug' => 'maslahat-al-iwaa',
-     'description' => 'تنظم عملية الإيواء في الإقامات الجامعية: التسجيل، توزيع الغرف، ومتابعة ظروف الإقامة.'],
-    ['name' => 'مصلحة الإطعام', 'slug' => 'maslahat-al-itaam',
-     'description' => 'تشرف على المطاعم الجامعية وتسهر على جودة الوجبات المقدمة وتوازنها الغذائي.'],
-    ['name' => 'مصلحة النقل', 'slug' => 'maslahat-al-naql',
-     'description' => 'تسيّر خطوط النقل الجامعي التي تربط الأحياء والإقامات بالأقطاب الجامعية.'],
-];
-
-// الإقامات الجامعية
-$cites_list = [
-    ['name' => 'دباغين', 'slug' => 'debaghine', 'main_image' => 'cites/main/debaghine.jpg', 'phone' => '036 00 00 01', 'address' => 'القطب الجامعي الباز، سطيف'],
-    ['name' => 'هاشمي حسين', 'slug' => 'hachemi-hocine', 'main_image' => 'cites/main/hachemi-hocine.jpg', 'phone' => '036 00 00 02', 'address' => 'حي الهضاب، سطيف'],
-    ['name' => 'بوخريصة', 'slug' => 'boukhrissa', 'main_image' => 'cites/main/boukhrissa.jpg', 'phone' => '036 00 00 03', 'address' => 'طريق بجاية، سطيف'],
-    ['name' => 'روابح', 'slug' => 'rouabah', 'main_image' => 'cites/main/rouabah.jpg', 'phone' => '036 00 00 04', 'address' => 'حي 1014 مسكن، سطيف'],
-    ['name' => 'فضيلة', 'slug' => 'fadila', 'main_image' => 'cites/main/fadila.jpg', 'phone' => '036 00 00 05', 'address' => 'حي المعبودة، سطيف'],
-    ['name' => '19 ماي 1956', 'slug' => '19-mai-1956', 'main_image' => 'cites/main/19-mai-1956.jpg', 'phone' => '036 00 00 06', 'address' => 'القطب الجامعي الباز، سطيف'],
-    ['name' => '24 أفريل', 'slug' => '24-avril', 'main_image' => 'cites/main/24-avril.jpg', 'phone' => '036 00 00 07', 'address' => 'حي كعبوب، سطيف'],
-];
-
-// أرقام قسم الإحصائيات
-$site_stats = [
-    'total_visitors' => 15230,
-    'total_page_views' => 48975,
-    'total_news' => 5,
-    'total_services' => 12,
-    'total_downloads' => 8,
-    'total_faqs' => 15,
-    'total_cites' => 7,
-];
 @@end
-@@block php-db 15 replaces=php-arrays
+@@block php-db 15 replaces=arr-slides,arr-news,arr-ticker,arr-acts,arr-depts,arr-cites,arr-stats
 // ---------------------------------------------- الاتصال بقاعدة البيانات
 $config = require __DIR__ . '/config.php';
 $db = $config['db'];
@@ -194,15 +74,112 @@ $site_stats = [
     'total_faqs'       => 15,
     'total_cites'      => (int) $pdo->query("SELECT COUNT(*) FROM cites WHERE is_active = 1")->fetchColumn(),
 ];
-@@end
-@@block php-year 12
 
-// السنة الحالية: يستعملها التذييل (footer.php)
-$current_year = date('Y');
-@@end
-@@block php-func 11
 
-// أسماء أنواع النشاطات بالعربية
+@@end
+@@block arr-slides 11
+// صور السلايدر
+$slider_images = [
+    ['title' => 'مرحباً بكم في مديرية الخدمات الجامعية سطيف', 'subtitle' => 'في خدمة الطالب: الإيواء، الإطعام، النقل والمنح', 'image' => 'slider/slide-1.jpg'],
+    ['title' => 'انطلاق التسجيلات في الإقامات الجامعية', 'subtitle' => 'الموسم الجامعي 2026/2027 — قدّم طلبك من فضاء الطالب', 'image' => 'slider/slide-2.jpg'],
+    ['title' => 'مطاعم جامعية بوجبات متوازنة', 'subtitle' => 'ثلاث وجبات يومياً بأسعار رمزية', 'image' => 'slider/slide-3.jpg'],
+];
+
+@@end
+@@block arr-news 11
+// كل الأخبار (من الأحدث إلى الأقدم)
+$latest_news = [
+    [
+        'title'          => 'صرف الشطر الأول من المنحة الجامعية',
+        'slug'           => 'sarf-al-minha',
+        'main_image'     => 'news/main/bourse.jpg',
+        'published_date' => '2026-10-12 09:00:00',
+        'views_count'    => 512,
+        'show_in_ticker' => 1,
+    ],
+    [
+        'title'          => 'تدشين مكتبة جديدة بالإقامة الجامعية دباغين',
+        'slug'           => 'maktaba-jadida',
+        'main_image'     => 'news/main/bibliotheque.jpg',
+        'published_date' => '2026-10-05 10:30:00',
+        'views_count'    => 130,
+        'show_in_ticker' => 0,
+    ],
+    [
+        'title'          => 'تعزيز خطوط النقل الجامعي نحو القطب الجامعي الباز',
+        'slug'           => 'naql-jamii',
+        'main_image'     => 'news/main/transport.jpg',
+        'published_date' => '2026-09-20 08:00:00',
+        'views_count'    => 98,
+        'show_in_ticker' => 0,
+    ],
+    [
+        'title'          => 'قائمة الوجبات الأسبوعية في المطاعم الجامعية',
+        'slug'           => 'qaimat-al-wajabat',
+        'main_image'     => 'news/main/menu.jpg',
+        'published_date' => '2026-09-15 12:00:00',
+        'views_count'    => 76,
+        'show_in_ticker' => 0,
+    ],
+    [
+        'title'          => 'انطلاق التسجيلات في الإقامات الجامعية للموسم 2026/2027',
+        'slug'           => 'tasjilat-al-iqamat',
+        'main_image'     => 'news/main/inscription.jpg',
+        'published_date' => '2026-09-01 08:30:00',
+        'views_count'    => 245,
+        'show_in_ticker' => 1,
+    ],
+];
+
+@@end
+@@block arr-ticker 11
+// أخبار الشريط المتحرك: الأخبار التي قيمة show_in_ticker فيها 1
+$ticker_news = [];
+foreach ($latest_news as $news) {
+    if ($news['show_in_ticker'] == 1) {
+        $ticker_news[] = $news;
+    }
+}
+
+@@end
+@@block arr-acts 11
+// النشاطات المميزة
+$featured_activities = [
+    [
+        'title'              => 'دورة كرة القدم بين الإقامات الجامعية',
+        'slug'               => 'dawrat-korat-al-qadam',
+        'activity_type'      => 'sport',
+        'short_description'  => 'دورة رياضية تجمع فرق الإقامات الجامعية لولاية سطيف في أجواء أخوية بمشاركة أكثر من عشرين فريقاً.',
+        'main_image'         => 'activities/main/football.jpg',
+        'date'               => '2026-10-20',
+        'location'           => 'الملعب الجامعي الباز',
+        'participants_count' => 240,
+    ],
+    [
+        'title'              => 'أمسية شعرية بمناسبة يوم الطالب',
+        'slug'               => 'umsiya-shiriya',
+        'activity_type'      => 'culture',
+        'short_description'  => 'أمسية أدبية يلقي فيها الطلبة قصائدهم ويتنافسون على جائزة أفضل قصيدة.',
+        'main_image'         => 'activities/main/poesie.jpg',
+        'date'               => '2026-10-02',
+        'location'           => 'قاعة المحاضرات، إقامة دباغين',
+        'participants_count' => 150,
+    ],
+    [
+        'title'              => 'معرض الكتاب الجامعي',
+        'slug'               => 'maarad-al-kitab',
+        'activity_type'      => 'scientific',
+        'short_description'  => 'معرض يضم آلاف العناوين في مختلف التخصصات بأسعار مخفضة للطلبة.',
+        'main_image'         => 'activities/main/salon-livre.jpg',
+        'date'               => '2026-09-28',
+        'location'           => 'المكتبة المركزية',
+        'participants_count' => 400,
+    ],
+];
+
+@@end
+@@block arr-types 11
+// أسماء أنواع النشاطات بالعربية (المفتاح هو القيمة المخزّنة)
 $activity_types = [
     'sport'      => 'رياضي',
     'culture'    => 'ثقافي',
@@ -212,11 +189,59 @@ $activity_types = [
     'other'      => 'أخرى',
 ];
 
-/** تهريب النص قبل طباعته داخل HTML (حماية من XSS) */
-function e($value)
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-}
+@@end
+@@block arr-depts 11
+// أقسام المديرية
+$departements_list = [
+    ['name' => 'مصلحة المنح', 'slug' => 'maslahat-al-minah',
+     'description' => 'تتكفل بدراسة ملفات المنحة الجامعية وصرفها للطلبة المستحقين، ومتابعة الطعون والتحويلات بين الولايات.'],
+    ['name' => 'مصلحة الإيواء', 'slug' => 'maslahat-al-iwaa',
+     'description' => 'تنظم عملية الإيواء في الإقامات الجامعية: التسجيل، توزيع الغرف، ومتابعة ظروف الإقامة.'],
+    ['name' => 'مصلحة الإطعام', 'slug' => 'maslahat-al-itaam',
+     'description' => 'تشرف على المطاعم الجامعية وتسهر على جودة الوجبات المقدمة وتوازنها الغذائي.'],
+    ['name' => 'مصلحة النقل', 'slug' => 'maslahat-al-naql',
+     'description' => 'تسيّر خطوط النقل الجامعي التي تربط الأحياء والإقامات بالأقطاب الجامعية.'],
+];
+
+@@end
+@@block arr-cites 11
+// الإقامات الجامعية
+$cites_list = [
+    ['name' => 'دباغين', 'slug' => 'debaghine', 'main_image' => 'cites/main/debaghine.jpg',
+     'phone' => '036 00 00 01', 'address' => 'القطب الجامعي الباز، سطيف'],
+    ['name' => 'هاشمي حسين', 'slug' => 'hachemi-hocine', 'main_image' => 'cites/main/hachemi-hocine.jpg',
+     'phone' => '036 00 00 02', 'address' => 'حي الهضاب، سطيف'],
+    ['name' => 'بوخريصة', 'slug' => 'boukhrissa', 'main_image' => 'cites/main/boukhrissa.jpg',
+     'phone' => '036 00 00 03', 'address' => 'طريق بجاية، سطيف'],
+    ['name' => 'روابح', 'slug' => 'rouabah', 'main_image' => 'cites/main/rouabah.jpg',
+     'phone' => '036 00 00 04', 'address' => 'حي 1014 مسكن، سطيف'],
+    ['name' => 'فضيلة', 'slug' => 'fadila', 'main_image' => 'cites/main/fadila.jpg',
+     'phone' => '036 00 00 05', 'address' => 'حي المعبودة، سطيف'],
+    ['name' => '19 ماي 1956', 'slug' => '19-mai-1956', 'main_image' => 'cites/main/19-mai-1956.jpg',
+     'phone' => '036 00 00 06', 'address' => 'القطب الجامعي الباز، سطيف'],
+    ['name' => '24 أفريل', 'slug' => '24-avril', 'main_image' => 'cites/main/24-avril.jpg',
+     'phone' => '036 00 00 07', 'address' => 'حي كعبوب، سطيف'],
+];
+
+@@end
+@@block arr-stats 11
+// أرقام قسم الإحصائيات
+$site_stats = [
+    'total_visitors' => 15230,
+    'total_page_views' => 48975,
+    'total_news' => 5,
+    'total_services' => 12,
+    'total_downloads' => 8,
+    'total_faqs' => 15,
+    'total_cites' => 7,
+];
+@@end
+@@block php-year 12
+
+// السنة الحالية: يستعملها التذييل (footer.php)
+$current_year = date('Y');
+@@end
+@@block php-close 11
 ?>
 @@end
 <!DOCTYPE html>

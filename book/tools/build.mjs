@@ -15,6 +15,7 @@
 //    @file database/schema.sql 89-102 insert   قطعة تُدرج في وسط ملف كُتب جزء منه (خارج الترتيب)
 //    @stage home nav-html [STEP]     كتلة من ملف مؤقت (stages/home.src) بأرقام أسطرها في تلك الخطوة
 //    @stage home * 2 [FILE]          الملف المؤقت كاملاً كما هو عند الخطوة 2
+//    @stage home stats-php - 16-20   جزء من كتلة (أسطرها 16–20 داخلها)؛ «-» = خطوة الكتلة نفسها
 //    @moved app/views/base/base.php 22-218 | نص   أسطر نهائية سبق كتابتها في ملف مؤقت: «انقلها كما هي»
 //    @shot images/home.png [40%] | تعليق   صورة مع تعليق (وعرض اختياري بالنسبة المئوية)
 //    @pagebreak                      صفحة جديدة
@@ -238,9 +239,13 @@ function includeFile(spec, chapter) {
 
 // ------------------------------------------------------------------ الملفات المؤقتة (المراحل) والكود المنقول
 function includeStage(spec, chapter) {
-  const [name, blockName, step, file] = spec.trim().split(/\s+/);
-  // «*» = الملف كاملاً كما هو عند تلك الخطوة
-  const b = blockName === '*' ? stageFile(name, step, file) : stageBlock(name, blockName, step);
+  const [name, blockName, step, extra] = spec.trim().split(/\s+/);
+  // «*» = الملف كاملاً كما هو عند تلك الخطوة (extra = اسم الملف)، وإلا extra = جزء من الكتلة «a-b» بأرقام نسبية
+  let b = blockName === '*' ? stageFile(name, step, extra) : stageBlock(name, blockName, step === '-' ? '' : step);
+  if (blockName !== '*' && extra && /^\d+-\d+$/.test(extra)) {
+    const [x, y] = extra.split('-').map(Number);
+    b = { ...b, lines: b.lines.slice(x - 1, y), start: b.start + x - 1, end: b.start + y - 1 };
+  }
   const fin = b.block && b.block.fromFile;
   if (fin) {
     if (!coverage.has(fin)) coverage.set(fin, []);
