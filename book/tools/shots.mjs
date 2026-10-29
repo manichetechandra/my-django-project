@@ -94,6 +94,15 @@ const stageShots = [
   { name: '29-contact-static', overlay: ['contact', 29.1], url: '/contact/', h: 1000, scrollTo: 'form', scrollPad: 200 },
   { name: '32-dashboard-static', overlay: ['dashboard', 32.1], url: '/students/dashboard/', login: STUDENT, h: 1000 },
   { name: '34-dashboard-static', overlay: ['staffdash', 34.1], url: '/students/admin/dashboard/', login: STAFF, h: 1000 },
+  { name: '35-static-index', overlay: ['admindemo', 35], plain: true, url: '/admin-demo/index.html', h: 760 },
+  {
+    name: '35-static-list', overlay: ['admindemo', 35], plain: true, url: '/admin-demo/list.html', h: 640,
+    act: async (page) => { const boxes = await page.$$('[data-row-check]'); for (const i of [0, 2]) await boxes[i].click(); },
+  },
+  {
+    name: '35-static-form', overlay: ['admindemo', 35], plain: true, url: '/admin-demo/form.html', h: 900,
+    act: async (page) => { await page.type('#f_title', 'تمديد التسجيل في الإقامات'); },
+  },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
@@ -247,14 +256,16 @@ async function prepareStage(s) {
 // صفحة من الموقع التجريبي الكامل (/tmp/site من tools/demo-site.sh) مع ملفات مؤقتة فوقه (مثل قالب بمحتوى ثابت)
 const DEMO_SITE = process.env.DEMO_SITE || '/tmp/site';
 async function prepareOverlay(s) {
-  const key = `overlay|${s.overlay.join('@')}`;
+  const key = `overlay|${s.overlay.join('@')}|${s.plain ? 'plain' : 'router'}`;
   if (key === serverKey && server) return;
   await stopServer();
   const dir = path.join(BOOK, '.build', 'overlay-site');
   fs.rmSync(dir, { recursive: true, force: true });
   fs.cpSync(DEMO_SITE, dir, { recursive: true });
   writeSnapshot(s.overlay[0], s.overlay[1], dir);
-  server = spawn(PHP, ['-S', '127.0.0.1:8100', '-t', dir, path.join(dir, 'index.php')], { env: { ...process.env, DB_NAME: 'dou_setif' }, stdio: ['ignore', 'ignore', 'pipe'] });
+  // plain: بلا موجّه index.php، فتُقدَّم ملفات HTML الثابتة (مثل admin-demo/) كما يفعل Apache
+  const routerArgs = s.plain ? [] : [path.join(dir, 'index.php')];
+  server = spawn(PHP, ['-S', '127.0.0.1:8100', '-t', dir, ...routerArgs], { env: { ...process.env, DB_NAME: 'dou_setif' }, stdio: ['ignore', 'ignore', 'pipe'] });
   server.stderr.on('data', (d) => { const t = String(d); if (/error|warning|fatal/i.test(t) && !/Accepted|Closing|\[200\]|\[30\d\]/.test(t)) process.stderr.write('  php: ' + t); });
   for (let i = 0; i < 50 && !(await portOpen(8100)); i++) await new Promise((r) => setTimeout(r, 100));
   serverKey = key;
