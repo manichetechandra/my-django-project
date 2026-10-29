@@ -91,6 +91,7 @@ const stageShots = [
   // صفحات بمحتوى ثابت فوق الموقع التجريبي (/tmp/site): overlay = [stage, step]
   { name: '26-director-static', overlay: ['director', 26.1], url: '/director-word/', h: 760 },
   { name: '27-newslist-static', overlay: ['newslist', 27.1], url: '/news/', h: 900 },
+  { name: '29-contact-static', overlay: ['contact', 29.1], url: '/contact/', h: 1000, scrollTo: 'form', scrollPad: 200 },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
@@ -105,7 +106,7 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '27-activities', url: '/activities/', h: 900 },
   { name: '28-services', url: '/services/', h: 900 },
   {
-    name: '19-contact', url: '/contact/', h: 1000, scrollTo: 'form:has(textarea[name=message])',
+    name: '29-contact', url: '/contact/', h: 1060, scrollTo: '.breadcrumb', scrollPad: 100,
     act: async (page) => {
       await page.type('input[name=full_name]', 'أح');
       await page.type('input[name=email]', 'ahmed@example.com');
@@ -281,7 +282,7 @@ for (const s of shots) {
   await page.goto(BASE + (await resolveUrl(s.url)), { waitUntil: 'networkidle0' });
   if (s.act) await s.act(page);
   // إخفاء رسائل التنبيه العائمة (إلا في صفحة اتصل بنا) وشريط إشعار الموقع إن غطّى المحتوى
-  await page.addStyleTag({ content: `${s.name === '19-contact' ? '' : '.flash-messages{display:none!important}'} *{transition:none!important;animation:none!important}` });
+  await page.addStyleTag({ content: `${s.name === '29-contact' ? '' : '.flash-messages{display:none!important}'} *{transition:none!important;animation:none!important}` });
   await page.evaluate(() => document.fonts.ready);
   if (s.scrollTo) {
     await page.evaluate((sel, pad) => {

@@ -1,0 +1,184 @@
+@@file app/views/contact/contact.php 29.1
+@@block head 29.1 from=app/views/contact/contact.php:1-178
+@@end
+@@block content-static 29.1
+
+<!-- Header -->
+<div class="contact-header">
+    <div class="container">
+        <h1 class="text-center" style="margin: 0; font-size: 42px;">
+            <i class="fa fa-envelope"></i> اتصل بنا
+        </h1>
+        <p class="text-center" style="font-size: 18px; margin-top: 15px; opacity: 0.9;">
+            نحن هنا للإجابة على استفساراتكم ومساعدتكم
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+        <li><a href="#">الرئيسية</a></li>
+        <li class="active">اتصل بنا</li>
+    </ol>
+    
+    <div class="row">
+        <!-- النموذج -->
+        <div class="col-md-7">
+            <div class="contact-form-container">
+                <h3 style="color: #2c3e50; margin-top: 0; margin-bottom: 25px;">
+                    <i class="fa fa-paper-plane"></i> أرسل لنا رسالة
+                </h3>
+                
+                <form method="post">
+                    <!-- الاسم الكامل -->
+                    <div class="form-group">
+                        <label for="id_full_name" class="required-field">الاسم الكامل</label>
+                        <input type="text" name="full_name" id="id_full_name" class="form-control" placeholder="الاسم الكامل" required maxlength="100">
+                    </div>
+                    
+                    <!-- البريد الإلكتروني -->
+                    <div class="form-group">
+                        <label for="id_email" class="required-field">البريد الإلكتروني</label>
+                        <input type="email" name="email" id="id_email" class="form-control" placeholder="example@email.com" required maxlength="254">
+                    </div>
+                    
+                    <!-- رقم الهاتف -->
+                    <div class="form-group">
+                        <label for="id_phone">رقم الهاتف <small style="color: #999;">(اختياري)</small></label>
+                        <input type="text" name="phone" id="id_phone" class="form-control" placeholder="0555123456 (اختياري)" maxlength="20">
+                    </div>
+                    
+                    <!-- الموضوع -->
+                    <div class="form-group">
+                        <label for="id_subject" class="required-field">الموضوع</label>
+                        <select name="subject" id="id_subject" class="form-control" required>
+                            <option value="" selected>---------</option>
+                            <option value="general">استفسار عام</option>
+                            <option value="transport">النقل الجامعي</option>
+                            <option value="housing">الإقامة الجامعية</option>
+                            <option value="catering">المطاعم والإطعام</option>
+                            <option value="scholarship">المنح والإعانات</option>
+                            <option value="complaint">شكوى</option>
+                            <option value="suggestion">اقتراح</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
+                    
+                    <!-- الرسالة -->
+                    <div class="form-group">
+                        <label for="id_message" class="required-field">رسالتك</label>
+                        <textarea name="message" id="id_message" class="form-control" rows="6" placeholder="اكتب رسالتك أو استفسارك هنا..." required></textarea>
+                    </div>
+                    
+                    <!-- زر الإرسال -->
+                    <button type="submit" class="btn btn-submit">
+                        <i class="fa fa-send"></i> إرسال الرسالة
+                    </button>
+                    
+                    <p style="text-align: center; margin-top: 15px; color: #999; font-size: 13px;">
+                        <i class="fa fa-lock"></i> معلوماتك آمنة ولن تُستخدم إلا للرد على استفسارك
+                    </p>
+                </form>
+            </div>
+        </div>
+        
+        <!-- معلومات الاتصال -->
+        <div class="col-md-5">
+            
+            <!-- إحصائية -->
+            <div class="stats-box">
+                <h3><i class="fa fa-envelope-o"></i> 2</h3>
+                <p>رسالة تم استقبالها</p>
+            </div>
+            
+            <!-- العنوان -->
+            <div class="contact-info-box">
+                <i class="fa fa-map-marker"></i>
+                <h4>العنوان</h4>
+                <p>
+                    مديرية الخدمات الجامعية<br>
+                    جامعة فرحات عباس - سطيف 1<br>
+                    سطيف، الجزائر
+                </p>
+            </div>
+            
+            <!-- الهاتف -->
+            <div class="contact-info-box">
+                <i class="fa fa-phone"></i>
+                <h4>الهاتف</h4>
+                <p>
+                    <strong>الخط الرئيسي:</strong> 036 xx xx xx<br>
+                    <strong>الفاكس:</strong> 036 xx xx xx
+                </p>
+            </div>
+            
+            <!-- البريد الإلكتروني -->
+            <div class="contact-info-box">
+                <i class="fa fa-envelope"></i>
+                <h4>البريد الإلكتروني</h4>
+                <p>
+                    <a href="mailto:contact@univ-setif.dz" style="color: #3498db;">
+                        contact@univ-setif.dz
+                    </a>
+                </p>
+            </div>
+            
+            <!-- ساعات العمل -->
+            <div class="working-hours">
+                <h5><i class="fa fa-clock-o"></i> ساعات العمل</h5>
+                <p>
+                    <strong>الأحد - الخميس:</strong> 8:00 صباحاً - 4:00 مساءً<br>
+                    <strong>الجمعة والسبت:</strong> مغلق
+                </p>
+            </div>
+            
+            <!-- روابط سريعة -->
+            <div class="contact-info-box">
+                <i class="fa fa-link"></i>
+                <h4>روابط مفيدة</h4>
+                <p>
+                    <a href="#" style="color: #3498db;">
+                        <i class="fa fa-arrow-left"></i> الخدمات الجامعية
+                    </a><br>
+                    <a href="#" style="color: #3498db; margin-top: 5px; display: inline-block;">
+                        <i class="fa fa-arrow-left"></i> آخر الأخبار
+                    </a>
+                </p>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- خريطة الموقع (اختياري) -->
+    <div class="row" style="margin-top: 40px;">
+        <div class="col-md-12">
+            <h3 style="color: #2c3e50; margin-bottom: 20px;">
+                <i class="fa fa-map"></i> موقعنا على الخريطة
+            </h3>
+            <div class="map-container">
+                <!-- خريطة Google Maps -->
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3233.8333333333!2d5.4166666666667!3d36.191666666667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzbCsDExJzMwLjAiTiA1wrAyNScwMC4wIkU!5e0!3m2!1sar!2sdz!4v1234567890123!5m2!1sar!2sdz" 
+                    width="100%" 
+                    height="400" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy">
+                </iframe>
+            </div>
+            <p style="text-align: center; margin-top: 10px; color: #999; font-size: 13px;">
+                <i class="fa fa-info-circle"></i> يمكنك استخدام الخريطة للوصول إلينا بسهولة
+            </p>
+        </div>
+    </div>
+    
+</div>
+
+<br><br>
+
+@@end
+@@block content-final 29.2 replaces=content-static from=app/views/contact/contact.php:179-399
+@@end
+@@block tail 29.1 from=app/views/contact/contact.php:400-433
+@@end
