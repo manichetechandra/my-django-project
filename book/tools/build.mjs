@@ -272,14 +272,21 @@ function movedBlock(spec, chapter) {
   const all = fs.readFileSync(path.join(SRC, file), 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
   const missing = [];
   for (let i = s; i <= e; i++) if (!seen.has(i)) missing.push(i);
-  if (missing.length) throw new Error(`@moved ${file} ${s}-${e} في ${chapter}: الأسطر ${missing.slice(0, 5).join(',')}… لم تُعرض من قبل في ملف مؤقت`);
+  if (missing.length) {
+    const msg = `@moved ${file} ${s}-${e} في ${chapter}: الأسطر ${missing.slice(0, 5).join(',')}… لم تُعرض من قبل في ملف مؤقت`;
+    if (!ONLY) throw new Error(msg);
+    console.warn('تحذير (بناء جزئي): ' + msg);
+  }
   const note = noteParts.join('|').trim();
   const range = `الأسطر ${s}–${e} من ${all.length}`;
-  const first = all[s - 1].trim();
-  const last = all[e - 1].trim();
+  // أول وآخر سطر غير فارغ في المدى، ليتعرّف القارئ على بداية القطعة ونهايتها
+  let a = s, z = e;
+  while (a < e && !all[a - 1].trim()) a++;
+  while (z > a && !all[z - 1].trim()) z--;
+  const edge = (n) => `<span class="edge"><b>${n}</b> <code>${esc(all[n - 1].trim())}</code></span>`;
   return `<div class="code moved"><div class="code-head"><span class="badge mv">منقول</span><span class="path">${esc(file)}</span><span class="range">${range}</span></div>`
     + `<div class="moved-body"><div class="moved-note">${md.renderInline(note)}</div>`
-    + `<div class="moved-edges"><span class="edge"><b>${s}</b> <code>${esc(first)}</code></span><span class="dots">…</span><span class="edge"><b>${e}</b> <code>${esc(last)}</code></span></div></div></div>`;
+    + `<div class="moved-edges">${edge(a)}${z > a ? `${z > a + 1 ? '<span class="dots">…</span>' : ''}${edge(z)}` : ''}</div></div></div>`;
 }
 
 // ------------------------------------------------------------------ Markdown

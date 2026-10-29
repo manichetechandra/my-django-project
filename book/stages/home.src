@@ -75,7 +75,6 @@ $site_stats = [
     'total_cites'      => (int) $pdo->query("SELECT COUNT(*) FROM cites WHERE is_active = 1")->fetchColumn(),
 ];
 
-
 @@end
 @@block arr-slides 11
 // صور السلايدر

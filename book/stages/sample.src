@@ -92,3 +92,8 @@ INSERT INTO `cites` (`name`, `slug`, `description`, `main_image`, `address`, `ca
 ('24 أفريل', '24-avril', 'إقامة جامعية بطاقة استيعاب 800 سرير، توفر الإيواء والإطعام والنقل للطلبة.',
  'cites/main/24-avril.jpg', 'حي كعبوب، سطيف', 800, '036 00 00 07', 7);
 @@end
+@@block extra 15.5
+-- (للاختبار فقط: الخبر الذي يضيفه القارئ يدوياً في الفصل 15)
+INSERT INTO `news` (`title`, `slug`, `summary`, `content`, `published_date`, `show_in_ticker`) VALUES
+('فتح باب الترشح لعضوية لجان الأحياء الجامعية', 'lijan-al-ahyaa', 'ملخص الخبر', 'نص الخبر', '2026-10-28 10:00:00', 1);
+@@end

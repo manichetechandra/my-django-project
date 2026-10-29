@@ -88,6 +88,7 @@ const stageShots = [
   { name: '08-cites', stage: ['home', 8], url: '/', h: 470, scrollTo: '#cite', scrollPad: 95 },
   { name: '09-footer', stage: ['home', 9], url: '/', h: 420, scrollTo: 'footer', scrollPad: 60 },
   { name: '09-full', stage: ['home', 9], url: '/', w: 1920, full: true, scaleTo: 0.3, wait: 2600 },
+  // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 640, scrollTo: '#list-news', scrollPad: 75, files: ['config.php'] },
 ];
 
