@@ -103,6 +103,14 @@ const stageShots = [
     name: '35-static-form', overlay: ['admindemo', 35], plain: true, url: '/admin-demo/form.html', h: 900,
     act: async (page) => { await page.type('#f_title', 'تمديد التسجيل في الإقامات'); },
   },
+  { name: '36-news-list', overlay: ['adminnews', 36.3], url: '/admin/news/', login: STAFF, h: 700 },
+  { name: '36-news-form', overlay: ['adminnews', 36.3], url: '/admin/news/1/', login: STAFF, h: 1250 },
+  {
+    name: '36-news-errors', overlay: ['adminnews', 36.3], url: '/admin/news/add/', login: STAFF, h: 760,
+    act: async (page) => {
+      await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('.admin-submit-row [type=submit]')]);
+    },
+  },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];

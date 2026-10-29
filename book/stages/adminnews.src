@@ -1,0 +1,307 @@
+@@file app/controllers/admin.php 36.1
+@@block header-temp 36.1
+<?php
+/**
+ * لوحة الإدارة /admin/ — مؤقت: قسم الأخبار وحده، بدوال مكتوبة باليد.
+ * في الفصل 37 تصبح عامة: تقرأ إعدادات كل جدول من app/admin_config.php
+ */
+
+@@end
+@@block guard 36.1 from=app/controllers/admin.php:35-48
+@@end
+@@block render-temp 36.1
+function admin_render(string $view, array $data = []): void
+{
+    // القائمة الجانبية: قسم واحد في الوقت الحالي
+    $data['admin_menu'] = [
+        'المحتوى' => [
+            ['key' => 'news', 'label' => 'الأخبار', 'icon' => 'fa-newspaper-o', 'badge' => 0],
+        ],
+    ];
+    render('admin/' . $view, $data);
+}
+
+// ====================================================================== الصفحات
+
+function admin_index(): void
+{
+    admin_guard();
+    // لا صفحة رئيسية بعد: نذهب إلى الأخبار مباشرة
+    redirect_to('admin:list', 'news');
+}
+
+@@end
+@@block auth 36.1 from=app/controllers/admin.php:92-134
+@@end
+@@block news-list 36.1
+// ====================================================================== الأخبار (مؤقت)
+
+/** لا نعرف في هذه المرحلة إلا قسم الأخبار */
+function admin_news_only(string $key): void
+{
+    if ($key !== 'news') {
+        abort(404, 'هذا القسم غير موجود في لوحة الإدارة');
+    }
+}
+
+function admin_list(string $key): void
+{
+    admin_guard();
+    admin_news_only($key);
+    admin_render('news_list', [
+        'page_title' => 'الأخبار',
+        'news_list'  => News::where('1', [], 'COALESCE(published_date, created_at) DESC'),
+    ]);
+}
+@@end
+@@block news-form 36.2
+
+function admin_add(string $key): void
+{
+    admin_guard();
+    admin_news_only($key);
+    admin_news_form(null);
+}
+
+function admin_edit(string $key, $id): void
+{
+    admin_guard();
+    admin_news_only($key);
+    admin_news_form(News::findOrFail($id));
+}
+
+/** الإضافة والتعديل في دالة واحدة: $news فارغ عند الإضافة */
+function admin_news_form(?News $news): void
+{
+    $errors = [];
+    if (is_post()) {
+        $data = [
+            'title'          => trim($_POST['title'] ?? ''),
+            'slug'           => trim($_POST['slug'] ?? ''),
+            'summary'        => trim($_POST['summary'] ?? ''),
+            'content'        => trim($_POST['content'] ?? ''),
+            'status'         => $_POST['status'] ?? '',
+            'published_date' => trim($_POST['published_date'] ?? ''),
+            'is_featured'    => empty($_POST['is_featured']) ? 0 : 1,
+            'show_in_ticker' => empty($_POST['show_in_ticker']) ? 0 : 1,
+        ];
+        if ($data['title'] === '') {
+            $errors['title'] = 'هذا الحقل مطلوب.';
+        }
+        if ($data['content'] === '') {
+            $errors['content'] = 'هذا الحقل مطلوب.';
+        }
+        if (!array_key_exists($data['status'], News::choiceMap('status'))) {
+            $errors['status'] = 'اختر قيمة صحيحة.';
+        }
+        if ($data['slug'] !== '' && News::exists('slug = ? AND id <> ?', [$data['slug'], $news ? (int) $news['id'] : 0])) {
+            $errors['slug'] = 'هذا الرابط مستعمل في خبر آخر.';
+        }
+        // حقل datetime-local يرسل «2026-10-29T10:00»، وMySQL يريد «2026-10-29 10:00:00»
+        if ($data['published_date'] === '') {
+            $data['published_date'] = null;
+        } else {
+            $d = DateTime::createFromFormat('Y-m-d\TH:i', $data['published_date']);
+            if ($d) {
+                $data['published_date'] = $d->format('Y-m-d H:i:s');
+            } else {
+                $errors['published_date'] = 'أدخل تاريخاً ووقتاً صالحين.';
+            }
+        }
+
+        // الصورة: نرفعها فقط إن لم يكن في الحقول الأخرى خطأ
+        $file = $_FILES['main_image'] ?? null;
+        if (!$errors && $file && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+            $max = (float) config('uploads.max_image_mb', 10);
+            $err = Upload::validate($file, Upload::IMAGES, $max);
+            if ($err) {
+                $errors['main_image'] = $err;
+            } else {
+                $data['main_image'] = Upload::store($file, 'news/main', Upload::IMAGES, $max);
+            }
+        }
+
+        if (!$errors) {
+            $oldImage = $news ? (string) $news['main_image'] : '';
+            if ($news === null) {
+                $news = new News(['author_id' => current_user()['id']]);
+            }
+            foreach ($data as $k => $v) {
+                $news[$k] = $v;
+            }
+            $news->save(); // تملأ الرابط الفارغ وتاريخ الإنشاء والتحديث
+            if (isset($data['main_image']) && $oldImage !== '') {
+                Upload::delete($oldImage); // الصورة القديمة استُبدلت
+            }
+            flash('success', 'تم حفظ "' . $news . '" بنجاح.');
+            redirect_to('admin:list', 'news');
+        }
+        $values = $_POST; // نعيد إلى النموذج ما كتبه المدير، مع الأخطاء
+    } else {
+        $values = $news ? $news->toArray() : ['status' => 'published', 'published_date' => now()];
+    }
+    admin_render('news_form', [
+        'page_title' => $news ? 'تعديل خبر' : 'إضافة خبر',
+        'news'       => $news,
+        'values'     => $values,
+        'errors'     => $errors,
+    ]);
+}
+@@end
+@@block news-delete 36.3
+
+function admin_delete(string $key, $id): void
+{
+    admin_guard();
+    admin_news_only($key);
+    $news = News::findOrFail($id);
+    if (is_post()) {
+        $image = (string) $news['main_image'];
+        $news->delete();
+        Upload::delete($image);
+        flash('success', 'تم حذف "' . $news . '" بنجاح.');
+        redirect_to('admin:list', 'news');
+    }
+    admin_render('delete', [
+        'page_title' => 'حذف خبر',
+        'r'          => ['label' => 'خبر', 'key' => 'news'], // ما يحتاجه قالب delete.php
+        'obj'        => $news,
+    ]);
+}
+@@end
+@@block news-list-view 36.1 file=app/views/admin/news_list.php@36.1
+<?php extend('admin/layout'); ?>
+<?php block('title'); ?><?= e($page_title) ?><?php endblock(); ?>
+<?php block('content'); ?>
+<div class="admin-header">
+    <h1 class="admin-title"><i class="fa fa-newspaper-o"></i> الأخبار <small>(<?= count($news_list) ?>)</small></h1>
+    <a href="<?= e(url('admin:add', 'news')) ?>" class="btn btn-success"><i class="fa fa-plus"></i> إضافة خبر</a>
+</div>
+
+<div class="table-responsive admin-table-wrap">
+    <table class="table table-striped table-hover admin-table">
+        <thead>
+        <tr>
+            <th>الصورة الرئيسية</th>
+            <th>العنوان</th>
+            <th>الحالة</th>
+            <th>خبر مميز</th>
+            <th>تاريخ النشر</th>
+            <th>عدد المشاهدات</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($news_list as $n): ?>
+            <tr>
+                <td>
+                    <?php if ($n['main_image']): ?>
+                        <img src="<?= e(media_url($n['main_image'])) ?>" class="admin-thumb" alt="">
+                    <?php else: ?>
+                        <span class="text-muted">—</span>
+                    <?php endif; ?>
+                </td>
+                <td><a href="<?= e(url('admin:edit', 'news', $n['id'])) ?>"><strong><?= e($n['title']) ?></strong></a></td>
+                <td><span class="label label-default admin-choice admin-choice-<?= e($n['status']) ?>"><?= e($n->get_status_display()) ?></span></td>
+                <td>
+                    <?php if ($n['is_featured']): ?>
+                        <i class="fa fa-check-circle text-success"></i>
+                    <?php else: ?>
+                        <i class="fa fa-times-circle text-danger"></i>
+                    <?php endif; ?>
+                </td>
+                <td><?= e(format_date($n['published_date'], 'd/m/Y H:i')) ?></td>
+                <td><?= e($n['views_count']) ?></td>
+                <td class="text-left" style="white-space: nowrap">
+                    <a href="<?= e(url('admin:edit', 'news', $n['id'])) ?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i> تعديل</a>
+                    <a href="<?= e(url('admin:delete', 'news', $n['id'])) ?>" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> حذف</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        <?php if (!$news_list): ?>
+            <tr><td colspan="7" class="text-center text-muted" style="padding:40px">لا توجد أخبار</td></tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+<?php endblock(); ?>
+@@end
+@@block news-form-view 36.2 file=app/views/admin/news_form.php@36.2
+<?php extend('admin/layout'); ?>
+<?php block('title'); ?><?= e($page_title) ?><?php endblock(); ?>
+<?php block('content'); ?>
+<ol class="breadcrumb">
+    <li><a href="<?= e(url('admin:index')) ?>">لوحة الإدارة</a></li>
+    <li><a href="<?= e(url('admin:list', 'news')) ?>">الأخبار</a></li>
+    <li class="active"><?= $news ? e(truncatechars($news['title'], 60)) : 'إضافة' ?></li>
+</ol>
+<h1 class="admin-title"><i class="fa fa-newspaper-o"></i> <?= e($page_title) ?></h1>
+
+<form method="post" enctype="multipart/form-data" class="admin-form" novalidate>
+    <?= csrf_field() ?>
+    <div class="panel panel-default admin-panel">
+        <div class="panel-body">
+            <div class="form-group <?= isset($errors['title']) ? 'has-error' : '' ?>">
+                <label for="f_title" class="control-label">العنوان <span class="text-danger">*</span></label>
+                <input type="text" name="title" id="f_title" class="form-control" maxlength="300" value="<?= e($values['title'] ?? '') ?>">
+                <?php if (isset($errors['title'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['title']) ?></span><?php endif; ?>
+            </div>
+            <div class="form-group <?= isset($errors['slug']) ? 'has-error' : '' ?>">
+                <label for="f_slug" class="control-label">الرابط (slug)</label>
+                <input type="text" name="slug" id="f_slug" class="form-control" dir="ltr" value="<?= e($values['slug'] ?? '') ?>" data-slug-from="f_title"<?= $news ? ' data-slug-locked="1"' : '' ?>>
+                <?php if (isset($errors['slug'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['slug']) ?></span><?php endif; ?>
+                <span class="help-block small text-muted">يُولَّد تلقائياً من "العنوان" إذا تُرك فارغاً.</span>
+            </div>
+            <div class="form-group">
+                <label for="f_summary" class="control-label">الملخص</label>
+                <textarea name="summary" id="f_summary" class="form-control" rows="3"><?= e($values['summary'] ?? '') ?></textarea>
+            </div>
+            <div class="form-group <?= isset($errors['content']) ? 'has-error' : '' ?>">
+                <label for="f_content" class="control-label">المحتوى <span class="text-danger">*</span></label>
+                <textarea name="content" id="f_content" class="form-control" rows="8"><?= e($values['content'] ?? '') ?></textarea>
+                <?php if (isset($errors['content'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['content']) ?></span><?php endif; ?>
+            </div>
+            <div class="form-group <?= isset($errors['main_image']) ? 'has-error' : '' ?>">
+                <label for="f_main_image" class="control-label">الصورة الرئيسية</label>
+                <?php if ($news && $news['main_image']): ?>
+                    <div class="admin-current-file">
+                        <img src="<?= e(media_url($news['main_image'])) ?>" class="admin-preview" alt="">
+                    </div>
+                <?php endif; ?>
+                <input type="file" name="main_image" id="f_main_image" class="form-control" accept="image/*">
+                <?php if (isset($errors['main_image'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['main_image']) ?></span><?php endif; ?>
+            </div>
+            <?php $date = to_datetime($values['published_date'] ?? null); ?>
+            <div class="form-group <?= isset($errors['published_date']) ? 'has-error' : '' ?>">
+                <label for="f_published_date" class="control-label">تاريخ النشر</label>
+                <input type="datetime-local" name="published_date" id="f_published_date" class="form-control" value="<?= $date ? $date->format('Y-m-d\TH:i') : '' ?>">
+                <?php if (isset($errors['published_date'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['published_date']) ?></span><?php endif; ?>
+                <span class="help-block small text-muted">اتركه فارغاً ليُعتمد تاريخ الإنشاء</span>
+            </div>
+            <div class="form-group <?= isset($errors['status']) ? 'has-error' : '' ?>">
+                <label for="f_status" class="control-label">الحالة <span class="text-danger">*</span></label>
+                <select name="status" id="f_status" class="form-control">
+                    <?php foreach (News::choiceMap('status') as $value => $label): ?>
+                        <option value="<?= e($value) ?>"<?= ($values['status'] ?? '') === $value ? ' selected' : '' ?>><?= e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <?php if (isset($errors['status'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['status']) ?></span><?php endif; ?>
+            </div>
+            <div class="form-group">
+                <div class="checkbox"><label><input type="checkbox" name="is_featured" id="f_is_featured" value="1"<?= !empty($values['is_featured']) ? ' checked' : '' ?>> خبر مميز</label></div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox"><label><input type="checkbox" name="show_in_ticker" id="f_show_in_ticker" value="1"<?= !empty($values['show_in_ticker']) ? ' checked' : '' ?>> عرض في شريط الأخبار</label></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-submit-row">
+        <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> حفظ</button>
+        <?php if ($news): ?>
+            <a href="<?= e(url('admin:delete', 'news', $news['id'])) ?>" class="btn btn-danger pull-left"><i class="fa fa-trash"></i> حذف</a>
+        <?php endif; ?>
+    </div>
+</form>
+<?php endblock(); ?>
+@@end

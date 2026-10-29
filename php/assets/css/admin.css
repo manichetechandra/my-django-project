@@ -76,3 +76,7 @@ body.admin-body { background: #f4f6f9; font-family: Tahoma, "Segoe UI", Arial, s
     .admin-main { margin-right: 0; padding: 15px; }
     .admin-topbar-links { gap: 12px; }
 }
+
+/* مربعات الاختيار: ملف bootstrap-rtl لا يُحمَّل، فنضع المربع على اليمين بأنفسنا */
+.checkbox label { padding-left: 0; padding-right: 20px; }
+.checkbox input[type=checkbox] { margin-left: 0; margin-right: -20px; }
