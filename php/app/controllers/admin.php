@@ -35,6 +35,7 @@ function admin_resource(string $key): array
 /** يتطلب أن يكون المستخدم موظفاً — مع صفحة دخول خاصة إن لم يكن مسجلاً */
 function admin_guard(): User
 {
+    set_lang(default_lang()); // لوحة الإدارة عربية دائماً
     never_cache();
     $u = current_user();
     if (!$u) {

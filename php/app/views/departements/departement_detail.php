@@ -49,7 +49,7 @@
     .info-item i {
         color: #8cc040;
         width: 25px;
-        margin-left: 5px;
+        margin-inline-end: 5px;
     }
     
     .description-box {
@@ -66,12 +66,16 @@
     .other-dept-card {
         margin-bottom: 20px;
         transition: transform 0.2s;
-        border-right: 3px solid #8cc040;
+        border-inline-start: 3px solid #8cc040;
     }
     
     .other-dept-card:hover {
         transform: translateX(-5px);
         background: #f8f9fa;
+    }
+
+    html[dir="ltr"] .other-dept-card:hover {
+        transform: translateX(5px);
     }
     
     .other-dept-card h4 {

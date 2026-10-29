@@ -222,7 +222,7 @@
         body:before {
             content: "تاريخ الطباعة: " attr(data-print-date);
             display: block;
-            text-align: left;
+            text-align: end;
             font-size: 12px;
             color: #666;
             margin-bottom: 10px;
@@ -364,7 +364,7 @@ if (printBtn) {
                         <?php foreach ($documents as $doc): ?>
                         <li>
                             <div>
-                                <i class="fa fa-file" style="color: #3498db; margin-left: 10px;"></i>
+                                <i class="fa fa-file" style="color: #3498db; margin-inline-end: 10px;"></i>
                                 <strong><?= e($doc['document_name']) ?></strong>
                                 <br>
                                 <small style="color: #7f8c8d;">

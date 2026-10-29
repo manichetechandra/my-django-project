@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="<?= e(lang()) ?>" dir="<?= text_dir() ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,7 +74,7 @@
     .section h2 {
         background: #ecf0f1;
         padding: 8px; /* ← قللنا من 10px */
-        border-right: 4px solid #3498db;
+        border-inline-start: 4px solid #3498db;
         font-size: 14px; /* ← قللنا من 16px */
         margin-bottom: 10px; /* ← قللنا من 15px */
         color: #2c3e50;

@@ -23,8 +23,8 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         margin-bottom: 40px;
         max-width: 500px;
-        margin-left: auto;
-        margin-right: auto;
+        margin-inline-end: auto;
+        margin-inline-start: auto;
     }
     
     .login-icon {
@@ -60,7 +60,7 @@
     }
     
     .remember-me input {
-        margin-left: 10px;
+        margin-inline-end: 10px;
     }
     
     .btn-login {

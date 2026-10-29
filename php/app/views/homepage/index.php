@@ -71,8 +71,7 @@
         margin-bottom: 30px;
         transition: transform 0.3s;
         height: 100%;
-        direction: rtl;
-        text-align: right;
+        text-align: start;
     }
     
     .card:hover {
@@ -97,8 +96,7 @@
         margin: 0;
         background-color: #2c3e50;
         color: white;
-        text-align: right;
-        direction: rtl;
+        text-align: start;
     }
     
     .card h4 a {
@@ -113,30 +111,28 @@
     .card p {
         padding: 15px;
         color: #666;
-        text-align: right;
-        direction: rtl;
+        text-align: start;
     }
     
     .card small {
-        text-align: right;
-        direction: rtl;
+        text-align: start;
     }
     
     .card .btn {
-        float: right;
-        margin-right: 0;
-        margin-left: 5px;
+        float: right; float: inline-start;
+        margin-inline-start: 0;
+        margin-inline-end: 5px;
     }
     
     /* إصلاح الأعمدة RTL */
     .activities-row .col-md-4 {
-        float: right !important;
+        float: right !important; float: inline-start !important;
     }
     
     /* بطاقات الأقسام */
     .panel-default {
         margin-bottom: 20px;
-        text-align: right;
+        text-align: start;
     }
     
     .outer {
@@ -152,7 +148,7 @@
     
     .thumbnails li {
         padding: 10px;
-        float: right;
+        float: right; float: inline-start;
     }
     
     .thumbnail {
@@ -205,13 +201,13 @@
 }
 
 .media-carousel .carousel-control.left {
-    right: 5px;
-    left: auto;
+    inset-inline-start: 5px;
+    inset-inline-end: auto;
 }
 
 .media-carousel .carousel-control.right {
-    left: 5px;
-    right: auto;
+    inset-inline-end: 5px;
+    inset-inline-start: auto;
 }
 </style>
 <?php endblock(); ?>
@@ -307,7 +303,7 @@
         <div class="col-lg-12">
             <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
                 <i class="fa fa-newspaper-o"></i> آخر الأخبـــار
-                <a href="<?= e(url('news:news_list')) ?>" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                <a href="<?= e(url('news:news_list')) ?>" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
                     <i class="fa fa-arrow-left"></i> عرض الكل
                 </a>
             </h3>
@@ -373,7 +369,7 @@
         <div class="col-lg-12">
             <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
                 <i class="fa fa-calendar-check-o"></i> آخر النشاطـــات
-                <a href="<?= e(url('activities:activity_list')) ?>" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                <a href="<?= e(url('activities:activity_list')) ?>" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
                     <i class="fa fa-arrow-left"></i> عرض الكل
                 </a>
             </h3>
@@ -636,7 +632,7 @@
                     </div>
                     <div class="panel-body text-justify">
                         <p><?= e(truncatewords($dept['description'], 20)) ?></p>
-                        <a class="btn btn-md btn-success" href="<?= e(url('departements:departement_detail', $dept['slug'])) ?>" style="float: right;">
+                        <a class="btn btn-md btn-success" href="<?= e(url('departements:departement_detail', $dept['slug'])) ?>" style="float: right; float: inline-start;">
                             المزيد <i class="fa fa-arrow-left"></i>
                         </a>
                     </div>
@@ -658,7 +654,7 @@
             <div class="col-lg-12">
                 <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
                     <i class="fa fa-building"></i> الإقامات الجامعية
-                    <a href="<?= e(url('cities:cite_list')) ?>" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                    <a href="<?= e(url('cities:cite_list')) ?>" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
                         <i class="fa fa-arrow-left"></i> عرض الكل
                     </a>
                 </h3>

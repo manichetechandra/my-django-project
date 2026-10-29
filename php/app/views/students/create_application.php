@@ -24,7 +24,7 @@
         padding: 25px;
         background: #f8f9fa;
         border-radius: 8px;
-        border-right: 4px solid #3498db;
+        border-inline-start: 4px solid #3498db;
     }
     
     .form-section h4 {
@@ -61,7 +61,7 @@
     
     .required-docs ul {
         margin: 0;
-        padding-right: 20px;
+        padding-inline-start: 20px;
     }
     
     .required-docs li {
@@ -209,7 +209,7 @@
                         <button type="submit" class="btn-submit">
                             <i class="fa fa-paper-plane"></i> تقديم الطلب
                         </button>
-                        <a href="<?= e(url('students:dashboard')) ?>" class="btn btn-default btn-lg" style="margin-right: 10px;">
+                        <a href="<?= e(url('students:dashboard')) ?>" class="btn btn-default btn-lg" style="margin-inline-start: 10px;">
                             <i class="fa fa-times"></i> إلغاء
                         </a>
                     </div>

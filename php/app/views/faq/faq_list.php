@@ -81,6 +81,10 @@
         transform: translateX(-5px);
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
+
+    html[dir="ltr"] .category-header:hover {
+        transform: translateX(5px);
+    }
     
     .category-header h3 {
         margin: 0;
@@ -92,7 +96,7 @@
         padding: 5px 15px;
         border-radius: 20px;
         font-size: 16px;
-        float: left;
+        float: left; float: inline-end;
         margin-top: 5px;
     }
     
@@ -113,7 +117,7 @@
         border-radius: 5px;
         transition: all 0.3s;
         position: relative;
-        padding-left: 50px;
+        padding-inline-end: 50px;
     }
     
     .faq-question:hover {
@@ -128,7 +132,7 @@
     
     .faq-question .toggle-icon {
         position: absolute;
-        left: 15px;
+        inset-inline-end: 15px;
         top: 50%;
         transform: translateY(-50%);
         font-size: 20px;
@@ -144,7 +148,7 @@
         display: none;
         padding: 20px;
         background: white;
-        border-right: 3px solid #16a085;
+        border-inline-start: 3px solid #16a085;
         margin-top: 10px;
         border-radius: 5px;
         line-height: 1.8;
@@ -175,7 +179,7 @@
     .faq-meta span {
         color: #999;
         font-size: 14px;
-        margin-left: 15px;
+        margin-inline-end: 15px;
     }
     
     /* الأكثر مشاهدة */
@@ -223,7 +227,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-left: 10px;
+        margin-inline-end: 10px;
         font-weight: bold;
     }
 </style>
@@ -295,7 +299,7 @@
                 <?php foreach ($faqs_by_category as [$category, $faqs]): ?>
                 <div class="category-section">
                     <div class="category-header" style="background-color: <?= e($category->get_color()) ?>;">
-                        <i class="fa <?= e($category['icon']) ?>" style="font-size: 28px; margin-left: 15px;"></i>
+                        <i class="fa <?= e($category['icon']) ?>" style="font-size: 28px; margin-inline-end: 15px;"></i>
                         <h3 style="display: inline;"><?= e($category['name']) ?></h3>
                         <span class="badge"><?= e(count($faqs)) ?> سؤال</span>
                     </div>
@@ -355,19 +359,19 @@
                 <h4><i class="fa fa-link"></i> روابط مفيدة</h4>
                 <div class="popular-item">
                     <a href="<?= e(url('contact:contact')) ?>">
-                        <i class="fa fa-envelope" style="margin-left: 10px; color: #16a085;"></i>
+                        <i class="fa fa-envelope" style="margin-inline-end: 10px; color: #16a085;"></i>
                         اتصل بنا
                     </a>
                 </div>
                 <div class="popular-item">
                     <a href="<?= e(url('downloads:download_center')) ?>">
-                        <i class="fa fa-download" style="margin-left: 10px; color: #16a085;"></i>
+                        <i class="fa fa-download" style="margin-inline-end: 10px; color: #16a085;"></i>
                         مركز التحميلات
                     </a>
                 </div>
                 <div class="popular-item">
                     <a href="<?= e(url('services:service_list')) ?>">
-                        <i class="fa fa-cogs" style="margin-left: 10px; color: #16a085;"></i>
+                        <i class="fa fa-cogs" style="margin-inline-end: 10px; color: #16a085;"></i>
                         الخدمات الجامعية
                     </a>
                 </div>

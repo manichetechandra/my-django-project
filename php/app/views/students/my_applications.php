@@ -146,7 +146,7 @@
     }
     
     .app-actions a {
-        margin-right: 10px;
+        margin-inline-start: 10px;
     }
     
     .empty-state {
@@ -224,8 +224,8 @@
         <h4><i class="fa fa-filter"></i> تصفية الطلبات</h4>
         
         <form method="get" class="form-inline">
-            <div class="form-group" style="margin-left: 15px;">
-                <label style="margin-left: 5px;">الحالة:</label>
+            <div class="form-group" style="margin-inline-end: 15px;">
+                <label style="margin-inline-end: 5px;">الحالة:</label>
                 <select name="status" class="form-control">
                     <option value="">الكل</option>
                     <option value="pending" <?php if ($status_filter == 'pending'): ?>selected<?php endif; ?>>قيد الانتظار</option>
@@ -236,8 +236,8 @@
                 </select>
             </div>
             
-            <div class="form-group" style="margin-left: 15px;">
-                <label style="margin-left: 5px;">النوع:</label>
+            <div class="form-group" style="margin-inline-end: 15px;">
+                <label style="margin-inline-end: 5px;">النوع:</label>
                 <select name="type" class="form-control">
                     <option value="">الكل</option>
                     <?php foreach ($application_types as $app_type): ?>
@@ -256,7 +256,7 @@
                 <i class="fa fa-refresh"></i> إعادة تعيين
             </a>
             
-            <a href="<?= e(url('students:create_application')) ?>" class="btn btn-success" style="float: left;">
+            <a href="<?= e(url('students:create_application')) ?>" class="btn btn-success" style="float: left; float: inline-end;">
                 <i class="fa fa-plus"></i> طلب جديد
             </a>
         </form>

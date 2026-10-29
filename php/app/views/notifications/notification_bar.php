@@ -8,7 +8,7 @@
          style="margin: 0; border-radius: 0; border: none; padding: 15px; text-align: center; position: relative;">
         
         <!-- أيقونة -->
-        <i class="fa <?= e($site_notification->get_icon()) ?>" style="font-size: 18px; margin-left: 10px;"></i>
+        <i class="fa <?= e($site_notification->get_icon()) ?>" style="font-size: 18px; margin-inline-end: 10px;"></i>
         
         <!-- العنوان -->
         <strong><?= e($site_notification['title']) ?>:</strong>
@@ -19,7 +19,7 @@
         <!-- الرابط (إذا وُجد) -->
         <?php if (!empty($site_notification['link'])): ?>
         <a href="<?= e(link_url($site_notification['link'])) ?>" 
-           style="color: inherit; text-decoration: underline; margin-right: 10px; font-weight: bold;">
+           style="color: inherit; text-decoration: underline; margin-inline-start: 10px; font-weight: bold;">
             <?= e($site_notification['link_text']) ?>
             <i class="fa fa-arrow-left"></i>
         </a>
@@ -31,7 +31,7 @@
                 class="close" 
                 data-dismiss="alert" 
                 aria-label="إغلاق"
-                style="position: absolute; left: 15px; top: 12px; font-size: 24px; opacity: 0.8;">
+                style="position: absolute; inset-inline-end: 15px; top: 12px; font-size: 24px; opacity: 0.8;">
             <span aria-hidden="true">&times;</span>
         </button>
         <?php endif; ?>

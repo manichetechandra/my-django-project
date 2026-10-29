@@ -35,7 +35,7 @@
     .info-item i {
         color: #8cc040;
         width: 30px;
-        margin-left: 5px;
+        margin-inline-end: 5px;
         font-size: 18px;
     }
     
@@ -48,8 +48,7 @@
         font-size: 16px;
         color: #333;
         margin-bottom: 30px;
-        direction: rtl;
-        text-align: right;
+        text-align: start;
     }
     
     .gallery-item {
@@ -74,13 +73,17 @@
     .other-cite-card {
         margin-bottom: 20px;
         transition: transform 0.2s;
-        border-right: 3px solid #8cc040;
+        border-inline-start: 3px solid #8cc040;
         padding: 15px;
     }
     
     .other-cite-card:hover {
         transform: translateX(-5px);
         background: #f8f9fa;
+    }
+
+    html[dir="ltr"] .other-cite-card:hover {
+        transform: translateX(5px);
     }
 </style>
 <?php endblock(); ?>

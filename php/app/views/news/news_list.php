@@ -31,7 +31,7 @@
                     
                     <!-- Badge للأخبار المميزة -->
                     <?php if (!empty($item['is_featured'])): ?>
-                    <span style="position: absolute; top: 10px; left: 10px; background-color: #e74c3c; color: white; padding: 5px 10px; border-radius: 3px; font-size: 12px;">
+                    <span style="position: absolute; top: 10px; inset-inline-end: 10px; background-color: #e74c3c; color: white; padding: 5px 10px; border-radius: 3px; font-size: 12px;">
                         <i class="fa fa-star"></i> مميز
                     </span>
                     <?php endif; ?>

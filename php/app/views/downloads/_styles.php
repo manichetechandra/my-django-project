@@ -46,7 +46,7 @@
         padding: 5px 15px;
         border-radius: 20px;
         font-size: 14px;
-        float: left;
+        float: left; float: inline-end;
         margin-top: 3px;
     }
     .file-card {
@@ -76,7 +76,7 @@
     .file-info h4 { margin: 0 0 6px; font-size: 16px; color: #2c3e50; font-weight: bold; }
     .file-info p { margin: 0 0 6px; color: #7f8c8d; font-size: 13px; }
     .file-meta { font-size: 12px; color: #95a5a6; }
-    .file-meta span { margin-left: 12px; white-space: nowrap; }
+    .file-meta span { margin-inline-end: 12px; white-space: nowrap; }
     .btn-download { background: #8cc040; color: white; border: none; white-space: nowrap; }
     .btn-download:hover, .btn-download:focus { background: #7ab030; color: white; }
     .sidebar-box {
@@ -97,8 +97,8 @@
         transition: all 0.2s;
     }
     .category-list li a:hover, .category-list li a.active { background: #f0f7e6; color: #6fa832; }
-    .category-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-left: 8px; }
-    .featured-badge { background: #f39c12; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-right: 5px; }
+    .category-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-inline-end: 8px; }
+    .featured-badge { background: #f39c12; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-inline-start: 5px; }
     .empty-state { text-align: center; padding: 60px 20px; color: #95a5a6; }
     .empty-state i { font-size: 64px; margin-bottom: 15px; display: block; }
     @media (max-width: 767px) {

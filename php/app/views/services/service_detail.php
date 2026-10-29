@@ -35,8 +35,8 @@
     
     .content-section h3 {
         color: #2c3e50;
-        border-right: 5px solid <?= e($service->get_type_color()) ?>;
-        padding-right: 15px;
+        border-inline-start: 5px solid <?= e($service->get_type_color()) ?>;
+        padding-inline-start: 15px;
         margin-bottom: 20px;
     }
     
@@ -50,7 +50,7 @@
     
     .content-section ul {
         list-style: none;
-        padding-right: 0;
+        padding-inline-start: 0;
     }
     
     .content-section ul li {
@@ -62,13 +62,13 @@
         content: "\f00c";
         font-family: FontAwesome;
         color: <?= e($service->get_type_color()) ?>;
-        margin-left: 10px;
+        margin-inline-end: 10px;
         font-weight: bold;
     }
     
     .info-box {
         background: #f8f9fa;
-        border-right: 5px solid <?= e($service->get_type_color()) ?>;
+        border-inline-start: 5px solid <?= e($service->get_type_color()) ?>;
         padding: 20px;
         border-radius: 5px;
         margin-bottom: 20px;

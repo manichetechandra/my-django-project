@@ -46,4 +46,26 @@ return [
         'max_document_mb' => 10,  // وثائق الطلبات
         'max_file_mb'     => 20,  // ملفات مركز التحميلات
     ],
+
+    // اللغات: العربية أساسية على الروابط العادية، والبقية تحت /fr/ و /en/
+    'i18n' => [
+        'default'   => 'ar',
+        'languages' => ['ar' => 'العربية', 'fr' => 'Français', 'en' => 'English'],
+    ],
+
+    // الترجمة التلقائية في لوحة الإدارة (زر «ترجمة تلقائية» + ترجمة الحقول الفارغة عند الحفظ)
+    'translation' => [
+        // gemini (الأفضل) أو mymemory (بلا تسجيل، محدود) أو none (يدوياً فقط)
+        'provider'       => $env('TRANSLATE_PROVIDER', 'gemini'),
+        // مفتاح مجاني من https://aistudio.google.com/apikey — بدونه يُستعمل البديل
+        'gemini_key'     => $env('GEMINI_API_KEY', ''),
+        'gemini_model'   => $env('GEMINI_MODEL', 'gemini-2.5-flash'),
+        // البديل عند غياب المفتاح أو فشل الخدمة الأولى (none لتعطيله)
+        'fallback'       => $env('TRANSLATE_FALLBACK', 'mymemory'),
+        // اختياري: بريدك يرفع حصة MyMemory اليومية من 5 آلاف إلى 50 ألف حرف
+        'mymemory_email' => $env('MYMEMORY_EMAIL', ''),
+        // ترجمة الحقول الفرنسية والإنجليزية الفارغة تلقائياً عند حفظ السجل
+        'auto_on_save'   => true,
+        'timeout'        => 45,
+    ],
 ];

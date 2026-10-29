@@ -67,7 +67,7 @@
         padding: 8px 15px;
         border-radius: 20px;
         font-size: 16px;
-        margin-right: 10px;
+        margin-inline-start: 10px;
     }
     
     .search-keywords {
@@ -126,7 +126,7 @@
         padding: 2px 8px;
         border-radius: 10px;
         font-size: 12px;
-        margin-right: 5px;
+        margin-inline-start: 5px;
     }
     
     .filter-btn.active .count {
@@ -140,8 +140,8 @@
     
     .result-section h3 {
         color: #2c3e50;
-        border-right: 5px solid #e74c3c;
-        padding-right: 15px;
+        border-inline-start: 5px solid #e74c3c;
+        padding-inline-start: 15px;
         margin-bottom: 20px;
     }
     
@@ -152,13 +152,17 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         margin-bottom: 15px;
         transition: all 0.3s;
-        border-right: 3px solid transparent;
+        border-inline-start: 3px solid transparent;
     }
     
     .result-card:hover {
-        border-right-color: #e74c3c;
+        border-inline-start-color: #e74c3c;
         box-shadow: 0 5px 20px rgba(0,0,0,0.15);
         transform: translateX(-5px);
+    }
+
+    html[dir="ltr"] .result-card:hover {
+        transform: translateX(5px);
     }
     
     .result-card .type-badge {
@@ -196,7 +200,7 @@
     }
     
     .result-card .meta i {
-        margin-left: 5px;
+        margin-inline-end: 5px;
         color: #e74c3c;
     }
     
@@ -222,7 +226,7 @@
         padding: 20px;
         border-radius: 10px;
         margin-top: 30px;
-        text-align: right;
+        text-align: start;
     }
 </style>
 <?php endblock(); ?>
@@ -333,7 +337,7 @@
             <p><?= e(truncatewords($news['summary'], 30)) ?></p>
             <div class="meta">
                 <i class="fa fa-calendar"></i> <?= e(format_date($news['published_date'], 'd/m/Y')) ?>
-                <span style="margin-right: 15px;">
+                <span style="margin-inline-start: 15px;">
                     <i class="fa fa-eye"></i> <?= e($news['views_count']) ?> مشاهدة
                 </span>
             </div>
@@ -393,7 +397,7 @@
             <p><?= e(truncatewords($file['description'], 30)) ?></p>
             <div class="meta">
                 <i class="fa fa-hdd-o"></i> <?= e($file->get_file_size_display()) ?>
-                <span style="margin-right: 15px;">
+                <span style="margin-inline-start: 15px;">
                     <i class="fa fa-download"></i> <?= e($file['downloads_count']) ?> تحميل
                 </span>
             </div>
@@ -415,7 +419,7 @@
             <p><?= e(truncatewords($activity['short_description'], 30)) ?></p>
             <div class="meta">
                 <i class="fa fa-calendar"></i> <?= e(format_date($activity['date'], 'd/m/Y')) ?>
-                <span style="margin-right: 15px;">
+                <span style="margin-inline-start: 15px;">
                     <i class="fa fa-map-marker"></i> <?= e($activity['location']) ?>
                 </span>
             </div>
@@ -532,7 +536,7 @@
         
         <div class="suggestions">
             <h4 style="color: #2c3e50; margin-top: 0;">اقتراحات:</h4>
-            <ul style="text-align: right; line-height: 2;">
+            <ul style="text-align: start; line-height: 2;">
                 <li>تحقق من الإملاء</li>
                 <li>استخدم كلمات أقل</li>
                 <li>جرب كلمات مرادفة</li>
@@ -558,7 +562,7 @@
         
         <div class="suggestions">
             <h4 style="color: #2c3e50; margin-top: 0;">أمثلة على البحث:</h4>
-            <ul style="text-align: right; line-height: 2;">
+            <ul style="text-align: start; line-height: 2;">
                 <li><strong>منحة</strong> - للبحث عن معلومات المنح</li>
                 <li><strong>سكن</strong> - للبحث عن الإقامات الجامعية</li>
                 <li><strong>نقل</strong> - للبحث عن النقل الجامعي</li>

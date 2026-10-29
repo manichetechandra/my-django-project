@@ -20,7 +20,17 @@ $GLOBALS['__router'] = $router;
 require APP_PATH . '/routes.php';
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$path = request_path();
+$path = request_path(); // يحدد لغة الطلب أيضاً: /fr/news/ => lang() = 'fr' و $path = '/news/'
+
+// لوحة الإدارة عربية دائماً: /fr/admin/... => /admin/...
+// والعربية بلا بادئة:        /ar/news/    => /news/
+$qs = empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING'];
+if (lang() !== default_lang() && preg_match('#^/admin(/|$)#', $path)) {
+    redirect(base_url() . route_prefix() . $path . $qs, 301);
+}
+if (preg_match('#^/' . default_lang() . '(/.*)?$#', $path, $m)) {
+    redirect(base_url() . route_prefix() . ($m[1] ?? '/') . $qs, 301);
+}
 
 // حماية CSRF لكل طلبات POST (مثل CsrfViewMiddleware)
 if ($method === 'POST' && !verify_csrf()) {

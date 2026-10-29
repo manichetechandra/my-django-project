@@ -1,35 +1,52 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="<?= e(lang()) ?>" dir="<?= text_dir() ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="keywords" content="مديرية الخدمات الجامعية سطيف, الخدمات الجامعية, الإقامات">
-    <meta name="description" content="الموقع الرسمي لمديرية الخدمات الجامعية سطيف">
+    <meta name="keywords" content="<?= t('مديرية الخدمات الجامعية سطيف, الخدمات الجامعية, الإقامات') ?>">
+    <meta name="description" content="<?= t('الموقع الرسمي لمديرية الخدمات الجامعية سطيف') ?>">
     
-    <title><?php block('title'); ?>مديرية الخدمات الجامعية سطيف<?php endblock(); ?></title>
+    <title><?php block('title'); ?><?= t('مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?></title>
     
     <link rel="icon" href="<?= asset('images/logo.svg') ?>" type="image/svg+xml">
     <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
+    <?php foreach (languages() as $code => $label): ?>
+    <link rel="alternate" hreflang="<?= e($code) ?>" href="<?= e(lang_url($code, true)) ?>">
+    <?php endforeach; ?>
     
-    <!-- Bootstrap RTL CSS -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+    <?php if (is_rtl()): ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rtl@3.4.0/dist/css/bootstrap-rtl.min.css">
+    <?php endif; ?>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     
-    <!-- Custom CSS الشامل للعربية -->
+    <!-- CSS الموقع: مكتوب بخصائص منطقية (start/end بدل right/left) فيعمل بالعربية والفرنسية والإنجليزية -->
     <style>
+        /* الاتجاه من <html dir="rtl|ltr">: كل عنصر يرث اتجاه أبيه، والنص يبدأ من بداية السطر */
+        :where(body) * {
+            direction: inherit;
+        }
+
         * {
-            direction: rtl;
+            text-align: start;
+        }
+
+        /* المتصفح يفرض اتجاه ltr داخل حقول التاريخ والوقت: نحاذيها لليمين في العربية */
+        html[dir="rtl"] input[type="date"],
+        html[dir="rtl"] input[type="time"],
+        html[dir="rtl"] input[type="datetime-local"],
+        html[dir="rtl"] input[type="month"],
+        html[dir="rtl"] input[type="week"] {
             text-align: right;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding-top: 70px;
-            direction: rtl;
-            text-align: right;
+            text-align: start;
         }
         
         /* Navbar RTL */
@@ -41,15 +58,15 @@
         .navbar-inverse .navbar-brand {
             color: #fff;
             font-weight: bold;
-            float: right;
+            float: right; float: inline-start;
         }
         
         .navbar-inverse .navbar-nav {
-            float: right;
+            float: right; float: inline-start;
         }
         
         .navbar-inverse .navbar-nav > li {
-            float: right;
+            float: right; float: inline-start;
         }
         
         .navbar-inverse .navbar-nav > li > a {
@@ -67,7 +84,7 @@
         }
         
         .navbar-toggle {
-            float: left;
+            float: left; float: inline-end;
         }
         
         .navbar-header {
@@ -75,28 +92,27 @@
         }
         
         .navbar-collapse {
-            text-align: right;
+            text-align: start;
         }
         
         /* Dropdown RTL */
         .dropdown-menu {
-            right: 0;
-            left: auto;
-            text-align: right;
+            inset-inline-start: 0;
+            inset-inline-end: auto;
+            text-align: start;
         }
         
         .dropdown-menu > li > a {
-            text-align: right;
+            text-align: start;
         }
         
         .caret {
-            margin-right: 5px;
-            margin-left: 0;
+            margin-inline-start: 5px;
+            margin-inline-end: 0;
         }
         
         /* Bootstrap Grid RTL */
         .row {
-            direction: rtl;
         }
         
         .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1,
@@ -111,50 +127,47 @@
         .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10,
         .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11,
         .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
-            float: right !important;
+            float: right !important; float: inline-start !important;
         }
         
         /* Panels RTL */
         .panel {
-            text-align: right;
-            direction: rtl;
+            text-align: start;
         }
         
         .panel-heading,
         .panel-body,
         .panel-footer {
-            text-align: right;
-            direction: rtl;
+            text-align: start;
         }
         
         /* Buttons RTL */
         .btn {
-            margin-left: 5px;
-            margin-right: 0;
+            margin-inline-end: 5px;
+            margin-inline-start: 0;
         }
         
         .btn i {
-            margin-left: 5px;
-            margin-right: 0;
+            margin-inline-end: 5px;
+            margin-inline-start: 0;
         }
         
         /* Text alignment */
         .text-left {
-            text-align: right !important;
+            text-align: start !important;
         }
         
         .text-right {
-            text-align: left !important;
+            text-align: end !important;
         }
         
         /* Breadcrumb RTL */
         .breadcrumb {
-            text-align: right;
-            direction: rtl;
+            text-align: start;
         }
         
         .breadcrumb > li {
-            float: right;
+            float: right; float: inline-start;
         }
         
         .breadcrumb > li + li:before {
@@ -164,65 +177,69 @@
         
         /* Forms RTL */
         .form-control {
-            text-align: right;
-            direction: rtl;
+            text-align: start;
         }
         
         /* Lists RTL */
         ul, ol {
-            padding-right: 0;
-            padding-left: 40px;
+            padding-inline-start: 0;
+            padding-inline-end: 40px;
         }
         
         /* Alerts RTL */
         .alert {
-            text-align: right;
-            direction: rtl;
+            text-align: start;
+        }
+        
+        /* الأسهم مرسومة للعربية (← تعني التالي أو المزيد): نعكسها في الفرنسية والإنجليزية */
+        html[dir="ltr"] .fa-arrow-left,
+        html[dir="ltr"] .fa-arrow-right,
+        html[dir="ltr"] .fa-arrow-circle-left,
+        html[dir="ltr"] .fa-arrow-circle-right {
+            transform: scaleX(-1);
         }
         
         /* Carousel RTL */
         .carousel-control.left {
-            right: 0;
-            left: auto;
+            inset-inline-start: 0;
+            inset-inline-end: auto;
         }
         
         .carousel-control.right {
-            left: 0;
-            right: auto;
+            inset-inline-end: 0;
+            inset-inline-start: auto;
         }
         
         .carousel-caption {
-            right: 15%;
-            left: 15%;
-            text-align: right;
+            inset-inline-start: 15%;
+            inset-inline-end: 15%;
+            text-align: start;
         }
         
         /* Pagination RTL */
         .pagination {
-            direction: rtl;
         }
         
         .pagination > li {
-            float: right;
+            float: right; float: inline-start;
         }
         
         /* Tables RTL */
         table {
-            direction: rtl;
-            text-align: right;
+            text-align: start;
         }
         
         th, td {
-            text-align: right;
+            text-align: start;
         }
     </style>
     
     <!-- إزاحة الأعمدة (col-md-offset-*) من اليمين، لأن bootstrap-rtl لا يُحمَّل -->
     <style>
         @media (min-width: 992px) {
-            .col-md-offset-1 { margin-left: 0; margin-right: 8.33333333%; }
-            .col-md-offset-2 { margin-left: 0; margin-right: 16.66666667%; }
-            .col-md-offset-3 { margin-left: 0; margin-right: 25%; }
+            .col-md-offset-1 { margin-inline-end: 0; margin-inline-start: 8.33333333%; }
+            .col-md-offset-2 { margin-inline-end: 0; margin-inline-start: 16.66666667%; }
+            .col-md-offset-3 { margin-inline-end: 0; margin-inline-start: 25%; }
         }
     </style>
     

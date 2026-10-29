@@ -25,7 +25,7 @@
         padding: 20px;
         background: #f8f9fa;
         border-radius: 5px;
-        border-right: 4px solid #3498db;
+        border-inline-start: 4px solid #3498db;
     }
     
     .form-section h4 {

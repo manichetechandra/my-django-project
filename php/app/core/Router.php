@@ -76,7 +76,7 @@ class Router
             foreach ($this->routes as $route) {
                 if (preg_match($route['regex'], $path . '/')) {
                     $qs = $_SERVER['QUERY_STRING'] ?? '';
-                    redirect(base_url() . route_prefix() . $path . '/' . ($qs !== '' ? '?' . $qs : ''), 301);
+                    redirect(base_url() . route_prefix() . lang_prefix() . $path . '/' . ($qs !== '' ? '?' . $qs : ''), 301);
                 }
             }
         }
@@ -95,7 +95,9 @@ class Router
             $i++;
             return rawurlencode((string) $v);
         }, $this->named[$name]);
-        return base_url() . route_prefix() . $path;
+        // بادئة اللغة الحالية (/fr ...) — لوحة الإدارة admin:* عربية دائماً فلا بادئة لها
+        $lang = str_starts_with($name, 'admin:') ? '' : lang_prefix();
+        return base_url() . route_prefix() . $lang . $path;
     }
 
     public function has(string $name): bool

@@ -64,7 +64,7 @@
                     </div>
                     <?php endif; ?>
                     <!-- شارة النوع -->
-                    <span class="label label-primary" style="position: absolute; top: 10px; right: 10px;">
+                    <span class="label label-primary" style="position: absolute; top: 10px; inset-inline-start: 10px;">
                         <?= e($activity->get_activity_type_display()) ?>
                     </span>
                 </div>

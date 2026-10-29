@@ -45,8 +45,7 @@
         margin-bottom: 30px;
         transition: all 0.3s;
         height: 100%;
-        direction: rtl;
-        text-align: right;
+        text-align: start;
     }
     
     .service-card:hover {
@@ -66,7 +65,7 @@
         content: '';
         position: absolute;
         top: -50%;
-        right: -50%;
+        inset-inline-start: -50%;
         width: 200%;
         height: 200%;
         background: rgba(255,255,255,0.1);
@@ -103,7 +102,7 @@
     
     .service-meta i {
         color: #8cc040;
-        margin-left: 5px;
+        margin-inline-end: 5px;
     }
     
     /* ألوان حسب النوع */

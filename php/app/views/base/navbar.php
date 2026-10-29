@@ -22,7 +22,7 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
                         <i class="fa fa-building"></i> المديرية <span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-right" style="width: 300px; max-height: 450px; overflow-y: auto; left: auto; right: 0;">
+                    <ul class="dropdown-menu dropdown-menu-right" style="width: 300px; max-height: 450px; overflow-y: auto; inset-inline-end: auto; inset-inline-start: 0;">
                         <li><a href="<?= e(url('homepage:director_word')) ?>">
                             <i class="fa fa-quote-left"></i> كلمة المدير
                         </a></li>
@@ -147,7 +147,7 @@
                             <?php $unread_count_nav = $student_profile->get_unread_notifications_count(); ?>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" style="position: relative;" title="الإشعارات">
                                 <i class="fa fa-bell" style="font-size: 18px;"></i>
-                                <span class="badge badge-danger notifications-badge" style="position: absolute; top: 5px; right: 8px; font-size: 10px; padding: 2px 5px;<?= $unread_count_nav ? '' : ' display: none;' ?>"><?= e($unread_count_nav) ?></span>
+                                <span class="badge badge-danger notifications-badge" style="position: absolute; top: 5px; inset-inline-start: 8px; font-size: 10px; padding: 2px 5px;<?= $unread_count_nav ? '' : ' display: none;' ?>"><?= e($unread_count_nav) ?></span>
                                 <span class="caret"></span>
                             </a>
 
@@ -161,7 +161,7 @@
                                 <?php foreach ($recent_notifications as $notif): ?>
                                 <li class="notif-item">
                                     <a href="<?= e($notif['link'] ? link_url($notif['link']) : url('students:notifications_list')) ?>"
-                                       style="white-space: normal; padding: 10px 15px; <?php if (empty($notif['is_read'])): ?>background: #f0f8ff; border-right: 3px solid #3498db;<?php endif; ?>">
+                                       style="white-space: normal; padding: 10px 15px; <?php if (empty($notif['is_read'])): ?>background: #f0f8ff; border-inline-start: 3px solid #3498db;<?php endif; ?>">
                                         <div style="display: flex; gap: 10px;">
                                             <div style="flex-shrink: 0;">
                                                 <i class="fa <?= e($notif->get_icon()) ?>" style="color: <?= e($notif->get_color()) ?>; font-size: 20px;"></i>
@@ -213,6 +213,19 @@
             </ul>
             
             <form class="navbar-form navbar-left" role="search" method="get" action="<?= e(url('search:search')) ?>">
+                <!-- اختيار اللغة: نفس الصفحة بلغة أخرى -->
+                <div class="btn-group lang-switch">
+                    <button type="button" class="btn btn-lang dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<?= t('اللغة') ?>">
+                        <i class="fa fa-globe"></i> <?= e(strtoupper(lang())) ?> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <?php foreach (languages() as $code => $label): ?>
+                            <li class="<?= $code === lang() ? 'active' : '' ?>">
+                                <a href="<?= e(lang_url($code)) ?>" hreflang="<?= e($code) ?>" lang="<?= e($code) ?>"><?= e($label) ?></a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
                 <div class="form-group">
                     <input type="text" class="form-control" name="q" value="<?= e($_GET['q'] ?? '') ?>" placeholder="ابحث في الموقع..." style="width: 250px;">
                 </div>
@@ -226,21 +239,39 @@
 
 <style>
     .navbar-right {
-        float: right !important;
+        float: right !important; float: inline-start !important;
     }
     
     .navbar-nav > li {
-        float: right;
+        float: right; float: inline-start;
     }
     
     .dropdown-menu {
-        right: 0;
-        left: auto;
+        inset-inline-start: 0;
+        inset-inline-end: auto;
     }
     
     .navbar-form.navbar-left {
-        float: left !important;
-        margin-left: 15px;
+        float: left !important; float: inline-end !important;
+        margin-inline-end: 15px;
+    }
+
+    /* زر اختيار اللغة بجانب البحث */
+    .navbar-form .btn-lang {
+        background: transparent;
+        color: #ecf0f1;
+        border: 1px solid rgba(255,255,255,0.35);
+    }
+
+    .navbar-form .btn-lang:hover,
+    .navbar-form .btn-lang:focus,
+    .navbar-form .open > .btn-lang {
+        background: rgba(255,255,255,0.12);
+        color: white;
+    }
+
+    .lang-switch .dropdown-menu {
+        min-width: 140px;
     }
     
     .navbar-form .form-control {
@@ -273,7 +304,7 @@
     .notifications-badge {
         position: absolute;
         top: 8px;
-        right: 10px;
+        inset-inline-start: 10px;
         background: #e74c3c;
         color: white;
         font-size: 10px;
@@ -293,8 +324,8 @@
         box-shadow: 0 5px 25px rgba(0,0,0,0.2);
         border: none;
         overflow: hidden;
-        right: 0;
-        left: auto;
+        inset-inline-start: 0;
+        inset-inline-end: auto;
     }
     
     .notifications-header {
@@ -342,7 +373,7 @@
     
     .notification-item.unread {
         background: #f0f8ff;
-        border-right: 3px solid #3498db;
+        border-inline-start: 3px solid #3498db;
     }
     
     .notification-item.unread:hover {
@@ -396,7 +427,7 @@
         border-radius: 8px;
         font-size: 9px;
         font-weight: bold;
-        margin-right: 4px;
+        margin-inline-start: 4px;
     }
     
     .notifications-footer a {
@@ -491,8 +522,8 @@
         .dropdown-menu-notifications {
             width: 100%;
             max-width: 100vw;
-            left: 0;
-            right: 0;
+            inset-inline-end: 0;
+            inset-inline-start: 0;
             border-radius: 0;
         }
         
@@ -551,13 +582,13 @@
 
     /* إصلاح موضع قائمة الإشعارات */
     .navbar-nav > li > .dropdown-menu {
-        right: 0;
-        left: auto;
+        inset-inline-start: 0;
+        inset-inline-end: auto;
     }
     
     .dropdown-menu-right {
-        right: 0;
-        left: auto;
+        inset-inline-start: 0;
+        inset-inline-end: auto;
     }
     
     /* للشاشات الصغيرة */

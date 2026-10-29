@@ -29,6 +29,7 @@ require APP_PATH . '/core/Form.php';
 require APP_PATH . '/core/Upload.php';
 require APP_PATH . '/core/XlsxWriter.php';
 require APP_PATH . '/helpers.php';
+require APP_PATH . '/i18n.php';
 
 require APP_PATH . '/models/homepage.php';
 require APP_PATH . '/models/content.php';

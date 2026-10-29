@@ -99,12 +99,13 @@ function link_url($link): string
         return $link;
     }
     if ($link[0] === '/') {
-        return base_url() . route_prefix() . $link;
+        $prefix = preg_match('#^/(admin|uploads|assets)(/|$)#', $link) ? '' : lang_prefix();
+        return base_url() . route_prefix() . $prefix . $link;
     }
     return $link;
 }
 
-/** المسار الحالي داخل الموقع (بدون المجلد الفرعي) مثل /news/ */
+/** المسار الحالي داخل الموقع (بدون المجلد الفرعي ولا بادئة اللغة) مثل /news/ */
 function request_path(): string
 {
     static $path = null;
@@ -119,7 +120,8 @@ function request_path(): string
         if (strpos($p, '/index.php') === 0) {
             $p = substr($p, strlen('/index.php'));
         }
-        $path = '/' . ltrim($p, '/');
+        // /fr/news/ => اللغة fr والمسار /news/ (انظر app/i18n.php)
+        $path = strip_lang_prefix('/' . ltrim($p, '/'));
     }
     return $path;
 }
@@ -336,7 +338,7 @@ function require_login(): User
 {
     $u = Auth::user();
     if (!$u) {
-        $next = request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING']);
+        $next = lang_prefix() . request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING']);
         redirect(url('students:login') . '?next=' . rawurlencode($next));
     }
     return $u;
@@ -348,7 +350,7 @@ function require_staff(): User
     $u = Auth::user();
     if (!$u) {
         flash('warning', 'يجب تسجيل الدخول أولاً');
-        redirect(url('students:login') . '?next=' . rawurlencode(request_path()));
+        redirect(url('students:login') . '?next=' . rawurlencode(lang_prefix() . request_path()));
     }
     if (!is_staff()) {
         flash('error', 'ليس لديك صلاحية للوصول لهذه الصفحة. هذه الصفحة للإداريين فقط.');

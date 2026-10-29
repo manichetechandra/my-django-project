@@ -74,12 +74,12 @@
         border-radius: 10px;
         text-align: center;
         box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        border-right: 4px solid;
+        border-inline-start: 4px solid;
     }
     
-    .stats-box.total { border-right-color: #3498db; }
-    .stats-box.approved { border-right-color: #2ecc71; }
-    .stats-box.pending { border-right-color: #f39c12; }
+    .stats-box.total { border-inline-start-color: #3498db; }
+    .stats-box.approved { border-inline-start-color: #2ecc71; }
+    .stats-box.pending { border-inline-start-color: #f39c12; }
     
     .stats-number {
         font-size: 36px;

@@ -17,7 +17,7 @@
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         margin-bottom: 30px;
-        border-right: 5px solid #16a085;
+        border-inline-start: 5px solid #16a085;
     }
     
     .answer-box h3 {
@@ -97,7 +97,7 @@
                     <span style="color: #999;">
                         <i class="fa fa-eye"></i> <?= e($faq['views_count']) ?> مشاهدة
                     </span>
-                    <span style="color: #999; margin-right: 20px;">
+                    <span style="color: #999; margin-inline-start: 20px;">
                         <i class="fa fa-calendar"></i> آخر تحديث: <?= e(format_date($faq['updated_at'], 'd/m/Y')) ?>
                     </span>
                 </div>
@@ -111,7 +111,7 @@
                 <?php foreach ($related_faqs as $related): ?>
                 <div class="related-item">
                     <a href="<?= e(url('faq:faq_detail', $related['id'])) ?>">
-                        <i class="fa fa-question-circle" style="color: #16a085; margin-left: 10px;"></i>
+                        <i class="fa fa-question-circle" style="color: #16a085; margin-inline-end: 10px;"></i>
                         <?= e($related['question']) ?>
                     </a>
                 </div>

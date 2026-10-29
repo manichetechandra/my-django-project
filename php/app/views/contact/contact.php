@@ -24,7 +24,7 @@
         background: #f8f9fa;
         padding: 25px;
         border-radius: 10px;
-        border-right: 5px solid #8cc040;
+        border-inline-start: 5px solid #8cc040;
         margin-bottom: 20px;
         transition: all 0.3s;
     }
@@ -32,6 +32,10 @@
     .contact-info-box:hover {
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         transform: translateX(-5px);
+    }
+
+    html[dir="ltr"] .contact-info-box:hover {
+        transform: translateX(5px);
     }
     
     .contact-info-box h4 {
@@ -44,8 +48,8 @@
     .contact-info-box i {
         color: #8cc040;
         font-size: 24px;
-        margin-left: 10px;
-        float: right;
+        margin-inline-end: 10px;
+        float: right; float: inline-start;
         margin-top: -5px;
     }
     
@@ -100,7 +104,7 @@
         border-radius: 8px;
         padding: 15px 20px;
         margin-bottom: 20px;
-        border-right: 5px solid;
+        border-inline-start: 5px solid;
     }
     
     .alert-success {
@@ -156,7 +160,7 @@
     
     .working-hours {
         background: #fff3cd;
-        border-right: 5px solid #ffc107;
+        border-inline-start: 5px solid #ffc107;
         padding: 15px;
         border-radius: 5px;
         margin-top: 20px;

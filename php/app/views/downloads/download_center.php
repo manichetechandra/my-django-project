@@ -82,7 +82,7 @@
             <?php if (!empty($featured_files) && $search_query === '' && $current_category === ''): ?>
                 <div class="category-section">
                     <div class="category-header" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
-                        <i class="fa fa-star" style="font-size: 24px; margin-left: 12px;"></i>
+                        <i class="fa fa-star" style="font-size: 24px; margin-inline-end: 12px;"></i>
                         <h3>ملفات مميزة</h3>
                     </div>
                     <?php foreach ($featured_files as $file): ?>
@@ -95,7 +95,7 @@
                 <?php foreach ($categories_data as $cat): ?>
                     <div class="category-section">
                         <div class="category-header" style="background-color: <?= e((new DownloadFile(['category' => $cat['code']]))->get_category_color()) ?>;">
-                            <i class="fa fa-folder-open" style="font-size: 24px; margin-left: 12px;"></i>
+                            <i class="fa fa-folder-open" style="font-size: 24px; margin-inline-end: 12px;"></i>
                             <h3><?= e($cat['name']) ?></h3>
                             <span class="badge"><?= e($cat['count']) ?> ملف</span>
                         </div>

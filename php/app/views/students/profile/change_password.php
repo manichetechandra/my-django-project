@@ -40,7 +40,7 @@
     
     .password-requirements ul {
         margin: 10px 0 0 0;
-        padding-right: 20px;
+        padding-inline-start: 20px;
     }
     
     .password-requirements li {

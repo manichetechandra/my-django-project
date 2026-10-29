@@ -36,7 +36,7 @@
     .intro-section {
         background: #f8f9fa;
         padding: 30px;
-        border-right: 5px solid #8e44ad;
+        border-inline-start: 5px solid #8e44ad;
         border-radius: 5px;
         margin-bottom: 30px;
     }
@@ -121,7 +121,7 @@
     <!-- معلومات إضافية -->
     <div class="row" style="margin-top: 50px; margin-bottom: 30px;">
         <div class="col-md-12">
-            <div class="alert alert-info" style="border-right: 5px solid #3498db;">
+            <div class="alert alert-info" style="border-inline-start: 5px solid #3498db;">
                 <i class="fa fa-info-circle"></i>
                 <strong>آخر تحديث:</strong> 
                 <?= e(format_date($history['updated_at'], 'd/m/Y - H:i')) ?>

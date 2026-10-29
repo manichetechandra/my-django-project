@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="<?= e(lang()) ?>" dir="<?= text_dir() ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -174,8 +174,8 @@
         .card-footer {
             position: absolute;
             bottom: 0;
-            left: 0;
-            right: 0;
+            inset-inline-end: 0;
+            inset-inline-start: 0;
             background: #fafafa;
             text-align: center;
             padding: 0.15cm;
@@ -188,7 +188,7 @@
         .university-icon {
             position: absolute;
             top: 0.2cm;
-            right: 0.2cm;
+            inset-inline-start: 0.2cm;
             font-size: 16px;
             color: #1976d2;
             opacity: 0.3;
@@ -345,9 +345,9 @@
         <i class="fa fa-arrow-right"></i> رجوع للوحة التحكم
     </a>
     
-    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px; max-width: 600px; margin-left: auto; margin-right: auto;">
+    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px; max-width: 600px; margin-inline-end: auto; margin-inline-start: auto;">
         <strong><i class="fa fa-info-circle"></i> نصائح للطباعة:</strong>
-        <ul style="text-align: right; margin: 10px 0 0 0; padding-right: 20px; font-size: 13px; color: #856404;">
+        <ul style="text-align: start; margin: 10px 0 0 0; padding-inline-start: 20px; font-size: 13px; color: #856404;">
             <li>استخدم ورق مقوى (Cardstock) للحصول على بطاقة متينة</li>
             <li>تأكد من تفعيل خيار "طباعة الخلفيات" في إعدادات الطباعة</li>
             <li>القياس: 8.5 سم × 5.3 سم (حجم بطاقة ائتمانية)</li>

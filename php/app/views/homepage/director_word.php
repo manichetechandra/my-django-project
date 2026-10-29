@@ -70,7 +70,7 @@
     }
     
     .signature-section {
-        text-align: left;
+        text-align: end;
         padding: 0 40px 40px;
     }
     

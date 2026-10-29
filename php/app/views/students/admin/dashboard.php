@@ -28,7 +28,7 @@
         padding: 25px;
         border-radius: 10px;
         box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-        border-right: 4px solid;
+        border-inline-start: 4px solid;
         transition: all 0.3s;
     }
     
@@ -39,11 +39,11 @@
     }
     
     /* ألوان مختلفة لكل نوع */
-    .stat-card.total { border-right-color: #3498db; }
-    .stat-card.pending { border-right-color: #f39c12; }
-    .stat-card.review { border-right-color: #9b59b6; }
-    .stat-card.approved { border-right-color: #2ecc71; }
-    .stat-card.rejected { border-right-color: #e74c3c; }
+    .stat-card.total { border-inline-start-color: #3498db; }
+    .stat-card.pending { border-inline-start-color: #f39c12; }
+    .stat-card.review { border-inline-start-color: #9b59b6; }
+    .stat-card.approved { border-inline-start-color: #2ecc71; }
+    .stat-card.rejected { border-inline-start-color: #e74c3c; }
     
     .stat-card .icon {
         font-size: 48px;
@@ -228,19 +228,19 @@
          ======================================== -->
     <div class="row" style="margin-bottom: 30px;">
         <div class="col-md-4">
-            <div class="stat-card" style="border-right-color: #1abc9c;">
+            <div class="stat-card" style="border-inline-start-color: #1abc9c;">
                 <div class="label">طلبات اليوم</div>
                 <div class="number" style="font-size: 32px;"><?= e($today_applications) ?></div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card" style="border-right-color: #e67e22;">
+            <div class="stat-card" style="border-inline-start-color: #e67e22;">
                 <div class="label">طلبات الأسبوع</div>
                 <div class="number" style="font-size: 32px;"><?= e($week_applications) ?></div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card" style="border-right-color: #8e44ad;">
+            <div class="stat-card" style="border-inline-start-color: #8e44ad;">
                 <div class="label">طلبات الشهر</div>
                 <div class="number" style="font-size: 32px;"><?= e($month_applications) ?></div>
             </div>

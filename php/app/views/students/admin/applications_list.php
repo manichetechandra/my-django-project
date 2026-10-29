@@ -50,7 +50,7 @@
         font-weight: bold;
         color: #856404;
         font-size: 16px;
-        margin-left: 15px;
+        margin-inline-end: 15px;
     }
     
     .bulk-action-select {
@@ -151,7 +151,7 @@
     }
     
     .action-buttons .btn {
-        margin-left: 5px;
+        margin-inline-end: 5px;
     }
 </style>
 <?php endblock(); ?>
@@ -184,8 +184,8 @@
         <h4><i class="fa fa-filter"></i> تصفية وبحث</h4>
         
         <form method="get" class="form-inline">
-            <div class="form-group" style="margin-left: 15px;">
-                <label style="margin-left: 5px;">الحالة:</label>
+            <div class="form-group" style="margin-inline-end: 15px;">
+                <label style="margin-inline-end: 5px;">الحالة:</label>
                 <select name="status" class="form-control">
                     <option value="">الكل</option>
                     <option value="pending" <?php if ($status_filter == 'pending'): ?>selected<?php endif; ?>>
@@ -206,8 +206,8 @@
                 </select>
             </div>
             
-            <div class="form-group" style="margin-left: 15px;">
-                <label style="margin-left: 5px;">النوع:</label>
+            <div class="form-group" style="margin-inline-end: 15px;">
+                <label style="margin-inline-end: 5px;">النوع:</label>
                 <select name="type" class="form-control">
                     <option value="">الكل</option>
                     <?php foreach ($application_types as $app_type): ?>
@@ -219,8 +219,8 @@
                 </select>
             </div>
             
-            <div class="form-group" style="margin-left: 15px;">
-                <label style="margin-left: 5px;">بحث:</label>
+            <div class="form-group" style="margin-inline-end: 15px;">
+                <label style="margin-inline-end: 5px;">بحث:</label>
                 <input type="text" 
                        name="search" 
                        class="form-control" 
@@ -287,7 +287,7 @@
                     <h3>
             <span>
                 <i class="fa fa-list"></i> قائمة الطلبات
-                <small style="opacity: 0.7; font-size: 14px; margin-right: 15px;">
+                <small style="opacity: 0.7; font-size: 14px; margin-inline-start: 15px;">
                     (<?= e($total_count) ?> طلب)
                 </small>
             </span>
@@ -347,7 +347,7 @@
                         </td>
                         
                         <td>
-                            <i class="fa fa-user" style="color: #95a5a6; margin-left: 5px;"></i>
+                            <i class="fa fa-user" style="color: #95a5a6; margin-inline-end: 5px;"></i>
                             <?= e($app['student']['full_name_arabic']) ?>
                         </td>
                         
@@ -359,7 +359,7 @@
                         
                         <td>
                             <i class="fa <?= e($app['application_type']['icon']) ?>" 
-                               style="color: <?= e($app['application_type']['color']) ?>; margin-left: 5px;"></i>
+                               style="color: <?= e($app['application_type']['color']) ?>; margin-inline-end: 5px;"></i>
                             <?= e($app['application_type']['name']) ?>
                         </td>
                         

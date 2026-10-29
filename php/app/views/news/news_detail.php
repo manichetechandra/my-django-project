@@ -45,7 +45,7 @@
             
             <!-- ملخص الخبر -->
             <?php if (!empty($news['summary'])): ?>
-            <div class="alert alert-info" style="border-right: 4px solid #8cc040;">
+            <div class="alert alert-info" style="border-inline-start: 4px solid #8cc040;">
                 <h4><i class="fa fa-info-circle"></i> ملخص:</h4>
                 <p style="font-size: 16px; line-height: 1.8;"><?= e($news['summary']) ?></p>
             </div>

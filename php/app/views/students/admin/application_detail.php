@@ -51,7 +51,7 @@
         padding: 15px;
         background: #f8f9fa;
         border-radius: 5px;
-        border-right: 3px solid #8e44ad;
+        border-inline-start: 3px solid #8e44ad;
     }
     
     .info-item label {
@@ -109,7 +109,7 @@
         border-radius: 5px;
         cursor: pointer;
         transition: all 0.3s;
-        margin-left: 10px;
+        margin-inline-end: 10px;
     }
     
     .action-btn:hover {
@@ -149,7 +149,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-right: 3px solid #3498db;
+        border-inline-start: 3px solid #3498db;
     }
     
     .documents-list li:hover {
@@ -379,7 +379,7 @@
                 <?php if (!empty($application['details'])): ?>
                 <div class="detail-section">
                     <h3><i class="fa fa-comment"></i> تفاصيل الطلب</h3>
-                    <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; line-height: 1.8; border-right: 3px solid #3498db;">
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; line-height: 1.8; border-inline-start: 3px solid #3498db;">
                         <?= linebreaks($application['details']) ?>
                         <!-- 
                             |linebreaks
@@ -403,7 +403,7 @@
                         <?php foreach ($documents as $doc): ?>
                         <li>
                             <div>
-                                <i class="fa fa-file-pdf-o" style="color: #e74c3c; font-size: 24px; margin-left: 10px;"></i>
+                                <i class="fa fa-file-pdf-o" style="color: #e74c3c; font-size: 24px; margin-inline-end: 10px;"></i>
                                 <strong><?= e($doc['document_name']) ?></strong>
                                 <br>
                                 <small style="color: #7f8c8d;">

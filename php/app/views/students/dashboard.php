@@ -39,7 +39,7 @@
         justify-content: center;
         color: white;
         font-size: 36px;
-        margin-left: 20px;
+        margin-inline-end: 20px;
     }
     
     .student-details h3 {
@@ -188,7 +188,7 @@
     
     .notification-item {
         padding: 15px;
-        border-right: 4px solid #3498db;
+        border-inline-start: 4px solid #3498db;
         background: #ecf0f1;
         border-radius: 5px;
         margin-bottom: 15px;
@@ -211,7 +211,7 @@
     
     .notification-item.unread {
         background: #e3f2fd;
-        border-right-color: #2196F3;
+        border-inline-start-color: #2196F3;
     }
 </style>
 <?php endblock(); ?>

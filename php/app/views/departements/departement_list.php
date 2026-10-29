@@ -76,7 +76,7 @@
     .dept-info i {
         color: #8cc040;
         width: 20px;
-        margin-left: 5px;
+        margin-inline-end: 5px;
     }
 </style>
 <?php endblock(); ?>

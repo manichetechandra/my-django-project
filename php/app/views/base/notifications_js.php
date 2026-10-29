@@ -39,7 +39,7 @@
             li.className = 'notif-item';
             li.innerHTML =
                 '<a href="' + esc(n.link || ALL_URL) + '" style="white-space: normal; padding: 10px 15px;' +
-                (n.is_read ? '' : ' background: #f0f8ff; border-right: 3px solid #3498db;') + '">' +
+                (n.is_read ? '' : ' background: #f0f8ff; border-inline-start: 3px solid #3498db;') + '">' +
                 '<div style="display: flex; gap: 10px;"><div style="flex-shrink: 0;">' +
                 '<i class="fa ' + esc(n.icon) + '" style="color: ' + esc(n.color) + '; font-size: 20px;"></i></div>' +
                 '<div style="flex: 1;"><strong style="display: block; font-size: 13px; color: #2c3e50;">' + esc(n.title) +

@@ -33,7 +33,7 @@
         border-radius: 10px;
         box-shadow: 0 3px 15px rgba(0,0,0,0.1);
         margin-bottom: 15px;
-        border-right: 4px solid;
+        border-inline-start: 4px solid;
         transition: all 0.3s;
         position: relative;
     }
@@ -42,14 +42,18 @@
         transform: translateX(-5px);
         box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     }
+
+    html[dir="ltr"] .notification-item:hover {
+        transform: translateX(5px);
+    }
     
     .notification-item.unread {
         background: #f8f9fa;
-        border-right-color: #3498db;
+        border-inline-start-color: #3498db;
     }
     
     .notification-item.read {
-        border-right-color: #95a5a6;
+        border-inline-start-color: #95a5a6;
         opacity: 0.8;
     }
     
@@ -66,7 +70,7 @@
     
     .notification-content {
         flex: 1;
-        margin-right: 20px;
+        margin-inline-start: 20px;
     }
     
     .notification-title {
@@ -95,7 +99,7 @@
     .unread-badge {
         position: absolute;
         top: 10px;
-        left: 10px;
+        inset-inline-end: 10px;
         background: #3498db;
         color: white;
         padding: 3px 8px;
