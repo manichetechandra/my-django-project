@@ -90,6 +90,7 @@ const stageShots = [
   { name: '09-full', stage: ['home', 9], url: '/', w: 1920, full: true, scaleTo: 0.3, wait: 2600 },
   // صفحات بمحتوى ثابت فوق الموقع التجريبي (/tmp/site): overlay = [stage, step]
   { name: '26-director-static', overlay: ['director', 26.1], url: '/director-word/', h: 760 },
+  { name: '27-newslist-static', overlay: ['newslist', 27.1], url: '/news/', h: 900 },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
@@ -99,7 +100,9 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '25-home', url: '/', h: 900 },
   { name: '26-director', url: '/director-word/', h: 760 },
   { name: '26-organization', url: '/organization/', h: 900, scrollTo: 'img[src*=chart]', scrollPad: 160 },
-  { name: '17-activities', url: '/activities/', h: 900 },
+  { name: '27-news-list', url: '/news/', h: 900 },
+  { name: '27-news-detail', url: '/news/maktaba-jadida/', h: 1100 },
+  { name: '27-activities', url: '/activities/', h: 900 },
   { name: '18-services', url: '/services/', h: 900 },
   {
     name: '19-contact', url: '/contact/', h: 1000, scrollTo: 'form:has(textarea[name=message])',
