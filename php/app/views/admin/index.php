@@ -50,6 +50,23 @@
         <?php endforeach; ?>
     </div>
     <div class="col-md-4">
+        <?php if (is_superuser()): ?>
+            <?php $missing = array_sum(Translator::missingCounts()); ?>
+            <div class="panel panel-default admin-panel">
+                <div class="panel-heading"><strong><i class="fa fa-language"></i> اللغات: الفرنسية والإنجليزية</strong></div>
+                <div class="panel-body">
+                    <?php if ($missing): ?>
+                        <p><strong><?= e($missing) ?></strong> سجل فيه نص عربي بلا ترجمة (يظهر بالعربية للزوار في /fr/ و /en/).</p>
+                        <a href="<?= e(url('admin:translate_all')) ?>" class="btn btn-info btn-sm"><i class="fa fa-language"></i> ترجمة المحتوى تلقائياً</a>
+                    <?php else: ?>
+                        <p class="text-success" style="margin: 0"><i class="fa fa-check-circle"></i> كل المحتوى مترجم.</p>
+                    <?php endif; ?>
+                    <?php if (!Translator::enabled()): ?>
+                        <p class="small text-muted" style="margin: 10px 0 0">الترجمة التلقائية معطلة: أضف مفتاح Gemini في config.php.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
         <div class="panel panel-default admin-panel">
             <div class="panel-heading"><strong><i class="fa fa-envelope"></i> آخر الرسائل</strong></div>
             <div class="list-group">

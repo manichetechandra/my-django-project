@@ -3,18 +3,22 @@
  * البحث الشامل في الموقع (search/views.py)
  */
 
-/** تطبيع البحث العربي: حذف كلمات الوقف وإضافة الكلمة بدون "ال" */
+/** تطبيع البحث: حذف كلمات الوقف (العربية والفرنسية والإنجليزية) وإضافة الكلمة بدون "ال" */
 function normalize_arabic_search(string $text): array
 {
     $text = trim($text);
     if ($text === '') {
         return [];
     }
-    $stopWords = ['في', 'من', 'إلى', 'على', 'عن', 'هذا', 'هذه', 'ذلك', 'تلك', 'أن', 'أو', 'لا', 'ما', 'هل'];
+    $stopWords = ['في', 'من', 'إلى', 'على', 'عن', 'هذا', 'هذه', 'ذلك', 'تلك', 'أن', 'أو', 'لا', 'ما', 'هل',
+        // الفرنسية والإنجليزية: كلمات قصيرة تطابق كل شيء تقريباً
+        'de', 'du', 'des', 'la', 'le', 'les', 'un', 'une', 'et', 'en', 'au', 'aux', 'pour', 'par', 'sur', 'dans', 'est', 'ou', 'que', 'qui', 'ce', 'ces', 'se', 'sa', 'son', 'ses',
+        'the', 'of', 'and', 'to', 'in', 'on', 'for', 'an', 'is', 'are', 'at', 'by', 'or', 'with', 'from', 'as', 'be', 'it', 'its', 'this', 'that'];
     $words = preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
     $expanded = [];
     foreach ($words as $w) {
-        if (in_array($w, $stopWords, true) || mb_strlen($w) < 2) {
+        $w = preg_replace("/^(?:l|d|qu|j|n|s|c)['’]/iu", '', $w); // الفرنسية: l'université → université
+        if (in_array(mb_strtolower($w), $stopWords, true) || mb_strlen($w) < 2) {
             continue;
         }
         $expanded[] = $w;
@@ -66,6 +70,12 @@ function search_view(): void
         foreach ($sections as $type => [$model, $fields, $cond, $order, $limit]) {
             if ($searchType !== 'all' && $searchType !== $type) {
                 continue;
+            }
+            // نبحث أيضاً في الترجمات (title_fr، title_en ...): زائر الموقع الفرنسي يكتب بالفرنسية
+            foreach (array_intersect($fields, $model::translatable()) as $f) {
+                foreach (array_diff(array_keys(languages()), [default_lang()]) as $code) {
+                    $fields[] = $f . '_' . $code;
+                }
             }
             $params = [];
             $where = build_search_query($fields, $searchTerms, $params) . ' AND ' . $cond;

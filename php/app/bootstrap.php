@@ -27,6 +27,7 @@ require APP_PATH . '/core/View.php';
 require APP_PATH . '/core/Auth.php';
 require APP_PATH . '/core/Form.php';
 require APP_PATH . '/core/Upload.php';
+require APP_PATH . '/core/Translator.php';
 require APP_PATH . '/core/XlsxWriter.php';
 require APP_PATH . '/helpers.php';
 require APP_PATH . '/i18n.php';

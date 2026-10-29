@@ -87,6 +87,8 @@ $router->get('/admin/', 'admin_index', 'admin:index');
 $router->any('/admin/login/', 'admin_login', 'admin:login');
 $router->get('/admin/logout/', 'admin_logout', 'admin:logout');
 $router->any('/admin/password/', 'admin_password', 'admin:password');
+$router->post('/admin/translate/', 'admin_translate', 'admin:translate');          // زر «ترجمة تلقائية» (AJAX)
+$router->any('/admin/translate-all/', 'admin_translate_all', 'admin:translate_all'); // ترجمة المحتوى القديم
 $router->any('/admin/{model}/', 'admin_list', 'admin:list');
 $router->any('/admin/{model}/add/', 'admin_add', 'admin:add');
 $router->any('/admin/{model}/{id:int}/', 'admin_edit', 'admin:edit');

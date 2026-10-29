@@ -80,3 +80,21 @@ body.admin-body { background: #f4f6f9; font-family: Tahoma, "Segoe UI", Arial, s
 /* مربعات الاختيار: ملف bootstrap-rtl لا يُحمَّل، فنضع المربع على اليمين بأنفسنا */
 .checkbox label { padding-left: 0; padding-right: 20px; }
 .checkbox input[type=checkbox] { margin-left: 0; margin-right: -20px; }
+
+/* الترجمة: حقول الفرنسية والإنجليزية تحت كل نص عربي */
+.admin-tr-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: -15px -15px 18px; padding: 10px 15px; background: #eef6fb; border-bottom: 1px solid #d6e6f2; border-radius: 8px 8px 0 0; }
+.admin-tr-status { font-weight: bold; color: #2c3e50; }
+.admin-translations { margin-top: 6px; padding: 8px 10px; background: #f7f9fc; border: 1px dashed #d3dce8; border-radius: 6px; }
+.admin-translations-inline { margin-top: 4px; padding: 4px 6px; }
+.admin-tr-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.admin-tr-row:last-child { margin-bottom: 0; }
+.admin-tr-lang { flex: 0 0 34px; margin: 0; padding: 5px 0; border-radius: 4px; background: #3498db; color: #fff; font-size: 11px; font-weight: bold; text-align: center; }
+.admin-tr-row[data-lang=en] .admin-tr-lang { background: #8e44ad; }
+.admin-tr-row .form-control { flex: 1; direction: ltr; text-align: left; }
+.admin-tr-new { background: #fffbe6; }
+.admin-tr-stale { border-color: #f0ad4e; box-shadow: 0 0 0 2px rgba(240,173,78,.25); }
+.admin-tr-log { max-height: 260px; overflow: auto; direction: ltr; text-align: left; font-size: 12px; background: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 6px; }
+.admin-tr-badges { margin-top: 4px; white-space: nowrap; line-height: 1; }
+.admin-tr-badge { display: inline-block; margin-left: 3px; padding: 1px 5px; border-radius: 3px; font-size: 10px; font-weight: bold; direction: ltr; }
+.admin-tr-badge.is-done { background: #8cc040; color: #fff; }
+.admin-tr-badge.is-missing { background: #f4f5f7; color: #a7b0bd; border: 1px dashed #c4cad3; }

@@ -60,6 +60,13 @@
                                         <?php endif; ?>
                                     <?php elseif (in_array($col, $r['links'], true)): ?>
                                         <a href="<?= e(url('admin:edit', $r['key'], $obj['id'])) ?>"><strong><?= admin_cell($r, $obj, $col) ?: '(بدون عنوان)' ?></strong></a>
+                                        <?php if ($col === $r['links'][0] && admin_translatable($r)): // حالة الترجمة: أخضر = مترجم ?>
+                                            <div class="admin-tr-badges">
+                                                <?php foreach (admin_translation_status($r, $obj) as $lang => $complete): ?>
+                                                    <span class="admin-tr-badge <?= $complete ? 'is-done' : 'is-missing' ?>" title="<?= $complete ? 'مترجم' : 'تنقصه ترجمة: يظهر النص العربي مكانها' ?>"><?= e(strtoupper($lang)) ?></span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <?= admin_cell($r, $obj, $col) ?>
                                     <?php endif; ?>

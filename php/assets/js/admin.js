@@ -62,6 +62,68 @@
         input.addEventListener('input', function () { if (preview) { preview.className = 'fa ' + input.value.trim(); } });
     });
 
+    // ================================================================ الترجمة التلقائية
+    // كل حقل ترجمة يحمل data-tr-of="اسم الحقل العربي" و data-tr-lang="fr|en"
+    function trSource(input) {
+        var name = input.getAttribute('data-tr-of');
+        return document.querySelector('[name="' + name.replace(/(["\\])/g, '\\$1') + '"]');
+    }
+
+    var trButton = document.querySelector('[data-auto-translate]');
+    var trStatus = document.querySelector('[data-tr-status]');
+    if (trButton) {
+        trButton.addEventListener('click', function () {
+            var targets = Array.prototype.slice.call(document.querySelectorAll('[data-tr-of]'));
+            var texts = {};
+            var hasOld = false;
+            targets.forEach(function (t) {
+                var src = trSource(t);
+                if (src && src.value.trim() !== '') {
+                    texts[t.getAttribute('data-tr-of')] = src.value;
+                    if (t.value.trim() !== '') { hasOld = true; }
+                }
+            });
+            if (!Object.keys(texts).length) {
+                trStatus.textContent = 'اكتب النص العربي أولاً.';
+                return;
+            }
+            var replace = !hasOld || confirm('بعض الحقول مترجمة مسبقاً. هل تريد استبدال ترجمتها؟\n(إلغاء = ملء الحقول الفارغة فقط)');
+            var body = new FormData();
+            body.append('csrfmiddlewaretoken', document.querySelector('input[name=csrfmiddlewaretoken]').value);
+            body.append('texts', JSON.stringify(texts));
+            trButton.disabled = true;
+            trStatus.innerHTML = '<i class="fa fa-spinner fa-spin"></i> جارٍ الترجمة...';
+            fetch(trButton.getAttribute('data-url'), {method: 'POST', body: body, credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (!data.success) { throw new Error(data.error || 'خطأ غير معروف'); }
+                    var n = 0;
+                    targets.forEach(function (t) {
+                        var value = (data[t.getAttribute('data-tr-lang')] || {})[t.getAttribute('data-tr-of')];
+                        if (value && (replace || t.value.trim() === '')) {
+                            t.value = value;
+                            t.classList.add('admin-tr-new');
+                            t.classList.remove('admin-tr-stale');
+                            n++;
+                        }
+                    });
+                    trStatus.textContent = '✓ تمت الترجمة (' + n + ') عبر ' + data.provider + '. راجعها ثم احفظ.';
+                })
+                .catch(function (e) { trStatus.textContent = '✗ تعذرت الترجمة: ' + e.message; })
+                .then(function () { trButton.disabled = false; });
+        });
+    }
+
+    // تعديل النص العربي بعد ترجمته: نلوّن حقول الترجمة لتذكيرك بتحديثها
+    document.querySelectorAll('[data-tr-of]').forEach(function (t) {
+        var src = trSource(t);
+        if (!src) { return; }
+        src.addEventListener('input', function () {
+            if (t.value.trim() !== '') { t.classList.add('admin-tr-stale'); t.title = 'تغيّر النص العربي: اضغط «ترجمة تلقائية» أو عدّل الترجمة'; }
+        });
+        t.addEventListener('input', function () { t.classList.remove('admin-tr-stale', 'admin-tr-new'); });
+    });
+
     // إخفاء الرسائل بعد 6 ثوانٍ
     setTimeout(function () {
         document.querySelectorAll('.admin-main > .alert-success').forEach(function (a) { a.style.display = 'none'; });

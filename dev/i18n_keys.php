@@ -5,7 +5,7 @@
  *   php -d extension=tokenizer dev/i18n_keys.php --json     ← قائمة كل المفاتيح (JSON)
  */
 $root = realpath(__DIR__ . '/../php');
-$skipFiles = ['/app/admin_config.php', '/app/controllers/admin.php', '/app/i18n.php', '/app/core/DB.php', '/app/core/Router.php',
+$skipFiles = ['/app/admin_config.php', '/app/controllers/admin.php', '/app/core/Translator.php', '/app/i18n.php', '/app/core/DB.php', '/app/core/Router.php',
               '/app/core/View.php', '/app/core/XlsxWriter.php', '/app/bootstrap.php', '/app/lang/fr.php', '/app/lang/en.php'];
 $skipKeys = ['في', 'من', 'إلى', 'على', 'عن', 'هذا', 'هذه', 'ذلك', 'تلك', 'أن', 'أو', 'لا', 'ما', 'هل', 'ال', '، ', 'ص', 'م',
              'خطأ في تسجيل الزيارة: ', '() غير موجودة', 'تعذر إنشاء مجلد الرفع: ', 'تعذر حفظ الملف المرفوع.', 'العربية'];

@@ -326,6 +326,7 @@ function admin_form(array $r, ?Model $obj): void
     if (is_post() && !$readonly) {
         [$data, $errors, $newFiles, $oldFiles] = admin_collect_form($r, $obj);
         if (!$errors) {
+            $data = admin_auto_translate($r, $data);
             $model = $r['model'];
             $old = $obj ? $obj->toArray() : null;
             try {
@@ -370,6 +371,13 @@ function admin_form(array $r, ?Model $obj): void
                 $values[$f] = $obj[$f];
             } else {
                 $values[$f] = admin_default_value($spec);
+            }
+        }
+        // حقول الترجمة (title_fr، title_en ...) كما هي في قاعدة البيانات
+        $raw = $obj ? $obj->toArray() : [];
+        foreach (admin_translatable($r) as $f) {
+            foreach (admin_other_langs() as $lang) {
+                $values[$f . '_' . $lang] = $raw[$f . '_' . $lang] ?? '';
             }
         }
     }
@@ -580,6 +588,20 @@ function admin_collect_form(array $r, ?Model $obj): array
         }
     }
 
+    // الترجمات (title_fr، title_en ...): اختيارية — الفارغة تُترجم تلقائياً عند الحفظ أو يظهر مكانها النص العربي
+    foreach (admin_translatable($r) as $f) {
+        foreach (admin_other_langs() as $lang) {
+            $col = $f . '_' . $lang;
+            $v = trim((string) ($_POST[$col] ?? ''));
+            $max = admin_translation_max($r['fields'][$f]);
+            if ($max && mb_strlen($v) > $max) {
+                $errors[$col] = 'الحد الأقصى ' . $max . ' حرفاً.';
+                continue;
+            }
+            $data[$col] = $v === '' ? null : $v;
+        }
+    }
+
     // عند وجود أخطاء نحذف الملفات التي رُفعت للتو
     if ($errors) {
         foreach ($newFiles as [$path, $private]) {
@@ -613,6 +635,12 @@ function admin_save_inlines(array $r, Model $obj): void
                 if (isset($vals[$col])) {
                     $upd[$col] = mb_substr(trim((string) $vals[$col]), 0, 200);
                 }
+                foreach (in_array($col, $m::translatable(), true) ? admin_other_langs() : [] as $lang) {
+                    if (isset($vals[$col . '_' . $lang])) {
+                        $t = mb_substr(trim((string) $vals[$col . '_' . $lang]), 0, 300);
+                        $upd[$col . '_' . $lang] = $t === '' ? null : $t;
+                    }
+                }
             }
             if ($inl['order'] && isset($vals[$inl['order']])) {
                 $upd[$inl['order']] = (int) $vals[$inl['order']];
@@ -645,7 +673,185 @@ function admin_save_inlines(array $r, Model $obj): void
                 $m::create($data);
             }
         }
+        admin_auto_translate_inline($inl, $obj);
     }
+}
+
+// ====================================================================== الترجمة (الحقول _fr و _en)
+
+/** الحقول العربية التي لها أعمدة ترجمة في هذا القسم (من $translatable في النموذج) */
+function admin_translatable(array $r): array
+{
+    return array_values(array_filter($r['model']::translatable(), fn($f) => isset($r['fields'][$f]) && $r['fields'][$f]['type'] !== 'readonly'));
+}
+
+/** لغات الترجمة (كل اللغات ما عدا العربية): ['fr', 'en'] */
+function admin_other_langs(): array
+{
+    return array_values(array_diff(array_keys(languages()), [default_lang()]));
+}
+
+/** الطول الأقصى لعمود الترجمة: أوسع من العربي كما في database/migrations/2026_10_i18n.sql */
+function admin_translation_max(array $spec): ?int
+{
+    if (!isset($spec['max'])) {
+        return null;
+    }
+    return [50 => 100, 100 => 200, 200 => 300, 300 => 500, 500 => 800][$spec['max']] ?? min($spec['max'] * 2, 1000);
+}
+
+/** حالة ترجمة سجل في قائمة السجلات: ['fr' => true (مكتمل) أو false (ينقصه حقل), 'en' => ...] */
+function admin_translation_status(array $r, Model $obj): array
+{
+    $raw = $obj->toArray();
+    $status = [];
+    foreach (admin_other_langs() as $lang) {
+        $status[$lang] = true;
+        foreach (admin_translatable($r) as $f) {
+            if (trim((string) ($raw[$f] ?? '')) !== '' && trim((string) ($raw[$f . '_' . $lang] ?? '')) === '') {
+                $status[$lang] = false;
+                break;
+            }
+        }
+    }
+    return $status;
+}
+
+/** ترجمة حقول الفرنسية والإنجليزية الفارغة تلقائياً قبل حفظ السجل */
+function admin_auto_translate(array $r, array $data): array
+{
+    if (!config('translation.auto_on_save', true) || !Translator::enabled()) {
+        return $data;
+    }
+    $texts = [];
+    foreach (admin_translatable($r) as $f) {
+        $ar = trim((string) ($data[$f] ?? ''));
+        foreach (admin_other_langs() as $lang) {
+            if ($ar !== '' && !isset($data[$f . '_' . $lang])) {
+                $texts[$f] = $ar;
+            }
+        }
+    }
+    if (!$texts) {
+        return $data;
+    }
+    try {
+        $tr = Translator::translate($texts);
+        $n = 0;
+        foreach ($texts as $f => $_) {
+            foreach (admin_other_langs() as $lang) {
+                $col = $f . '_' . $lang;
+                if (!isset($data[$col]) && $tr[$lang][$f] !== '') {
+                    $max = admin_translation_max($r['fields'][$f]);
+                    $data[$col] = $max ? mb_substr($tr[$lang][$f], 0, $max) : $tr[$lang][$f];
+                    $n++;
+                }
+            }
+        }
+        if ($n) {
+            flash('info', 'الترجمة التلقائية: مُلئت حقول الفرنسية والإنجليزية الفارغة (' . $n . ') عبر ' . Translator::$usedProvider . '. يمكنك مراجعتها وتعديلها من صفحة السجل.');
+        }
+    } catch (Throwable $e) {
+        flash('warning', 'تعذرت الترجمة التلقائية: ' . $e->getMessage() . ' — سيظهر النص العربي في النسختين الفرنسية والإنجليزية إلى أن تضيف الترجمة.');
+    }
+    return $data;
+}
+
+/** ترجمة تعليقات الصور المرفقة الفارغة (طلب واحد لكل صور السجل) */
+function admin_auto_translate_inline(array $inl, Model $obj): void
+{
+    $m = $inl['model'];
+    $cols = array_values(array_intersect(array_keys($inl['text']), $m::translatable()));
+    if (!$cols || !config('translation.auto_on_save', true) || !Translator::enabled()) {
+        return;
+    }
+    $texts = [];
+    $rows = [];
+    foreach ($m::where('`' . $inl['fk'] . '` = ?', [(int) $obj['id']]) as $row) {
+        $raw = $row->toArray();
+        foreach ($cols as $col) {
+            foreach (admin_other_langs() as $lang) {
+                if (trim((string) $raw[$col]) !== '' && trim((string) ($raw[$col . '_' . $lang] ?? '')) === '') {
+                    $texts[$row['id'] . ':' . $col] = $raw[$col];
+                    $rows[$row['id']] = $row;
+                }
+            }
+        }
+    }
+    if (!$texts) {
+        return;
+    }
+    try {
+        $tr = Translator::translate($texts);
+        foreach ($texts as $key => $_) {
+            [$id, $col] = explode(':', $key, 2);
+            $upd = [];
+            foreach (admin_other_langs() as $lang) {
+                if (trim((string) ($rows[$id]->toArray()[$col . '_' . $lang] ?? '')) === '' && $tr[$lang][$key] !== '') {
+                    $upd[$col . '_' . $lang] = mb_substr($tr[$lang][$key], 0, 300);
+                }
+            }
+            if ($upd) {
+                $rows[$id]->update($upd);
+            }
+        }
+    } catch (Throwable $e) {
+        flash('warning', 'تعذرت ترجمة تعليقات الصور: ' . $e->getMessage());
+    }
+}
+
+/** زر «ترجمة تلقائية» في نموذج السجل (AJAX): يستقبل النصوص العربية ويرجع الفرنسية والإنجليزية */
+function admin_translate(): void
+{
+    admin_guard();
+    $texts = json_decode((string) ($_POST['texts'] ?? ''), true);
+    if (!is_array($texts) || !$texts) {
+        json_response(['success' => false, 'error' => 'لا توجد نصوص عربية للترجمة.'], 400);
+    }
+    if (!Translator::enabled()) {
+        json_response(['success' => false, 'error' => 'الترجمة التلقائية غير مفعّلة. أضف مفتاح Gemini المجاني في config.php (translation.gemini_key) أو فعّل MyMemory.']);
+    }
+    $clean = [];
+    foreach (array_slice($texts, 0, 80, true) as $k => $v) {
+        $clean[(string) $k] = mb_substr((string) $v, 0, 30000);
+    }
+    try {
+        $tr = Translator::translate($clean);
+        json_response(['success' => true, 'provider' => Translator::$usedProvider] + $tr);
+    } catch (Throwable $e) {
+        json_response(['success' => false, 'error' => $e->getMessage()]);
+    }
+}
+
+/** صفحة «ترجمة المحتوى القديم»: تترجم السجلات التي تنقصها ترجمة على دفعات صغيرة */
+function admin_translate_all(): void
+{
+    admin_guard();
+    if (!is_superuser()) {
+        abort(403, 'هذه الصفحة للمدير العام فقط.');
+    }
+    if (is_post()) {
+        @set_time_limit(300);
+        $skip = json_decode((string) ($_POST['skip'] ?? '{}'), true) ?: [];
+        Translator::$patient = true;
+        try {
+            $res = Translator::fillMissing(3, false, $skip);
+            json_response(['success' => true, 'provider' => Translator::$usedProvider, 'remaining' => array_sum(Translator::missingCounts())] + $res);
+        } catch (Throwable $e) {
+            json_response(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+    $labels = [];
+    foreach (admin_resources() as $key => $res) {
+        $labels[$res['model']::table()] = $res['plural'];
+    }
+    admin_render('translate_all', [
+        'page_title' => 'ترجمة المحتوى إلى الفرنسية والإنجليزية',
+        'counts'     => Translator::missingCounts(),
+        'labels'     => $labels,
+        'enabled'    => Translator::enabled(),
+        'providers'  => Translator::providers(),
+    ]);
 }
 
 // ====================================================================== الحذف

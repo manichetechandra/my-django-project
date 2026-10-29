@@ -21,22 +21,29 @@
   ملف ترحيل للقواعد الموجودة: database/migrations/2026_10_i18n.sql (+ schema.sql محدّث).
 - **الخيارات (choices)** وتسميات الحالات: تمر عبر __().
 - **إشعارات الطالب**: تُنشأ بالعربية + الفرنسية + الإنجليزية (أعمدة title_fr/message_fr…).
-- **لوحة الإدارة**: 'translate' => [...] في admin_config يضيف حقول _fr/_en تحت كل حقل، وزر ترجمة (AJAX /admin/translate/)،
-  وترجمة الفارغ عند الحفظ. صفحة «ترجمة المحتوى القديم» دفعة بعد دفعة.
-- **Translator** (app/core/Translator.php): gemini (generateContent + JSON) ← mymemory (500 بايت/طلب) ← لا شيء.
-  الإعداد في config.php: translation.provider / gemini_key / gemini_model / mymemory_email / auto_on_save.
-  لا يمكن تجربة الخدمات الحقيقية من بيئة العمل (لا إنترنت): مزوّد `fake` للاختبار.
+- **لوحة الإدارة**: الحقول المترجمة تأتي من Model::$translatable (admin_translatable)، فيظهر تحت كل حقل عربي حقلا FR/EN،
+  وزر «ترجمة تلقائية» (AJAX POST /admin/translate/)، وترجمة الفارغ عند الحفظ (admin_auto_translate)، وتعليقات الصور المرفقة،
+  وشارات FR/EN في القوائم، وصفحة «ترجمة المحتوى» /admin/translate-all/ (دفعات من 3 سجلات، للمدير العام)،
+  وأداة database/tools/translate_content.php (--dry-run --limit --force).
+- **Translator** (app/core/Translator.php): gemini (generateContent + JSON، ويجرب gemini-flash-latest عند 404) ← mymemory (450 بايت/طلب).
+  الترجمة الجماعية (Translator::$patient) تنتظر retryDelay عند 429 بدل الانتقال للبديل.
+  الإعداد في config.php: translation.provider / gemini_key / gemini_model / fallback / mymemory_email / auto_on_save / *_endpoint.
+  لا إنترنت في بيئة العمل: مزوّد `test`، وخادم وهمي dev/mock_translate.py يقلّد الخدمتين (اختبار dev/admin_i18n.mjs).
+- **البحث**: يبحث في الأعمدة العربية و _fr و _en معاً، مع كلمات وقف فرنسية وإنجليزية.
 
 ## المراحل
 1. [x] تجميد الكتاب (أدواته تقرأ من الملف المضغوط).
-2. [ ] نواة اللغات: config، app/i18n.php، بادئة الروابط، مبدّل اللغة، lang/dir، hreflang.
-3. [ ] الاتجاه: CSS منطقي في base.php وكل القوالب العامة/الطالب/الموظفين + مقارنة بكسلية للعربية.
-4. [ ] نصوص الواجهة: القوالب، المتحكمات، النماذج، Form.php، التواريخ… + fr.php و en.php.
-5. [ ] المحتوى: أعمدة الترجمة، Model، البحث، الإشعارات.
-6. [ ] الإدارة: حقول الترجمة، الزر، الترجمة عند الحفظ، ترجمة المحتوى القديم، Translator.
+2. [x] نواة اللغات: config، app/i18n.php، بادئة الروابط، مبدّل اللغة، lang/dir، hreflang.
+3. [x] الاتجاه: CSS منطقي في base.php وكل القوالب العامة/الطالب/الموظفين + مقارنة بكسلية للعربية.
+4. [x] نصوص الواجهة: القوالب، المتحكمات، النماذج، Form.php، التواريخ… + fr.php و en.php.
+5. [x] المحتوى: أعمدة الترجمة، Model، البحث، الإشعارات.
+6. [x] الإدارة: حقول الترجمة، الزر، الترجمة عند الحفظ، ترجمة المحتوى القديم، Translator.
 7. [ ] اختبار شامل + لقطات + README + dou-setif-php-v2.zip + دفع.
 
 ## أدوات التطوير
-- موقع تجريبي للنسخة 2.0: `cd book && SRC_DIR=../php bash tools/demo-site.sh /tmp/site2` ثم
-  `cd /tmp/site2 && php -S 0.0.0.0:8002 index.php`.
-- dev/ : سكربتات لقطات كل الصفحات والمقارنة البكسلية.
+- موقع تجريبي للنسخة 2.0 مع ترجمات المحتوى التجريبي: `bash dev/demo-site.sh` ثم
+  `cd /tmp/site2 && DB_NAME=dou_setif2 php -S 0.0.0.0:8002 index.php`. تحديث الكود فقط: `bash dev/sync.sh`.
+- `bash dev/smoke.sh` (كل الصفحات بثلاث لغات)، `node dev/pages.mjs` (لقطات) و `dev/compare.py` (مقارنة بكسلية).
+- نصوص الواجهة: `python3 dev/i18n/build_lang.py` يبني app/lang/*.php ويجب أن يبلّغ 0 ناقص.
+- الترجمة التلقائية بلا إنترنت: `python3 dev/mock_translate.py` + الموقع بـ GEMINI_ENDPOINT=http://127.0.0.1:8999/v1beta
+  ثم `node dev/admin_i18n.mjs` (اختبار الإدارة من المتصفح).

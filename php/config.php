@@ -67,5 +67,8 @@ return [
         // ترجمة الحقول الفرنسية والإنجليزية الفارغة تلقائياً عند حفظ السجل
         'auto_on_save'   => true,
         'timeout'        => 45,
+        // عناوين الخدمتين (لا تغيّرها إلا للاختبار بخادم محلي: dev/mock_translate.py)
+        'gemini_endpoint'   => $env('GEMINI_ENDPOINT', 'https://generativelanguage.googleapis.com/v1beta'),
+        'mymemory_endpoint' => $env('MYMEMORY_ENDPOINT', 'https://api.mymemory.translated.net/get'),
     ],
 ];
