@@ -81,7 +81,7 @@ const stageShots = [
     act: async (page) => { await page.click('.navbar-toggle'); await new Promise((r) => setTimeout(r, 600)); },
   },
   { name: '05-slider', stage: ['home', 5], url: '/', h: 600 },
-  { name: '06-news', stage: ['home', 6], url: '/', h: 640, scrollTo: '#list-news', scrollPad: 75 },
+  { name: '06-news', stage: ['home', 6], url: '/', h: 640, scrollTo: '#list-news', scrollPad: 112 },
   { name: '07-activities', stage: ['home', 7], url: '/', h: 720, scrollTo: 'h3:has(.fa-calendar-check-o)', scrollPad: 100 },
   { name: '07-stats', stage: ['home', 7], url: '/', h: 560, scrollTo: '.statistics-section', scrollPad: 60, wait: 2600 },
   { name: '08-departments', stage: ['home', 8], url: '/', h: 760, scrollTo: '.outer', scrollPad: 100 },
@@ -89,7 +89,7 @@ const stageShots = [
   { name: '09-footer', stage: ['home', 9], url: '/', h: 420, scrollTo: 'footer', scrollPad: 60 },
   { name: '09-full', stage: ['home', 9], url: '/', w: 1920, full: true, scaleTo: 0.3, wait: 2600 },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
-  { name: '15-db', stage: ['home', 15], url: '/', h: 640, scrollTo: '#list-news', scrollPad: 75, files: ['config.php'] },
+  { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
 
 const shots = SET === 'stages' ? stageShots : [
