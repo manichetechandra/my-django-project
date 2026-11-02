@@ -1,0 +1,49 @@
+# =============================================================
+#  مديرية الخدمات الجامعية سطيف — إعدادات Apache (XAMPP / cPanel)
+# =============================================================
+Options -Indexes
+DirectoryIndex index.php
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # منع الوصول المباشر للمجلدات الداخلية
+    RewriteRule ^(app|database|storage)(/|$) - [F,L]
+    RewriteRule (^|/)\.(?!well-known) - [F,L]
+
+    # الملفات والمجلدات الموجودة فعلاً تُقدَّم مباشرة (assets, uploads...)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # كل شيء آخر يمر عبر index.php
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# منع قراءة ملفات حساسة
+<FilesMatch "^(config\.php|.*\.sql|.*\.md|.*\.log|composer\.(json|lock))$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "same-origin"
+</IfModule>
+
+# حدود رفع الملفات (إن سمحت الاستضافة بذلك)
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 25M
+</IfModule>
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 25M
+</IfModule>

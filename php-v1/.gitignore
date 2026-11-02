@@ -1,0 +1,11 @@
+# ملفات التشغيل (لا تُرفع إلى Git)
+storage/sessions/*
+storage/logs/*
+storage/private/*
+!storage/sessions/.gitkeep
+!storage/logs/.gitkeep
+!storage/private/.gitkeep
+config.local.php
+
+# قاعدة "downloads/" في .gitignore الرئيسي (قالب Python) كانت تستثني قوالب مركز التحميلات
+!app/views/downloads/
