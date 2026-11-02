@@ -231,8 +231,8 @@
 const applicationTypes = {
     <?php foreach ($application_types as $app_type): ?>
     '<?= e($app_type['id']) ?>': {
-        name: '<?= e($app_type['name']) ?>',
-        documents: `<?= escapejs($app_type['required_documents']) ?>`
+        name: <?= json_js((string) $app_type['name']) ?>,
+        documents: <?= json_js((string) $app_type['required_documents']) ?>
     },
     <?php endforeach; ?>
 };

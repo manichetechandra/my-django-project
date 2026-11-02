@@ -20,7 +20,7 @@
         <a href="<?= e(url('students:admin_dashboard')) ?>"><i class="fa fa-dashboard"></i> <span class="hidden-xs">متابعة الطلبات</span></a>
         <span class="admin-user"><i class="fa fa-user-circle"></i> <?= e(current_user()->display_name()) ?></span>
         <a href="<?= e(url('admin:password')) ?>" title="تغيير كلمة المرور"><i class="fa fa-key"></i></a>
-        <a href="<?= e(url('admin:logout')) ?>" title="تسجيل الخروج"><i class="fa fa-sign-out"></i></a>
+        <a href="<?= e(logout_url('admin:logout')) ?>" title="تسجيل الخروج"><i class="fa fa-sign-out"></i></a>
     </div>
 </nav>
 <aside class="admin-sidebar">

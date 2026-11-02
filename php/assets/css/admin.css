@@ -98,3 +98,22 @@ body.admin-body { background: #f4f6f9; font-family: Tahoma, "Segoe UI", Arial, s
 .admin-tr-badge { display: inline-block; margin-left: 3px; padding: 1px 5px; border-radius: 3px; font-size: 10px; font-weight: bold; direction: ltr; }
 .admin-tr-badge.is-done { background: #8cc040; color: #fff; }
 .admin-tr-badge.is-missing { background: #f4f5f7; color: #a7b0bd; border: 1px dashed #c4cad3; }
+
+/* ===================== صفحة دخول الإدارة /admin/login/ ===================== */
+body.admin-login-body {
+    min-height: 100vh; margin: 0; padding: 20px 15px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 55%, #3d566e 100%);
+    font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+}
+.admin-login { width: 100%; max-width: 400px; }
+.admin-login-card { background: #fff; border-radius: 10px; padding: 30px 28px 22px; box-shadow: 0 12px 35px rgba(0,0,0,.3); border-top: 5px solid #8cc040; }
+.admin-login-head { text-align: center; margin-bottom: 22px; }
+.admin-login-head img { width: 64px; height: 64px; }
+.admin-login-head h1 { font-size: 22px; margin: 12px 0 4px; color: #2c3e50; font-weight: bold; }
+.admin-login-head p { color: #7f8c8d; margin: 0; }
+.admin-login-card label { color: #2c3e50; }
+.admin-login-card .form-control { height: 42px; }
+.admin-login-card .alert { font-size: 13px; }
+.admin-login-note { margin: 18px 0 0; font-size: 12px; color: #7f8c8d; text-align: center; line-height: 1.8; }
+.admin-login-back { display: block; text-align: center; margin-top: 16px; color: #ecf0f1; }
+.admin-login-back:hover, .admin-login-back:focus { color: #8cc040; text-decoration: none; }

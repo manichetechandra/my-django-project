@@ -24,14 +24,29 @@ function is_debug(): bool
     if ($debug === null) {
         $d = config('app.debug');
         if ($d === null) {
-            // تلقائي: مفعّل على جهازك المحلي فقط
-            $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-            $debug = PHP_SAPI === 'cli' || in_array($ip, ['127.0.0.1', '::1'], true);
+            // تلقائي: مفعّل فقط عند فتح الموقع على نفس الجهاز مباشرة (http://localhost/...)
+            // لا يكفي أن يكون REMOTE_ADDR محلياً: خلف خادم وسيط (Nginx، Cloudflare...) تأتي كل الطلبات من 127.0.0.1
+            $debug = PHP_SAPI === 'cli' || is_local_request();
         } else {
             $debug = (bool) $d;
         }
     }
     return $debug;
+}
+
+/** طلب من نفس الجهاز مباشرة: عنوان محلي، واسم localhost، وبلا ترويسات خادم وسيط */
+function is_local_request(): bool
+{
+    if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) {
+        return false;
+    }
+    foreach (['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'HTTP_FORWARDED', 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_HOST'] as $h) {
+        if (!empty($_SERVER[$h])) {
+            return false;
+        }
+    }
+    $host = strtolower((string) preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? '')));
+    return in_array($host, ['localhost', '127.0.0.1', '[::1]'], true) || str_ends_with($host, '.localhost');
 }
 
 // ====================================================================== الروابط
@@ -94,15 +109,57 @@ function media_url($path): string
 /** الروابط المخزنة في قاعدة البيانات مثل "/students/dashboard/" تُضاف لها بادئة الموقع */
 function link_url($link): string
 {
-    $link = (string) $link;
-    if ($link === '' || preg_match('#^(https?:|mailto:|tel:|\#)#i', $link)) {
+    $link = trim((string) $link);
+    if ($link === '' || $link[0] === '#') {
         return $link;
     }
-    if ($link[0] === '/') {
+    if ($link[0] === '/' && !preg_match('#^/[/\\\\]#', $link)) {
         $prefix = preg_match('#^/(admin|uploads|assets)(/|$)#', $link) ? '' : lang_prefix();
         return base_url() . route_prefix() . $prefix . $link;
     }
-    return $link;
+    // رابط خارجي: http(s) و mailto و tel فقط — نمنع javascript: و data: ... (XSS)
+    return safe_url($link);
+}
+
+/**
+ * نوع الرابط (scheme) كما يفهمه المتصفح، أو null للرابط النسبي.
+ * المتصفح يتجاهل المسافات وأحرف التحكم: " java\tscript:alert(1)" = javascript:
+ */
+function url_scheme(string $url): ?string
+{
+    $u = (string) preg_replace('/[\x00-\x20\x7F]+/', '', $url);
+    return preg_match('/^([a-z][a-z0-9+.\-]*):/i', $u, $m) ? strtolower($m[1]) : null;
+}
+
+/** رابط آمن لوضعه في href: http(s) و mailto و tel والروابط النسبية فقط، وإلا $fallback */
+function safe_url($url, string $fallback = '#'): string
+{
+    $url = trim((string) $url);
+    if ($url === '') {
+        return $fallback;
+    }
+    $scheme = url_scheme($url);
+    return ($scheme === null || in_array($scheme, ['http', 'https', 'mailto', 'tel'], true)) ? $url : $fallback;
+}
+
+/** رابط مقبول في حقول «الرابط» بلوحة الإدارة: مسار داخلي /... أو #... أو http(s)/mailto/tel */
+function is_allowed_link(string $link): bool
+{
+    $link = trim($link);
+    if ($link === '' || $link[0] === '#') {
+        return true;
+    }
+    if (preg_match('/[\x00-\x1F\x7F]/', $link)) {
+        return false;
+    }
+    if ($link[0] === '/') {
+        return !preg_match('#^/[/\\\\]#', $link);
+    }
+    $scheme = url_scheme($link);
+    if (in_array($scheme, ['mailto', 'tel'], true)) {
+        return true;
+    }
+    return in_array($scheme, ['http', 'https'], true) && filter_var($link, FILTER_VALIDATE_URL) !== false;
 }
 
 /** المسار الحالي داخل الموقع (بدون المجلد الفرعي ولا بادئة اللغة) مثل /news/ */
@@ -146,21 +203,35 @@ function redirect_to(string $routeName, ...$params): void
 }
 
 /**
+ * مسار داخلي آمن لإعادة التوجيه: "//evil.com" و "/\evil.com" و "/\t/evil.com" يفهمها المتصفح كموقع آخر
+ * (Open Redirect)، فنحذف أحرف التحكم ونختصر البداية إلى "/" واحدة ونعيد ترميز الأحرف.
+ */
+function redirect_path(string $path): string
+{
+    $path = (string) preg_replace('/[\x00-\x1F\x7F]+/', '', $path);
+    $path = '/' . ltrim(str_replace('\\', '/', $path), '/');
+    return implode('/', array_map('rawurlencode', explode('/', $path)));
+}
+
+/**
  * رابط "next" بعد تسجيل الدخول: يُقبل فقط مسار داخلي مثل /students/notifications/
  * (لمنع إعادة التوجيه لمواقع خارجية) ويُضاف له مجلد الموقع.
+ * $pattern (اختياري): تعبير منتظم يجب أن يطابقه المسار، مثل مسارات الإدارة فقط.
  */
-function safe_next(?string $next, string $fallback): string
+function safe_next($next, string $fallback, ?string $pattern = null): string
 {
-    $next = (string) $next;
-    if ($next !== '' && $next[0] === '/' && (strlen($next) < 2 || ($next[1] !== '/' && $next[1] !== '\\'))) {
-        $base = base_url() . route_prefix();
-        // إن كان الرابط يحتوي مسبقاً على مجلد الموقع فلا نكرره
-        if ($base !== '' && strpos($next, $base . '/') === 0) {
-            return $next;
-        }
-        return $base . $next;
+    $next = is_string($next) ? $next : '';
+    // يبدأ بـ "/" واحدة، بلا "\" ولا مسافات ولا أحرف تحكم (المتصفح يحذف \t و \n: "/\t/evil.com" => "//evil.com")
+    if ($next === '' || $next[0] !== '/' || str_starts_with($next, '//') || preg_match('/[\x00-\x20\x7F\\\\]/', $next)) {
+        return $fallback;
     }
-    return $fallback;
+    $base = base_url() . route_prefix();
+    // إن كان الرابط يحتوي مسبقاً على مجلد الموقع فلا نكرره
+    $path = ($base !== '' && strpos($next, $base . '/') === 0) ? substr($next, strlen($base)) : $next;
+    if ($pattern !== null && !preg_match($pattern, $path)) {
+        return $fallback;
+    }
+    return $base . $path;
 }
 
 // ====================================================================== الطلب والاستجابة
@@ -186,13 +257,101 @@ function query(string $key, $default = '')
     return is_string($v) ? trim($v) : $default;
 }
 
+/**
+ * عنوان IP الزائر. ترويسة X-Forwarded-For يكتبها أي شخص، فلا نصدّقها إلا إذا جاء الطلب
+ * من خادم وسيط موثوق مذكور في config.php => app.trusted_proxies (مثل Cloudflare أو Nginx).
+ */
 function client_ip(): string
 {
-    $fwd = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
-    if ($fwd !== '') {
-        return trim(explode(',', $fwd)[0]);
+    $remote = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+    $trusted = (array) config('app.trusted_proxies', []);
+    if ($trusted && !empty($_SERVER['HTTP_X_FORWARDED_FOR']) && ip_matches($remote, $trusted)) {
+        // من اليمين إلى اليسار: أول عنوان ليس خادماً وسيطاً موثوقاً هو الزائر
+        foreach (array_reverse(array_map('trim', explode(',', (string) $_SERVER['HTTP_X_FORWARDED_FOR']))) as $ip) {
+            if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+                break;
+            }
+            if (!ip_matches($ip, $trusted)) {
+                return $ip;
+            }
+        }
     }
-    return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    return $remote;
+}
+
+/** هل العنوان ضمن القائمة؟ (عناوين مفردة أو نطاقات CIDR مثل 10.0.0.0/8 و 2400:cb00::/32) */
+function ip_matches(string $ip, array $list): bool
+{
+    if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        return false;
+    }
+    $bin = inet_pton($ip);
+    foreach ($list as $entry) {
+        $parts = explode('/', trim((string) $entry), 2);
+        if (!filter_var($parts[0], FILTER_VALIDATE_IP)) {
+            continue;
+        }
+        $net = inet_pton($parts[0]);
+        if (strlen($net) !== strlen($bin)) {
+            continue;
+        }
+        $bits = isset($parts[1]) ? max(0, min((int) $parts[1], strlen($bin) * 8)) : strlen($bin) * 8;
+        $bytes = intdiv($bits, 8);
+        $rest = $bits % 8;
+        if (substr($bin, 0, $bytes) !== substr($net, 0, $bytes)) {
+            continue;
+        }
+        if ($rest && ((ord($bin[$bytes]) ^ ord($net[$bytes])) & (0xFF << (8 - $rest)) & 0xFF)) {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
+/** هل الاتصال مشفّر (HTTPS)؟ */
+function is_https(): bool
+{
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+}
+
+/**
+ * ترويسات الأمان لكل الصفحات (تعمل على Apache و Nginx و php -S، حتى بدون mod_headers).
+ * نفس الترويسات موجودة في .htaccess كخط دفاع ثانٍ.
+ */
+function send_security_headers(): void
+{
+    if (headers_sent()) {
+        return;
+    }
+    header_remove('X-Powered-By');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+    // منع تضمين الموقع داخل إطار في موقع آخر (Clickjacking) — يمكن تعطيله بـ FRAME_OPTIONS=off
+    $frame = strtoupper((string) config('security.frame_options', 'SAMEORIGIN'));
+    $csp = "base-uri 'self'; object-src 'none'; form-action 'self'";
+    if (in_array($frame, ['DENY', 'SAMEORIGIN'], true)) {
+        header('X-Frame-Options: ' . $frame);
+        $csp .= '; frame-ancestors ' . ($frame === 'DENY' ? "'none'" : "'self'");
+    }
+    header('Content-Security-Policy: ' . $csp);
+    $hsts = (int) config('security.hsts_seconds', 0);
+    if ($hsts > 0 && is_https()) {
+        header('Strict-Transport-Security: max-age=' . $hsts . '; includeSubDomains');
+    }
+}
+
+/** سجل أحداث الأمان (دخول ناجح/فاشل، حظر مؤقت...) في storage/logs/security.log */
+function security_log(string $event, array $data = []): void
+{
+    $dir = STORAGE_PATH . '/logs';
+    if (!is_dir($dir) || !is_writable($dir)) {
+        return;
+    }
+    $line = json_encode(['time' => date('c'), 'event' => $event, 'ip' => client_ip()] + $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    @file_put_contents($dir . '/security.log', $line . "\n", FILE_APPEND | LOCK_EX);
 }
 
 function json_response($data, int $status = 200): void
@@ -276,6 +435,27 @@ function verify_csrf(): bool
     return is_string($token) && $token !== '' && !empty($_SESSION['_csrf']) && hash_equals($_SESSION['_csrf'], $token);
 }
 
+/**
+ * رمز رابط تسجيل الخروج: بدونه يستطيع أي موقع آخر تسجيل خروج المستخدم بصورة <img src=".../logout/">.
+ * مشتق من رمز CSRF (لا نضع رمز CSRF نفسه في الرابط حتى لا يظهر في السجلات).
+ */
+function logout_token(): string
+{
+    return substr(hash_hmac('sha256', 'logout', csrf_token()), 0, 32);
+}
+
+function logout_url(string $routeName): string
+{
+    return url($routeName) . '?t=' . logout_token();
+}
+
+/** طلب تسجيل خروج صحيح؟ (POST محمي أصلاً برمز CSRF في index.php) */
+function verify_logout(): bool
+{
+    $t = $_GET['t'] ?? '';
+    return is_post() || (is_string($t) && hash_equals(logout_token(), $t));
+}
+
 // ====================================================================== الرسائل (django.contrib.messages)
 
 function flash(string $tag, string $message): void
@@ -344,19 +524,75 @@ function require_login(): User
     return $u;
 }
 
-/** مثل @staff_required في students/decorators.py */
+/**
+ * مثل @staff_required في students/decorators.py.
+ * الموظفون يدخلون من واجهة الإدارة الخاصة /admin/login/ وليس من فضاء الطالب.
+ */
 function require_staff(): User
 {
     $u = Auth::user();
     if (!$u) {
-        flash('warning', __('يجب تسجيل الدخول أولاً'));
-        redirect(url('students:login') . '?next=' . rawurlencode(lang_prefix() . request_path()));
+        $next = lang_prefix() . request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING']);
+        redirect(url('admin:login') . '?next=' . rawurlencode($next));
     }
     if (!is_staff()) {
         flash('error', __('ليس لديك صلاحية للوصول لهذه الصفحة. هذه الصفحة للإداريين فقط.'));
         redirect_to('homepage:index');
     }
     return $u;
+}
+
+/** المسارات المسموح الرجوع إليها بعد دخول الإدارة: /admin/... و /students/admin/... (مع بادئة اللغة) */
+const STAFF_NEXT_PATTERN = '#^(/[a-z]{2})?/(admin|students/admin)/#';
+
+// ====================================================================== محاولات الدخول
+
+/**
+ * حدود محاولات الدخول الفاشلة خلال نافذة زمنية (افتراضياً 15 دقيقة):
+ * لكل عنوان IP (أي اسم مستخدم)، ولكل اسم مستخدم من نفس العنوان.
+ * مشتركة بين فضاء الطالب وواجهة الإدارة حتى لا يُضاعف المهاجم محاولاته بالتنقل بينهما.
+ */
+function login_throttle_keys(string $username): array
+{
+    $ip = client_ip();
+    return [
+        'login-ip:' . $ip                                     => (int) config('security.login_max_per_ip', 20),
+        'login-user:' . $ip . '|' . mb_strtolower(trim($username)) => (int) config('security.login_max_per_user', 5),
+    ];
+}
+
+/** عدد الثواني المتبقية قبل السماح بمحاولة جديدة (0 = مسموح) */
+function login_throttle_wait(string $username): int
+{
+    $window = (int) config('security.login_window', 900);
+    $wait = 0;
+    foreach (login_throttle_keys($username) as $key => $max) {
+        if ($max > 0) {
+            $wait = max($wait, RateLimit::retryAfter($key, $max, $window));
+        }
+    }
+    return $wait;
+}
+
+function login_throttle_hit(string $username): void
+{
+    $window = (int) config('security.login_window', 900);
+    foreach (array_keys(login_throttle_keys($username)) as $key) {
+        RateLimit::hit($key, $window);
+    }
+}
+
+/** بعد دخول ناجح: نمسح عداد اسم المستخدم (ويبقى عداد العنوان) */
+function login_throttle_clear(string $username): void
+{
+    $keys = array_keys(login_throttle_keys($username));
+    RateLimit::clear($keys[1]);
+}
+
+/** رسالة «محاولات كثيرة» مع المدة المتبقية بالدقائق */
+function too_many_attempts_message(int $seconds): string
+{
+    return __('محاولات كثيرة. يرجى المحاولة مجدداً بعد {minutes} دقيقة.', ['minutes' => max(1, (int) ceil($seconds / 60))]);
 }
 
 // ====================================================================== التواريخ

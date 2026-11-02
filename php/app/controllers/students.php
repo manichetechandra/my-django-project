@@ -36,7 +36,15 @@ function student_register(): void
         redirect_to('students:dashboard');
     }
     $form = student_registration_form(is_post() ? $_POST : null);
+    if (is_post() && ($wait = RateLimit::retryAfter('register:' . client_ip(), (int) config('security.register_max', 10), 3600)) > 0) {
+        // حد لمحاولات التسجيل من نفس العنوان (إنشاء حسابات وهمية بالجملة، وتخمين أرقام التسجيل)
+        header('Retry-After: ' . $wait);
+        flash('error', too_many_attempts_message($wait));
+        render('students/register', ['form' => $form, 'page_title' => __('تسجيل طالب جديد')], 429);
+        return;
+    }
     if (is_post()) {
+        RateLimit::hit('register:' . client_ip(), 3600);
         if ($form->is_valid()) {
             $d = $form->cleaned;
             try {
@@ -89,39 +97,60 @@ function student_login(): void
         redirect_to(is_staff() ? 'students:admin_dashboard' : 'students:dashboard');
     }
     $form = student_login_form(is_post() ? $_POST : null);
+    $status = 200;
     if (is_post() && $form->is_valid()) {
         $d = $form->cleaned;
-        $user = Auth::attempt($d['username'], $d['password']);
-        if ($user) {
-            $next = $_GET['next'] ?? '';
-            $student = $user->student_profile();
-            if ($user['is_staff'] || $user['is_superuser']) {
-                Auth::login($user, (bool) $d['remember_me']);
-                flash('success', __('مرحباً! تم تسجيل الدخول كمشرف'));
-                redirect(safe_next($next, url('students:admin_dashboard')));
-            }
-            if ($student) {
+        $wait = login_throttle_wait($d['username']);
+        if ($wait > 0) {
+            // حماية من تخمين كلمات المرور: لا نتحقق من كلمة المرور أصلاً أثناء الحظر المؤقت
+            header('Retry-After: ' . $wait);
+            flash('error', too_many_attempts_message($wait));
+            security_log('login_throttled', ['form' => 'student', 'username' => $d['username']]);
+            $status = 429;
+        } else {
+            // فضاء الطالب للطلبة فقط: حسابات الموظفين والمدير تدخل من واجهتها الخاصة /admin/login/
+            // (وتُعامل هنا كأنها غير موجودة، فلا تكشف الصفحة وجودها ولا صحة كلمة مرورها)
+            $user = Auth::attempt($d['username'], $d['password'], fn(User $u) => !$u->is_staff_account() && $u->student_profile() !== null);
+            if ($user) {
+                login_throttle_clear($d['username']);
+                $student = $user->student_profile();
                 if (!$student['is_active']) {
                     flash('error', __('حسابك غير نشط. يرجى الاتصال بالإدارة'));
                     redirect_to('students:login');
                 }
                 Auth::login($user, (bool) $d['remember_me']);
                 flash('success', __('مرحباً {name}!', ['name' => $student['full_name_arabic']]));
-                redirect(safe_next($next, url('students:dashboard')));
+                // لا رجوع إلى صفحات الإدارة من فضاء الطالب
+                $next = safe_next($_GET['next'] ?? '', '');
+                if ($next === '' || preg_match('#^(/[a-z]{2})?/(admin|students/admin)/#', substr($next, strlen(base_url() . route_prefix())))) {
+                    $next = url('students:dashboard');
+                }
+                redirect($next);
             }
-            Auth::login($user, (bool) $d['remember_me']);
-            flash('warning', __('لا يوجد ملف طالب. يمكنك الوصول للوحة الإدارة فقط'));
-            redirect_to('homepage:index');
+            login_throttle_hit($d['username']);
+            security_log('login_failed', ['form' => 'student', 'username' => $d['username']]);
+            flash('error', __('اسم المستخدم أو كلمة المرور غير صحيحة'));
         }
-        flash('error', __('اسم المستخدم أو كلمة المرور غير صحيحة'));
     }
-    render('students/login', ['form' => $form, 'page_title' => __('تسجيل الدخول')]);
+    render('students/login', ['form' => $form, 'page_title' => __('تسجيل الدخول')], $status);
 }
 
 function student_logout(): void
 {
     never_cache();
+    if (!is_authenticated()) {
+        redirect_to('students:login');
+    }
+    $staff = is_staff();
+    if (!verify_logout()) {
+        // رابط بلا رمز صحيح (مثلاً من موقع آخر): لا نسجّل الخروج
+        redirect_to($staff ? 'students:admin_dashboard' : 'students:dashboard');
+    }
     Auth::logout();
+    if ($staff) {
+        flash('success', 'تم تسجيل الخروج بنجاح');
+        redirect_to('admin:login');
+    }
     flash('success', __('تم تسجيل الخروج بنجاح'));
     redirect_to('students:login');
 }

@@ -68,7 +68,7 @@ ${['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'Arial', 'Helvetica', 'Helvetica N
 `);
 
 const STUDENT = ['1234566', 'Talib2026x'];
-const STAFF = ['miloudsellam', 'AdminDemo2026'];
+const STAFF = ['miloudsellam', 'AdminDemo2026', '/admin/login/']; // الموظفون يدخلون من واجهة الإدارة
 
 // [الاسم, المسار, الدخول] — {first:LIST:SELECTOR} = أول رابط في صفحة القائمة
 const PAGES = [
@@ -96,6 +96,7 @@ const PAGES = [
   ['search-empty', '/search/'],
   ['register', '/students/register/'],
   ['login', '/students/login/'],
+  ['admin-login', '{abs:/admin/login/}'],
   ['404', '/no-such-page/'],
   ['st-dashboard', '/students/dashboard/', STUDENT],
   ['st-create', '/students/applications/create/', STUDENT],
@@ -142,14 +143,15 @@ async function newPage(ctx) {
   return page;
 }
 
-async function login(page, [user, pass]) {
-  await page.goto(BASE + LANG + '/students/login/', { waitUntil: 'networkidle0' });
+async function login(page, [user, pass, loginPath]) {
+  await page.goto(BASE + (loginPath || LANG + '/students/login/'), { waitUntil: 'networkidle0' });
   await page.type('input[name=username]', user);
   await page.type('input[name=password]', pass);
   await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('form:has(input[name=password]) [type=submit]')]);
 }
 
 async function resolve(page, spec) {
+  if (spec.startsWith('{abs:')) return spec.slice(5, -1); // بلا بادئة لغة (لوحة الإدارة عربية دائماً)
   const m = spec.match(/^\{first:([^:]+):(.+)\}$/);
   if (!m) return LANG + spec;
   await page.goto(BASE + LANG + m[1], { waitUntil: 'networkidle0' });

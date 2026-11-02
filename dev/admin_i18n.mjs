@@ -69,7 +69,7 @@ const val = (sel) => page.$eval(sel, (e) => e.value);
 const flash = () => page.$$eval('.alert', (els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim()).join(' || '));
 
 // ---------------------------------------------------------------- الدخول
-await go('/students/login/');
+await go('/admin/login/');
 await page.type('input[name=username]', 'miloudsellam');
 await page.type('input[name=password]', 'AdminDemo2026');
 await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('form:has(input[name=password]) [type=submit]')]);
@@ -164,7 +164,7 @@ const ctx = await browser.createBrowserContext();
 const p2 = await ctx.newPage();
 await p2.setRequestInterception(true);
 p2.on('request', (req) => (req.url().startsWith(BASE) ? req.continue() : req.respond({ status: 404, body: '' })));
-await p2.goto(BASE + '/students/login/', { waitUntil: 'networkidle0' });
+await p2.goto(BASE + '/admin/login/', { waitUntil: 'networkidle0' });
 await p2.type('input[name=username]', 'hicham41');
 await p2.type('input[name=password]', 'StaffDemo2026');
 await Promise.all([p2.waitForNavigation({ waitUntil: 'networkidle0' }), p2.click('form:has(input[name=password]) [type=submit]')]);

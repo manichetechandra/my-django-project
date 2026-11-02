@@ -2,9 +2,11 @@
 storage/sessions/*
 storage/logs/*
 storage/private/*
+storage/ratelimit/*
 !storage/sessions/.gitkeep
 !storage/logs/.gitkeep
 !storage/private/.gitkeep
+!storage/ratelimit/.gitkeep
 config.local.php
 
 # قاعدة "downloads/" في .gitignore الرئيسي (قالب Python) كانت تستثني قوالب مركز التحميلات

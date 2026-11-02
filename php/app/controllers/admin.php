@@ -32,14 +32,14 @@ function admin_resource(string $key): array
     return $r;
 }
 
-/** يتطلب أن يكون المستخدم موظفاً — مع صفحة دخول خاصة إن لم يكن مسجلاً */
+/** يتطلب أن يكون المستخدم موظفاً — مع صفحة دخول خاصة بالإدارة إن لم يكن مسجلاً */
 function admin_guard(): User
 {
     set_lang(default_lang()); // لوحة الإدارة عربية دائماً
     never_cache();
     $u = current_user();
     if (!$u) {
-        redirect(url('students:login') . '?next=' . rawurlencode(request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING'])));
+        redirect(url('admin:login') . '?next=' . rawurlencode(request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING'])));
     }
     if (!is_staff()) {
         abort(403, 'لوحة الإدارة مخصصة للموظفين فقط.');
@@ -90,19 +90,66 @@ function admin_index(): void
     ]);
 }
 
+/**
+ * واجهة دخول خاصة بالموظفين والمدير (منفصلة عن فضاء الطالب):
+ * تقبل حسابات الموظفين فقط، بلا «تذكرني»، مع حد لمحاولات الدخول الفاشلة.
+ */
 function admin_login(): void
 {
+    set_lang(default_lang());
+    never_cache();
+    $next = $_GET['next'] ?? '';
     if (is_staff()) {
-        redirect_to('admin:index');
+        redirect(safe_next($next, url('admin:index'), STAFF_NEXT_PATTERN));
     }
-    redirect(url('students:login') . '?next=' . rawurlencode('/admin/'));
+    $form = new Form([
+        'username' => ['type' => 'text', 'label' => 'اسم المستخدم', 'max_length' => 150,
+            'attrs' => FC + ['autocomplete' => 'username', 'autofocus' => 'autofocus', 'dir' => 'auto', 'autocapitalize' => 'none', 'spellcheck' => 'false']],
+        'password' => ['type' => 'password', 'label' => 'كلمة المرور', 'attrs' => FC + ['autocomplete' => 'current-password']],
+    ], is_post() ? $_POST : null);
+    $status = 200;
+    $error = '';
+    if (is_post() && $form->is_valid()) {
+        $d = $form->cleaned;
+        $wait = login_throttle_wait($d['username']);
+        if ($wait > 0) {
+            header('Retry-After: ' . $wait);
+            $error = 'محاولات دخول فاشلة كثيرة. يرجى المحاولة مجدداً بعد ' . max(1, (int) ceil($wait / 60)) . ' دقيقة.';
+            security_log('login_throttled', ['form' => 'admin', 'username' => $d['username']]);
+            $status = 429;
+        } else {
+            $user = Auth::attempt($d['username'], $d['password'], fn(User $u) => $u->is_staff_account());
+            if ($user) {
+                login_throttle_clear($d['username']);
+                Auth::login($user); // جلسة تنتهي بإغلاق المتصفح
+                security_log('admin_login', ['username' => $user['username']]);
+                flash('success', 'مرحباً ' . $user->display_name() . '، تم تسجيل الدخول إلى لوحة الإدارة.');
+                redirect(safe_next($next, url('admin:index'), STAFF_NEXT_PATTERN));
+            }
+            login_throttle_hit($d['username']);
+            security_log('login_failed', ['form' => 'admin', 'username' => $d['username']]);
+            // رسالة واحدة لكل الحالات (كلمة مرور خاطئة، حساب غير موجود، حساب طالب) — مثل Django admin
+            $error = 'يرجى إدخال اسم المستخدم وكلمة المرور الصحيحين لحساب موظف. لاحظ أن الحقلين قد يكونان حساسين لحالة الأحرف.';
+        }
+    }
+    render('admin/login', [
+        'form'       => $form,
+        'error'      => $error,
+        'next'       => is_string($next) ? $next : '',
+        'page_title' => 'دخول لوحة الإدارة',
+    ], $status);
 }
 
 function admin_logout(): void
 {
+    never_cache();
+    if (is_authenticated() && !verify_logout()) {
+        // رابط بلا رمز صحيح (مثلاً من موقع آخر): لا نسجّل الخروج
+        redirect_to(is_staff() ? 'admin:index' : 'homepage:index');
+    }
     Auth::logout();
     flash('success', 'تم تسجيل الخروج بنجاح');
-    redirect_to('students:login');
+    redirect_to('admin:login');
 }
 
 function admin_password(): void
@@ -516,8 +563,14 @@ function admin_collect_form(array $r, ?Model $obj): array
                 }
                 break;
             case 'url':
-                if (!filter_var($v, FILTER_VALIDATE_URL)) {
+                // FILTER_VALIDATE_URL وحده يقبل javascript://... فنشترط http(s)
+                if (!filter_var($v, FILTER_VALIDATE_URL) || !in_array(url_scheme($v), ['http', 'https'], true)) {
                     $errors[$f] = 'أدخل رابطاً صالحاً يبدأ بـ http:// أو https://';
+                }
+                break;
+            case 'link':
+                if (!is_allowed_link($v)) {
+                    $errors[$f] = 'أدخل رابطاً داخلياً يبدأ بـ / (مثل /news/) أو رابطاً كاملاً يبدأ بـ https://';
                 }
                 break;
             case 'int':
@@ -1076,6 +1129,9 @@ function admin_input(array $r, string $f, array $spec, $value, bool $readonly, ?
         case 'email':
         case 'url':
             return '<input type="' . $type . '" name="' . $name . '" id="' . $id . '" class="form-control" dir="ltr" value="' . e($val) . '"' . $reqAttr . $dis . '>';
+        case 'link':
+            return '<input type="text" name="' . $name . '" id="' . $id . '" class="form-control" dir="ltr" value="' . e($val) . '"'
+                . (isset($spec['max']) ? ' maxlength="' . (int) $spec['max'] . '"' : '') . $reqAttr . $dis . '>';
         default:
             return '<input type="text" name="' . $name . '" id="' . $id . '" class="form-control" value="' . e($val) . '"'
                 . (isset($spec['max']) ? ' maxlength="' . (int) $spec['max'] . '"' : '') . $reqAttr . $dis . '>';

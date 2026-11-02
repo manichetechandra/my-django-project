@@ -31,6 +31,12 @@ class User extends Model
         return Auth::verifyPassword($plain, (string) ($this->attributes['password'] ?? ''));
     }
 
+    /** حساب موظف أو مدير (يدخل من واجهة الإدارة /admin/login/ فقط) */
+    public function is_staff_account(): bool
+    {
+        return !empty($this->attributes['is_staff']) || !empty($this->attributes['is_superuser']);
+    }
+
     public function student_profile(): ?StudentProfile
     {
         return StudentProfile::firstWhere('user_id = ?', [(int) $this->attributes['id']]);

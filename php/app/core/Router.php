@@ -76,7 +76,7 @@ class Router
             foreach ($this->routes as $route) {
                 if (preg_match($route['regex'], $path . '/')) {
                     $qs = $_SERVER['QUERY_STRING'] ?? '';
-                    redirect(base_url() . route_prefix() . lang_prefix() . $path . '/' . ($qs !== '' ? '?' . $qs : ''), 301);
+                    redirect(base_url() . route_prefix() . lang_prefix() . redirect_path($path . '/') . ($qs !== '' ? '?' . $qs : ''), 301);
                 }
             }
         }
