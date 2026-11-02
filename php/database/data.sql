@@ -8,11 +8,15 @@ SET time_zone = '+01:00';
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- auth.user => users (4)
+-- ⚠️ أمان: كلمات المرور هنا غير قابلة للاستعمال عمداً ("!..."). المستودع عام، وتشفير كلمات المرور
+--    القديمة لا يجب أن يُنشر أبداً. بعد الاستيراد عيّن كلمات مرور جديدة:
+--      php database/tools/create_admin.php miloudsellam "كلمة-مرور-قوية"     (المدير العام)
+--      php database/tools/set_password.php hicham41 "كلمة-مرور-قوية"         (أي حساب آخر)
 INSERT INTO `users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`) VALUES
-(1, 'pbkdf2_sha256$1000000$K7D21YbA8pIvQklfgTCrax$Ss6y7F2zUxiTvUGH3tgu+ZuwJIQXHgNnG72Vjc2o8Kw=', '2025-11-23 10:58:54', 1, 'miloudsellam', '', '', '', 1, 1, '2025-11-05 15:20:02'),
-(2, 'pbkdf2_sha256$1000000$BvZTEoqyrHLaQKqzNWX0dh$lU1edCJ15PL2j8/zQX5YqMPO9XC+XGA4gTm/FXYy3hc=', '2025-11-24 13:32:50', 0, '1234566', '', '', 'ahmed@student.univ-setif.dz', 0, 1, '2025-11-20 11:44:28'),
-(3, 'pbkdf2_sha256$1000000$W2xoNA4YRgx3SBc275ECWX$xhnXiBXarM6hhjXE+DtsKHjHTT0O1zjmUvy5dSnSVTU=', '2025-11-20 11:47:37', 0, '20232023', 'أحمد', 'بن جدي', 'maniche@gmail.com', 0, 1, '2025-11-20 11:47:37'),
-(4, 'pbkdf2_sha256$1000000$NMq6ElCuleL0QO06YrjcyY$qNrgjwK8Qz0P9jr1+prpT7/wC9l62O+XaOrpQkc24OQ=', '2025-11-24 10:58:44', 0, 'hicham41', 'هشام', 'محمد', 'hicham@gmail.com', 1, 1, '2025-11-20 13:07:38');
+(1, '!unusable:set-a-new-password-with-database/tools/set_password.php', '2025-11-23 10:58:54', 1, 'miloudsellam', '', '', '', 1, 1, '2025-11-05 15:20:02'),
+(2, '!unusable:set-a-new-password-with-database/tools/set_password.php', '2025-11-24 13:32:50', 0, '1234566', '', '', 'ahmed@student.univ-setif.dz', 0, 1, '2025-11-20 11:44:28'),
+(3, '!unusable:set-a-new-password-with-database/tools/set_password.php', '2025-11-20 11:47:37', 0, '20232023', 'أحمد', 'بن جدي', 'maniche@gmail.com', 0, 1, '2025-11-20 11:47:37'),
+(4, '!unusable:set-a-new-password-with-database/tools/set_password.php', '2025-11-24 10:58:44', 0, 'hicham41', 'هشام', 'محمد', 'hicham@gmail.com', 1, 1, '2025-11-20 13:07:38');
 
 -- homepage.slider => sliders (2)
 INSERT INTO `sliders` (`id`, `title`, `subtitle`, `image`, `link`, `button_text`, `order`, `is_active`, `created_at`) VALUES

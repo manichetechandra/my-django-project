@@ -333,7 +333,7 @@
         
         <!-- Barcode -->
         <div class="barcode-section">
-            <img src="https://bwipjs-api.metafloor.com/?bcid=code128&text=<?= e($app['application_number']) ?>&scale=3&height=12&includetext=true" 
+            <img src="<?= e(barcode_data_uri($app['application_number'], 3, 100, true)) ?>" 
                  alt="Barcode" 
                  onerror="this.style.display='none';">
         </div>

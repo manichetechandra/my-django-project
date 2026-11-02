@@ -22,7 +22,7 @@ AddDefaultCharset UTF-8
 </IfModule>
 
 # منع قراءة ملفات حساسة
-<FilesMatch "^(config\.php|.*\.sql|.*\.md|.*\.log|composer\.(json|lock))$">
+<FilesMatch "^(config\.php|config\.local\.php|.*\.sql|.*\.md|.*\.log|.*\.bak|.*\.swp|composer\.(json|lock))$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>
@@ -32,10 +32,14 @@ AddDefaultCharset UTF-8
     </IfModule>
 </FilesMatch>
 
+# ترويسات الأمان: يرسلها PHP أيضاً (send_security_headers في app/helpers.php)، وهنا تشمل الملفات الثابتة
 <IfModule mod_headers.c>
-    Header always set X-Content-Type-Options "nosniff"
-    Header always set X-Frame-Options "SAMEORIGIN"
-    Header always set Referrer-Policy "same-origin"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
 </IfModule>
 
 # حدود رفع الملفات (إن سمحت الاستضافة بذلك)

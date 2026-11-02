@@ -36,7 +36,7 @@ function student_register(): void
         redirect_to('students:dashboard');
     }
     $form = student_registration_form(is_post() ? $_POST : null);
-    if (is_post() && ($wait = RateLimit::retryAfter('register:' . client_ip(), (int) config('security.register_max', 10), 3600)) > 0) {
+    if (is_post() && ($wait = RateLimit::retryAfter('register:' . client_ip(), (int) config('security.register_max', 20), 3600)) > 0) {
         // حد لمحاولات التسجيل من نفس العنوان (إنشاء حسابات وهمية بالجملة، وتخمين أرقام التسجيل)
         header('Retry-After: ' . $wait);
         flash('error', too_many_attempts_message($wait));

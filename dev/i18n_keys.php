@@ -37,10 +37,14 @@ foreach ($files as $file) {
         $keys[$s][] = substr($file, strlen($root) + 1) . ':' . $t[2];
     }
 }
-// نصوص الأشهر والأيام ووحدات الوقت تُترجم في helpers.php مباشرة
+// نصوص الأشهر والأيام ووحدات الوقت تُترجم في helpers.php مباشرة (من قسم «التواريخ» إلى آخر الملف)
+$datesLine = PHP_INT_MAX;
+foreach (file($root . '/app/helpers.php') as $n => $line) {
+    if (str_contains($line, '// ====') && str_contains($line, 'التواريخ')) { $datesLine = $n + 1; break; }
+}
 foreach (array_keys($keys) as $k) {
     $where = $keys[$k];
-    if (count($where) && array_reduce($where, fn($c, $w) => $c && str_starts_with($w, 'app/helpers.php:') && (int) explode(':', $w)[1] >= 380, true)) unset($keys[$k]);
+    if (count($where) && array_reduce($where, fn($c, $w) => $c && str_starts_with($w, 'app/helpers.php:') && (int) explode(':', $w)[1] >= $datesLine, true)) unset($keys[$k]);
 }
 if (in_array('--tsv', $argv, true)) {
     // مرقمة حسب أول ظهور (الملف ثم السطر): id <TAB> المكان <TAB> النص

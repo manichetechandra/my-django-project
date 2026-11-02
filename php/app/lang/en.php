@@ -574,15 +574,13 @@ return [
     'الطلبات' => 'Applications',
     'لا يوجد ملف طالب' => 'No student profile',
     'لا يوجد ملف طالب لهذا المستخدم' => 'No student profile for this user',
+    'تسجيل طالب جديد' => 'New student registration',
     'مرحباً بك!' => 'Welcome!',
     'مرحباً {name}، تم إنشاء حسابك بنجاح. يمكنك الآن تقديم الطلبات.' => 'Hello {name}, your account has been created successfully. You can now submit applications.',
     'تم إنشاء حسابك بنجاح! مرحباً بك' => 'Your account has been created successfully! Welcome',
     'حدث خطأ أثناء إنشاء الحساب. حاول مرة أخرى.' => 'An error occurred while creating the account. Please try again.',
-    'تسجيل طالب جديد' => 'New student registration',
-    'مرحباً! تم تسجيل الدخول كمشرف' => 'Welcome! You are logged in as a supervisor',
     'حسابك غير نشط. يرجى الاتصال بالإدارة' => 'Your account is inactive. Please contact the administration',
     'مرحباً {name}!' => 'Welcome {name}!',
-    'لا يوجد ملف طالب. يمكنك الوصول للوحة الإدارة فقط' => 'No student profile. You can only access the administration panel',
     'اسم المستخدم أو كلمة المرور غير صحيحة' => 'Incorrect username or password',
     'تسجيل الدخول' => 'Login',
     'تم تسجيل الخروج بنجاح' => 'You have been logged out successfully',
@@ -753,8 +751,8 @@ return [
     'خطأ' => 'Error',
 
     // ======================================================== رسائل عامة
-    'يجب تسجيل الدخول أولاً' => 'You must log in first',
     'ليس لديك صلاحية للوصول لهذه الصفحة. هذه الصفحة للإداريين فقط.' => 'You do not have permission to access this page. It is reserved for administrators.',
+    'محاولات كثيرة. يرجى المحاولة مجدداً بعد {minutes} دقيقة.' => 'Too many attempts. Please try again in {minutes} minute(s).',
     'انتهت صلاحية الجلسة. أعد تحميل الصفحة.' => 'Your session has expired. Reload the page.',
 
 ];

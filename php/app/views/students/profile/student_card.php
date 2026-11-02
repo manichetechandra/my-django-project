@@ -6,7 +6,7 @@
     <title><?= e($page_title) ?></title>
     
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" rel="stylesheet">
     
     <style>
         @page {
@@ -281,7 +281,7 @@
             
             <!-- Barcode -->
             <div class="barcode-container">
-                <img src="https://bwipjs-api.metafloor.com/?bcid=code128&text=<?= e($student['registration_number']) ?>&scale=2&height=10&includetext=false" 
+                <img src="<?= e(barcode_data_uri($student['registration_number'], 2, 56)) ?>" 
                      alt="Barcode" 
                      onerror="this.style.display='none';">
             </div>

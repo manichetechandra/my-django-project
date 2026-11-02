@@ -574,15 +574,13 @@ return [
     'الطلبات' => 'Demandes',
     'لا يوجد ملف طالب' => 'Aucun dossier étudiant',
     'لا يوجد ملف طالب لهذا المستخدم' => 'Aucun dossier étudiant pour cet utilisateur',
+    'تسجيل طالب جديد' => 'Inscription d\'un nouvel étudiant',
     'مرحباً بك!' => 'Bienvenue !',
     'مرحباً {name}، تم إنشاء حسابك بنجاح. يمكنك الآن تقديم الطلبات.' => 'Bonjour {name}, votre compte a été créé avec succès. Vous pouvez désormais déposer vos demandes.',
     'تم إنشاء حسابك بنجاح! مرحباً بك' => 'Votre compte a été créé avec succès ! Bienvenue',
     'حدث خطأ أثناء إنشاء الحساب. حاول مرة أخرى.' => 'Une erreur est survenue lors de la création du compte. Veuillez réessayer.',
-    'تسجيل طالب جديد' => 'Inscription d\'un nouvel étudiant',
-    'مرحباً! تم تسجيل الدخول كمشرف' => 'Bienvenue ! Vous êtes connecté en tant que superviseur',
     'حسابك غير نشط. يرجى الاتصال بالإدارة' => 'Votre compte est inactif. Veuillez contacter l\'administration',
     'مرحباً {name}!' => 'Bienvenue {name} !',
-    'لا يوجد ملف طالب. يمكنك الوصول للوحة الإدارة فقط' => 'Aucun dossier étudiant. Vous n\'avez accès qu\'au panneau d\'administration',
     'اسم المستخدم أو كلمة المرور غير صحيحة' => 'Nom d\'utilisateur ou mot de passe incorrect',
     'تسجيل الدخول' => 'Connexion',
     'تم تسجيل الخروج بنجاح' => 'Vous avez été déconnecté avec succès',
@@ -753,8 +751,8 @@ return [
     'خطأ' => 'Erreur',
 
     // ======================================================== رسائل عامة
-    'يجب تسجيل الدخول أولاً' => 'Vous devez d\'abord vous connecter',
     'ليس لديك صلاحية للوصول لهذه الصفحة. هذه الصفحة للإداريين فقط.' => 'Vous n\'avez pas l\'autorisation d\'accéder à cette page. Elle est réservée aux administrateurs.',
+    'محاولات كثيرة. يرجى المحاولة مجدداً بعد {minutes} دقيقة.' => 'Trop de tentatives. Veuillez réessayer dans {minutes} minute(s).',
     'انتهت صلاحية الجلسة. أعد تحميل الصفحة.' => 'La session a expiré. Rechargez la page.',
 
 ];

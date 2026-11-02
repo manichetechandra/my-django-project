@@ -23,4 +23,6 @@ T.update({
     'nav|الخدمات الجامعية': ("Services", "Services"),
     'nav|الأسئلة الشائعة': ("FAQ", "FAQ"),
     'nav|لوحة المشرف': ("Superviseur", "Supervisor"),
+    # النسخة 2.0 (6): الحماية من تخمين كلمات المرور والرسائل المزعجة
+    'محاولات كثيرة. يرجى المحاولة مجدداً بعد {minutes} دقيقة.': ("Trop de tentatives. Veuillez réessayer dans {minutes} minute(s).", "Too many attempts. Please try again in {minutes} minute(s)."),
 })

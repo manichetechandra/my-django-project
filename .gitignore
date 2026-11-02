@@ -45,3 +45,8 @@ staticfiles/
 # OS
 .DS_Store
 Thumbs.db
+# ⚠️ نسخ قاعدة البيانات تحتوي تشفير كلمات المرور وبيانات شخصية: لا تُرفع أبداً إلى المستودع
+data.json
+db_backup.sql
+*.dump
+*.sql.gz

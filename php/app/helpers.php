@@ -556,7 +556,7 @@ function login_throttle_keys(string $username): array
 {
     $ip = client_ip();
     return [
-        'login-ip:' . $ip                                     => (int) config('security.login_max_per_ip', 20),
+        'login-ip:' . $ip                                     => (int) config('security.login_max_per_ip', 30),
         'login-user:' . $ip . '|' . mb_strtolower(trim($username)) => (int) config('security.login_max_per_user', 5),
     ];
 }

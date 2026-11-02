@@ -46,4 +46,4 @@ if ($user) {
     User::create(['username' => $username, 'password' => Auth::hashPassword($password), 'is_staff' => 1, 'is_superuser' => 1, 'is_active' => 1]);
     echo "✔ تم إنشاء المدير العام \"$username\".\n";
 }
-echo "ادخل إلى لوحة الإدارة من: /admin/\n";
+echo "ادخل إلى لوحة الإدارة من واجهتها الخاصة: /admin/login/\n";
