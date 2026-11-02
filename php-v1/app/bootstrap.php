@@ -25,9 +25,11 @@ require APP_PATH . '/core/Page.php';
 require APP_PATH . '/core/Router.php';
 require APP_PATH . '/core/View.php';
 require APP_PATH . '/core/Auth.php';
+require APP_PATH . '/core/RateLimit.php';
 require APP_PATH . '/core/Form.php';
 require APP_PATH . '/core/Upload.php';
 require APP_PATH . '/core/XlsxWriter.php';
+require APP_PATH . '/core/Barcode.php';
 require APP_PATH . '/helpers.php';
 
 require APP_PATH . '/models/homepage.php';
@@ -100,7 +102,10 @@ function handle_exception(Throwable $e): void
     }
 }
 
-// ------------------------------------------------------------------ الجلسة
+// ------------------------------------------------------------------ الجلسة وترويسات الأمان
+if (PHP_SAPI !== 'cli') {
+    send_security_headers();
+}
 if (PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_NONE) {
     $sessionDir = STORAGE_PATH . '/sessions';
     if (is_dir($sessionDir) && is_writable($sessionDir)) {
@@ -109,12 +114,12 @@ if (PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_NONE) {
     ini_set('session.gc_maxlifetime', '1209600'); // أسبوعان (مثل Django)
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
-    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    ini_set('session.use_trans_sid', '0');
     session_name('dou_session');
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => (base_url() ?: '') . '/',
-        'secure'   => $https,
+        'secure'   => is_https(),
         'httponly' => true,
         'samesite' => 'Lax',
     ]);

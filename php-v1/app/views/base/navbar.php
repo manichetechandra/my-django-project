@@ -80,7 +80,7 @@
                 </li>
 
                 <?php if (is_authenticated()): ?>
-                    <?php if (!empty($user['is_staff'])): ?>
+                    <?php if (is_staff()): ?>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
                                 <i class="fa fa-shield"></i> لوحة المشرف <span class="caret"></span>
@@ -106,7 +106,7 @@
                                  
                                 <li class="divider"></li>
                                 <?php endif; ?>
-                                <li><a href="<?= e(url('students:logout')) ?>">
+                                <li><a href="<?= e(logout_url('students:logout')) ?>">
                                     <i class="fa fa-sign-out"></i> تسجيل الخروج
                                 </a></li>
                             </ul>
@@ -137,7 +137,7 @@
                                  <i class="fa fa-id-card"></i> بطاقتي الرقمية
                                  </a></li>
                                 <li class="divider"></li>
-                                <li><a href="<?= e(url('students:logout')) ?>">
+                                <li><a href="<?= e(logout_url('students:logout')) ?>">
                                     <i class="fa fa-sign-out"></i> تسجيل الخروج
                                 </a></li>
                             </ul>

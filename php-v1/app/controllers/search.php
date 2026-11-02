@@ -22,7 +22,7 @@ function normalize_arabic_search(string $text): array
             $expanded[] = mb_substr($w, 2);
         }
     }
-    return array_values(array_unique($expanded));
+    return array_slice(array_values(array_unique($expanded)), 0, 8);
 }
 
 /** (field1 LIKE ? OR field2 LIKE ? ...) لكل كلمة، مجمّعة بـ OR */
@@ -41,7 +41,8 @@ function build_search_query(array $fields, array $terms, array &$params): string
 
 function search_view(): void
 {
-    $query = query('q');
+    // حد لطول البحث وعدد كلماته: كل كلمة تضيف عشرات شروط LIKE على كل الجداول (حماية من إبطاء الخادم)
+    $query = mb_substr(query('q'), 0, 100);
     $searchType = query('type', 'all') ?: 'all';
     $sections = [
         // النوع => [النموذج, الحقول, شرط إضافي, الترتيب, الحد]

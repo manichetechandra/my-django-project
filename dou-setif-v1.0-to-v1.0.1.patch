@@ -1,0 +1,2170 @@
+diff --git a/.gitignore b/.gitignore
+index 04615d8..e4cc025 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -2,9 +2,12 @@
+ storage/sessions/*
+ storage/logs/*
+ storage/private/*
++storage/ratelimit/*
++storage/recover-*
+ !storage/sessions/.gitkeep
+ !storage/logs/.gitkeep
+ !storage/private/.gitkeep
++!storage/ratelimit/.gitkeep
+ config.local.php
+ 
+ # قاعدة "downloads/" في .gitignore الرئيسي (قالب Python) كانت تستثني قوالب مركز التحميلات
+diff --git a/.htaccess b/.htaccess
+index 88d3b6b..00ce30d 100644
+--- a/.htaccess
++++ b/.htaccess
+@@ -22,7 +22,7 @@ AddDefaultCharset UTF-8
+ </IfModule>
+ 
+ # منع قراءة ملفات حساسة
+-<FilesMatch "^(config\.php|.*\.sql|.*\.md|.*\.log|composer\.(json|lock))$">
++<FilesMatch "^(config\.php|config\.local\.php|.*\.sql|.*\.md|.*\.log|.*\.bak|.*\.swp|composer\.(json|lock))$">
+     <IfModule mod_authz_core.c>
+         Require all denied
+     </IfModule>
+@@ -32,10 +32,14 @@ AddDefaultCharset UTF-8
+     </IfModule>
+ </FilesMatch>
+ 
++# ترويسات الأمان: يرسلها PHP أيضاً (send_security_headers في app/helpers.php)، وهنا تشمل الملفات الثابتة
+ <IfModule mod_headers.c>
+-    Header always set X-Content-Type-Options "nosniff"
+-    Header always set X-Frame-Options "SAMEORIGIN"
+-    Header always set Referrer-Policy "same-origin"
++    Header set X-Content-Type-Options "nosniff"
++    Header set X-Frame-Options "SAMEORIGIN"
++    Header set Referrer-Policy "strict-origin-when-cross-origin"
++    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
++    Header always unset X-Powered-By
++    Header unset X-Powered-By
+ </IfModule>
+ 
+ # حدود رفع الملفات (إن سمحت الاستضافة بذلك)
+diff --git a/README.md b/README.md
+index c623878..f6715a3 100644
+--- a/README.md
++++ b/README.md
+@@ -3,7 +3,11 @@
+ هذه نسخة كاملة من الموقع بعد تحويله من **Django + PostgreSQL** إلى **PHP + MySQL**.
+ الموقع مكتوب بـ PHP خالص بدون أي إطار عمل أو Composer، لذلك يعمل مباشرة على XAMPP وعلى أي استضافة مشتركة (cPanel).
+ 
+-نفس الروابط، ونفس التصميم، ونفس البيانات، ونفس كلمات المرور.
++نفس الروابط، ونفس التصميم، ونفس البيانات.
++
++**الإصدار 1.0.1 (عربي فقط):** نفس الإصدار 1.0 الذي يشرحه الكتاب، مع الإصلاحات الأمنية: واجهة دخول خاصة بالإدارة،
++حد لمحاولات الدخول، واستعادة كلمة مرور المدير من المتصفح، وغيرها (قسم [الأمان في الإصدار 1.0.1](#الأمان-في-الإصدار-101)).
++الترقية من 1.0: [هنا](#الترقية-من-10-إلى-101-الإصلاحات-الأمنية).
+ 
+ ---
+ 
+@@ -32,21 +36,42 @@
+ 
+ ### الحسابات
+ 
+-كل الحسابات القديمة نُقلت **بنفس كلمات المرور** التي كانت في Django (يتعرف الموقع على تشفير Django ويحوّله تلقائياً إلى تشفير PHP الحديث عند أول دخول):
++| المستخدم | الصلاحية | يدخل من |
++|---|---|---|
++| `miloudsellam` | مدير عام (كل الصلاحيات) | `/admin/login/` |
++| `hicham41` | موظف (متابعة طلبات الطلاب + لوحة الإدارة بدون إدارة المستخدمين) | `/admin/login/` |
++| `1234566` و `20232023` | طلاب | `/students/login/` (فضاء الطالب) |
+ 
+-| المستخدم | الصلاحية |
+-|---|---|
+-| `miloudsellam` | مدير عام (كل الصلاحيات) |
+-| `hicham41` | موظف (متابعة طلبات الطلاب + لوحة الإدارة بدون إدارة المستخدمين) |
+-| `1234566` و `20232023` | طلاب |
++**للموظفين والمدير واجهة دخول خاصة: `/admin/login/`** — فضاء الطالب يقبل حسابات الطلبة فقط.
++
++**كلمات المرور:** المستودع عام، لذلك حُذف تشفير كلمات المرور القديمة من `data.sql`: الحسابات موجودة لكن بلا كلمة مرور صالحة.
++بعد الاستيراد عيّن كلمة مرور المدير العام بإحدى الطريقتين في القسم التالي، ثم عيّن كلمات مرور الموظفين والطلبة
++من **«المستخدمون»** في لوحة الإدارة (حقل «كلمة المرور» في صفحة كل مستخدم).
++
++### نسيت كلمة مرور المدير؟ (وأول تثبيت أيضاً)
+ 
+-نسيت كلمة المرور أو تريد مديراً جديداً؟ (بديل `python manage.py createsuperuser`):
++**الطريقة 1 — من المتصفح، بدون سطر أوامر (XAMPP وأي استضافة):**
++1. افتح `/admin/login/` واضغط **«نسيت كلمة مرور المدير؟»** (أو افتح `/admin/recover/` مباشرة).
++2. تعطيك الصفحة اسم ملف مثل `recover-3f9a1c0d2b7e.txt`: أنشئ ملفاً فارغاً بهذا الاسم داخل المجلد `storage` للموقع
++   (مستكشف الملفات في XAMPP، مثلاً `C:\xampp\htdocs\dou-setif\storage`، أو File Manager في cPanel)، ثم اضغط **«تحقّق»**.
++3. اكتب كلمة المرور الجديدة واحفظ، ثم ادخل من `/admin/login/`. يُحذف الملف تلقائياً.
++
++إنشاء الملف يثبت أنك صاحب الموقع، فلا يستطيع أي زائر استعمال هذه الصفحة. الاسم صالح 30 دقيقة ولنفس المتصفح فقط.
++لتعطيلها: `'web_recovery' => false` في `config.php` (أو `WEB_RECOVERY=0`).
++
++**الطريقة 2 — سطر الأوامر** (بديل `python manage.py createsuperuser` و `changepassword`):
+ 
+ ```bat
+ cd C:\xampp\htdocs\dou-setif
+-C:\xampp\php\php.exe database\tools\create_admin.php admin "كلمة-مرور-قوية#2025"
++C:\xampp\php\php.exe database\tools\create_admin.php miloudsellam "Setif#Admin2026"
+ ```
+ 
++وفي استضافة فيها Terminal أو SSH: `php database/tools/create_admin.php miloudsellam "Setif#Admin2026"`.
++`create_admin.php` ينشئ مديراً عاماً أو يعيد تعيين كلمة مروره، و`set_password.php` يغيّر كلمة مرور أي حساب آخر دون تغيير صلاحياته.
++اكتب كلمة المرور في سطر الأوامر بحروف لاتينية وأرقام ورموز (الحروف العربية قد لا تصل سليمة في سطر أوامر Windows).
++
++إن نقلت بياناتك الخاصة من موقع Django بأداة `django_json_to_sql.php` فستبقى كلمات المرور القديمة تعمل (لا ترفع ذلك الملف إلى أي مكان عام).
++
+ ---
+ 
+ ## النشر على استضافة (cPanel)
+@@ -58,22 +83,18 @@ C:\xampp\php\php.exe database\tools\create_admin.php admin "كلمة-مرور-ق
+    - بيانات قاعدة البيانات (الاسم، المستخدم، كلمة المرور).
+    - `'debug' => false` (مهم جداً حتى لا تظهر تفاصيل الأخطاء للزوار).
+ 5. تأكد أن المجلدين `uploads/` و `storage/` قابلان للكتابة (الصلاحية 755 أو 775).
++6. عيّن كلمة مرور المدير العام من المتصفح: `/admin/recover/` (قسم [نسيت كلمة مرور المدير؟](#نسيت-كلمة-مرور-المدير-وأول-تثبيت-أيضاً))، وراجع [قائمة الأمان قبل النشر](SECURITY.md#1-قبل-النشر-قائمة-تحقق-مهمة).
+ 
+ يمكن أيضاً وضع الإعدادات في متغيرات البيئة بدل تعديل الملف:
+-`DB_HOST`، `DB_PORT`، `DB_NAME`، `DB_USER`، `DB_PASSWORD`، `APP_DEBUG`، `BASE_URL`، `PRETTY_URLS`.
++`DB_HOST`، `DB_PORT`، `DB_NAME`، `DB_USER`، `DB_PASSWORD`، `APP_DEBUG`، `BASE_URL`، `PRETTY_URLS`،
++وللحماية: `TRUSTED_PROXIES`، `HSTS_SECONDS`، `FRAME_OPTIONS`، `WEB_RECOVERY`.
+ 
+ ### إذا لم يكن `mod_rewrite` متاحاً
+ ضع `'pretty_urls' => false` في `config.php` فتصبح الروابط بالشكل `/index.php/news/` وتعمل بدون `.htaccess`.
+ 
+ ### خادم Nginx
+-```nginx
+-root /var/www/dou-setif;
+-index index.php;
+-location ~ ^/(app|database|storage)/ { deny all; }
+-location /uploads/ { location ~ \.php$ { deny all; } }
+-location / { try_files $uri $uri/ /index.php?$query_string; }
+-location ~ \.php$ { include fastcgi_params; fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; fastcgi_pass unix:/run/php/php8.2-fpm.sock; }
+-```
++Nginx لا يقرأ ملفات `.htaccess` التي تحمي `database/` و `storage/` وسجل الأخطاء: استعمل الإعداد الكامل في
++[SECURITY.md](SECURITY.md#4-إعداد-nginx) (وإلا يصبح `database/data.sql` قابلاً للتحميل).
+ 
+ ### تجربة سريعة بدون XAMPP
+ ```bash
+@@ -83,6 +104,23 @@ php -S localhost:8000 index.php
+ 
+ ---
+ 
++## الترقية من 1.0 إلى 1.0.1 (الإصلاحات الأمنية)
++
++موقعك يعمل بالإصدار 1.0 (نسخة الكتاب) وتريد الإصلاحات الأمنية دون فقدان البيانات. **لا تغيير في قاعدة البيانات.**
++
++1. خذ نسخة احتياطية من قاعدة البيانات (phpMyAdmin ← Export) ومن المجلدين `uploads/` و `storage/`.
++2. ارفع ملفات الإصدار 1.0.1 فوق القديمة **ما عدا** `config.php` و `uploads/` و `storage/`.
++3. انسخ من `config.php` الجديد القسم `'security'` والسطر `'trusted_proxies'` (داخل `'app'`) إلى ملفك
++   (اختياري: بدونهما يعمل الموقع بنفس القيم الافتراضية).
++4. **الموظفون والمدير يدخلون الآن من `/admin/login/`**؛ فضاء الطالب `/students/login/` للطلبة فقط.
++5. **غيّر كلمات مرور الحسابات القديمة**: تشفيرها كان منشوراً في المستودع العام.
++
++ما الذي تغيّر بالتفصيل: قسم [الأمان في الإصدار 1.0.1](#الأمان-في-الإصدار-101) و [SECURITY.md](SECURITY.md).
++الكتاب يشرح الإصدار 1.0؛ كل الفروق بينه وبين 1.0.1 في ملف واحد: `dou-setif-v1.0-to-v1.0.1.patch` (في المستودع).
++إن كتبت الكود بنفسك مع الكتاب، طبّقه من داخل مجلد مشروعك: `git apply dou-setif-v1.0-to-v1.0.1.patch`.
++
++---
++
+ ## الصور والملفات المرفوعة
+ 
+ الصور التي كانت على Django/Cloudinary **غير موجودة في المستودع** (ما عدا 3 صور نُقلت إلى `uploads/`).
+@@ -116,6 +154,8 @@ php database/tools/django_json_to_sql.php data.json > database/data.sql
+ 
+ ثم أعد استيراد `schema.sql` و `data.sql`. الأداة تحوّل التواريخ من UTC إلى توقيت الجزائر تلقائياً.
+ 
++> ⚠️ الملفان `data.json` و `data.sql` الناتجان يحتويان تشفير كلمات المرور وبيانات الطلبة: لا ترفعهما أبداً إلى GitHub أو إلى مجلد الموقع العام.
++
+ ---
+ 
+ ## بنية المشروع
+@@ -136,11 +176,11 @@ php/
+ │   └── core/              ← النواة: قاعدة البيانات، الموجّه، القوالب، المصادقة، رفع الملفات، Excel
+ ├── assets/                ← CSS / JS / صور الموقع (بديل static/)
+ ├── uploads/               ← الصور والملفات المرفوعة (بديل media/)
+-├── storage/               ← ملفات خاصة: وثائق الطلبات، الجلسات، سجل الأخطاء
++├── storage/               ← ملفات خاصة: وثائق الطلبات، الجلسات، سجل الأخطاء وسجل الأمان، عدادات محاولات الدخول
+ └── database/
+     ├── schema.sql         ← بنية الجداول
+     ├── data.sql           ← البيانات المنقولة من Django
+-    └── tools/             ← أداة نقل البيانات + إنشاء مدير
++    └── tools/             ← نقل البيانات، إنشاء مدير، تعيين كلمة مرور
+ ```
+ 
+ ### المقابل بين Django و PHP
+@@ -163,8 +203,8 @@ php/
+ 
+ - **الموقع العام**: الرئيسية (سلايدر، شريط الأخبار، النشاطات، الإحصائيات)، كلمة المدير، الهيكل التنظيمي، تاريخ المديرية، الأخبار، النشاطات، المصالح، الإقامات، الخدمات، مركز التحميلات، الأسئلة الشائعة، البحث الشامل مع معالجة "ال" التعريف، اتصل بنا، شريط الإشعارات، إحصائيات الزوار.
+ - **فضاء الطالب**: التسجيل، الدخول (مع "تذكرني")، تقديم الطلبات مع وثائق، متابعة الطلبات وإلغاؤها، الإشعارات الفورية (تحديث تلقائي + صوت + إشعارات سطح المكتب)، الملف الشخصي والصورة، تغيير كلمة المرور، البطاقة الرقمية، الطباعة.
+-- **لوحة الموظفين** (`/students/admin/dashboard/`): إحصائيات ورسوم بيانية، قائمة الطلبات مع البحث والفلترة، إجراءات جماعية، قبول/رفض مع ملاحظات وإشعار الطالب، تصدير Excel.
+-- **لوحة الإدارة** (`/admin/`): إدارة كل الجداول (إضافة، تعديل، حذف، بحث، فلاتر، إجراءات جماعية، تعديل مباشر من القائمة، معرض الصور، الوثائق المرفقة، المستخدمون والصلاحيات).
++- **لوحة الموظفين** (`/students/admin/dashboard/`، الدخول من `/admin/login/`): إحصائيات ورسوم بيانية، قائمة الطلبات مع البحث والفلترة، إجراءات جماعية، قبول/رفض مع ملاحظات وإشعار الطالب، تصدير Excel.
++- **لوحة الإدارة** (`/admin/`، بواجهة دخول خاصة `/admin/login/`): إدارة كل الجداول (إضافة، تعديل، حذف، بحث، فلاتر، إجراءات جماعية، تعديل مباشر من القائمة، معرض الصور، الوثائق المرفقة، المستخدمون والصلاحيات).
+ 
+ ## ما الذي أُصلح أو حُسّن أثناء التحويل
+ 
+@@ -178,3 +218,18 @@ php/
+ - **رسائل الخطأ**: كانت تظهر بدون لون لأن Bootstrap لا يعرف `alert-error`. الآن تظهر بالأحمر.
+ - **أخطاء HTML** في شريط التنقل: محرف `<` زائد، ووسم `<style>` مكرر.
+ - **الأمان**: حماية CSRF لكل النماذج، استعلامات محضّرة ضد حقن SQL، تهريب HTML ضد XSS، منع إعادة التوجيه لمواقع خارجية بعد الدخول، منع تنفيذ السكربتات في مجلد الرفع، وتجديد معرّف الجلسة عند الدخول.
++
++### الأمان في الإصدار 1.0.1
++فحص أمني كامل للموقع، والتفاصيل في [SECURITY.md](SECURITY.md). أهم ما تغيّر عن الإصدار 1.0:
++- **واجهة دخول خاصة بالإدارة `/admin/login/`**: الموظفون والمدير لا يدخلون من فضاء الطالب (يرفضهم كأن الحساب غير موجود)،
++  وبلا «تذكرني». كل صفحات الإدارة ومتابعة الطلبات تحوّل إليها.
++- **«نسيت كلمة مرور المدير؟»** من المتصفح (`/admin/recover/`) بإثبات ملكية الموقع عبر ملف في `storage/`.
++- **حد لمحاولات الدخول**: 5 محاولات خاطئة لنفس الحساب (و30 لنفس العنوان) كل 15 دقيقة، ثم انتظار.
++- **روابط `javascript:`** في السلايدر والإشعارات و«الموقع الإلكتروني» للأقسام كانت تنفّذ سكربتاً عند الزائر: صارت مرفوضة عند الحفظ ومُبطلة عند العرض.
++- **«الوثائق المطلوبة»** في صفحة «طلب جديد» كانت تُحقن في قالب JavaScript: صارت JSON.
++- **إعادة التوجيه لموقع خارجي** بعد الدخول (`next=/%09/evil.com`): أُغلقت.
++- **ترويسات الأمان** من PHP نفسه، وإخفاء إصدار PHP، ووضع التطوير لا يُفعَّل إلا على `localhost` الحقيقي.
++- **كلمات المرور القديمة** لم تعد في `data.sql` (المستودع عام): عيّن كلمة مرور المدير من المتصفح (`/admin/recover/`) أو بـ `create_admin.php`.
++- **الباركود** يُولَّد داخل الموقع بدل خدمة خارجية كانت تستقبل أرقام تسجيل الطلبة، و**SRI** على ملفات CDN.
++- رمز في رابط تسجيل الخروج، وحماية «اتصل بنا» والتسجيل من البرامج الآلية، وحد لطول البحث، وتصدير CSV آمن.
++- **شكل الموقع لم يتغير**: نفس صفحات الكتاب تماماً، ما عدا صفحة دخول الإدارة الجديدة.
+diff --git a/SECURITY.md b/SECURITY.md
+new file mode 100644
+index 0000000..436a816
+--- /dev/null
++++ b/SECURITY.md
+@@ -0,0 +1,141 @@
++# الأمان — موقع مديرية الخدمات الجامعية سطيف (الإصدار 1.0.1)
++
++هذا الملف يشرح كيف يحمي الموقع نفسه، وما يجب أن تفعله أنت عند النشر، ونتيجة الفحص الأمني الأخير.
++
++---
++
++## 1. قبل النشر: قائمة تحقق (مهمة)
++
++1. **وضع التطوير مُعطّل**: ضع `APP_DEBUG=0` في متغيرات البيئة، أو `'debug' => false` في `config.php`.
++   (الوضع التلقائي لا يُفعّل التطوير إلا عند فتح الموقع من نفس الجهاز عبر `http://localhost`.)
++2. **كلمات المرور**: الحسابات المستوردة من `data.sql` بلا كلمة مرور صالحة (عمداً). عيّن كلمة مرور قوية للمدير العام:
++   - من المتصفح: `/admin/recover/` (القسم 2: تنشئ ملفاً في `storage/` يثبت أنك صاحب الموقع)، أو
++   - من سطر الأوامر:
++     ```bash
++     php database/tools/create_admin.php miloudsellam "Setif#Admin2026"   # المدير العام
++     php database/tools/set_password.php hicham41 "Setif#Staff2026"       # أي حساب آخر (موظف أو طالب)
++     ```
++   ثم عيّن كلمات مرور الموظفين والطلبة من «المستخدمون» في لوحة الإدارة.
++3. **قاعدة البيانات**: لا تستعمل `root` في الاستضافة. أنشئ مستخدماً خاصاً بكلمة مرور طويلة، بصلاحيات هذه القاعدة فقط.
++4. **HTTPS**: فعّل شهادة SSL (مجانية في أغلب الاستضافات: Let's Encrypt / AutoSSL). بعد التأكد أن كل الموقع يعمل بـ HTTPS
++   ضع `HSTS_SECONDS=31536000` ليفرض المتصفح HTTPS دائماً. كوكي الجلسة يصبح `Secure` تلقائياً على HTTPS.
++5. **خادم وسيط (Cloudflare أو Nginx أمام PHP)**: ضع عناوينه في `TRUSTED_PROXIES` (مثل `TRUSTED_PROXIES=127.0.0.1`)
++   وإلا ستُسجَّل كل الزيارات والمحاولات بعنوان الخادم الوسيط. بدون خادم وسيط اتركه فارغاً.
++6. **المجلدات الخاصة**: `app/` و `database/` و `storage/` محمية بملفات `.htaccess` على Apache.
++   على **Nginx** لا تُقرأ هذه الملفات: استعمل الإعداد في القسم 4.
++7. **النسخ الاحتياطية**: لا ترفع أبداً نسخة من قاعدة البيانات (`.sql`، `data.json`...) إلى GitHub أو إلى مجلد الموقع العام:
++   فيها تشفير كلمات المرور وبيانات الطلبة الشخصية.
++8. **المتابعة**: محاولات الدخول (الناجحة والفاشلة والمحظورة) تُسجَّل في `storage/logs/security.log`.
++
++---
++
++## 2. واجهتا دخول منفصلتان
++
++| الواجهة | الرابط | من يدخل منها |
++|---|---|---|
++| فضاء الطالب | `/students/login/` | الطلبة فقط (حساب له ملف طالب) |
++| لوحة الإدارة | `/admin/login/` | الموظفون والمدير العام فقط |
++
++- فضاء الطالب **يرفض حسابات الموظفين والمدير** بنفس رسالة «اسم المستخدم أو كلمة المرور غير صحيحة»، فلا يكشف وجود حساب
++  الموظف ولا صحة كلمة مروره. وواجهة الإدارة ترفض حسابات الطلبة بنفس الطريقة.
++- واجهة الإدارة **بلا «تذكرني»**: جلسة الموظف تنتهي بإغلاق المتصفح.
++- أي صفحة إدارة (`/admin/...` أو لوحة متابعة الطلبات `/students/admin/...`) تحوّل غير المسجّل إلى `/admin/login/`
++  ثم تعيده بعد الدخول إلى الصفحة نفسها (صفحات الإدارة فقط، لا روابط خارجية).
++- **«نسيت كلمة مرور المدير؟»** (`/admin/recover/`): الصفحة تعطي اسم ملف عشوائياً (48 بت) مرتبطاً بجلسة المتصفح وصالحاً 30 دقيقة؛
++  لا تظهر خانة كلمة المرور إلا بعد وجود ملف بهذا الاسم داخل `storage/` (لا يُنشأ إلا من يملك الوصول إلى ملفات الخادم).
++  بعد الحفظ يُحذف الملف، ويتجدد معرّف الجلسة، وتُغلق جلسات الحساب الأخرى، ويُسجَّل الحدث في `security.log`.
++  لا تشمل الموظفين: المدير العام يعيّن كلماتهم من «المستخدمون». لتعطيلها: `'web_recovery' => false` في `config.php`.
++- **اختياري**: حصر لوحة الإدارة في عناوين IP معيّنة (مقر المديرية) بإضافة هذا إلى `.htaccess` (Apache 2.4):
++  ```apache
++  <If "%{REQUEST_URI} =~ m#^/(admin|students/admin)(/|$)#">
++      Require ip 41.0.0.10 105.0.0.0/16
++  </If>
++  ```
++
++---
++
++## 3. الحماية الموجودة في الكود
++
++| الخطر | الحماية |
++|---|---|
++| حقن SQL | كل الاستعلامات محضّرة (PDO prepared statements)، وأسماء الأعمدة من الإعدادات لا من المستخدم |
++| XSS (حقن سكربت) | كل المخرجات تمر عبر `e()`؛ الروابط المخزنة تمر عبر `link_url()` / `safe_url()` التي تقبل http(s) و mailto و tel والروابط الداخلية فقط (تمنع `javascript:` و `data:`)؛ البيانات المرسلة إلى JavaScript بصيغة JSON (`json_js()`) |
++| CSRF | رمز في كل نموذج POST، ورمز في رابط تسجيل الخروج، وكوكي `SameSite=Lax` |
++| تخمين كلمات المرور | 5 محاولات فاشلة لكل اسم مستخدم من نفس العنوان، و30 لكل عنوان، خلال 15 دقيقة (مشتركة بين الواجهتين)، ثم 429 مع `Retry-After` |
++| سرقة الجلسة وتثبيتها | `HttpOnly`، `SameSite`، `Secure` على HTTPS، `use_strict_mode`، معرّف جديد ورمز CSRF جديد عند الدخول، ومعرّف جديد عند تغيير كلمة المرور؛ الجلسات الأخرى تُغلق تلقائياً عند تغيير كلمة المرور أو تعطيل الحساب |
++| كلمات المرور | `password_hash` (bcrypt)، وتشفير Django القديم يُحوَّل تلقائياً عند أول دخول، وقواعد طول وتعقيد |
++| نسيان كلمة مرور المدير | استعادة من المتصفح بإثبات ملكية الموقع (ملف في `storage/`)، أو `create_admin.php` من سطر الأوامر |
++| إعادة التوجيه لموقع خارجي | `next` يقبل مساراً داخلياً فقط (يرفض `//` و `\` وأحرف التحكم)، وروابط اللغة تُنظَّف بـ `redirect_path()` |
++| رفع الملفات | امتدادات محددة + فحص نوع المحتوى الحقيقي + أسماء عشوائية؛ وثائق الطلبات خاصة في `storage/private` لصاحبها والموظفين فقط؛ لا تنفيذ للسكربتات في `uploads/` |
++| النقر الخادع (Clickjacking) | `X-Frame-Options: SAMEORIGIN` و `frame-ancestors 'self'` |
++| ترويسات أخرى | `X-Content-Type-Options: nosniff`، `Referrer-Policy`، `Permissions-Policy`، `Content-Security-Policy` (base-uri، object-src، form-action)، إخفاء `X-Powered-By`، و HSTS اختيارياً |
++| الرسائل المزعجة | «اتصل بنا»: حقل خفي للبرامج الآلية + 5 رسائل كل 10 دقائق لكل عنوان؛ التسجيل: 20 محاولة في الساعة لكل عنوان |
++| ملفات CDN | توقيع SRI (`integrity`) على Bootstrap و jQuery و Font Awesome و Chart.js: إن عُدِّل الملف على الـ CDN يرفضه المتصفح |
++| الخصوصية | الباركود (البطاقة الرقمية والطباعة) يُولَّد داخل الموقع، فلا يُرسل رقم تسجيل الطالب إلى أي موقع خارجي |
++| تصدير CSV | الخلايا التي تبدأ بـ `= + - @` تُعرض كنص (منع تنفيذ معادلات Excel) |
++| البحث | 100 حرف و 8 كلمات كحد أقصى (منع إبطاء الخادم باستعلامات ضخمة) |
++
++الإعدادات القابلة للتعديل في `config.php` ← القسم `'security'`.
++
++---
++
++## 4. إعداد Nginx
++
++Nginx لا يقرأ ملفات `.htaccess`، فبدون هذه القواعد تصبح `database/data.sql` وسجل الأخطاء وملفات الجلسات قابلة للتحميل:
++
++```nginx
++server {
++    root /var/www/dou-setif;
++    index index.php;
++    client_max_body_size 25m;
++
++    location ~ ^/(app|database|storage)(/|$) { deny all; return 404; }
++    location ~ /\.(?!well-known) { deny all; }
++    location ~* \.(sql|md|log|bak|swp)$ { deny all; }
++    location = /config.php { deny all; }
++    location ^~ /uploads/ { location ~* \.(php|phtml|phar|pl|py|cgi|sh)$ { deny all; } }
++
++    location / { try_files $uri $uri/ /index.php?$query_string; }
++    location ~ \.php$ {
++        include fastcgi_params;
++        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
++        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
++    }
++}
++```
++
++---
++
++## 5. نتيجة الفحص الأمني (نوفمبر 2026): ما كان في الإصدار 1.0 وما أُصلح في 1.0.1
++
++| الخطورة | المشكلة | الإصلاح |
++|---|---|---|
++| عالية | **XSS مخزّن عبر الروابط**: رابط مثل `javascript:alert(1)` في السلايدر أو الإشعارات، أو `javascript://...` في «الموقع الإلكتروني» للقسم (كان يمر من `FILTER_VALIDATE_URL`)، ينفّذ سكربتاً عند كل زائر يضغط عليه | حقل «الرابط» يقبل `/...` و `https://` فقط، و`url` يشترط http(s)، و`link_url()` / `safe_url()` تُبطل أي رابط قديم خطير عند العرض |
++| عالية | **حقن في قالب JavaScript**: «الوثائق المطلوبة» لنوع الطلب كانت داخل `` `...` `` فتنفَّذ `${...}` في صفحة كل طالب يفتح «طلب جديد» | تُمرَّر الآن بصيغة JSON |
++| عالية | **إعادة توجيه لموقع خارجي (Open Redirect)** بعد الدخول: `next=/%09/evil.com` (المتصفح يحذف الـ Tab فيصبح الرابط `//evil.com`) | `safe_next()` ترفض أحرف التحكم و `\` و `//`، و `redirect_path()` لروابط إضافة `/` في آخر الرابط |
++| عالية | **لا حد لمحاولات الدخول**: يمكن تجربة آلاف كلمات المرور | `RateLimit` (القسم 3) |
++| عالية | **تشفير كلمات المرور منشور**: `data.sql` (حسابات المدير والموظف) و `data.json` و `db_backup.sql` في مستودع GitHub عام | كلمات المرور في `data.sql` غير قابلة للاستعمال، وحُذف الملفان من المستودع مع منع رفعهما مستقبلاً — **ويجب تغيير كلمات المرور القديمة** (لا تزال في تاريخ Git) |
++| متوسطة | الموظفون يدخلون من فضاء الطالب (بـ «تذكرني» لأسبوعين) | واجهة دخول خاصة بالإدارة (القسم 2) |
++| متوسطة | وضع التطوير (تفاصيل الأخطاء) يُفعَّل تلقائياً خلف أي خادم وسيط محلي (كل الطلبات من 127.0.0.1) | يُفعَّل فقط على `http://localhost` بلا ترويسات خادم وسيط |
++| متوسطة | `X-Forwarded-For` مصدَّق من أي شخص (تزوير عنوان IP في الرسائل والإحصائيات، وتجاوز الحظر) | يُقبل فقط من `trusted_proxies` |
++| متوسطة | ترويسات الأمان على Apache مع `mod_headers` فقط | يرسلها PHP نفسه في كل الخوادم |
++| متوسطة | البحث بآلاف الكلمات يبطئ الخادم | 100 حرف و 8 كلمات |
++| متوسطة | حقن معادلات Excel في تصدير CSV | `csv_safe()` |
++| متوسطة | تسجيل الخروج برابط GET (أي موقع يستطيع إخراج المستخدم) | رمز في رابط الخروج |
++| متوسطة | الباركود عبر موقع خارجي (يستقبل رقم تسجيل كل طالب) | باركود Code 128 محلي (`app/core/Barcode.php`) |
++| منخفضة | رمز CSRF لا يتغير عند الدخول؛ لا SRI على ملفات CDN؛ رابط لحزمة `bootstrap-rtl@3.4.0` غير موجودة على npm؛ روابط المشاركة غير مرمّزة؛ رسائل مزعجة في «اتصل بنا» والتسجيل | أُصلحت كلها |
++
++الاختبارات: `python3 dev/security_check.py --v1` (في المستودع) يتحقق من كل نقطة أعلاه.
++
++### مشروع Django الأصلي (في جذر المستودع)
++
++لم يُعدَّل كوده، لكن انتبه إن كان لا يزال منشوراً:
++- `SECRET_KEY` له قيمة افتراضية مكتوبة في `config/settings.py`: ضع مفتاحاً سرياً جديداً في متغيرات البيئة.
++- `ALLOWED_HOSTS = ['*']`: ضع اسم نطاقك فقط.
++- الجلسات القديمة الموجودة في `data.json` منتهية الصلاحية، لكن الملف كشف تشفير كلمات المرور: غيّرها.
++
++---
++
++## 6. الإبلاغ عن ثغرة
++
++إن وجدت ثغرة، راسل إدارة الموقع عبر صفحة «اتصل بنا» أو البريد الرسمي للمديرية **دون نشر التفاصيل علناً** حتى تُصلح.
+diff --git a/app/admin_config.php b/app/admin_config.php
+index 95a8b33..b04f225 100644
+--- a/app/admin_config.php
++++ b/app/admin_config.php
+@@ -37,7 +37,7 @@ return [
+             'title' => ['type' => 'text', 'label' => 'العنوان', 'max' => 200],
+             'subtitle' => ['type' => 'text', 'label' => 'العنوان الفرعي', 'max' => 300, 'required' => false],
+             'image' => ['type' => 'image', 'label' => 'الصورة', 'dir' => 'slider', 'help' => 'المقاس المقترح: 1920×500 بكسل'],
+-            'link' => ['type' => 'text', 'label' => 'الرابط', 'max' => 255, 'required' => false, 'nullable' => true, 'help' => 'رابط كامل (https://...) أو داخلي مثل /news/'],
++            'link' => ['type' => 'link', 'label' => 'الرابط', 'max' => 255, 'required' => false, 'nullable' => true, 'help' => 'رابط كامل (https://...) أو داخلي مثل /news/'],
+             'button_text' => ['type' => 'text', 'label' => 'نص الزر', 'max' => 50, 'required' => false],
+             'order' => $order(),
+             'is_active' => $bool('نشط'),
+@@ -151,7 +151,7 @@ return [
+         'fields' => [
+             'description' => ['type' => 'textarea', 'label' => 'الوصف', 'rows' => 3, 'max' => 500],
+             'image' => ['type' => 'image', 'label' => 'الصورة', 'dir' => 'latest_news'],
+-            'link' => ['type' => 'text', 'label' => 'الرابط', 'max' => 255, 'required' => false, 'nullable' => true],
++            'link' => ['type' => 'link', 'label' => 'الرابط', 'max' => 255, 'required' => false, 'nullable' => true],
+             'order' => $order(),
+             'is_active' => $bool('نشط'),
+         ],
+@@ -333,7 +333,7 @@ return [
+             'title' => ['type' => 'text', 'label' => 'العنوان', 'max' => 200],
+             'message' => ['type' => 'textarea', 'label' => 'الرسالة', 'rows' => 3],
+             'notification_type' => ['type' => 'select', 'label' => 'النوع', 'default' => 'info'],
+-            'link' => ['type' => 'text', 'label' => 'الرابط', 'max' => 255, 'required' => false],
++            'link' => ['type' => 'link', 'label' => 'الرابط', 'max' => 255, 'required' => false],
+             'link_text' => ['type' => 'text', 'label' => 'نص الرابط', 'max' => 50, 'required' => false, 'default' => 'المزيد'],
+             'start_date' => ['type' => 'datetime', 'label' => 'تاريخ البداية', 'default' => 'now'],
+             'end_date' => ['type' => 'datetime', 'label' => 'تاريخ النهاية', 'required' => false, 'nullable' => true, 'help' => 'اتركه فارغاً ليبقى الإشعار ظاهراً'],
+@@ -464,7 +464,7 @@ return [
+             'student_id' => ['type' => 'fk', 'label' => 'الطالب', 'model' => StudentProfile::class, 'display' => 'full_name_arabic'],
+             'title' => ['type' => 'text', 'label' => 'العنوان', 'max' => 200],
+             'message' => ['type' => 'textarea', 'label' => 'الرسالة', 'rows' => 4],
+-            'link' => ['type' => 'text', 'label' => 'الرابط', 'max' => 500, 'required' => false, 'nullable' => true, 'help' => 'مثال: /students/applications/'],
++            'link' => ['type' => 'link', 'label' => 'الرابط', 'max' => 500, 'required' => false, 'nullable' => true, 'help' => 'مثال: /students/applications/'],
+             'notification_type' => ['type' => 'select', 'label' => 'النوع', 'default' => 'info'],
+             'is_read' => $bool('مقروء', false),
+             'created_at' => $created,
+diff --git a/app/bootstrap.php b/app/bootstrap.php
+index adef26d..54b718f 100644
+--- a/app/bootstrap.php
++++ b/app/bootstrap.php
+@@ -25,9 +25,11 @@ require APP_PATH . '/core/Page.php';
+ require APP_PATH . '/core/Router.php';
+ require APP_PATH . '/core/View.php';
+ require APP_PATH . '/core/Auth.php';
++require APP_PATH . '/core/RateLimit.php';
+ require APP_PATH . '/core/Form.php';
+ require APP_PATH . '/core/Upload.php';
+ require APP_PATH . '/core/XlsxWriter.php';
++require APP_PATH . '/core/Barcode.php';
+ require APP_PATH . '/helpers.php';
+ 
+ require APP_PATH . '/models/homepage.php';
+@@ -100,7 +102,10 @@ function handle_exception(Throwable $e): void
+     }
+ }
+ 
+-// ------------------------------------------------------------------ الجلسة
++// ------------------------------------------------------------------ الجلسة وترويسات الأمان
++if (PHP_SAPI !== 'cli') {
++    send_security_headers();
++}
+ if (PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_NONE) {
+     $sessionDir = STORAGE_PATH . '/sessions';
+     if (is_dir($sessionDir) && is_writable($sessionDir)) {
+@@ -109,12 +114,12 @@ if (PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_NONE) {
+     ini_set('session.gc_maxlifetime', '1209600'); // أسبوعان (مثل Django)
+     ini_set('session.use_strict_mode', '1');
+     ini_set('session.use_only_cookies', '1');
+-    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
++    ini_set('session.use_trans_sid', '0');
+     session_name('dou_session');
+     session_set_cookie_params([
+         'lifetime' => 0,
+         'path'     => (base_url() ?: '') . '/',
+-        'secure'   => $https,
++        'secure'   => is_https(),
+         'httponly' => true,
+         'samesite' => 'Lax',
+     ]);
+diff --git a/app/controllers/admin.php b/app/controllers/admin.php
+index 846a97b..9483dda 100644
+--- a/app/controllers/admin.php
++++ b/app/controllers/admin.php
+@@ -32,13 +32,13 @@ function admin_resource(string $key): array
+     return $r;
+ }
+ 
+-/** يتطلب أن يكون المستخدم موظفاً — مع صفحة دخول خاصة إن لم يكن مسجلاً */
++/** يتطلب أن يكون المستخدم موظفاً — مع صفحة دخول خاصة بالإدارة إن لم يكن مسجلاً */
+ function admin_guard(): User
+ {
+     never_cache();
+     $u = current_user();
+     if (!$u) {
+-        redirect(url('students:login') . '?next=' . rawurlencode(request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING'])));
++        redirect(url('admin:login') . '?next=' . rawurlencode(request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING'])));
+     }
+     if (!is_staff()) {
+         abort(403, 'لوحة الإدارة مخصصة للموظفين فقط.');
+@@ -89,19 +89,65 @@ function admin_index(): void
+     ]);
+ }
+ 
++/**
++ * واجهة دخول خاصة بالموظفين والمدير (منفصلة عن فضاء الطالب):
++ * تقبل حسابات الموظفين فقط، بلا «تذكرني»، مع حد لمحاولات الدخول الفاشلة.
++ */
+ function admin_login(): void
+ {
++    never_cache();
++    $next = $_GET['next'] ?? '';
+     if (is_staff()) {
+-        redirect_to('admin:index');
++        redirect(safe_next($next, url('admin:index'), STAFF_NEXT_PATTERN));
++    }
++    $form = new Form([
++        'username' => ['type' => 'text', 'label' => 'اسم المستخدم', 'max_length' => 150,
++            'attrs' => FC + ['autocomplete' => 'username', 'autofocus' => 'autofocus', 'dir' => 'auto', 'autocapitalize' => 'none', 'spellcheck' => 'false']],
++        'password' => ['type' => 'password', 'label' => 'كلمة المرور', 'attrs' => FC + ['autocomplete' => 'current-password']],
++    ], is_post() ? $_POST : null);
++    $status = 200;
++    $error = '';
++    if (is_post() && $form->is_valid()) {
++        $d = $form->cleaned;
++        $wait = login_throttle_wait($d['username']);
++        if ($wait > 0) {
++            header('Retry-After: ' . $wait);
++            $error = 'محاولات دخول فاشلة كثيرة. يرجى المحاولة مجدداً بعد ' . max(1, (int) ceil($wait / 60)) . ' دقيقة.';
++            security_log('login_throttled', ['form' => 'admin', 'username' => $d['username']]);
++            $status = 429;
++        } else {
++            $user = Auth::attempt($d['username'], $d['password'], fn(User $u) => $u->is_staff_account());
++            if ($user) {
++                login_throttle_clear($d['username']);
++                Auth::login($user); // جلسة تنتهي بإغلاق المتصفح
++                security_log('admin_login', ['username' => $user['username']]);
++                flash('success', 'مرحباً ' . $user->display_name() . '، تم تسجيل الدخول إلى لوحة الإدارة.');
++                redirect(safe_next($next, url('admin:index'), STAFF_NEXT_PATTERN));
++            }
++            login_throttle_hit($d['username']);
++            security_log('login_failed', ['form' => 'admin', 'username' => $d['username']]);
++            // رسالة واحدة لكل الحالات (كلمة مرور خاطئة، حساب غير موجود، حساب طالب) — مثل Django admin
++            $error = 'يرجى إدخال اسم المستخدم وكلمة المرور الصحيحين لحساب موظف. لاحظ أن الحقلين قد يكونان حساسين لحالة الأحرف.';
++        }
+     }
+-    redirect(url('students:login') . '?next=' . rawurlencode('/admin/'));
++    render('admin/login', [
++        'form'       => $form,
++        'error'      => $error,
++        'next'       => is_string($next) ? $next : '',
++        'page_title' => 'دخول لوحة الإدارة',
++    ], $status);
+ }
+ 
+ function admin_logout(): void
+ {
++    never_cache();
++    if (is_authenticated() && !verify_logout()) {
++        // رابط بلا رمز صحيح (مثلاً من موقع آخر): لا نسجّل الخروج
++        redirect_to(is_staff() ? 'admin:index' : 'homepage:index');
++    }
+     Auth::logout();
+     flash('success', 'تم تسجيل الخروج بنجاح');
+-    redirect_to('students:login');
++    redirect_to('admin:login');
+ }
+ 
+ function admin_password(): void
+@@ -132,6 +178,118 @@ function admin_password(): void
+     admin_render('password', ['page_title' => 'تغيير كلمة المرور', 'form' => $form]);
+ }
+ 
++// ====================================================================== نسيت كلمة مرور المدير؟
++
++const ADMIN_RECOVER_TTL = 1800; // صلاحية رمز الاستعادة: 30 دقيقة
++
++/**
++ * استعادة دخول المدير العام من المتصفح، بدون سطر أوامر (مفيدة في الاستضافة المشتركة بلا Terminal).
++ *
++ * إثبات أنك صاحب الموقع: الصفحة تعطي اسم ملف عشوائياً، فتنشئه داخل المجلد storage/
++ * (مدير الملفات في cPanel، أو مستكشف Windows في XAMPP)، ثم تعيّن كلمة المرور الجديدة.
++ * من لا يملك الوصول إلى ملفات الخادم لا يستطيع إنشاء الملف. الرمز مرتبط بجلسة المتصفح وصالح 30 دقيقة،
++ * والملف يُحذف بعد النجاح. لتعطيلها: 'web_recovery' => false في config.php (يبقى create_admin.php).
++ */
++function admin_recover(): void
++{
++    never_cache();
++    if (!config('security.web_recovery', true)) {
++        abort(404);
++    }
++    if (is_staff()) {
++        redirect_to('admin:password'); // متصل فعلاً: تغيير كلمة المرور العادي
++    }
++    $rec = $_SESSION['_recover'] ?? null;
++    if (!is_array($rec) || !isset($rec['code'], $rec['t']) || $rec['t'] < time() - ADMIN_RECOVER_TTL) {
++        $rec = ['code' => bin2hex(random_bytes(6)), 't' => time(), 'ok' => false];
++        $_SESSION['_recover'] = $rec;
++    }
++    $fileName = 'recover-' . $rec['code'] . '.txt';
++    $hasFile = admin_recover_files($rec['code']) !== [];
++    $error = '';
++    $form = null;
++    $supers = [];
++
++    if (!($rec['ok'] && $hasFile)) {
++        // الخطوة 1: إنشاء الملف ثم «تحقّق»
++        if ($rec['ok']) {
++            $_SESSION['_recover']['ok'] = false; // حُذف الملف بعد التحقق: نعيد الخطوة 1
++        }
++        if (is_post()) {
++            if ($hasFile) {
++                $_SESSION['_recover']['ok'] = true;
++                security_log('admin_recover_verified', []);
++                redirect_to('admin:recover');
++            }
++            $error = 'لم يُعثر على الملف ' . $fileName . ' داخل المجلد storage. تأكد من الاسم والمكان ثم اضغط «تحقّق» مرة أخرى.';
++        }
++    } else {
++        // الخطوة 2: كلمة المرور الجديدة
++        $supers = array_column(DB::all('SELECT username FROM users WHERE is_superuser = 1 AND is_active = 1 ORDER BY id'), 'username');
++        $form = new Form([
++            'username'  => ['type' => 'text', 'label' => 'اسم المستخدم (المدير العام)', 'max_length' => 150,
++                'attrs' => FC + ['autocomplete' => 'username', 'dir' => 'ltr', 'autocapitalize' => 'none', 'spellcheck' => 'false']],
++            'password1' => ['type' => 'password', 'label' => 'كلمة المرور الجديدة', 'attrs' => FC + ['autocomplete' => 'new-password', 'autofocus' => 'autofocus']],
++            'password2' => ['type' => 'password', 'label' => 'تأكيد كلمة المرور الجديدة', 'attrs' => FC + ['autocomplete' => 'new-password']],
++        ], is_post() ? $_POST : null, null, ['username' => $supers[0] ?? '']);
++        $form->clean = function (Form $f) {
++            if (!preg_match('/^[\w.@+-]+$/u', $f->cleaned['username'])) {
++                $f->add_error('username', 'أحرف وأرقام و @/./+/-/_ فقط');
++            }
++            if ($f->cleaned['password1'] !== $f->cleaned['password2']) {
++                $f->add_error('password2', 'كلمتا المرور غير متطابقتين');
++            }
++            foreach (password_errors($f->cleaned['password1'], $f->cleaned['username']) as $err) {
++                $f->add_error('password1', $err);
++            }
++        };
++        if (is_post() && $form->is_valid()) {
++            $d = $form->cleaned;
++            $data = ['password' => Auth::hashPassword($d['password1']), 'is_staff' => 1, 'is_superuser' => 1, 'is_active' => 1];
++            $user = User::firstWhere('username = ?', [$d['username']]);
++            $user ? $user->update($data) : User::create(['username' => $d['username']] + $data);
++            $left = [];
++            foreach (admin_recover_files() as $f) {
++                if (!@unlink(STORAGE_PATH . '/' . $f)) {
++                    $left[] = $f;
++                }
++            }
++            unset($_SESSION['_recover']);
++            session_regenerate_id(true);
++            login_throttle_clear($d['username']);
++            security_log('admin_recover', ['username' => $d['username'], 'created' => !$user]);
++            flash('success', 'تم تعيين كلمة المرور الجديدة للمدير العام «' . $d['username'] . '». سجّل الدخول الآن.'
++                . ($left ? ' احذف يدوياً من المجلد storage الملف: ' . implode('، ', $left) : ''));
++            redirect_to('admin:login');
++        }
++    }
++    render('admin/recover', [
++        'file_name'  => $fileName,
++        'verified'   => $form !== null,
++        'form'       => $form,
++        'supers'     => $supers,
++        'error'      => $error,
++        'minutes'    => max(1, (int) ceil(($rec['t'] + ADMIN_RECOVER_TTL - time()) / 60)),
++        'page_title' => 'استعادة دخول المدير',
++    ]);
++}
++
++/** ملفات الاستعادة في storage/ (لرمز معيّن أو كلها). يقبل الاسم بلا امتداد أو بامتداد مكرر مثل .txt.txt (Windows يخفي الامتدادات) */
++function admin_recover_files(string $code = ''): array
++{
++    $found = [];
++    foreach (scandir(STORAGE_PATH) ?: [] as $name) {
++        $lower = strtolower($name);
++        $match = $code === ''
++            ? str_starts_with($lower, 'recover-')
++            : preg_match('/^recover-' . preg_quote($code, '/') . '(\.[a-z0-9]{1,5}){0,3}$/', $lower) === 1;
++        if ($match && is_file(STORAGE_PATH . '/' . $name)) {
++            $found[] = $name;
++        }
++    }
++    return $found;
++}
++
+ // ====================================================================== قائمة السجلات
+ 
+ function admin_list(string $key): void
+@@ -507,10 +665,16 @@ function admin_collect_form(array $r, ?Model $obj): array
+                 }
+                 break;
+             case 'url':
+-                if (!filter_var($v, FILTER_VALIDATE_URL)) {
++                // FILTER_VALIDATE_URL وحده يقبل javascript://... فنشترط http(s)
++                if (!filter_var($v, FILTER_VALIDATE_URL) || !in_array(url_scheme($v), ['http', 'https'], true)) {
+                     $errors[$f] = 'أدخل رابطاً صالحاً يبدأ بـ http:// أو https://';
+                 }
+                 break;
++            case 'link':
++                if (!is_allowed_link($v)) {
++                    $errors[$f] = 'أدخل رابطاً داخلياً يبدأ بـ / (مثل /news/) أو رابطاً كاملاً يبدأ بـ https://';
++                }
++                break;
+             case 'int':
+                 if (filter_var($v, FILTER_VALIDATE_INT) === false) {
+                     $errors[$f] = 'أدخل رقماً صحيحاً.';
+@@ -869,6 +1033,9 @@ function admin_input(array $r, string $f, array $spec, $value, bool $readonly, ?
+         case 'email':
+         case 'url':
+             return '<input type="' . $type . '" name="' . $name . '" id="' . $id . '" class="form-control" dir="ltr" value="' . e($val) . '"' . $reqAttr . $dis . '>';
++        case 'link':
++            return '<input type="text" name="' . $name . '" id="' . $id . '" class="form-control" dir="ltr" value="' . e($val) . '"'
++                . (isset($spec['max']) ? ' maxlength="' . (int) $spec['max'] . '"' : '') . $reqAttr . $dis . '>';
+         default:
+             return '<input type="text" name="' . $name . '" id="' . $id . '" class="form-control" value="' . e($val) . '"'
+                 . (isset($spec['max']) ? ' maxlength="' . (int) $spec['max'] . '"' : '') . $reqAttr . $dis . '>';
+diff --git a/app/controllers/contact.php b/app/controllers/contact.php
+index c135377..45d2ea0 100644
+--- a/app/controllers/contact.php
++++ b/app/controllers/contact.php
+@@ -6,8 +6,24 @@
+ function contact_view(): void
+ {
+     $form = contact_form(is_post() ? $_POST : null);
++    $status = 200;
+     if (is_post()) {
+-        if ($form->is_valid()) {
++        $key = 'contact:' . client_ip();
++        // حقل خفي (honeypot) لا يراه الزائر ولا يملؤه إلا البرامج الآلية: نتظاهر بالنجاح ولا نحفظ شيئاً
++        $honeypot = $_POST['contact_website'] ?? '';
++        if ($honeypot !== '') {
++            security_log('contact_honeypot');
++            $name = is_string($_POST['full_name'] ?? null) ? mb_substr(trim($_POST['full_name']), 0, 60) : '';
++            flash('success', 'شكراً لك ' . $name . '! تم إرسال رسالتك بنجاح. سنتواصل معك في أقرب وقت ممكن.');
++            redirect_to('contact:contact');
++        }
++        $wait = RateLimit::retryAfter($key, (int) config('security.contact_max', 5), 600);
++        if ($wait > 0) {
++            header('Retry-After: ' . $wait);
++            flash('error', too_many_attempts_message($wait));
++            $status = 429;
++        } elseif ($form->is_valid()) {
++            RateLimit::hit($key, 600);
+             $data = $form->cleaned;
+             ContactMessage::create([
+                 'full_name'  => $data['full_name'],
+@@ -19,12 +35,13 @@ function contact_view(): void
+             ]);
+             flash('success', 'شكراً لك ' . $data['full_name'] . '! تم إرسال رسالتك بنجاح. سنتواصل معك في أقرب وقت ممكن.');
+             redirect_to('contact:contact');
++        } else {
++            flash('error', 'يرجى تصحيح الأخطاء في النموذج');
+         }
+-        flash('error', 'يرجى تصحيح الأخطاء في النموذج');
+     }
+     render('contact/contact', [
+         'form'           => $form,
+         'page_title'     => 'اتصل بنا',
+         'total_messages' => ContactMessage::count(),
+-    ]);
++    ], $status);
+ }
+diff --git a/app/controllers/search.php b/app/controllers/search.php
+index 7fb5b9f..a230a4c 100644
+--- a/app/controllers/search.php
++++ b/app/controllers/search.php
+@@ -22,7 +22,7 @@ function normalize_arabic_search(string $text): array
+             $expanded[] = mb_substr($w, 2);
+         }
+     }
+-    return array_values(array_unique($expanded));
++    return array_slice(array_values(array_unique($expanded)), 0, 8);
+ }
+ 
+ /** (field1 LIKE ? OR field2 LIKE ? ...) لكل كلمة، مجمّعة بـ OR */
+@@ -41,7 +41,8 @@ function build_search_query(array $fields, array $terms, array &$params): string
+ 
+ function search_view(): void
+ {
+-    $query = query('q');
++    // حد لطول البحث وعدد كلماته: كل كلمة تضيف عشرات شروط LIKE على كل الجداول (حماية من إبطاء الخادم)
++    $query = mb_substr(query('q'), 0, 100);
+     $searchType = query('type', 'all') ?: 'all';
+     $sections = [
+         // النوع => [النموذج, الحقول, شرط إضافي, الترتيب, الحد]
+diff --git a/app/controllers/staff.php b/app/controllers/staff.php
+index 26bff9d..748f7c6 100644
+--- a/app/controllers/staff.php
++++ b/app/controllers/staff.php
+@@ -4,6 +4,18 @@
+  */
+ 
+ /** بناء شرط الفلترة المشترك بين القائمة والتصدير */
++/**
++ * خلية CSV آمنة: Excel ينفّذ الخلايا التي تبدأ بـ = + - @ كمعادلات (CSV/Formula Injection)،
++ * والطالب يكتب اسمه وتفاصيل طلبه بنفسه، فنضيف ' قبلها لتُعرض كنص.
++ */
++function csv_safe($value)
++{
++    if (is_string($value) && $value !== '' && strpbrk($value[0], "=+-@\t\r") !== false) {
++        return "'" . $value;
++    }
++    return $value;
++}
++
+ function staff_applications_filter(): array
+ {
+     $where = '1';
+@@ -286,7 +298,7 @@ function staff_export_applications_excel(): void
+         fwrite($out, "\xEF\xBB\xBF");
+         fputcsv($out, $headers);
+         foreach ($rows as $row) {
+-            fputcsv($out, $row);
++            fputcsv($out, array_map('csv_safe', $row));
+         }
+         fputcsv($out, []);
+         fputcsv($out, ['الإجمالي:', count($rows)]);
+diff --git a/app/controllers/students.php b/app/controllers/students.php
+index 0676009..0e9d386 100644
+--- a/app/controllers/students.php
++++ b/app/controllers/students.php
+@@ -36,7 +36,15 @@ function student_register(): void
+         redirect_to('students:dashboard');
+     }
+     $form = student_registration_form(is_post() ? $_POST : null);
++    if (is_post() && ($wait = RateLimit::retryAfter('register:' . client_ip(), (int) config('security.register_max', 20), 3600)) > 0) {
++        // حد لمحاولات التسجيل من نفس العنوان (إنشاء حسابات وهمية بالجملة، وتخمين أرقام التسجيل)
++        header('Retry-After: ' . $wait);
++        flash('error', too_many_attempts_message($wait));
++        render('students/register', ['form' => $form, 'page_title' => 'تسجيل طالب جديد'], 429);
++        return;
++    }
+     if (is_post()) {
++        RateLimit::hit('register:' . client_ip(), 3600);
+         if ($form->is_valid()) {
+             $d = $form->cleaned;
+             try {
+@@ -89,41 +97,58 @@ function student_login(): void
+         redirect_to(is_staff() ? 'students:admin_dashboard' : 'students:dashboard');
+     }
+     $form = student_login_form(is_post() ? $_POST : null);
++    $status = 200;
+     if (is_post() && $form->is_valid()) {
+         $d = $form->cleaned;
+-        $user = Auth::attempt($d['username'], $d['password']);
+-        if ($user) {
+-            $next = $_GET['next'] ?? '';
+-            $student = $user->student_profile();
+-            if ($user['is_staff'] || $user['is_superuser']) {
+-                Auth::login($user, (bool) $d['remember_me']);
+-                flash('success', 'مرحباً! تم تسجيل الدخول كمشرف');
+-                redirect(safe_next($next, url('students:admin_dashboard')));
+-            }
+-            if ($student) {
++        $wait = login_throttle_wait($d['username']);
++        if ($wait > 0) {
++            // حماية من تخمين كلمات المرور: لا نتحقق من كلمة المرور أصلاً أثناء الحظر المؤقت
++            header('Retry-After: ' . $wait);
++            flash('error', too_many_attempts_message($wait));
++            security_log('login_throttled', ['form' => 'student', 'username' => $d['username']]);
++            $status = 429;
++        } else {
++            // فضاء الطالب للطلبة فقط: حسابات الموظفين والمدير تدخل من واجهتها الخاصة /admin/login/
++            // (وتُعامل هنا كأنها غير موجودة، فلا تكشف الصفحة وجودها ولا صحة كلمة مرورها)
++            $user = Auth::attempt($d['username'], $d['password'], fn(User $u) => !$u->is_staff_account() && $u->student_profile() !== null);
++            if ($user) {
++                login_throttle_clear($d['username']);
++                $student = $user->student_profile();
+                 if (!$student['is_active']) {
+                     flash('error', 'حسابك غير نشط. يرجى الاتصال بالإدارة');
+                     redirect_to('students:login');
+                 }
+                 Auth::login($user, (bool) $d['remember_me']);
+                 flash('success', 'مرحباً ' . $student['full_name_arabic'] . '!');
+-                redirect(safe_next($next, url('students:dashboard')));
++                // لا رجوع إلى صفحات الإدارة من فضاء الطالب
++                $next = safe_next($_GET['next'] ?? '', '');
++                if ($next === '' || preg_match(STAFF_NEXT_PATTERN, substr($next, strlen(base_url() . route_prefix())))) {
++                    $next = url('students:dashboard');
++                }
++                redirect($next);
+             }
+-            Auth::login($user, (bool) $d['remember_me']);
+-            flash('warning', 'لا يوجد ملف طالب. يمكنك الوصول للوحة الإدارة فقط');
+-            redirect_to('homepage:index');
++            login_throttle_hit($d['username']);
++            security_log('login_failed', ['form' => 'student', 'username' => $d['username']]);
++            flash('error', 'اسم المستخدم أو كلمة المرور غير صحيحة');
+         }
+-        flash('error', 'اسم المستخدم أو كلمة المرور غير صحيحة');
+     }
+-    render('students/login', ['form' => $form, 'page_title' => 'تسجيل الدخول']);
++    render('students/login', ['form' => $form, 'page_title' => 'تسجيل الدخول'], $status);
+ }
+ 
+ function student_logout(): void
+ {
+     never_cache();
++    if (!is_authenticated()) {
++        redirect_to('students:login');
++    }
++    $staff = is_staff();
++    if (!verify_logout()) {
++        // رابط بلا رمز صحيح (مثلاً من موقع آخر): لا نسجّل الخروج
++        redirect_to($staff ? 'students:admin_dashboard' : 'students:dashboard');
++    }
+     Auth::logout();
+     flash('success', 'تم تسجيل الخروج بنجاح');
+-    redirect_to('students:login');
++    redirect_to($staff ? 'admin:login' : 'students:login');
+ }
+ 
+ // ====================================================================== لوحة الطالب
+diff --git a/app/core/Auth.php b/app/core/Auth.php
+index b2489a4..5b0f183 100644
+--- a/app/core/Auth.php
++++ b/app/core/Auth.php
+@@ -25,11 +25,16 @@ final class Auth
+         return self::$user;
+     }
+ 
+-    /** التحقق من اسم المستخدم وكلمة المرور (مثل authenticate) */
+-    public static function attempt(string $username, string $password): ?User
++    /**
++     * التحقق من اسم المستخدم وكلمة المرور (مثل authenticate).
++     * $allowed (اختياري): من يحق له الدخول من هذه الواجهة، مثلاً الموظفون فقط في /admin/login/.
++     * الحساب غير المسموح يُعامل كأنه غير موجود (نفس الرسالة ونفس الوقت تقريباً)
++     * فلا تكشف الواجهة نوع الحساب ولا صحة كلمة المرور.
++     */
++    public static function attempt(string $username, string $password, ?callable $allowed = null): ?User
+     {
+         $u = User::firstWhere('username = ?', [$username]);
+-        if (!$u) {
++        if (!$u || ($allowed !== null && !$allowed($u))) {
+             // نفس الوقت تقريباً لمنع تخمين أسماء المستخدمين
+             password_verify($password, '$2y$10$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG');
+             return null;
+@@ -46,7 +51,9 @@ final class Auth
+ 
+     public static function login(User $u, bool $remember = false): void
+     {
++        // معرّف جلسة جديد ورمز CSRF جديد (منع تثبيت الجلسة Session Fixation)
+         session_regenerate_id(true);
++        unset($_SESSION['_csrf']);
+         $_SESSION['_auth_user_id'] = (int) $u['id'];
+         $_SESSION['_auth_hash'] = self::sessionHash($u);
+         $u->update(['last_login' => now()]);
+@@ -73,6 +80,8 @@ final class Auth
+     /** بعد تغيير كلمة المرور: إبقاء المستخدم متصلاً (update_session_auth_hash) */
+     public static function refreshSession(User $u): void
+     {
++        // الجلسات الأخرى (بالهاش القديم) تُغلق تلقائياً في user()، والجلسة الحالية تأخذ معرّفاً جديداً
++        session_regenerate_id(true);
+         $_SESSION['_auth_hash'] = self::sessionHash($u);
+         self::$user = $u;
+     }
+diff --git a/app/core/Barcode.php b/app/core/Barcode.php
+new file mode 100644
+index 0000000..742a3a2
+--- /dev/null
++++ b/app/core/Barcode.php
+@@ -0,0 +1,91 @@
++<?php
++/**
++ * باركود Code 128 بصيغة SVG يُولَّد داخل الموقع.
++ * بديل خدمة bwipjs-api.metafloor.com الخارجية: كانت تستقبل رقم تسجيل كل طالب ورقم كل طلب
++ * عند كل طباعة (تسريب بيانات شخصية لطرف ثالث)، وتتوقف الطباعة إن توقفت الخدمة.
++ *
++ *   <img src="<?= barcode_data_uri($student['registration_number']) ?>" alt="Barcode">
++ */
++final class Barcode
++{
++    /** رموز Code 128 الـ 107 (1 = خط أسود، 0 = فراغ؛ كل رمز 11 وحدة، والتوقف 13) */
++    private const BARS = [
++        '11011001100', '11001101100', '11001100110', '10010011000', '10010001100', '10001001100', '10011001000', '10011000100',
++        '10001100100', '11001001000', '11001000100', '11000100100', '10110011100', '10011011100', '10011001110', '10111001100',
++        '10011101100', '10011100110', '11001110010', '11001011100', '11001001110', '11011100100', '11001110100', '11101101110',
++        '11101001100', '11100101100', '11100100110', '11101100100', '11100110100', '11100110010', '11011011000', '11011000110',
++        '11000110110', '10100011000', '10001011000', '10001000110', '10110001000', '10001101000', '10001100010', '11010001000',
++        '11000101000', '11000100010', '10110111000', '10110001110', '10001101110', '10111011000', '10111000110', '10001110110',
++        '11101110110', '11010001110', '11000101110', '11011101000', '11011100010', '11011101110', '11101011000', '11101000110',
++        '11100010110', '11101101000', '11101100010', '11100011010', '11101111010', '11001000010', '11110001010', '10100110000',
++        '10100001100', '10010110000', '10010000110', '10000101100', '10000100110', '10110010000', '10110000100', '10011010000',
++        '10011000010', '10000110100', '10000110010', '11000010010', '11001010000', '11110111010', '11000010100', '10001111010',
++        '10100111100', '10010111100', '10010011110', '10111100100', '10011110100', '10011110010', '11110100100', '11110010100',
++        '11110010010', '11011011110', '11011110110', '11110110110', '10101111000', '10100011110', '10001011110', '10111101000',
++        '10111100010', '11110101000', '11110100010', '10111011110', '10111101110', '11101011110', '11110101110', '11010000100',
++        '11010010000', '11010011100', '1100011101011',
++    ];
++    private const START_B = 104;
++    private const START_C = 105;
++    private const STOP = 106;
++
++    /** وحدات الباركود (سلسلة من 0 و 1) */
++    public static function code128(string $text): string
++    {
++        $text = (string) preg_replace('/[^\x20-\x7E]/', '?', $text);
++        $codes = [];
++        if ($text !== '' && strlen($text) % 2 === 0 && ctype_digit($text)) {
++            // المجموعة C: كل رقمين في رمز واحد (باركود أقصر)
++            $codes[] = self::START_C;
++            foreach (str_split($text, 2) as $pair) {
++                $codes[] = (int) $pair;
++            }
++        } else {
++            $codes[] = self::START_B;
++            foreach (str_split($text) as $ch) {
++                $codes[] = ord($ch) - 32;
++            }
++        }
++        $sum = $codes[0];
++        foreach (array_slice($codes, 1) as $i => $code) {
++            $sum += ($i + 1) * $code;
++        }
++        $codes[] = $sum % 103;
++        $codes[] = self::STOP;
++        return implode('', array_map(fn($c) => self::BARS[$c], $codes));
++    }
++
++    /** صورة SVG: $scale بكسل لكل وحدة، $height ارتفاع الخطوط، مع النص تحتها اختيارياً */
++    public static function svg(string $text, int $scale = 2, int $height = 60, bool $includeText = false): string
++    {
++        $modules = self::code128($text);
++        $quiet = 10; // هامش أبيض على الجانبين يحتاجه القارئ
++        $width = (strlen($modules) + 2 * $quiet) * $scale;
++        $textHeight = $includeText ? 14 * $scale : 0;
++        $rects = '';
++        $len = strlen($modules);
++        for ($i = 0; $i < $len; $i++) {
++            if ($modules[$i] !== '1') {
++                continue;
++            }
++            $run = 1;
++            while ($i + $run < $len && $modules[$i + $run] === '1') {
++                $run++;
++            }
++            $rects .= '<rect x="' . (($quiet + $i) * $scale) . '" y="0" width="' . ($run * $scale) . '" height="' . $height . '"/>';
++            $i += $run - 1;
++        }
++        $label = $includeText
++            ? '<text x="' . ($width / 2) . '" y="' . ($height + 12 * $scale) . '" font-family="monospace" font-size="' . (11 * $scale) . '" text-anchor="middle">'
++                . htmlspecialchars($text, ENT_QUOTES | ENT_XML1, 'UTF-8') . '</text>'
++            : '';
++        return '<svg xmlns="http://www.w3.org/2000/svg" width="' . $width . '" height="' . ($height + $textHeight) . '" viewBox="0 0 ' . $width . ' ' . ($height + $textHeight) . '">'
++            . '<rect width="100%" height="100%" fill="#fff"/><g fill="#000">' . $rects . '</g>' . $label . '</svg>';
++    }
++}
++
++/** رابط data: لصورة الباركود (يعمل في الطباعة وبدون إنترنت) */
++function barcode_data_uri($text, int $scale = 2, int $height = 60, bool $includeText = false): string
++{
++    return 'data:image/svg+xml;base64,' . base64_encode(Barcode::svg((string) $text, $scale, $height, $includeText));
++}
+diff --git a/app/core/RateLimit.php b/app/core/RateLimit.php
+new file mode 100644
+index 0000000..ecde14f
+--- /dev/null
++++ b/app/core/RateLimit.php
+@@ -0,0 +1,126 @@
++<?php
++/**
++ * تحديد عدد المحاولات خلال نافذة زمنية (Rate Limiting):
++ * يحمي من تخمين كلمات المرور، ومن إغراق نماذج «اتصل بنا» والتسجيل بالرسائل المزعجة.
++ *
++ * يحفظ أوقات المحاولات في ملفات صغيرة داخل storage/ratelimit (بدون جدول في قاعدة البيانات)
++ * مع قفل الملف (flock) حتى لا تضيع محاولة عند وصول طلبين في نفس اللحظة.
++ *
++ *   if ($wait = RateLimit::retryAfter('contact:' . client_ip(), 5, 600)) { ... انتظر $wait ثانية }
++ *   RateLimit::hit('contact:' . client_ip(), 600);
++ */
++final class RateLimit
++{
++    /** مجلد الحفظ: storage/ratelimit، أو المجلد المؤقت للنظام إن تعذرت الكتابة فيه */
++    private static function dir(): ?string
++    {
++        static $dir = false;
++        if ($dir === false) {
++            $dir = null;
++            $candidates = [
++                STORAGE_PATH . '/ratelimit',
++                rtrim(sys_get_temp_dir(), '/\\') . '/dou-ratelimit-' . substr(md5(BASE_PATH), 0, 10),
++            ];
++            foreach ($candidates as $candidate) {
++                if (!is_dir($candidate)) {
++                    @mkdir($candidate, 0700, true);
++                }
++                if (is_dir($candidate) && is_writable($candidate)) {
++                    $dir = $candidate;
++                    break;
++                }
++            }
++        }
++        return $dir;
++    }
++
++    /**
++     * يقرأ أوقات المحاولات الحديثة لمفتاح، ويعدّلها اختيارياً داخل القفل.
++     * إن تعذر الحفظ لا نمنع أحداً (الموقع يبقى يعمل).
++     */
++    private static function times(string $key, int $window, ?callable $change = null): array
++    {
++        $dir = self::dir();
++        if ($dir === null) {
++            return [];
++        }
++        $file = $dir . '/' . hash('sha256', $key) . '.json';
++        if ($change === null && !is_file($file)) {
++            return [];
++        }
++        $fh = @fopen($file, 'c+');
++        if (!$fh) {
++            return [];
++        }
++        flock($fh, $change ? LOCK_EX : LOCK_SH);
++        $times = json_decode((string) stream_get_contents($fh), true);
++        $now = time();
++        $times = array_values(array_filter(is_array($times) ? $times : [], fn($t) => is_int($t) && $t > $now - $window));
++        if ($change) {
++            $times = array_slice($change($times, $now), -500);
++            ftruncate($fh, 0);
++            rewind($fh);
++            fwrite($fh, json_encode($times));
++            fflush($fh);
++        }
++        flock($fh, LOCK_UN);
++        fclose($fh);
++        if ($change && mt_rand(1, 200) === 1) {
++            self::cleanup($dir);
++        }
++        return $times;
++    }
++
++    /** عدد المحاولات خلال آخر $window ثانية */
++    public static function attempts(string $key, int $window): int
++    {
++        return count(self::times($key, $window));
++    }
++
++    /** تسجيل محاولة جديدة، ويعيد عدد المحاولات بعدها */
++    public static function hit(string $key, int $window): int
++    {
++        return count(self::times($key, $window, function (array $times, int $now) {
++            $times[] = $now;
++            return $times;
++        }));
++    }
++
++    /** هل تجاوز الحد؟ */
++    public static function tooMany(string $key, int $max, int $window): bool
++    {
++        return self::retryAfter($key, $max, $window) > 0;
++    }
++
++    /** الثواني المتبقية حتى تُسمح محاولة جديدة (0 = مسموح الآن) */
++    public static function retryAfter(string $key, int $max, int $window): int
++    {
++        $times = self::times($key, $window);
++        $count = count($times);
++        if ($max <= 0 || $count < $max) {
++            return 0;
++        }
++        sort($times);
++        // يجب أن تنتهي صلاحية أقدم (count - max + 1) محاولات
++        return max(1, $times[$count - $max] + $window - time());
++    }
++
++    /** مسح العداد (مثلاً بعد دخول ناجح) */
++    public static function clear(string $key): void
++    {
++        $dir = self::dir();
++        if ($dir !== null) {
++            @unlink($dir . '/' . hash('sha256', $key) . '.json');
++        }
++    }
++
++    /** حذف الملفات القديمة (أكثر من يوم) */
++    private static function cleanup(string $dir): void
++    {
++        foreach (glob($dir . '/*.json') ?: [] as $f) {
++            if (@filemtime($f) < time() - 86400) {
++                @unlink($f);
++            }
++        }
++    }
++}
+diff --git a/app/core/Router.php b/app/core/Router.php
+index 4d3f002..828b388 100644
+--- a/app/core/Router.php
++++ b/app/core/Router.php
+@@ -76,7 +76,7 @@ class Router
+             foreach ($this->routes as $route) {
+                 if (preg_match($route['regex'], $path . '/')) {
+                     $qs = $_SERVER['QUERY_STRING'] ?? '';
+-                    redirect(base_url() . route_prefix() . $path . '/' . ($qs !== '' ? '?' . $qs : ''), 301);
++                    redirect(base_url() . route_prefix() . redirect_path($path . '/') . ($qs !== '' ? '?' . $qs : ''), 301);
+                 }
+             }
+         }
+diff --git a/app/helpers.php b/app/helpers.php
+index 6787136..00bfc6e 100644
+--- a/app/helpers.php
++++ b/app/helpers.php
+@@ -24,9 +24,9 @@ function is_debug(): bool
+     if ($debug === null) {
+         $d = config('app.debug');
+         if ($d === null) {
+-            // تلقائي: مفعّل على جهازك المحلي فقط
+-            $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+-            $debug = PHP_SAPI === 'cli' || in_array($ip, ['127.0.0.1', '::1'], true);
++            // تلقائي: مفعّل فقط عند فتح الموقع على نفس الجهاز مباشرة (http://localhost/...)
++            // لا يكفي أن يكون REMOTE_ADDR محلياً: خلف خادم وسيط (Nginx، Cloudflare...) تأتي كل الطلبات من 127.0.0.1
++            $debug = PHP_SAPI === 'cli' || is_local_request();
+         } else {
+             $debug = (bool) $d;
+         }
+@@ -34,6 +34,21 @@ function is_debug(): bool
+     return $debug;
+ }
+ 
++/** طلب من نفس الجهاز مباشرة: عنوان محلي، واسم localhost، وبلا ترويسات خادم وسيط */
++function is_local_request(): bool
++{
++    if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) {
++        return false;
++    }
++    foreach (['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'HTTP_FORWARDED', 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_HOST'] as $h) {
++        if (!empty($_SERVER[$h])) {
++            return false;
++        }
++    }
++    $host = strtolower((string) preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? '')));
++    return in_array($host, ['localhost', '127.0.0.1', '[::1]'], true) || str_ends_with($host, '.localhost');
++}
++
+ // ====================================================================== الروابط
+ 
+ /** المسار الأساسي للموقع (يعمل حتى لو كان داخل مجلد فرعي مثل /dou-setif) */
+@@ -94,14 +109,56 @@ function media_url($path): string
+ /** الروابط المخزنة في قاعدة البيانات مثل "/students/dashboard/" تُضاف لها بادئة الموقع */
+ function link_url($link): string
+ {
+-    $link = (string) $link;
+-    if ($link === '' || preg_match('#^(https?:|mailto:|tel:|\#)#i', $link)) {
++    $link = trim((string) $link);
++    if ($link === '' || $link[0] === '#') {
+         return $link;
+     }
+-    if ($link[0] === '/') {
++    if ($link[0] === '/' && !preg_match('#^/[/\\\\]#', $link)) {
+         return base_url() . route_prefix() . $link;
+     }
+-    return $link;
++    // رابط خارجي: http(s) و mailto و tel فقط — نمنع javascript: و data: ... (XSS)
++    return safe_url($link);
++}
++
++/**
++ * نوع الرابط (scheme) كما يفهمه المتصفح، أو null للرابط النسبي.
++ * المتصفح يتجاهل المسافات وأحرف التحكم: " java\tscript:alert(1)" = javascript:
++ */
++function url_scheme(string $url): ?string
++{
++    $u = (string) preg_replace('/[\x00-\x20\x7F]+/', '', $url);
++    return preg_match('/^([a-z][a-z0-9+.\-]*):/i', $u, $m) ? strtolower($m[1]) : null;
++}
++
++/** رابط آمن لوضعه في href: http(s) و mailto و tel والروابط النسبية فقط، وإلا $fallback */
++function safe_url($url, string $fallback = '#'): string
++{
++    $url = trim((string) $url);
++    if ($url === '') {
++        return $fallback;
++    }
++    $scheme = url_scheme($url);
++    return ($scheme === null || in_array($scheme, ['http', 'https', 'mailto', 'tel'], true)) ? $url : $fallback;
++}
++
++/** رابط مقبول في حقول «الرابط» بلوحة الإدارة: مسار داخلي /... أو #... أو http(s)/mailto/tel */
++function is_allowed_link(string $link): bool
++{
++    $link = trim($link);
++    if ($link === '' || $link[0] === '#') {
++        return true;
++    }
++    if (preg_match('/[\x00-\x1F\x7F]/', $link)) {
++        return false;
++    }
++    if ($link[0] === '/') {
++        return !preg_match('#^/[/\\\\]#', $link);
++    }
++    $scheme = url_scheme($link);
++    if (in_array($scheme, ['mailto', 'tel'], true)) {
++        return true;
++    }
++    return in_array($scheme, ['http', 'https'], true) && filter_var($link, FILTER_VALIDATE_URL) !== false;
+ }
+ 
+ /** المسار الحالي داخل الموقع (بدون المجلد الفرعي) مثل /news/ */
+@@ -143,22 +200,36 @@ function redirect_to(string $routeName, ...$params): void
+     redirect(url($routeName, ...$params));
+ }
+ 
++/**
++ * مسار داخلي آمن لإعادة التوجيه: "//evil.com" و "/\evil.com" و "/\t/evil.com" يفهمها المتصفح كموقع آخر
++ * (Open Redirect)، فنحذف أحرف التحكم ونختصر البداية إلى "/" واحدة ونعيد ترميز الأحرف.
++ */
++function redirect_path(string $path): string
++{
++    $path = (string) preg_replace('/[\x00-\x1F\x7F]+/', '', $path);
++    $path = '/' . ltrim(str_replace('\\', '/', $path), '/');
++    return implode('/', array_map('rawurlencode', explode('/', $path)));
++}
++
+ /**
+  * رابط "next" بعد تسجيل الدخول: يُقبل فقط مسار داخلي مثل /students/notifications/
+  * (لمنع إعادة التوجيه لمواقع خارجية) ويُضاف له مجلد الموقع.
++ * $pattern (اختياري): تعبير منتظم يجب أن يطابقه المسار، مثل مسارات الإدارة فقط.
+  */
+-function safe_next(?string $next, string $fallback): string
+-{
+-    $next = (string) $next;
+-    if ($next !== '' && $next[0] === '/' && (strlen($next) < 2 || ($next[1] !== '/' && $next[1] !== '\\'))) {
+-        $base = base_url() . route_prefix();
+-        // إن كان الرابط يحتوي مسبقاً على مجلد الموقع فلا نكرره
+-        if ($base !== '' && strpos($next, $base . '/') === 0) {
+-            return $next;
+-        }
+-        return $base . $next;
++function safe_next($next, string $fallback, ?string $pattern = null): string
++{
++    $next = is_string($next) ? $next : '';
++    // يبدأ بـ "/" واحدة، بلا "\" ولا مسافات ولا أحرف تحكم (المتصفح يحذف \t و \n: "/\t/evil.com" => "//evil.com")
++    if ($next === '' || $next[0] !== '/' || str_starts_with($next, '//') || preg_match('/[\x00-\x20\x7F\\\\]/', $next)) {
++        return $fallback;
+     }
+-    return $fallback;
++    $base = base_url() . route_prefix();
++    // إن كان الرابط يحتوي مسبقاً على مجلد الموقع فلا نكرره
++    $path = ($base !== '' && strpos($next, $base . '/') === 0) ? substr($next, strlen($base)) : $next;
++    if ($pattern !== null && !preg_match($pattern, $path)) {
++        return $fallback;
++    }
++    return $base . $path;
+ }
+ 
+ // ====================================================================== الطلب والاستجابة
+@@ -184,13 +255,101 @@ function query(string $key, $default = '')
+     return is_string($v) ? trim($v) : $default;
+ }
+ 
++/**
++ * عنوان IP الزائر. ترويسة X-Forwarded-For يكتبها أي شخص، فلا نصدّقها إلا إذا جاء الطلب
++ * من خادم وسيط موثوق مذكور في config.php => app.trusted_proxies (مثل Cloudflare أو Nginx).
++ */
+ function client_ip(): string
+ {
+-    $fwd = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
+-    if ($fwd !== '') {
+-        return trim(explode(',', $fwd)[0]);
++    $remote = (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
++    $trusted = (array) config('app.trusted_proxies', []);
++    if ($trusted && !empty($_SERVER['HTTP_X_FORWARDED_FOR']) && ip_matches($remote, $trusted)) {
++        // من اليمين إلى اليسار: أول عنوان ليس خادماً وسيطاً موثوقاً هو الزائر
++        foreach (array_reverse(array_map('trim', explode(',', (string) $_SERVER['HTTP_X_FORWARDED_FOR']))) as $ip) {
++            if (!filter_var($ip, FILTER_VALIDATE_IP)) {
++                break;
++            }
++            if (!ip_matches($ip, $trusted)) {
++                return $ip;
++            }
++        }
++    }
++    return $remote;
++}
++
++/** هل العنوان ضمن القائمة؟ (عناوين مفردة أو نطاقات CIDR مثل 10.0.0.0/8 و 2400:cb00::/32) */
++function ip_matches(string $ip, array $list): bool
++{
++    if (!filter_var($ip, FILTER_VALIDATE_IP)) {
++        return false;
++    }
++    $bin = inet_pton($ip);
++    foreach ($list as $entry) {
++        $parts = explode('/', trim((string) $entry), 2);
++        if (!filter_var($parts[0], FILTER_VALIDATE_IP)) {
++            continue;
++        }
++        $net = inet_pton($parts[0]);
++        if (strlen($net) !== strlen($bin)) {
++            continue;
++        }
++        $bits = isset($parts[1]) ? max(0, min((int) $parts[1], strlen($bin) * 8)) : strlen($bin) * 8;
++        $bytes = intdiv($bits, 8);
++        $rest = $bits % 8;
++        if (substr($bin, 0, $bytes) !== substr($net, 0, $bytes)) {
++            continue;
++        }
++        if ($rest && ((ord($bin[$bytes]) ^ ord($net[$bytes])) & (0xFF << (8 - $rest)) & 0xFF)) {
++            continue;
++        }
++        return true;
++    }
++    return false;
++}
++
++/** هل الاتصال مشفّر (HTTPS)؟ */
++function is_https(): bool
++{
++    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
++        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
++}
++
++/**
++ * ترويسات الأمان لكل الصفحات (تعمل على Apache و Nginx و php -S، حتى بدون mod_headers).
++ * نفس الترويسات موجودة في .htaccess كخط دفاع ثانٍ.
++ */
++function send_security_headers(): void
++{
++    if (headers_sent()) {
++        return;
++    }
++    header_remove('X-Powered-By');
++    header('X-Content-Type-Options: nosniff');
++    header('Referrer-Policy: strict-origin-when-cross-origin');
++    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()');
++    // منع تضمين الموقع داخل إطار في موقع آخر (Clickjacking) — يمكن تعطيله بـ FRAME_OPTIONS=off
++    $frame = strtoupper((string) config('security.frame_options', 'SAMEORIGIN'));
++    $csp = "base-uri 'self'; object-src 'none'; form-action 'self'";
++    if (in_array($frame, ['DENY', 'SAMEORIGIN'], true)) {
++        header('X-Frame-Options: ' . $frame);
++        $csp .= '; frame-ancestors ' . ($frame === 'DENY' ? "'none'" : "'self'");
++    }
++    header('Content-Security-Policy: ' . $csp);
++    $hsts = (int) config('security.hsts_seconds', 0);
++    if ($hsts > 0 && is_https()) {
++        header('Strict-Transport-Security: max-age=' . $hsts . '; includeSubDomains');
+     }
+-    return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
++}
++
++/** سجل أحداث الأمان (دخول ناجح/فاشل، حظر مؤقت...) في storage/logs/security.log */
++function security_log(string $event, array $data = []): void
++{
++    $dir = STORAGE_PATH . '/logs';
++    if (!is_dir($dir) || !is_writable($dir)) {
++        return;
++    }
++    $line = json_encode(['time' => date('c'), 'event' => $event, 'ip' => client_ip()] + $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
++    @file_put_contents($dir . '/security.log', $line . "\n", FILE_APPEND | LOCK_EX);
+ }
+ 
+ function json_response($data, int $status = 200): void
+@@ -274,6 +433,27 @@ function verify_csrf(): bool
+     return is_string($token) && $token !== '' && !empty($_SESSION['_csrf']) && hash_equals($_SESSION['_csrf'], $token);
+ }
+ 
++/**
++ * رمز رابط تسجيل الخروج: بدونه يستطيع أي موقع آخر تسجيل خروج المستخدم بصورة <img src=".../logout/">.
++ * مشتق من رمز CSRF (لا نضع رمز CSRF نفسه في الرابط حتى لا يظهر في السجلات).
++ */
++function logout_token(): string
++{
++    return substr(hash_hmac('sha256', 'logout', csrf_token()), 0, 32);
++}
++
++function logout_url(string $routeName): string
++{
++    return url($routeName) . '?t=' . logout_token();
++}
++
++/** طلب تسجيل خروج صحيح؟ (POST محمي أصلاً برمز CSRF في index.php) */
++function verify_logout(): bool
++{
++    $t = $_GET['t'] ?? '';
++    return is_post() || (is_string($t) && hash_equals(logout_token(), $t));
++}
++
+ // ====================================================================== الرسائل (django.contrib.messages)
+ 
+ function flash(string $tag, string $message): void
+@@ -342,13 +522,16 @@ function require_login(): User
+     return $u;
+ }
+ 
+-/** مثل @staff_required في students/decorators.py */
++/**
++ * مثل @staff_required في students/decorators.py.
++ * الموظفون يدخلون من واجهة الإدارة الخاصة /admin/login/ وليس من فضاء الطالب.
++ */
+ function require_staff(): User
+ {
+     $u = Auth::user();
+     if (!$u) {
+-        flash('warning', 'يجب تسجيل الدخول أولاً');
+-        redirect(url('students:login') . '?next=' . rawurlencode(request_path()));
++        $next = request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING']);
++        redirect(url('admin:login') . '?next=' . rawurlencode($next));
+     }
+     if (!is_staff()) {
+         flash('error', 'ليس لديك صلاحية للوصول لهذه الصفحة. هذه الصفحة للإداريين فقط.');
+@@ -357,6 +540,59 @@ function require_staff(): User
+     return $u;
+ }
+ 
++/** المسارات المسموح الرجوع إليها بعد دخول الإدارة: /admin/... و /students/admin/... (مع بادئة اللغة) */
++const STAFF_NEXT_PATTERN = '#^/(admin|students/admin)/#';
++
++// ====================================================================== محاولات الدخول
++
++/**
++ * حدود محاولات الدخول الفاشلة خلال نافذة زمنية (افتراضياً 15 دقيقة):
++ * لكل عنوان IP (أي اسم مستخدم)، ولكل اسم مستخدم من نفس العنوان.
++ * مشتركة بين فضاء الطالب وواجهة الإدارة حتى لا يُضاعف المهاجم محاولاته بالتنقل بينهما.
++ */
++function login_throttle_keys(string $username): array
++{
++    $ip = client_ip();
++    return [
++        'login-ip:' . $ip                                     => (int) config('security.login_max_per_ip', 30),
++        'login-user:' . $ip . '|' . mb_strtolower(trim($username)) => (int) config('security.login_max_per_user', 5),
++    ];
++}
++
++/** عدد الثواني المتبقية قبل السماح بمحاولة جديدة (0 = مسموح) */
++function login_throttle_wait(string $username): int
++{
++    $window = (int) config('security.login_window', 900);
++    $wait = 0;
++    foreach (login_throttle_keys($username) as $key => $max) {
++        if ($max > 0) {
++            $wait = max($wait, RateLimit::retryAfter($key, $max, $window));
++        }
++    }
++    return $wait;
++}
++
++function login_throttle_hit(string $username): void
++{
++    $window = (int) config('security.login_window', 900);
++    foreach (array_keys(login_throttle_keys($username)) as $key) {
++        RateLimit::hit($key, $window);
++    }
++}
++
++/** بعد دخول ناجح: نمسح عداد اسم المستخدم (ويبقى عداد العنوان) */
++function login_throttle_clear(string $username): void
++{
++    $keys = array_keys(login_throttle_keys($username));
++    RateLimit::clear($keys[1]);
++}
++
++/** رسالة «محاولات كثيرة» مع المدة المتبقية بالدقائق */
++function too_many_attempts_message(int $seconds): string
++{
++    return 'محاولات كثيرة. يرجى المحاولة مجدداً بعد ' . max(1, (int) ceil($seconds / 60)) . ' دقيقة.';
++}
++
+ // ====================================================================== التواريخ
+ 
+ function to_datetime($value): ?DateTimeImmutable
+diff --git a/app/models/students.php b/app/models/students.php
+index 8ceb1ef..0c7105d 100644
+--- a/app/models/students.php
++++ b/app/models/students.php
+@@ -31,6 +31,12 @@ class User extends Model
+         return Auth::verifyPassword($plain, (string) ($this->attributes['password'] ?? ''));
+     }
+ 
++    /** حساب موظف أو مدير (يدخل من واجهة الإدارة /admin/login/ فقط) */
++    public function is_staff_account(): bool
++    {
++        return !empty($this->attributes['is_staff']) || !empty($this->attributes['is_superuser']);
++    }
++
+     public function student_profile(): ?StudentProfile
+     {
+         return StudentProfile::firstWhere('user_id = ?', [(int) $this->attributes['id']]);
+diff --git a/app/routes.php b/app/routes.php
+index 1648158..f0b7691 100644
+--- a/app/routes.php
++++ b/app/routes.php
+@@ -87,6 +87,7 @@ $router->get('/admin/', 'admin_index', 'admin:index');
+ $router->any('/admin/login/', 'admin_login', 'admin:login');
+ $router->get('/admin/logout/', 'admin_logout', 'admin:logout');
+ $router->any('/admin/password/', 'admin_password', 'admin:password');
++$router->any('/admin/recover/', 'admin_recover', 'admin:recover');            // نسيت كلمة مرور المدير؟
+ $router->any('/admin/{model}/', 'admin_list', 'admin:list');
+ $router->any('/admin/{model}/add/', 'admin_add', 'admin:add');
+ $router->any('/admin/{model}/{id:int}/', 'admin_edit', 'admin:edit');
+diff --git a/app/views/activities/activity_detail.php b/app/views/activities/activity_detail.php
+index f49523a..35087b5 100644
+--- a/app/views/activities/activity_detail.php
++++ b/app/views/activities/activity_detail.php
+@@ -127,10 +127,10 @@
+                 <div class="panel-body text-center">
+                     <p>شارك هذا النشاط مع الآخرين:</p>
+                     <div class="btn-group btn-group-justified">
+-                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(current_url()) ?>" target="_blank" class="btn btn-primary">
++                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(rawurlencode(current_url())) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                             <i class="fa fa-facebook"></i> Facebook
+                         </a>
+-                        <a href="https://twitter.com/intent/tweet?text=<?= e($activity['title']) ?>&url=<?= e(current_url()) ?>" target="_blank" class="btn btn-info">
++                        <a href="https://twitter.com/intent/tweet?text=<?= e(rawurlencode((string) $activity['title'])) ?>&url=<?= e(rawurlencode(current_url())) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-info">
+                             <i class="fa fa-twitter"></i> Twitter
+                         </a>
+                     </div>
+diff --git a/app/views/admin/layout.php b/app/views/admin/layout.php
+index 45c057a..f732c2e 100644
+--- a/app/views/admin/layout.php
++++ b/app/views/admin/layout.php
+@@ -6,9 +6,8 @@
+     <meta name="robots" content="noindex, nofollow">
+     <title><?php block('title'); ?>لوحة الإدارة<?php endblock(); ?> | مديرية الخدمات الجامعية سطيف</title>
+     <link rel="icon" href="<?= asset('images/logo.svg') ?>" type="image/svg+xml">
+-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rtl@3.4.0/dist/css/bootstrap-rtl.min.css">
+-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
++    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+     <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
+ </head>
+ <body class="admin-body">
+@@ -20,7 +19,7 @@
+         <a href="<?= e(url('students:admin_dashboard')) ?>"><i class="fa fa-dashboard"></i> <span class="hidden-xs">متابعة الطلبات</span></a>
+         <span class="admin-user"><i class="fa fa-user-circle"></i> <?= e(current_user()->display_name()) ?></span>
+         <a href="<?= e(url('admin:password')) ?>" title="تغيير كلمة المرور"><i class="fa fa-key"></i></a>
+-        <a href="<?= e(url('admin:logout')) ?>" title="تسجيل الخروج"><i class="fa fa-sign-out"></i></a>
++        <a href="<?= e(logout_url('admin:logout')) ?>" title="تسجيل الخروج"><i class="fa fa-sign-out"></i></a>
+     </div>
+ </nav>
+ <aside class="admin-sidebar">
+@@ -44,8 +43,8 @@
+     <?php endforeach; ?>
+     <?php block('content'); ?><?php endblock(); ?>
+ </main>
+-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+-<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
++<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
++<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+ <script src="<?= asset('js/admin.js') ?>"></script>
+ </body>
+ </html>
+diff --git a/app/views/admin/login.php b/app/views/admin/login.php
+new file mode 100644
+index 0000000..5cd99ff
+--- /dev/null
++++ b/app/views/admin/login.php
+@@ -0,0 +1,57 @@
++<!DOCTYPE html>
++<html lang="ar" dir="rtl">
++<head>
++    <meta charset="utf-8">
++    <meta name="viewport" content="width=device-width, initial-scale=1">
++    <meta name="robots" content="noindex, nofollow">
++    <title><?= e($page_title) ?> | مديرية الخدمات الجامعية سطيف</title>
++    <link rel="icon" href="<?= asset('images/logo.svg') ?>" type="image/svg+xml">
++    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
++    <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
++</head>
++<body class="admin-login-body">
++<main class="admin-login">
++    <div class="admin-login-card">
++        <div class="admin-login-head">
++            <img src="<?= asset('images/logo.svg') ?>" alt="">
++            <h1>لوحة الإدارة</h1>
++            <p>مديرية الخدمات الجامعية سطيف</p>
++        </div>
++
++        <?php foreach ($messages as $message): ?>
++            <div class="alert alert-<?= e(alert_class($message['tags'])) ?>" role="alert"><?= e($message['message']) ?></div>
++        <?php endforeach; ?>
++        <?php if ($error): ?>
++            <div class="alert alert-danger" role="alert"><i class="fa fa-exclamation-circle"></i> <?= e($error) ?></div>
++        <?php elseif ($next !== '' && !is_post()): ?>
++            <div class="alert alert-info" role="status"><i class="fa fa-info-circle"></i> سجّل الدخول بحساب موظف للمتابعة.</div>
++        <?php endif; ?>
++
++        <form method="post" novalidate>
++            <?= csrf_field() ?>
++            <div class="form-group <?= $form->errors('username') ? 'has-error' : '' ?>">
++                <label for="id_username"><i class="fa fa-user"></i> اسم المستخدم</label>
++                <?= $form->widget('username') ?>
++                <?php foreach ($form->errors('username') as $err): ?><span class="help-block"><?= e($err) ?></span><?php endforeach; ?>
++            </div>
++            <div class="form-group <?= $form->errors('password') ? 'has-error' : '' ?>">
++                <label for="id_password"><i class="fa fa-lock"></i> كلمة المرور</label>
++                <?= $form->widget('password') ?>
++                <?php foreach ($form->errors('password') as $err): ?><span class="help-block"><?= e($err) ?></span><?php endforeach; ?>
++            </div>
++            <button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-sign-in"></i> دخول</button>
++        </form>
++        <?php if (config('security.web_recovery', true)): ?>
++            <p class="admin-login-forgot"><a href="<?= e(url('admin:recover')) ?>"><i class="fa fa-key"></i> نسيت كلمة مرور المدير؟</a></p>
++        <?php endif; ?>
++
++        <p class="admin-login-note">
++            <i class="fa fa-shield"></i> هذه الواجهة مخصصة لموظفي المديرية فقط.
++            الطلبة يدخلون من <a href="<?= e(url('students:login')) ?>">فضاء الطالب</a>.
++        </p>
++    </div>
++    <a class="admin-login-back" href="<?= e(url('homepage:index')) ?>"><i class="fa fa-arrow-right"></i> العودة إلى الموقع</a>
++</main>
++</body>
++</html>
+diff --git a/app/views/admin/recover.php b/app/views/admin/recover.php
+new file mode 100644
+index 0000000..85388b3
+--- /dev/null
++++ b/app/views/admin/recover.php
+@@ -0,0 +1,109 @@
++<!DOCTYPE html>
++<html lang="ar" dir="rtl">
++<head>
++    <meta charset="utf-8">
++    <meta name="viewport" content="width=device-width, initial-scale=1">
++    <meta name="robots" content="noindex, nofollow">
++    <title><?= e($page_title) ?> | مديرية الخدمات الجامعية سطيف</title>
++    <link rel="icon" href="<?= asset('images/logo.svg') ?>" type="image/svg+xml">
++    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
++    <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
++</head>
++<body class="admin-login-body">
++<main class="admin-login admin-recover">
++    <div class="admin-login-card">
++        <div class="admin-login-head">
++            <img src="<?= asset('images/logo.svg') ?>" alt="">
++            <h1><i class="fa fa-key"></i> استعادة دخول المدير</h1>
++            <p>نسيت كلمة مرور المدير العام؟</p>
++        </div>
++
++        <?php if ($error): ?>
++            <div class="alert alert-danger" role="alert"><i class="fa fa-exclamation-circle"></i> <?= e($error) ?></div>
++        <?php endif; ?>
++
++        <?php if (!$verified): ?>
++            <p class="admin-recover-intro">أثبت أنك صاحب الموقع بإنشاء ملف على الخادم، ثم عيّن كلمة مرور جديدة.</p>
++            <ol class="admin-recover-steps">
++                <li>
++                    افتح مجلد الموقع على الخادم: <b>مدير الملفات</b> (File Manager) في cPanel،
++                    أو <b>مستكشف الملفات</b> في XAMPP، مثلاً:<br><code dir="ltr">C:\xampp\htdocs\dou-setif</code>
++                </li>
++                <li>
++                    ادخل المجلد <code dir="ltr">storage</code> (بجانب <code dir="ltr">config.php</code>)
++                    وأنشئ فيه ملفاً فارغاً بهذا الاسم بالضبط:
++                    <div class="admin-recover-file">
++                        <code dir="ltr" id="recover-file"><?= e($file_name) ?></code>
++                        <button type="button" class="btn btn-default btn-xs" data-copy="#recover-file"><i class="fa fa-copy"></i> نسخ</button>
++                    </div>
++                    <small class="text-muted">في Windows: زر الفأرة الأيمن ← جديد ← مستند نصي، ثم أعد تسميته بهذا الاسم.</small>
++                </li>
++                <li>ارجع إلى هذه الصفحة واضغط «تحقّق».</li>
++            </ol>
++            <form method="post" novalidate>
++                <?= csrf_field() ?>
++                <button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-check-circle"></i> تحقّق</button>
++            </form>
++            <p class="admin-login-note">
++                <i class="fa fa-shield"></i> الاسم صالح <?= (int) $minutes ?> دقيقة ولهذا المتصفح فقط. من لا يملك الوصول إلى ملفات الخادم
++                لا يستطيع إنشاء الملف، لذلك لا يستطيع غيرك استعمال هذه الصفحة.
++                <br>بديل من سطر الأوامر: <code dir="ltr">php database/tools/create_admin.php</code>
++            </p>
++        <?php else: ?>
++            <div class="alert alert-success" role="status"><i class="fa fa-check"></i> تم التحقق. عيّن كلمة المرور الجديدة.</div>
++            <form method="post" novalidate>
++                <?= csrf_field() ?>
++                <?php foreach (['username', 'password1', 'password2'] as $field): ?>
++                    <div class="form-group <?= $form->errors($field) ? 'has-error' : '' ?>">
++                        <label for="id_<?= $field ?>"><?= e($form->label($field)) ?></label>
++                        <?= $form->widget($field) ?>
++                        <?php foreach ($form->errors($field) as $err): ?><span class="help-block"><?= e($err) ?></span><?php endforeach; ?>
++                        <?php if ($field === 'username'): ?>
++                            <span class="help-block">
++                                <?php if ($supers): ?>
++                                    حسابات المدير العام الموجودة: <b dir="ltr"><?= e(implode('، ', $supers)) ?></b>.
++                                    اسم جديد يُنشئ مديراً عاماً جديداً.
++                                <?php else: ?>
++                                    لا يوجد مدير عام بعد: سيُنشأ حساب جديد بهذا الاسم.
++                                <?php endif; ?>
++                            </span>
++                        <?php elseif ($field === 'password1'): ?>
++                            <span class="help-block">8 أحرف على الأقل، ولا تكون أرقاماً فقط. يُنصح بحروف لاتينية وأرقام ورموز.</span>
++                        <?php endif; ?>
++                    </div>
++                <?php endforeach; ?>
++                <button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-save"></i> حفظ كلمة المرور</button>
++            </form>
++            <p class="admin-login-note"><i class="fa fa-info-circle"></i> بعد الحفظ يُحذف الملف تلقائياً، وتُغلق كل الجلسات المفتوحة لهذا الحساب.</p>
++        <?php endif; ?>
++
++        <p class="admin-login-note">
++            موظف ولست المدير العام؟ اطلب من المدير العام تعيين كلمة مرور جديدة لك من «المستخدمون» في لوحة الإدارة.
++        </p>
++    </div>
++    <a class="admin-login-back" href="<?= e(url('admin:login')) ?>"><i class="fa fa-arrow-right"></i> العودة إلى صفحة الدخول</a>
++</main>
++<script>
++document.querySelectorAll('[data-copy]').forEach(function (btn) {
++    btn.addEventListener('click', function () {
++        var el = document.querySelector(btn.getAttribute('data-copy'));
++        var select = function () {
++            var r = document.createRange();
++            r.selectNodeContents(el);
++            var s = window.getSelection();
++            s.removeAllRanges();
++            s.addRange(r);
++        };
++        if (navigator.clipboard && window.isSecureContext) {
++            navigator.clipboard.writeText(el.textContent).then(function () {
++                btn.innerHTML = '<i class="fa fa-check"></i> نُسخ';
++            }, select);
++        } else {
++            select();
++        }
++    });
++});
++</script>
++</body>
++</html>
+diff --git a/app/views/base/base.php b/app/views/base/base.php
+index 128f7bd..511e860 100644
+--- a/app/views/base/base.php
++++ b/app/views/base/base.php
+@@ -11,12 +11,11 @@
+     <link rel="icon" href="<?= asset('images/logo.svg') ?>" type="image/svg+xml">
+     <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
+     
+-    <!-- Bootstrap RTL CSS -->
+-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rtl@3.4.0/dist/css/bootstrap-rtl.min.css">
++    <!-- Bootstrap CSS -->
++    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+     
+     <!-- Font Awesome -->
+-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
++    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+     
+     <!-- Custom CSS الشامل للعربية -->
+     <style>
+@@ -276,10 +275,10 @@ setTimeout(function() {
+     <?php include view_path('base/footer'); ?>
+ 
+     <!-- jQuery -->
+-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
++    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+     
+     <!-- Bootstrap JS -->
+-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
++    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+     
+     <?php block('extra_js'); ?><?php endblock(); ?>
+ 
+diff --git a/app/views/base/navbar.php b/app/views/base/navbar.php
+index 226449b..c1ce081 100644
+--- a/app/views/base/navbar.php
++++ b/app/views/base/navbar.php
+@@ -80,7 +80,7 @@
+                 </li>
+ 
+                 <?php if (is_authenticated()): ?>
+-                    <?php if (!empty($user['is_staff'])): ?>
++                    <?php if (is_staff()): ?>
+                         <li class="dropdown">
+                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                                 <i class="fa fa-shield"></i> لوحة المشرف <span class="caret"></span>
+@@ -106,7 +106,7 @@
+                                  
+                                 <li class="divider"></li>
+                                 <?php endif; ?>
+-                                <li><a href="<?= e(url('students:logout')) ?>">
++                                <li><a href="<?= e(logout_url('students:logout')) ?>">
+                                     <i class="fa fa-sign-out"></i> تسجيل الخروج
+                                 </a></li>
+                             </ul>
+@@ -137,7 +137,7 @@
+                                  <i class="fa fa-id-card"></i> بطاقتي الرقمية
+                                  </a></li>
+                                 <li class="divider"></li>
+-                                <li><a href="<?= e(url('students:logout')) ?>">
++                                <li><a href="<?= e(logout_url('students:logout')) ?>">
+                                     <i class="fa fa-sign-out"></i> تسجيل الخروج
+                                 </a></li>
+                             </ul>
+diff --git a/app/views/contact/contact.php b/app/views/contact/contact.php
+index f967ce7..535a698 100644
+--- a/app/views/contact/contact.php
++++ b/app/views/contact/contact.php
+@@ -223,6 +223,10 @@
+                 
+                 <form method="post" action="<?= e(url('contact:contact')) ?>">
+                     <?= csrf_field() ?>
++                    <div class="contact-hp" aria-hidden="true" style="position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden;">
++                        <label for="contact_website">Website</label>
++                        <input type="text" name="contact_website" id="contact_website" value="" tabindex="-1" autocomplete="off">
++                    </div>
+                     
+                     <!-- الاسم الكامل -->
+                     <div class="form-group">
+diff --git a/app/views/departements/departement_detail.php b/app/views/departements/departement_detail.php
+index de5b1bc..fe5fc32 100644
+--- a/app/views/departements/departement_detail.php
++++ b/app/views/departements/departement_detail.php
+@@ -164,7 +164,7 @@
+                     <div class="info-item">
+                         <i class="fa fa-globe"></i>
+                         <strong>الموقع الإلكتروني:</strong><br>
+-                        <a href="<?= e($departement['website']) ?>" target="_blank" rel="noopener noreferrer">
++                        <a href="<?= e(safe_url($departement['website'])) ?>" target="_blank" rel="noopener noreferrer">
+                             زيارة الموقع <i class="fa fa-external-link"></i>
+                         </a>
+                     </div>
+diff --git a/app/views/news/news_detail.php b/app/views/news/news_detail.php
+index 873fed7..aa7baa3 100644
+--- a/app/views/news/news_detail.php
++++ b/app/views/news/news_detail.php
+@@ -83,16 +83,16 @@
+             <!-- أزرار المشاركة -->
+             <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+                 <h4><i class="fa fa-share-alt"></i> شارك الخبر:</h4>
+-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(current_url()) ?>" 
+-                   target="_blank" class="btn btn-primary" style="margin: 5px;">
++                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(rawurlencode(current_url())) ?>" 
++                   target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="margin: 5px;">
+                     <i class="fa fa-facebook"></i> Facebook
+                 </a>
+-                <a href="https://twitter.com/intent/tweet?url=<?= e(current_url()) ?>&text=<?= e($news['title']) ?>" 
+-                   target="_blank" class="btn btn-info" style="margin: 5px;">
++                <a href="https://twitter.com/intent/tweet?url=<?= e(rawurlencode(current_url())) ?>&text=<?= e(rawurlencode((string) $news['title'])) ?>" 
++                   target="_blank" rel="noopener noreferrer" class="btn btn-info" style="margin: 5px;">
+                     <i class="fa fa-twitter"></i> Twitter
+                 </a>
+-                <a href="https://wa.me/?text=<?= e($news['title']) ?> <?= e(current_url()) ?>" 
+-                   target="_blank" class="btn btn-success" style="margin: 5px;">
++                <a href="https://wa.me/?text=<?= e(rawurlencode($news['title'] . ' ' . current_url())) ?>" 
++                   target="_blank" rel="noopener noreferrer" class="btn btn-success" style="margin: 5px;">
+                     <i class="fa fa-whatsapp"></i> WhatsApp
+                 </a>
+             </div>
+diff --git a/app/views/students/admin/dashboard.php b/app/views/students/admin/dashboard.php
+index 441169d..4b6caf1 100644
+--- a/app/views/students/admin/dashboard.php
++++ b/app/views/students/admin/dashboard.php
+@@ -377,7 +377,7 @@
+      Chart.js - مكتبة الرسوم البيانية
+      CDN = Content Delivery Network (نجلبها من الإنترنت)
+      ======================================== -->
+-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
++<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
+ 
+ <script>
+ // ========================================
+diff --git a/app/views/students/application_print.php b/app/views/students/application_print.php
+index 7a55a5d..1e516df 100644
+--- a/app/views/students/application_print.php
++++ b/app/views/students/application_print.php
+@@ -245,7 +245,7 @@
+     
+     <!-- Barcode -->
+     <div class="barcode-section">
+-        <img src="https://bwipjs-api.metafloor.com/?bcid=code128&text=<?= e($application['application_number']) ?>&scale=3&height=12&includetext=true" 
++        <img src="<?= e(barcode_data_uri($application['application_number'], 3, 100, true)) ?>" 
+              alt="Barcode" 
+              onerror="this.style.display='none';">
+     </div>
+diff --git a/app/views/students/create_application.php b/app/views/students/create_application.php
+index cac1c47..5f927fa 100644
+--- a/app/views/students/create_application.php
++++ b/app/views/students/create_application.php
+@@ -231,8 +231,8 @@
+ const applicationTypes = {
+     <?php foreach ($application_types as $app_type): ?>
+     '<?= e($app_type['id']) ?>': {
+-        name: '<?= e($app_type['name']) ?>',
+-        documents: `<?= escapejs($app_type['required_documents']) ?>`
++        name: <?= json_js((string) $app_type['name']) ?>,
++        documents: <?= json_js((string) $app_type['required_documents']) ?>
+     },
+     <?php endforeach; ?>
+ };
+diff --git a/app/views/students/print_all.php b/app/views/students/print_all.php
+index 935c693..b4a90f7 100644
+--- a/app/views/students/print_all.php
++++ b/app/views/students/print_all.php
+@@ -333,7 +333,7 @@
+         
+         <!-- Barcode -->
+         <div class="barcode-section">
+-            <img src="https://bwipjs-api.metafloor.com/?bcid=code128&text=<?= e($app['application_number']) ?>&scale=3&height=12&includetext=true" 
++            <img src="<?= e(barcode_data_uri($app['application_number'], 3, 100, true)) ?>" 
+                  alt="Barcode" 
+                  onerror="this.style.display='none';">
+         </div>
+diff --git a/app/views/students/profile/student_card.php b/app/views/students/profile/student_card.php
+index 3134eb9..19d3ee8 100644
+--- a/app/views/students/profile/student_card.php
++++ b/app/views/students/profile/student_card.php
+@@ -6,7 +6,7 @@
+     <title><?= e($page_title) ?></title>
+     
+     <!-- Font Awesome -->
+-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
++    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" rel="stylesheet">
+     
+     <style>
+         @page {
+@@ -281,7 +281,7 @@
+             
+             <!-- Barcode -->
+             <div class="barcode-container">
+-                <img src="https://bwipjs-api.metafloor.com/?bcid=code128&text=<?= e($student['registration_number']) ?>&scale=2&height=10&includetext=false" 
++                <img src="<?= e(barcode_data_uri($student['registration_number'], 2, 56)) ?>" 
+                      alt="Barcode" 
+                      onerror="this.style.display='none';">
+             </div>
+diff --git a/assets/css/admin.css b/assets/css/admin.css
+index ff03685..62f5aca 100644
+--- a/assets/css/admin.css
++++ b/assets/css/admin.css
+@@ -80,3 +80,33 @@ body.admin-body { background: #f4f6f9; font-family: Tahoma, "Segoe UI", Arial, s
+ /* مربعات الاختيار: ملف bootstrap-rtl لا يُحمَّل، فنضع المربع على اليمين بأنفسنا */
+ .checkbox label { padding-left: 0; padding-right: 20px; }
+ .checkbox input[type=checkbox] { margin-left: 0; margin-right: -20px; }
++
++/* ===================== صفحة دخول الإدارة /admin/login/ ===================== */
++body.admin-login-body {
++    min-height: 100vh; margin: 0; padding: 20px 15px; display: flex; align-items: center; justify-content: center;
++    background: linear-gradient(135deg, #2c3e50 0%, #34495e 55%, #3d566e 100%);
++    font-family: Tahoma, "Segoe UI", Arial, sans-serif;
++}
++.admin-login { width: 100%; max-width: 400px; }
++.admin-login-card { background: #fff; border-radius: 10px; padding: 30px 28px 22px; box-shadow: 0 12px 35px rgba(0,0,0,.3); border-top: 5px solid #8cc040; }
++.admin-login-head { text-align: center; margin-bottom: 22px; }
++.admin-login-head img { width: 64px; height: 64px; }
++.admin-login-head h1 { font-size: 22px; margin: 12px 0 4px; color: #2c3e50; font-weight: bold; }
++.admin-login-head p { color: #7f8c8d; margin: 0; }
++.admin-login-card label { color: #2c3e50; }
++.admin-login-card .form-control { height: 42px; }
++.admin-login-card .alert { font-size: 13px; }
++.admin-login-note { margin: 18px 0 0; font-size: 12px; color: #7f8c8d; text-align: center; line-height: 1.8; }
++.admin-login-back { display: block; text-align: center; margin-top: 16px; color: #ecf0f1; }
++.admin-login-back:hover, .admin-login-back:focus { color: #8cc040; text-decoration: none; }
++.admin-login-note a { white-space: nowrap; }
++.admin-login-forgot { text-align: center; margin: 12px 0 0; font-size: 13px; }
++/* استعادة دخول المدير */
++.admin-recover { max-width: 470px; }
++.admin-recover-intro { color: #2c3e50; }
++.admin-recover-steps { padding-right: 20px; margin-bottom: 18px; color: #34495e; line-height: 1.9; }
++.admin-recover-steps li { margin-bottom: 10px; }
++.admin-recover-steps code { white-space: nowrap; direction: ltr; unicode-bidi: embed; }
++.admin-recover-file { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; padding: 8px 10px; background: #f4f8ec; border: 1px dashed #8cc040; border-radius: 6px; }
++.admin-recover-file code { font-size: 15px; background: none; color: #2c3e50; padding: 0; direction: ltr; unicode-bidi: embed; }
++
+diff --git a/config.php b/config.php
+index 043250e..a9b0b4a 100644
+--- a/config.php
++++ b/config.php
+@@ -27,8 +27,8 @@ return [
+         'name'     => 'مديرية الخدمات الجامعية سطيف',
+         'timezone' => 'Africa/Algiers',
+ 
+-        // عرض تفاصيل الأخطاء: null = تلقائي (مفعّل على localhost فقط)، true أو false لفرض الإعداد
+-        // ⚠️ ضع false في الاستضافة الحقيقية
++        // عرض تفاصيل الأخطاء: null = تلقائي (مفعّل فقط عند فتح الموقع من نفس الجهاز عبر http://localhost)
++        // true أو false لفرض الإعداد. ⚠️ ضع false في الاستضافة الحقيقية (أو APP_DEBUG=0)
+         'debug' => $env('APP_DEBUG') === null ? null : $env('APP_DEBUG') === '1',
+ 
+         // رابط الموقع الأساسي: اتركه null ليُكتشف تلقائياً (يعمل حتى داخل مجلد فرعي مثل localhost/dou-setif)
+@@ -39,6 +39,29 @@ return [
+ 
+         // تسجيل زيارات الموقع (إحصائيات الزوار)
+         'track_visits' => true,
++
++        // خوادم وسيطة موثوقة (Cloudflare، Nginx أمام PHP...) — فقط منها نقبل ترويسة X-Forwarded-For
++        // لمعرفة عنوان الزائر الحقيقي. اتركها فارغة إن لم يكن هناك خادم وسيط (XAMPP، استضافة عادية).
++        // مثال: ['127.0.0.1', '10.0.0.0/8'] أو متغير البيئة TRUSTED_PROXIES=127.0.0.1,10.0.0.0/8
++        'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', (string) $env('TRUSTED_PROXIES', ''))))),
++    ],
++
++    // الحماية (انظر SECURITY.md)
++    'security' => [
++        // محاولات الدخول الفاشلة المسموحة خلال login_window ثانية (فضاء الطالب + لوحة الإدارة)
++        'login_window'       => 900, // 15 دقيقة
++        'login_max_per_user' => 5,   // لنفس اسم المستخدم من نفس العنوان
++        'login_max_per_ip'   => 30,  // من نفس العنوان لكل الحسابات (أكبر لأن طلبة الإقامة قد يتشاركون عنواناً واحداً)
++        // محاولات إنشاء حساب طالب من نفس العنوان في الساعة، ورسائل «اتصل بنا» كل 10 دقائق
++        'register_max'       => 20,
++        'contact_max'        => 5,
++        // منع عرض الموقع داخل إطار في موقع آخر: SAMEORIGIN (الافتراضي) أو DENY أو off
++        'frame_options'      => $env('FRAME_OPTIONS', 'SAMEORIGIN'),
++        // HSTS: بعد تفعيل HTTPS نهائياً ضع مثلاً 31536000 (سنة) ليفرض المتصفح HTTPS دائماً
++        'hsts_seconds'       => (int) $env('HSTS_SECONDS', '0'),
++        // «نسيت كلمة مرور المدير؟» من المتصفح (/admin/recover/): تتطلب إنشاء ملف داخل storage/ لإثبات ملكية الموقع.
++        // ضع false لتعطيلها (تبقى أداة سطر الأوامر database/tools/create_admin.php)
++        'web_recovery'       => filter_var($env('WEB_RECOVERY', '1'), FILTER_VALIDATE_BOOLEAN),
+     ],
+ 
+     'uploads' => [
+diff --git a/database/data.sql b/database/data.sql
+index 8dc640f..f569053 100644
+--- a/database/data.sql
++++ b/database/data.sql
+@@ -8,11 +8,15 @@ SET time_zone = '+01:00';
+ SET FOREIGN_KEY_CHECKS = 0;
+ 
+ -- auth.user => users (4)
++-- ⚠️ أمان: كلمات المرور هنا غير قابلة للاستعمال عمداً ("!..."). المستودع عام، وتشفير كلمات المرور
++--    القديمة لا يجب أن يُنشر أبداً. بعد الاستيراد عيّن كلمات مرور جديدة:
++--      php database/tools/create_admin.php miloudsellam "كلمة-مرور-قوية"     (المدير العام)
++--      php database/tools/set_password.php hicham41 "كلمة-مرور-قوية"         (أي حساب آخر)
+ INSERT INTO `users` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`) VALUES
+-(1, 'pbkdf2_sha256$1000000$K7D21YbA8pIvQklfgTCrax$Ss6y7F2zUxiTvUGH3tgu+ZuwJIQXHgNnG72Vjc2o8Kw=', '2025-11-23 10:58:54', 1, 'miloudsellam', '', '', '', 1, 1, '2025-11-05 15:20:02'),
+-(2, 'pbkdf2_sha256$1000000$BvZTEoqyrHLaQKqzNWX0dh$lU1edCJ15PL2j8/zQX5YqMPO9XC+XGA4gTm/FXYy3hc=', '2025-11-24 13:32:50', 0, '1234566', '', '', 'ahmed@student.univ-setif.dz', 0, 1, '2025-11-20 11:44:28'),
+-(3, 'pbkdf2_sha256$1000000$W2xoNA4YRgx3SBc275ECWX$xhnXiBXarM6hhjXE+DtsKHjHTT0O1zjmUvy5dSnSVTU=', '2025-11-20 11:47:37', 0, '20232023', 'أحمد', 'بن جدي', 'maniche@gmail.com', 0, 1, '2025-11-20 11:47:37'),
+-(4, 'pbkdf2_sha256$1000000$NMq6ElCuleL0QO06YrjcyY$qNrgjwK8Qz0P9jr1+prpT7/wC9l62O+XaOrpQkc24OQ=', '2025-11-24 10:58:44', 0, 'hicham41', 'هشام', 'محمد', 'hicham@gmail.com', 1, 1, '2025-11-20 13:07:38');
++(1, '!unusable:set-a-new-password-with-database/tools/set_password.php', '2025-11-23 10:58:54', 1, 'miloudsellam', '', '', '', 1, 1, '2025-11-05 15:20:02'),
++(2, '!unusable:set-a-new-password-with-database/tools/set_password.php', '2025-11-24 13:32:50', 0, '1234566', '', '', 'ahmed@student.univ-setif.dz', 0, 1, '2025-11-20 11:44:28'),
++(3, '!unusable:set-a-new-password-with-database/tools/set_password.php', '2025-11-20 11:47:37', 0, '20232023', 'أحمد', 'بن جدي', 'maniche@gmail.com', 0, 1, '2025-11-20 11:47:37'),
++(4, '!unusable:set-a-new-password-with-database/tools/set_password.php', '2025-11-24 10:58:44', 0, 'hicham41', 'هشام', 'محمد', 'hicham@gmail.com', 1, 1, '2025-11-20 13:07:38');
+ 
+ -- homepage.slider => sliders (2)
+ INSERT INTO `sliders` (`id`, `title`, `subtitle`, `image`, `link`, `button_text`, `order`, `is_active`, `created_at`) VALUES
+diff --git a/database/tools/create_admin.php b/database/tools/create_admin.php
+index 35c7b21..7715ab6 100644
+--- a/database/tools/create_admin.php
++++ b/database/tools/create_admin.php
+@@ -46,4 +46,4 @@ if ($user) {
+     User::create(['username' => $username, 'password' => Auth::hashPassword($password), 'is_staff' => 1, 'is_superuser' => 1, 'is_active' => 1]);
+     echo "✔ تم إنشاء المدير العام \"$username\".\n";
+ }
+-echo "ادخل إلى لوحة الإدارة من: /admin/\n";
++echo "ادخل إلى لوحة الإدارة من واجهتها الخاصة: /admin/login/\n";
+diff --git a/database/tools/django_json_to_sql.php b/database/tools/django_json_to_sql.php
+index a4bed4e..fdd35f3 100644
+--- a/database/tools/django_json_to_sql.php
++++ b/database/tools/django_json_to_sql.php
+@@ -12,6 +12,7 @@
+  *
+  * - التواريخ تُحوَّل من UTC إلى توقيت الجزائر (Africa/Algiers).
+  * - كلمات مرور Django تبقى كما هي، والموقع الجديد يتعرف عليها ويحدّثها تلقائياً عند أول دخول.
++ * - ⚠️ الملف الناتج يحتوي تشفير كلمات المرور: لا ترفعه أبداً إلى مستودع Git عام أو أي مكان مكشوف.
+  */
+ 
+ if (PHP_SAPI !== 'cli') {
+diff --git a/database/tools/set_password.php b/database/tools/set_password.php
+new file mode 100644
+index 0000000..db8269f
+--- /dev/null
++++ b/database/tools/set_password.php
+@@ -0,0 +1,46 @@
++<?php
++/**
++ * تعيين كلمة مرور جديدة لأي حساب موجود (طالب أو موظف أو مدير) دون تغيير صلاحياته.
++ * (لإنشاء مدير عام جديد استعمل create_admin.php)
++ *
++ *   php database/tools/set_password.php                      (يسألك عن الاسم وكلمة المرور)
++ *   php database/tools/set_password.php hicham41 "MyPass#2025"
++ *
++ * في XAMPP على Windows (من داخل مجلد المشروع):
++ *   C:\xampp\php\php.exe database\tools\set_password.php hicham41 "MyPass#2025"
++ *
++ * تغيير كلمة المرور يُغلق تلقائياً كل الجلسات المفتوحة لهذا الحساب.
++ */
++if (PHP_SAPI !== 'cli') {
++    exit('CLI only');
++}
++require dirname(__DIR__, 2) . '/app/bootstrap.php';
++
++function ask(string $q, bool $hidden = false): string
++{
++    echo $q;
++    if ($hidden && DIRECTORY_SEPARATOR === '/') {
++        system('stty -echo');
++        $v = trim((string) fgets(STDIN));
++        system('stty echo');
++        echo PHP_EOL;
++        return $v;
++    }
++    return trim((string) fgets(STDIN));
++}
++
++$username = $argv[1] ?? ask('اسم المستخدم: ');
++$user = User::firstWhere('username = ?', [$username]);
++if (!$user) {
++    fwrite(STDERR, "لا يوجد حساب باسم \"$username\".\n");
++    exit(1);
++}
++$password = $argv[2] ?? ask('كلمة المرور الجديدة: ', true);
++if ($errors = password_errors($password, $username)) {
++    fwrite(STDERR, implode("\n", $errors) . "\n");
++    exit(1);
++}
++$user->update(['password' => Auth::hashPassword($password)]);
++$role = $user['is_superuser'] ? 'مدير عام' : ($user['is_staff'] ? 'موظف' : 'طالب');
++echo "✔ تم تعيين كلمة مرور جديدة للحساب \"$username\" ($role).\n";
++echo $user->is_staff_account() ? "الدخول من واجهة الإدارة: /admin/login/\n" : "الدخول من فضاء الطالب: /students/login/\n";
+diff --git a/storage/ratelimit/.gitkeep b/storage/ratelimit/.gitkeep
+new file mode 100644
+index 0000000..e69de29

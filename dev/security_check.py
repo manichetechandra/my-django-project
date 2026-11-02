@@ -2,6 +2,7 @@
 """اختبارات الأمان للنسخة 2.0 (كل ثغرة أُصلحت لها اختبار يتأكد أنها لا تعود).
 
   python3 dev/security_check.py [http://127.0.0.1:8002] [/tmp/site2]
+  DB_NAME=dou_setif101 python3 dev/security_check.py http://127.0.0.1:8101 /tmp/site101 --v1     (الإصدار 1.0.1)
 
 يحتاج الموقع التجريبي (bash dev/demo-site.sh) — يعدّل بعض السجلات ثم يعيدها كما كانت،
 ويمسح عدادات محاولات الدخول (storage/ratelimit) قبل وبعد الاختبارات.
@@ -15,8 +16,11 @@ import sys
 import time
 import urllib.parse
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8002'
-SITE = sys.argv[2] if len(sys.argv) > 2 else '/tmp/site2'
+ARGS = [a for a in sys.argv[1:] if not a.startswith('--')]
+V1 = '--v1' in sys.argv  # الإصدار 1.0.1: عربي فقط (بلا بادئات اللغة /fr/ و /ar/)
+BASE = ARGS[0] if len(ARGS) > 0 else 'http://127.0.0.1:8002'
+SITE = ARGS[1] if len(ARGS) > 1 else '/tmp/site2'
+SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'php-v1' if V1 else 'php')
 PHP = os.environ.get('PHP_BIN', '/tmp/tools/bin/php')
 DB_NAME = os.environ.get('DB_NAME', 'dou_setif2')
 U = urllib.parse.urlparse(BASE)
@@ -121,10 +125,16 @@ check('noindex' in b and 'autocomplete="current-password"' in b and 'remember_me
 # ----------------------------------------------------------------------------------------------
 print('2) إعادة التوجيه لمواقع خارجية (Open Redirect)')
 # (بلا نقطة في المسار: خادم php -S يغيّر SCRIPT_NAME للمسارات التي تشبه ملفاً مثل evil.com)
-for path in ('/ar//evil/', '/ar/%5Cevil/', '/ar/%09/evil/', '/ar/%2F%2Fevil/', '/ar/%0d%0aSet-Cookie:x=1/'):
+if not V1:  # بادئة اللغة /ar/ (النسخة 2.0)
+    for path in ('/ar//evil/', '/ar/%5Cevil/', '/ar/%09/evil/', '/ar/%2F%2Fevil/', '/ar/%0d%0aSet-Cookie:x=1/'):
+        s, h, _ = Client().req('GET', path)
+        loc = location(h)
+        check(s == 301 and not re.match(r'^(/|\\)[/\\\t]', loc) and not loc.startswith('http'), f'{path} ← {loc!r}')
+for path in ('//evil', '/%5Cevil', '/%09/evil', '/%2F%2Fevil', '//news'):
     s, h, _ = Client().req('GET', path)
     loc = location(h)
-    check(s == 301 and not re.match(r'^(/|\\)[/\\\t]', loc) and not loc.startswith('http'), f'{path} ← {loc!r}')
+    # 200 (parse_url يقرأ //evil كاسم خادم فيعرض الرئيسية) أو 404 أو 301 داخلي — المهم ألا يخرج إلى موقع آخر
+    check(s in (200, 301, 404) and not re.match(r'^(/|\\)[/\\\t]', loc) and not loc.startswith('http'), f'{path} ← {s} {loc!r}')
 for nxt in ('//evil.example/', '/\\evil.example/', '/\t/evil.example/', 'https://evil.example/', '/%09/evil.example'):
     c = Client()
     t = c.token('/students/login/')
@@ -253,7 +263,7 @@ check(cdn and all('integrity="sha' in tag and 'crossorigin="anonymous"' in tag f
 check('bootstrap-rtl@3.4.0' not in b, 'لا رابط لحزمة bootstrap-rtl@3.4.0 غير الموجودة')
 check(php("echo json_encode(Auth::verifyPassword('x', '!unusable:set-a-new-password-with-database/tools/set_password.php'));") == 'false',
       'كلمات المرور في data.sql غير قابلة للاستعمال')
-data_sql = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'php', 'database', 'data.sql'), encoding='utf-8').read()
+data_sql = open(os.path.join(SRC, 'database', 'data.sql'), encoding='utf-8').read()
 check('pbkdf2_sha256$' not in data_sql, 'data.sql بلا تشفير كلمات مرور Django')
 
 # ----------------------------------------------------------------------------------------------

@@ -127,10 +127,10 @@
                 <div class="panel-body text-center">
                     <p>شارك هذا النشاط مع الآخرين:</p>
                     <div class="btn-group btn-group-justified">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(current_url()) ?>" target="_blank" class="btn btn-primary">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(rawurlencode(current_url())) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
                             <i class="fa fa-facebook"></i> Facebook
                         </a>
-                        <a href="https://twitter.com/intent/tweet?text=<?= e($activity['title']) ?>&url=<?= e(current_url()) ?>" target="_blank" class="btn btn-info">
+                        <a href="https://twitter.com/intent/tweet?text=<?= e(rawurlencode((string) $activity['title'])) ?>&url=<?= e(rawurlencode(current_url())) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-info">
                             <i class="fa fa-twitter"></i> Twitter
                         </a>
                     </div>

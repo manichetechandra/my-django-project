@@ -83,16 +83,16 @@
             <!-- أزرار المشاركة -->
             <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
                 <h4><i class="fa fa-share-alt"></i> شارك الخبر:</h4>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(current_url()) ?>" 
-                   target="_blank" class="btn btn-primary" style="margin: 5px;">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= e(rawurlencode(current_url())) ?>" 
+                   target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="margin: 5px;">
                     <i class="fa fa-facebook"></i> Facebook
                 </a>
-                <a href="https://twitter.com/intent/tweet?url=<?= e(current_url()) ?>&text=<?= e($news['title']) ?>" 
-                   target="_blank" class="btn btn-info" style="margin: 5px;">
+                <a href="https://twitter.com/intent/tweet?url=<?= e(rawurlencode(current_url())) ?>&text=<?= e(rawurlencode((string) $news['title'])) ?>" 
+                   target="_blank" rel="noopener noreferrer" class="btn btn-info" style="margin: 5px;">
                     <i class="fa fa-twitter"></i> Twitter
                 </a>
-                <a href="https://wa.me/?text=<?= e($news['title']) ?> <?= e(current_url()) ?>" 
-                   target="_blank" class="btn btn-success" style="margin: 5px;">
+                <a href="https://wa.me/?text=<?= e(rawurlencode($news['title'] . ' ' . current_url())) ?>" 
+                   target="_blank" rel="noopener noreferrer" class="btn btn-success" style="margin: 5px;">
                     <i class="fa fa-whatsapp"></i> WhatsApp
                 </a>
             </div>

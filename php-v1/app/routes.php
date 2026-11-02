@@ -87,6 +87,7 @@ $router->get('/admin/', 'admin_index', 'admin:index');
 $router->any('/admin/login/', 'admin_login', 'admin:login');
 $router->get('/admin/logout/', 'admin_logout', 'admin:logout');
 $router->any('/admin/password/', 'admin_password', 'admin:password');
+$router->any('/admin/recover/', 'admin_recover', 'admin:recover');            // نسيت كلمة مرور المدير؟
 $router->any('/admin/{model}/', 'admin_list', 'admin:list');
 $router->any('/admin/{model}/add/', 'admin_add', 'admin:add');
 $router->any('/admin/{model}/{id:int}/', 'admin_edit', 'admin:edit');

@@ -80,3 +80,33 @@ body.admin-body { background: #f4f6f9; font-family: Tahoma, "Segoe UI", Arial, s
 /* مربعات الاختيار: ملف bootstrap-rtl لا يُحمَّل، فنضع المربع على اليمين بأنفسنا */
 .checkbox label { padding-left: 0; padding-right: 20px; }
 .checkbox input[type=checkbox] { margin-left: 0; margin-right: -20px; }
+
+/* ===================== صفحة دخول الإدارة /admin/login/ ===================== */
+body.admin-login-body {
+    min-height: 100vh; margin: 0; padding: 20px 15px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 55%, #3d566e 100%);
+    font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+}
+.admin-login { width: 100%; max-width: 400px; }
+.admin-login-card { background: #fff; border-radius: 10px; padding: 30px 28px 22px; box-shadow: 0 12px 35px rgba(0,0,0,.3); border-top: 5px solid #8cc040; }
+.admin-login-head { text-align: center; margin-bottom: 22px; }
+.admin-login-head img { width: 64px; height: 64px; }
+.admin-login-head h1 { font-size: 22px; margin: 12px 0 4px; color: #2c3e50; font-weight: bold; }
+.admin-login-head p { color: #7f8c8d; margin: 0; }
+.admin-login-card label { color: #2c3e50; }
+.admin-login-card .form-control { height: 42px; }
+.admin-login-card .alert { font-size: 13px; }
+.admin-login-note { margin: 18px 0 0; font-size: 12px; color: #7f8c8d; text-align: center; line-height: 1.8; }
+.admin-login-back { display: block; text-align: center; margin-top: 16px; color: #ecf0f1; }
+.admin-login-back:hover, .admin-login-back:focus { color: #8cc040; text-decoration: none; }
+.admin-login-note a { white-space: nowrap; }
+.admin-login-forgot { text-align: center; margin: 12px 0 0; font-size: 13px; }
+/* استعادة دخول المدير */
+.admin-recover { max-width: 470px; }
+.admin-recover-intro { color: #2c3e50; }
+.admin-recover-steps { padding-right: 20px; margin-bottom: 18px; color: #34495e; line-height: 1.9; }
+.admin-recover-steps li { margin-bottom: 10px; }
+.admin-recover-steps code { white-space: nowrap; direction: ltr; unicode-bidi: embed; }
+.admin-recover-file { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; padding: 8px 10px; background: #f4f8ec; border: 1px dashed #8cc040; border-radius: 6px; }
+.admin-recover-file code { font-size: 15px; background: none; color: #2c3e50; padding: 0; direction: ltr; unicode-bidi: embed; }
+

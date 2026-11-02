@@ -164,7 +164,7 @@
                     <div class="info-item">
                         <i class="fa fa-globe"></i>
                         <strong>الموقع الإلكتروني:</strong><br>
-                        <a href="<?= e($departement['website']) ?>" target="_blank" rel="noopener noreferrer">
+                        <a href="<?= e(safe_url($departement['website'])) ?>" target="_blank" rel="noopener noreferrer">
                             زيارة الموقع <i class="fa fa-external-link"></i>
                         </a>
                     </div>

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # فحص لوحة الإدارة (الدخول من واجهة الإدارة الخاصة /admin/login/): لكل قسم في admin_config صفحة القائمة + الإضافة + تعديل أول سجل ترجع 200 دون أخطاء PHP
 #   bash dev/admin_smoke.sh [http://127.0.0.1:8002] [/tmp/site2]
+#   DB_NAME=dou_setif101 bash dev/admin_smoke.sh http://127.0.0.1:8101 /tmp/site101     (الإصدار 1.0.1)
 B=${1:-http://127.0.0.1:8002}
 SITE=${2:-/tmp/site2}
 PHP=${PHP_BIN:-/tmp/tools/bin/php}
@@ -17,7 +18,9 @@ foreach (admin_resources() as $key => $r) {
     $id = DB::value("SELECT id FROM `" . $r["model"]::table() . "` ORDER BY id LIMIT 1");
     if ($id) echo "/admin/$key/$id/\n";
 }
-echo "/admin/\n/admin/translate-all/\n/admin/password/\n";')
+echo "/admin/\n/admin/password/\n";
+// الترجمة الجماعية في النسخة 2.0 فقط
+if (is_file("app/views/admin/translate_all.php")) echo "/admin/translate-all/\n";')
 fail=0; n=0
 for u in $URLS; do
   code=$(curl -s -b "$JAR" -o /tmp/admin_smoke.html -w "%{http_code}" "$B$u")

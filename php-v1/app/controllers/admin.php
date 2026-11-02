@@ -32,13 +32,13 @@ function admin_resource(string $key): array
     return $r;
 }
 
-/** يتطلب أن يكون المستخدم موظفاً — مع صفحة دخول خاصة إن لم يكن مسجلاً */
+/** يتطلب أن يكون المستخدم موظفاً — مع صفحة دخول خاصة بالإدارة إن لم يكن مسجلاً */
 function admin_guard(): User
 {
     never_cache();
     $u = current_user();
     if (!$u) {
-        redirect(url('students:login') . '?next=' . rawurlencode(request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING'])));
+        redirect(url('admin:login') . '?next=' . rawurlencode(request_path() . (empty($_SERVER['QUERY_STRING']) ? '' : '?' . $_SERVER['QUERY_STRING'])));
     }
     if (!is_staff()) {
         abort(403, 'لوحة الإدارة مخصصة للموظفين فقط.');
@@ -89,19 +89,65 @@ function admin_index(): void
     ]);
 }
 
+/**
+ * واجهة دخول خاصة بالموظفين والمدير (منفصلة عن فضاء الطالب):
+ * تقبل حسابات الموظفين فقط، بلا «تذكرني»، مع حد لمحاولات الدخول الفاشلة.
+ */
 function admin_login(): void
 {
+    never_cache();
+    $next = $_GET['next'] ?? '';
     if (is_staff()) {
-        redirect_to('admin:index');
+        redirect(safe_next($next, url('admin:index'), STAFF_NEXT_PATTERN));
     }
-    redirect(url('students:login') . '?next=' . rawurlencode('/admin/'));
+    $form = new Form([
+        'username' => ['type' => 'text', 'label' => 'اسم المستخدم', 'max_length' => 150,
+            'attrs' => FC + ['autocomplete' => 'username', 'autofocus' => 'autofocus', 'dir' => 'auto', 'autocapitalize' => 'none', 'spellcheck' => 'false']],
+        'password' => ['type' => 'password', 'label' => 'كلمة المرور', 'attrs' => FC + ['autocomplete' => 'current-password']],
+    ], is_post() ? $_POST : null);
+    $status = 200;
+    $error = '';
+    if (is_post() && $form->is_valid()) {
+        $d = $form->cleaned;
+        $wait = login_throttle_wait($d['username']);
+        if ($wait > 0) {
+            header('Retry-After: ' . $wait);
+            $error = 'محاولات دخول فاشلة كثيرة. يرجى المحاولة مجدداً بعد ' . max(1, (int) ceil($wait / 60)) . ' دقيقة.';
+            security_log('login_throttled', ['form' => 'admin', 'username' => $d['username']]);
+            $status = 429;
+        } else {
+            $user = Auth::attempt($d['username'], $d['password'], fn(User $u) => $u->is_staff_account());
+            if ($user) {
+                login_throttle_clear($d['username']);
+                Auth::login($user); // جلسة تنتهي بإغلاق المتصفح
+                security_log('admin_login', ['username' => $user['username']]);
+                flash('success', 'مرحباً ' . $user->display_name() . '، تم تسجيل الدخول إلى لوحة الإدارة.');
+                redirect(safe_next($next, url('admin:index'), STAFF_NEXT_PATTERN));
+            }
+            login_throttle_hit($d['username']);
+            security_log('login_failed', ['form' => 'admin', 'username' => $d['username']]);
+            // رسالة واحدة لكل الحالات (كلمة مرور خاطئة، حساب غير موجود، حساب طالب) — مثل Django admin
+            $error = 'يرجى إدخال اسم المستخدم وكلمة المرور الصحيحين لحساب موظف. لاحظ أن الحقلين قد يكونان حساسين لحالة الأحرف.';
+        }
+    }
+    render('admin/login', [
+        'form'       => $form,
+        'error'      => $error,
+        'next'       => is_string($next) ? $next : '',
+        'page_title' => 'دخول لوحة الإدارة',
+    ], $status);
 }
 
 function admin_logout(): void
 {
+    never_cache();
+    if (is_authenticated() && !verify_logout()) {
+        // رابط بلا رمز صحيح (مثلاً من موقع آخر): لا نسجّل الخروج
+        redirect_to(is_staff() ? 'admin:index' : 'homepage:index');
+    }
     Auth::logout();
     flash('success', 'تم تسجيل الخروج بنجاح');
-    redirect_to('students:login');
+    redirect_to('admin:login');
 }
 
 function admin_password(): void
@@ -130,6 +176,118 @@ function admin_password(): void
         redirect_to('admin:index');
     }
     admin_render('password', ['page_title' => 'تغيير كلمة المرور', 'form' => $form]);
+}
+
+// ====================================================================== نسيت كلمة مرور المدير؟
+
+const ADMIN_RECOVER_TTL = 1800; // صلاحية رمز الاستعادة: 30 دقيقة
+
+/**
+ * استعادة دخول المدير العام من المتصفح، بدون سطر أوامر (مفيدة في الاستضافة المشتركة بلا Terminal).
+ *
+ * إثبات أنك صاحب الموقع: الصفحة تعطي اسم ملف عشوائياً، فتنشئه داخل المجلد storage/
+ * (مدير الملفات في cPanel، أو مستكشف Windows في XAMPP)، ثم تعيّن كلمة المرور الجديدة.
+ * من لا يملك الوصول إلى ملفات الخادم لا يستطيع إنشاء الملف. الرمز مرتبط بجلسة المتصفح وصالح 30 دقيقة،
+ * والملف يُحذف بعد النجاح. لتعطيلها: 'web_recovery' => false في config.php (يبقى create_admin.php).
+ */
+function admin_recover(): void
+{
+    never_cache();
+    if (!config('security.web_recovery', true)) {
+        abort(404);
+    }
+    if (is_staff()) {
+        redirect_to('admin:password'); // متصل فعلاً: تغيير كلمة المرور العادي
+    }
+    $rec = $_SESSION['_recover'] ?? null;
+    if (!is_array($rec) || !isset($rec['code'], $rec['t']) || $rec['t'] < time() - ADMIN_RECOVER_TTL) {
+        $rec = ['code' => bin2hex(random_bytes(6)), 't' => time(), 'ok' => false];
+        $_SESSION['_recover'] = $rec;
+    }
+    $fileName = 'recover-' . $rec['code'] . '.txt';
+    $hasFile = admin_recover_files($rec['code']) !== [];
+    $error = '';
+    $form = null;
+    $supers = [];
+
+    if (!($rec['ok'] && $hasFile)) {
+        // الخطوة 1: إنشاء الملف ثم «تحقّق»
+        if ($rec['ok']) {
+            $_SESSION['_recover']['ok'] = false; // حُذف الملف بعد التحقق: نعيد الخطوة 1
+        }
+        if (is_post()) {
+            if ($hasFile) {
+                $_SESSION['_recover']['ok'] = true;
+                security_log('admin_recover_verified', []);
+                redirect_to('admin:recover');
+            }
+            $error = 'لم يُعثر على الملف ' . $fileName . ' داخل المجلد storage. تأكد من الاسم والمكان ثم اضغط «تحقّق» مرة أخرى.';
+        }
+    } else {
+        // الخطوة 2: كلمة المرور الجديدة
+        $supers = array_column(DB::all('SELECT username FROM users WHERE is_superuser = 1 AND is_active = 1 ORDER BY id'), 'username');
+        $form = new Form([
+            'username'  => ['type' => 'text', 'label' => 'اسم المستخدم (المدير العام)', 'max_length' => 150,
+                'attrs' => FC + ['autocomplete' => 'username', 'dir' => 'ltr', 'autocapitalize' => 'none', 'spellcheck' => 'false']],
+            'password1' => ['type' => 'password', 'label' => 'كلمة المرور الجديدة', 'attrs' => FC + ['autocomplete' => 'new-password', 'autofocus' => 'autofocus']],
+            'password2' => ['type' => 'password', 'label' => 'تأكيد كلمة المرور الجديدة', 'attrs' => FC + ['autocomplete' => 'new-password']],
+        ], is_post() ? $_POST : null, null, ['username' => $supers[0] ?? '']);
+        $form->clean = function (Form $f) {
+            if (!preg_match('/^[\w.@+-]+$/u', $f->cleaned['username'])) {
+                $f->add_error('username', 'أحرف وأرقام و @/./+/-/_ فقط');
+            }
+            if ($f->cleaned['password1'] !== $f->cleaned['password2']) {
+                $f->add_error('password2', 'كلمتا المرور غير متطابقتين');
+            }
+            foreach (password_errors($f->cleaned['password1'], $f->cleaned['username']) as $err) {
+                $f->add_error('password1', $err);
+            }
+        };
+        if (is_post() && $form->is_valid()) {
+            $d = $form->cleaned;
+            $data = ['password' => Auth::hashPassword($d['password1']), 'is_staff' => 1, 'is_superuser' => 1, 'is_active' => 1];
+            $user = User::firstWhere('username = ?', [$d['username']]);
+            $user ? $user->update($data) : User::create(['username' => $d['username']] + $data);
+            $left = [];
+            foreach (admin_recover_files() as $f) {
+                if (!@unlink(STORAGE_PATH . '/' . $f)) {
+                    $left[] = $f;
+                }
+            }
+            unset($_SESSION['_recover']);
+            session_regenerate_id(true);
+            login_throttle_clear($d['username']);
+            security_log('admin_recover', ['username' => $d['username'], 'created' => !$user]);
+            flash('success', 'تم تعيين كلمة المرور الجديدة للمدير العام «' . $d['username'] . '». سجّل الدخول الآن.'
+                . ($left ? ' احذف يدوياً من المجلد storage الملف: ' . implode('، ', $left) : ''));
+            redirect_to('admin:login');
+        }
+    }
+    render('admin/recover', [
+        'file_name'  => $fileName,
+        'verified'   => $form !== null,
+        'form'       => $form,
+        'supers'     => $supers,
+        'error'      => $error,
+        'minutes'    => max(1, (int) ceil(($rec['t'] + ADMIN_RECOVER_TTL - time()) / 60)),
+        'page_title' => 'استعادة دخول المدير',
+    ]);
+}
+
+/** ملفات الاستعادة في storage/ (لرمز معيّن أو كلها). يقبل الاسم بلا امتداد أو بامتداد مكرر مثل .txt.txt (Windows يخفي الامتدادات) */
+function admin_recover_files(string $code = ''): array
+{
+    $found = [];
+    foreach (scandir(STORAGE_PATH) ?: [] as $name) {
+        $lower = strtolower($name);
+        $match = $code === ''
+            ? str_starts_with($lower, 'recover-')
+            : preg_match('/^recover-' . preg_quote($code, '/') . '(\.[a-z0-9]{1,5}){0,3}$/', $lower) === 1;
+        if ($match && is_file(STORAGE_PATH . '/' . $name)) {
+            $found[] = $name;
+        }
+    }
+    return $found;
 }
 
 // ====================================================================== قائمة السجلات
@@ -507,8 +665,14 @@ function admin_collect_form(array $r, ?Model $obj): array
                 }
                 break;
             case 'url':
-                if (!filter_var($v, FILTER_VALIDATE_URL)) {
+                // FILTER_VALIDATE_URL وحده يقبل javascript://... فنشترط http(s)
+                if (!filter_var($v, FILTER_VALIDATE_URL) || !in_array(url_scheme($v), ['http', 'https'], true)) {
                     $errors[$f] = 'أدخل رابطاً صالحاً يبدأ بـ http:// أو https://';
+                }
+                break;
+            case 'link':
+                if (!is_allowed_link($v)) {
+                    $errors[$f] = 'أدخل رابطاً داخلياً يبدأ بـ / (مثل /news/) أو رابطاً كاملاً يبدأ بـ https://';
                 }
                 break;
             case 'int':
@@ -869,6 +1033,9 @@ function admin_input(array $r, string $f, array $spec, $value, bool $readonly, ?
         case 'email':
         case 'url':
             return '<input type="' . $type . '" name="' . $name . '" id="' . $id . '" class="form-control" dir="ltr" value="' . e($val) . '"' . $reqAttr . $dis . '>';
+        case 'link':
+            return '<input type="text" name="' . $name . '" id="' . $id . '" class="form-control" dir="ltr" value="' . e($val) . '"'
+                . (isset($spec['max']) ? ' maxlength="' . (int) $spec['max'] . '"' : '') . $reqAttr . $dis . '>';
         default:
             return '<input type="text" name="' . $name . '" id="' . $id . '" class="form-control" value="' . e($val) . '"'
                 . (isset($spec['max']) ? ' maxlength="' . (int) $spec['max'] . '"' : '') . $reqAttr . $dis . '>';

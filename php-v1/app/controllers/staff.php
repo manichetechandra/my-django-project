@@ -4,6 +4,18 @@
  */
 
 /** بناء شرط الفلترة المشترك بين القائمة والتصدير */
+/**
+ * خلية CSV آمنة: Excel ينفّذ الخلايا التي تبدأ بـ = + - @ كمعادلات (CSV/Formula Injection)،
+ * والطالب يكتب اسمه وتفاصيل طلبه بنفسه، فنضيف ' قبلها لتُعرض كنص.
+ */
+function csv_safe($value)
+{
+    if (is_string($value) && $value !== '' && strpbrk($value[0], "=+-@\t\r") !== false) {
+        return "'" . $value;
+    }
+    return $value;
+}
+
 function staff_applications_filter(): array
 {
     $where = '1';
@@ -286,7 +298,7 @@ function staff_export_applications_excel(): void
         fwrite($out, "\xEF\xBB\xBF");
         fputcsv($out, $headers);
         foreach ($rows as $row) {
-            fputcsv($out, $row);
+            fputcsv($out, array_map('csv_safe', $row));
         }
         fputcsv($out, []);
         fputcsv($out, ['الإجمالي:', count($rows)]);

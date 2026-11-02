@@ -223,6 +223,10 @@
                 
                 <form method="post" action="<?= e(url('contact:contact')) ?>">
                     <?= csrf_field() ?>
+                    <div class="contact-hp" aria-hidden="true" style="position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden;">
+                        <label for="contact_website">Website</label>
+                        <input type="text" name="contact_website" id="contact_website" value="" tabindex="-1" autocomplete="off">
+                    </div>
                     
                     <!-- الاسم الكامل -->
                     <div class="form-group">

@@ -25,11 +25,16 @@ final class Auth
         return self::$user;
     }
 
-    /** التحقق من اسم المستخدم وكلمة المرور (مثل authenticate) */
-    public static function attempt(string $username, string $password): ?User
+    /**
+     * التحقق من اسم المستخدم وكلمة المرور (مثل authenticate).
+     * $allowed (اختياري): من يحق له الدخول من هذه الواجهة، مثلاً الموظفون فقط في /admin/login/.
+     * الحساب غير المسموح يُعامل كأنه غير موجود (نفس الرسالة ونفس الوقت تقريباً)
+     * فلا تكشف الواجهة نوع الحساب ولا صحة كلمة المرور.
+     */
+    public static function attempt(string $username, string $password, ?callable $allowed = null): ?User
     {
         $u = User::firstWhere('username = ?', [$username]);
-        if (!$u) {
+        if (!$u || ($allowed !== null && !$allowed($u))) {
             // نفس الوقت تقريباً لمنع تخمين أسماء المستخدمين
             password_verify($password, '$2y$10$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG');
             return null;
@@ -46,7 +51,9 @@ final class Auth
 
     public static function login(User $u, bool $remember = false): void
     {
+        // معرّف جلسة جديد ورمز CSRF جديد (منع تثبيت الجلسة Session Fixation)
         session_regenerate_id(true);
+        unset($_SESSION['_csrf']);
         $_SESSION['_auth_user_id'] = (int) $u['id'];
         $_SESSION['_auth_hash'] = self::sessionHash($u);
         $u->update(['last_login' => now()]);
@@ -73,6 +80,8 @@ final class Auth
     /** بعد تغيير كلمة المرور: إبقاء المستخدم متصلاً (update_session_auth_hash) */
     public static function refreshSession(User $u): void
     {
+        // الجلسات الأخرى (بالهاش القديم) تُغلق تلقائياً في user()، والجلسة الحالية تأخذ معرّفاً جديداً
+        session_regenerate_id(true);
         $_SESSION['_auth_hash'] = self::sessionHash($u);
         self::$user = $u;
     }

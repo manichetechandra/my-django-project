@@ -377,7 +377,7 @@
      Chart.js - مكتبة الرسوم البيانية
      CDN = Content Delivery Network (نجلبها من الإنترنت)
      ======================================== -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
 
 <script>
 // ========================================
