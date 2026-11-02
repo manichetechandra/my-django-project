@@ -97,6 +97,7 @@ const PAGES = [
   ['register', '/students/register/'],
   ['login', '/students/login/'],
   ['admin-login', '{abs:/admin/login/}'],
+  ['admin-recover', '{abs:/admin/recover/}'],
   ['404', '/no-such-page/'],
   ['st-dashboard', '/students/dashboard/', STUDENT],
   ['st-create', '/students/applications/create/', STUDENT],

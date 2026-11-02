@@ -3,6 +3,7 @@ storage/sessions/*
 storage/logs/*
 storage/private/*
 storage/ratelimit/*
+storage/recover-*
 !storage/sessions/.gitkeep
 !storage/logs/.gitkeep
 !storage/private/.gitkeep

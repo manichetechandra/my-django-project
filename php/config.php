@@ -59,6 +59,9 @@ return [
         'frame_options'      => $env('FRAME_OPTIONS', 'SAMEORIGIN'),
         // HSTS: بعد تفعيل HTTPS نهائياً ضع مثلاً 31536000 (سنة) ليفرض المتصفح HTTPS دائماً
         'hsts_seconds'       => (int) $env('HSTS_SECONDS', '0'),
+        // «نسيت كلمة مرور المدير؟» من المتصفح (/admin/recover/): تتطلب إنشاء ملف داخل storage/ لإثبات ملكية الموقع.
+        // ضع false لتعطيلها (تبقى أداة سطر الأوامر database/tools/create_admin.php)
+        'web_recovery'       => filter_var($env('WEB_RECOVERY', '1'), FILTER_VALIDATE_BOOLEAN),
     ],
 
     'uploads' => [

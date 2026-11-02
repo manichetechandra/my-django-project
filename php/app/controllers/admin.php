@@ -180,6 +180,119 @@ function admin_password(): void
     admin_render('password', ['page_title' => 'تغيير كلمة المرور', 'form' => $form]);
 }
 
+// ====================================================================== نسيت كلمة مرور المدير؟
+
+const ADMIN_RECOVER_TTL = 1800; // صلاحية رمز الاستعادة: 30 دقيقة
+
+/**
+ * استعادة دخول المدير العام من المتصفح، بدون سطر أوامر (مفيدة في الاستضافة المشتركة بلا Terminal).
+ *
+ * إثبات أنك صاحب الموقع: الصفحة تعطي اسم ملف عشوائياً، فتنشئه داخل المجلد storage/
+ * (مدير الملفات في cPanel، أو مستكشف Windows في XAMPP)، ثم تعيّن كلمة المرور الجديدة.
+ * من لا يملك الوصول إلى ملفات الخادم لا يستطيع إنشاء الملف. الرمز مرتبط بجلسة المتصفح وصالح 30 دقيقة،
+ * والملف يُحذف بعد النجاح. لتعطيلها: 'web_recovery' => false في config.php (يبقى create_admin.php).
+ */
+function admin_recover(): void
+{
+    set_lang(default_lang());
+    never_cache();
+    if (!config('security.web_recovery', true)) {
+        abort(404);
+    }
+    if (is_staff()) {
+        redirect_to('admin:password'); // متصل فعلاً: تغيير كلمة المرور العادي
+    }
+    $rec = $_SESSION['_recover'] ?? null;
+    if (!is_array($rec) || !isset($rec['code'], $rec['t']) || $rec['t'] < time() - ADMIN_RECOVER_TTL) {
+        $rec = ['code' => bin2hex(random_bytes(6)), 't' => time(), 'ok' => false];
+        $_SESSION['_recover'] = $rec;
+    }
+    $fileName = 'recover-' . $rec['code'] . '.txt';
+    $hasFile = admin_recover_files($rec['code']) !== [];
+    $error = '';
+    $form = null;
+    $supers = [];
+
+    if (!($rec['ok'] && $hasFile)) {
+        // الخطوة 1: إنشاء الملف ثم «تحقّق»
+        if ($rec['ok']) {
+            $_SESSION['_recover']['ok'] = false; // حُذف الملف بعد التحقق: نعيد الخطوة 1
+        }
+        if (is_post()) {
+            if ($hasFile) {
+                $_SESSION['_recover']['ok'] = true;
+                security_log('admin_recover_verified', []);
+                redirect_to('admin:recover');
+            }
+            $error = 'لم يُعثر على الملف ' . $fileName . ' داخل المجلد storage. تأكد من الاسم والمكان ثم اضغط «تحقّق» مرة أخرى.';
+        }
+    } else {
+        // الخطوة 2: كلمة المرور الجديدة
+        $supers = array_column(DB::all('SELECT username FROM users WHERE is_superuser = 1 AND is_active = 1 ORDER BY id'), 'username');
+        $form = new Form([
+            'username'  => ['type' => 'text', 'label' => 'اسم المستخدم (المدير العام)', 'max_length' => 150,
+                'attrs' => FC + ['autocomplete' => 'username', 'dir' => 'ltr', 'autocapitalize' => 'none', 'spellcheck' => 'false']],
+            'password1' => ['type' => 'password', 'label' => 'كلمة المرور الجديدة', 'attrs' => FC + ['autocomplete' => 'new-password', 'autofocus' => 'autofocus']],
+            'password2' => ['type' => 'password', 'label' => 'تأكيد كلمة المرور الجديدة', 'attrs' => FC + ['autocomplete' => 'new-password']],
+        ], is_post() ? $_POST : null, null, ['username' => $supers[0] ?? '']);
+        $form->clean = function (Form $f) {
+            if (!preg_match('/^[\w.@+-]+$/u', $f->cleaned['username'])) {
+                $f->add_error('username', 'أحرف وأرقام و @/./+/-/_ فقط');
+            }
+            if ($f->cleaned['password1'] !== $f->cleaned['password2']) {
+                $f->add_error('password2', 'كلمتا المرور غير متطابقتين');
+            }
+            foreach (password_errors($f->cleaned['password1'], $f->cleaned['username']) as $err) {
+                $f->add_error('password1', $err);
+            }
+        };
+        if (is_post() && $form->is_valid()) {
+            $d = $form->cleaned;
+            $data = ['password' => Auth::hashPassword($d['password1']), 'is_staff' => 1, 'is_superuser' => 1, 'is_active' => 1];
+            $user = User::firstWhere('username = ?', [$d['username']]);
+            $user ? $user->update($data) : User::create(['username' => $d['username']] + $data);
+            $left = [];
+            foreach (admin_recover_files() as $f) {
+                if (!@unlink(STORAGE_PATH . '/' . $f)) {
+                    $left[] = $f;
+                }
+            }
+            unset($_SESSION['_recover']);
+            session_regenerate_id(true);
+            login_throttle_clear($d['username']);
+            security_log('admin_recover', ['username' => $d['username'], 'created' => !$user]);
+            flash('success', 'تم تعيين كلمة المرور الجديدة للمدير العام «' . $d['username'] . '». سجّل الدخول الآن.'
+                . ($left ? ' احذف يدوياً من المجلد storage الملف: ' . implode('، ', $left) : ''));
+            redirect_to('admin:login');
+        }
+    }
+    render('admin/recover', [
+        'file_name'  => $fileName,
+        'verified'   => $form !== null,
+        'form'       => $form,
+        'supers'     => $supers,
+        'error'      => $error,
+        'minutes'    => max(1, (int) ceil(($rec['t'] + ADMIN_RECOVER_TTL - time()) / 60)),
+        'page_title' => 'استعادة دخول المدير',
+    ]);
+}
+
+/** ملفات الاستعادة في storage/ (لرمز معيّن أو كلها). يقبل الاسم بلا امتداد أو بامتداد مكرر مثل .txt.txt (Windows يخفي الامتدادات) */
+function admin_recover_files(string $code = ''): array
+{
+    $found = [];
+    foreach (scandir(STORAGE_PATH) ?: [] as $name) {
+        $lower = strtolower($name);
+        $match = $code === ''
+            ? str_starts_with($lower, 'recover-')
+            : preg_match('/^recover-' . preg_quote($code, '/') . '(\.[a-z0-9]{1,5}){0,3}$/', $lower) === 1;
+        if ($match && is_file(STORAGE_PATH . '/' . $name)) {
+            $found[] = $name;
+        }
+    }
+    return $found;
+}
+
 // ====================================================================== قائمة السجلات
 
 function admin_list(string $key): void

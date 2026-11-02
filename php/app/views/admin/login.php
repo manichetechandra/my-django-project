@@ -42,6 +42,9 @@
             </div>
             <button type="submit" class="btn btn-success btn-lg btn-block"><i class="fa fa-sign-in"></i> دخول</button>
         </form>
+        <?php if (config('security.web_recovery', true)): ?>
+            <p class="admin-login-forgot"><a href="<?= e(url('admin:recover')) ?>"><i class="fa fa-key"></i> نسيت كلمة مرور المدير؟</a></p>
+        <?php endif; ?>
 
         <p class="admin-login-note">
             <i class="fa fa-shield"></i> هذه الواجهة مخصصة لموظفي المديرية فقط.

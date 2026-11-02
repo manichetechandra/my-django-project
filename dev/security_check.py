@@ -256,6 +256,50 @@ check(php("echo json_encode(Auth::verifyPassword('x', '!unusable:set-a-new-passw
 data_sql = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'php', 'database', 'data.sql'), encoding='utf-8').read()
 check('pbkdf2_sha256$' not in data_sql, 'data.sql بلا تشفير كلمات مرور Django')
 
+# ----------------------------------------------------------------------------------------------
+print('9) «نسيت كلمة مرور المدير؟» من المتصفح (/admin/recover/)')
+
+
+def recover_page(c):
+    _s, _h, b = c.req('GET', '/admin/recover/')
+    m = re.search(r'id="recover-file">(recover-[0-9a-f]{12}\.txt)<', b)
+    t = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', b)
+    return (m.group(1) if m else ''), (t.group(1) if t else ''), b
+
+
+STORAGE = os.path.join(SITE, 'storage')
+c = Client()
+fname, t, b = recover_page(c)
+check(fname != '', f'الصفحة تعطي اسم ملف عشوائياً ({fname})')
+s, h, b = c.req('POST', '/admin/recover/', {'csrfmiddlewaretoken': t, 'username': ADMIN[0], 'password1': 'Hacked#2026x', 'password2': 'Hacked#2026x'})
+check('لم يُعثر' in b and 'name="password1"' not in b, 'بدون الملف: لا نموذج ولا تغيير لكلمة المرور')
+other = Client()
+f2, _t2, _b2 = recover_page(other)
+open(os.path.join(STORAGE, f2), 'w').close()
+s, h, b = c.req('POST', '/admin/recover/', {'csrfmiddlewaretoken': t})
+check('لم يُعثر' in b, 'ملف أنشأه زائر آخر لرمزه لا يصلح لهذه الجلسة')
+os.remove(os.path.join(STORAGE, f2))
+open(os.path.join(STORAGE, fname + '.txt'), 'w').close()  # Windows يضيف .txt مرة ثانية إن كانت الامتدادات مخفية
+s, h, _b = c.req('POST', '/admin/recover/', {'csrfmiddlewaretoken': t})
+_s, _h, b = c.req('GET', '/admin/recover/')
+check(s == 302 and 'name="password1"' in b and f'value="{ADMIN[0]}"' in b, 'مع الملف (حتى باسم .txt.txt): نموذج كلمة المرور واسم المدير الحالي')
+t = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', b).group(1)
+s, h, b = c.req('POST', '/admin/recover/', {'csrfmiddlewaretoken': t, 'username': ADMIN[0], 'password1': '12345678', 'password2': '12345678'})
+check(s == 200 and 'أرقام' in b, 'كلمة مرور ضعيفة تُرفض')
+s, h, b = c.req('POST', '/admin/recover/', {'csrfmiddlewaretoken': t, 'username': ADMIN[0], 'password1': 'Recovered#2026', 'password2': 'Recovered#2026'})
+check(s == 302 and location(h) == '/admin/login/' and not glob.glob(os.path.join(STORAGE, 'recover-*')), 'الحفظ ← صفحة الدخول، والملف حُذف')
+s, h, _b = Client().login('/admin/login/', ADMIN[0], 'Recovered#2026')
+check(s == 302, 'الدخول بكلمة المرور الجديدة')
+s, h, _b = Client().login('/admin/login/', *ADMIN)
+check(s == 200, 'كلمة المرور القديمة لم تعد تعمل')
+php("DB::update('users', ['password' => Auth::hashPassword(" + repr(ADMIN[1]) + ")], 'username = :u', ['u' => " + repr(ADMIN[0]) + "]);")
+s, h, _b = Client().login('/admin/login/', *ADMIN)
+check(s == 302, '  (إرجاع كلمة مرور المدير التجريبية)')
+c = Client()
+c.login('/admin/login/', *STAFF)
+s, h, _b = c.req('GET', '/admin/recover/')
+check(s == 302 and location(h) == '/admin/password/', 'المتصل فعلاً يُحوَّل إلى «تغيير كلمة المرور» العادي')
+
 clear_ratelimit()
 print('\n' + ('✓ كل اختبارات الأمان نجحت' if not failures else f'✗ {failures} اختبار فشل'))
 sys.exit(1 if failures else 0)

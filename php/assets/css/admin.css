@@ -118,3 +118,13 @@ body.admin-login-body {
 .admin-login-back { display: block; text-align: center; margin-top: 16px; color: #ecf0f1; }
 .admin-login-back:hover, .admin-login-back:focus { color: #8cc040; text-decoration: none; }
 .admin-login-note a { white-space: nowrap; }
+.admin-login-forgot { text-align: center; margin: 12px 0 0; font-size: 13px; }
+/* استعادة دخول المدير */
+.admin-recover { max-width: 470px; }
+.admin-recover-intro { color: #2c3e50; }
+.admin-recover-steps { padding-right: 20px; margin-bottom: 18px; color: #34495e; line-height: 1.9; }
+.admin-recover-steps li { margin-bottom: 10px; }
+.admin-recover-steps code { white-space: nowrap; direction: ltr; unicode-bidi: embed; }
+.admin-recover-file { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; padding: 8px 10px; background: #f4f8ec; border: 1px dashed #8cc040; border-radius: 6px; }
+.admin-recover-file code { font-size: 15px; background: none; color: #2c3e50; padding: 0; direction: ltr; unicode-bidi: embed; }
+
