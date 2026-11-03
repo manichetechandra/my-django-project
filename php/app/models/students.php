@@ -6,7 +6,7 @@
 class User extends Model
 {
     protected static string $table = 'users';
-    protected static array $booleans = ['is_staff', 'is_superuser', 'is_active'];
+    protected static array $booleans = ['is_staff', 'is_superuser', 'is_active', 'can_recruit'];
     protected static array $defaults = ['email' => '', 'first_name' => '', 'last_name' => '', 'is_staff' => 0, 'is_superuser' => 0, 'is_active' => 1];
     protected static array $createdFields = ['date_joined'];
 

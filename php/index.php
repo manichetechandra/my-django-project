@@ -33,6 +33,14 @@ if (preg_match('#^/' . default_lang() . '(/.*)?$#s', $path, $m)) {
     redirect(base_url() . route_prefix() . redirect_path($m[1] ?? '/') . $qs, 301);
 }
 
+// بيانات أكبر من post_max_size: يحذف PHP كل الحقول والملفات (ويفشل رمز CSRF) — نشرح السبب بدل صفحة خطأ غامضة
+if ($method === 'POST' && !$_POST && !$_FILES && ($sent = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0)) > 0
+    && ($max = ini_bytes((string) ini_get('post_max_size'))) > 0 && $sent > $max) {
+    flash('error', __('حجم البيانات المرسلة ({sent} ميغابايت) أكبر من الحد المسموح به في الخادم ({max} ميغابايت). قلّل حجم الملفات ثم أعد المحاولة.',
+        ['sent' => round($sent / 1048576, 1), 'max' => round($max / 1048576, 1)]));
+    redirect(base_url() . route_prefix() . redirect_path(lang_prefix() . $path) . $qs);
+}
+
 // حماية CSRF لكل طلبات POST (مثل CsrfViewMiddleware)
 if ($method === 'POST' && !verify_csrf()) {
     if (is_ajax() || str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) {

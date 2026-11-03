@@ -5,6 +5,10 @@
 B=${1:-http://127.0.0.1:8002}
 LANGS=${LANGS-"/fr /en"}
 PAGES="/ /director-word/ /organization/ /history/ /news/ /news/sarf-al-minha/ /activities/ /activities/dawrat-korat-al-qadam/ /departements/ /departements/maslahat-al-minah/ /cities/ /cities/debaghine/ /services/ /services/type/housing/ /services/naql-jamii/ /contact/ /downloads/ /downloads/category/scholarship_forms/ /faq/ /faq/3/ /search/?q=%D8%A7%D9%84%D8%A5%D9%82%D8%A7%D9%85%D8%A9 /search/?q=bourse /students/register/ /students/login/ /no-such-page/"
+# قسم المسابقات (النسخة 2.0 فقط — الإصدار 1.0.1 بلا مسابقات)
+if [ "$(curl -s -o /dev/null -w '%{http_code}' "$B/competitions/")" = 200 ]; then
+  PAGES="$PAGES /competitions/ /competitions/?tab=closed /competitions/track/ /competitions/msbk-aal-ass-lshhd-ltothyf-mtsrfyn-dryyn-omlhkyn-dryyn/ /competitions/msbk-aal-ass-lshhd-ltothyf-mtsrfyn-dryyn-omlhkyn-dryyn/apply/"
+fi
 fail=0
 for L in "" $LANGS; do
   for p in $PAGES; do

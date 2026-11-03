@@ -31,12 +31,15 @@ require APP_PATH . '/core/Upload.php';
 require APP_PATH . '/core/Translator.php';
 require APP_PATH . '/core/XlsxWriter.php';
 require APP_PATH . '/core/Barcode.php';
+require APP_PATH . '/core/Crypto.php';
+require APP_PATH . '/core/PdfGuard.php';
 require APP_PATH . '/helpers.php';
 require APP_PATH . '/i18n.php';
 
 require APP_PATH . '/models/homepage.php';
 require APP_PATH . '/models/content.php';
 require APP_PATH . '/models/students.php';
+require APP_PATH . '/models/recruitment.php';
 
 require APP_PATH . '/forms.php';
 

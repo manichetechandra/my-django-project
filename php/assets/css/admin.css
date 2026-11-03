@@ -128,3 +128,31 @@ body.admin-login-body {
 .admin-recover-file { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; padding: 8px 10px; background: #f4f8ec; border: 1px dashed #8cc040; border-radius: 6px; }
 .admin-recover-file code { font-size: 15px; background: none; color: #2c3e50; padding: 0; direction: ltr; unicode-bidi: embed; }
 
+
+/* ===================== الجداول المرتبطة (inlines) ===================== */
+.admin-inline-new td { background: #fbfdf7; }
+.admin-inline-upload { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.admin-inline-upload input[type=file] { flex: 1 1 260px; width: auto; }
+.admin-inline-upload select { display: inline-block; width: auto; }
+
+/* ===================== مسابقات التوظيف: طلبات الترشح ===================== */
+.recruit-export { display: flex; gap: 6px; flex-wrap: wrap; }
+.recruit-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.recruit-filters select { max-width: 360px; }
+.recruit-filters .input-group { width: 330px; max-width: 100%; }
+.recruit-status-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.recruit-status-tabs a { padding: 5px 12px; border-radius: 16px; background: #fff; border: 1px solid #dde3e8; color: #2c3e50; }
+.recruit-status-tabs a:hover, .recruit-status-tabs a:focus { text-decoration: none; border-color: #8cc040; }
+.recruit-status-tabs a.active { background: #2c3e50; color: #fff; border-color: #2c3e50; }
+.recruit-status-tabs a .badge { background: #ecf0f1; color: #2c3e50; }
+.recruit-current { margin-bottom: 10px; }
+.recruit-code { font-family: Consolas, "Courier New", monospace; direction: ltr; unicode-bidi: embed; white-space: nowrap; font-weight: bold; letter-spacing: .5px; }
+.recruit-table td { vertical-align: middle !important; }
+.recruit-kv { margin: 0; }
+.recruit-kv th { width: 32%; color: #7f8c8d; font-weight: normal; }
+.recruit-private .panel-heading { background: #fdf6e3; }
+.recruit-nin { font-size: 15px; letter-spacing: 1px; color: #2c3e50; background: #f4f6f7; }
+.recruit-status-big { font-size: 13px; vertical-align: middle; margin-inline-start: 6px; }
+.recruit-history { max-height: 460px; overflow-y: auto; }
+.recruit-history .list-group-item { font-size: 13px; }
+.recruit-key-alert code { font-size: 13px; }

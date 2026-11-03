@@ -10,7 +10,9 @@
  *   search   : حقول البحث (search_fields) — "fk_col>table.col" للبحث في جدول مرتبط
  *   actions  : إجراءات جماعية إضافية (actions)
  *   fields   : حقول نموذج الإضافة/التعديل
- *   inlines  : صور/ملفات مرتبطة تُدار داخل صفحة السجل (inlines)
+ *   inlines  : صور/ملفات مرتبطة تُدار داخل صفحة السجل (inlines)، أو جداول بلا ملفات (kind => rows) مثل رتب المسابقة
+ *   permission : صلاحية إضافية للقسم (recruitment = المدير العام أو من منحه «صلاحية مسابقات التوظيف»)
+ *   before_delete : دالة ترجع سبب منع الحذف (أو null)
  *
  * أنواع الحقول: text, textarea, email, url, int, decimal, bool, select, fk, date, datetime,
  *               image, file, slug, color, icon, password, readonly
@@ -472,6 +474,82 @@ return [
         ],
     ],
 
+    // ================================================================ مسابقات التوظيف (للمدير العام ومن له الصلاحية)
+    'competitions' => [
+        'model' => Competition::class, 'group' => 'مسابقات التوظيف', 'icon' => 'fa-trophy', 'permission' => 'recruitment',
+        'label' => 'مسابقة', 'plural' => 'المسابقات', 'per_page' => 25,
+        'list' => ['title', 'reference', 'opens_at', 'closes_at', 'phase', 'online_apply', 'applications'], 'links' => ['title'],
+        'editable' => ['online_apply'], 'filters' => ['status', 'recruitment_mode', 'online_apply'],
+        'search' => ['title', 'reference', 'summary'], 'order_by' => 'closes_at DESC, id DESC',
+        'view_url' => fn($o) => url('competitions:detail', $o['slug']),
+        'columns' => [
+            'phase' => ['label' => 'المرحلة', 'html' => true, 'value' => fn($o) => $o['status'] === 'draft'
+                ? '<span class="label label-default">مسودة</span>'
+                : '<span class="label label-' . ['open' => 'success', 'upcoming' => 'info', 'closed' => 'default', 'cancelled' => 'danger'][$o->phase()] . '">' . e(Competition::PHASES[$o->phase()]) . '</span>'],
+            'applications' => ['label' => 'طلبات الترشح', 'html' => true, 'value' => function ($o) {
+                $n = $o->applications_count();
+                $pending = $n ? $o->applications_count('pending') : 0;
+                return '<a href="' . e(url('admin:recruit_applications') . '?competition=' . (int) $o['id']) . '"><i class="fa fa-id-card-o"></i> ' . $n . '</a>'
+                    . ($pending ? ' <span class="badge admin-badge" title="قيد الانتظار">' . $pending . '</span>' : '');
+            }],
+        ],
+        'actions' => [
+            'publish' => ['label' => 'نشر المسابقات المحددة', 'set' => ['status' => 'published'], 'message' => 'تم نشر %d مسابقة'],
+            'cancel' => ['label' => 'إلغاء المسابقات المحددة', 'set' => ['status' => 'cancelled'], 'message' => 'تم إلغاء %d مسابقة'],
+        ],
+        'before_delete' => fn($o) => $o->applications_count()
+            ? 'لا يمكن حذف مسابقة «' . $o['title'] . '» لأن لها ' . $o->applications_count() . ' طلب ترشح. احذف ملفات المترشحين أولاً من صفحة «طلبات الترشح» (للمدير العام بعد انتهاء المسابقة).'
+            : null,
+        'fields' => [
+            'title' => ['type' => 'text', 'label' => 'عنوان المسابقة', 'max' => 300, 'help' => 'مثال: مسابقة على أساس الشهادة لتوظيف متصرفين إداريين'],
+            'slug' => ['type' => 'slug', 'label' => 'الرابط (slug)', 'from' => 'title', 'max' => 300, 'unique' => true],
+            'reference' => ['type' => 'text', 'label' => 'رقم الإعلان', 'max' => 100, 'required' => false, 'help' => 'الرقم فقط، مثل 07/2026 — يظهر في الموقع «إعلان رقم 07/2026» بكل اللغات'],
+            'recruitment_mode' => ['type' => 'select', 'label' => 'نمط التوظيف', 'default' => 'qualification'],
+            'summary' => ['type' => 'textarea', 'label' => 'ملخص قصير (يظهر في قائمة المسابقات)', 'rows' => 2, 'max' => 500, 'required' => false],
+            'description' => ['type' => 'textarea', 'label' => 'نص الإعلان', 'rows' => 8, 'required' => false],
+            'conditions' => ['type' => 'textarea', 'label' => 'شروط المشاركة', 'rows' => 6, 'help' => 'شرط في كل سطر (تظهر كقائمة)'],
+            'deposit_info' => ['type' => 'textarea', 'label' => 'إيداع الملف الورقي (اختياري)', 'rows' => 3, 'required' => false, 'help' => 'المكان والمواعيد إن كان المترشحون يودعون ملفاً ورقياً أيضاً'],
+            'opens_at' => ['type' => 'date', 'label' => 'بداية إيداع الملفات', 'default' => 'now'],
+            'closes_at' => ['type' => 'date', 'label' => 'آخر أجل لإيداع الملفات', 'help' => 'يبقى الترشح مفتوحاً حتى الساعة 23:59 من هذا اليوم (توقيت الجزائر)'],
+            'exam_date' => ['type' => 'date', 'label' => 'تاريخ الاختبار أو المقابلة (اختياري)', 'required' => false, 'nullable' => true],
+            'online_apply' => $bool('قبول الترشح الإلكتروني (استمارة + رفع الوثائق PDF)'),
+            'status' => ['type' => 'select', 'label' => 'الحالة', 'default' => 'published'],
+            'views_count' => ['type' => 'readonly', 'label' => 'عدد المشاهدات'],
+            'created_at' => $created, 'updated_at' => $updated,
+        ],
+        'inlines' => [
+            [
+                'model' => CompetitionPost::class, 'fk' => 'competition_id', 'label' => 'الرتب والمناصب المفتوحة', 'kind' => 'rows', 'icon' => 'fa-sitemap',
+                'order' => 'order', 'new_rows' => 3,
+                'columns' => [
+                    'title' => ['type' => 'text', 'label' => 'الرتبة', 'max' => 200, 'required' => true, 'example' => 'متصرف إداري'],
+                    'positions' => ['type' => 'int', 'label' => 'عدد المناصب', 'min' => 1, 'max_value' => 9999, 'default' => 1],
+                    'requirements' => ['type' => 'text', 'label' => 'الشهادة أو التخصص المطلوب', 'max' => 300, 'example' => 'ليسانس في الحقوق أو العلوم الاقتصادية'],
+                    'location' => ['type' => 'text', 'label' => 'مكان التعيين', 'max' => 200, 'example' => 'الإقامة الجامعية الباز'],
+                ],
+            ],
+            [
+                'model' => CompetitionRequirement::class, 'fk' => 'competition_id', 'label' => 'الوثائق المطلوبة في ملف الترشح', 'kind' => 'rows', 'icon' => 'fa-files-o',
+                'order' => 'order', 'new_rows' => 4,
+                'help' => 'كل وثيقة = خانة لرفع ملف PDF في استمارة الترشح الإلكتروني. «إلزامية» تعني أن الطلب لا يُقبل بدونها.',
+                'columns' => [
+                    'label' => ['type' => 'text', 'label' => 'الوثيقة', 'max' => 200, 'required' => true, 'example' => 'نسخة من الشهادة أو ما يعادلها'],
+                    'is_required' => ['type' => 'bool', 'label' => 'إلزامية', 'default' => 1],
+                ],
+            ],
+            [
+                'model' => CompetitionFile::class, 'fk' => 'competition_id', 'label' => 'الملفات المنشورة (الإعلان، الاستمارة، قائمة المقبولين، النتائج)',
+                'file' => 'file', 'dir' => 'competitions/{Y}', 'kind' => 'document', 'icon' => 'fa-paperclip', 'order' => 'order',
+                'ext' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png'],
+                'help' => 'ملفات عامة يحمّلها الزوار. ⚠️ لا تنشر في القوائم أرقام التعريف أو تواريخ الميلاد: يكفي الاسم واللقب أو رقم المتابعة.',
+                'columns' => [
+                    'title' => ['type' => 'text', 'label' => 'العنوان', 'max' => 200],
+                    'kind' => ['type' => 'select', 'label' => 'النوع', 'default' => 'announcement'],
+                ],
+            ],
+        ],
+    ],
+
     // ================================================================ الإحصائيات
     'site_visits' => [
         'model' => SiteVisit::class, 'group' => 'الإحصائيات', 'icon' => 'fa-line-chart', 'can_add' => false, 'can_edit' => false,
@@ -500,8 +578,8 @@ return [
     'users' => [
         'model' => User::class, 'group' => 'المستخدمون والصلاحيات', 'icon' => 'fa-users', 'superuser_only' => true,
         'label' => 'مستخدم', 'plural' => 'المستخدمون',
-        'list' => ['username', 'full_name', 'email', 'is_staff', 'is_superuser', 'is_active', 'last_login'], 'links' => ['username'],
-        'filters' => ['is_staff', 'is_superuser', 'is_active'], 'search' => ['username', 'first_name', 'last_name', 'email'],
+        'list' => ['username', 'full_name', 'email', 'is_staff', 'is_superuser', 'can_recruit', 'is_active', 'last_login'], 'links' => ['username'],
+        'filters' => ['is_staff', 'is_superuser', 'can_recruit', 'is_active'], 'search' => ['username', 'first_name', 'last_name', 'email'],
         'order_by' => 'username',
         'columns' => ['full_name' => ['label' => 'الاسم الكامل', 'value' => fn($o) => $o->get_full_name()]],
         'fields' => [
@@ -513,6 +591,7 @@ return [
             'is_active' => $bool('نشط'),
             'is_staff' => $bool('موظف (دخول لوحة الإدارة)', false),
             'is_superuser' => $bool('مدير عام (كل الصلاحيات)', false),
+            'can_recruit' => $bool('صلاحية مسابقات التوظيف (إدارة المسابقات والاطلاع على ملفات المترشحين ومعطياتهم الشخصية)', false),
             'last_login' => ['type' => 'readonly', 'label' => 'آخر دخول'],
             'date_joined' => ['type' => 'readonly', 'label' => 'تاريخ التسجيل'],
         ],

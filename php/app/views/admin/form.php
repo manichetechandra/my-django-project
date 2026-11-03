@@ -69,16 +69,26 @@
         </div>
     </div>
 
-    <?php foreach ($r['inlines'] as $i => $inl): ?>
+    <?php foreach ($r['inlines'] as $i => $inl): $cols = admin_inline_columns($inl); $isRows = ($inl['kind'] ?? '') === 'rows'; ?>
         <div class="panel panel-default admin-panel">
-            <div class="panel-heading"><strong><i class="fa <?= $inl['kind'] === 'document' ? 'fa-paperclip' : 'fa-picture-o' ?>"></i> <?= e($inl['label']) ?></strong></div>
+            <div class="panel-heading"><strong><i class="fa <?= e($inl['icon'] ?? ($inl['kind'] === 'document' ? 'fa-paperclip' : ($isRows ? 'fa-list' : 'fa-picture-o'))) ?>"></i> <?= e($inl['label']) ?></strong>
+                <?php if (!empty($inl['help'])): ?><div class="small text-muted"><?= e($inl['help']) ?></div><?php endif; ?>
+            </div>
             <div class="panel-body">
-                <?php if ($obj && !empty($inline_rows[$i])): ?>
+                <?php $newRows = $isRows && !$readonly ? (int) ($inl['new_rows'] ?? 3) : 0; $postedNew = (array) ($_POST['inline_new'][$i] ?? []); ?>
+                <?php if (($obj && !empty($inline_rows[$i])) || $newRows): ?>
+                    <div class="table-responsive">
                     <table class="table table-condensed admin-inline-table">
-                        <thead><tr><th>الملف</th><?php foreach ($inl['text'] as $lbl): ?><th><?= e($lbl) ?></th><?php endforeach; ?><?php if ($inl['order']): ?><th style="width:90px">الترتيب</th><?php endif; ?><th style="width:60px">حذف</th></tr></thead>
+                        <thead><tr>
+                            <?php if (!$isRows): ?><th>الملف</th><?php endif; ?>
+                            <?php foreach ($cols as $spec): ?><th<?= ($spec['type'] ?? 'text') === 'text' ? '' : ' style="width:' . (($spec['type'] ?? '') === 'select' ? 170 : 100) . 'px"' ?>><?= e($spec['label']) ?><?= !empty($spec['required']) ? ' <span class="text-danger">*</span>' : '' ?></th><?php endforeach; ?>
+                            <?php if ($inl['order']): ?><th style="width:90px">الترتيب</th><?php endif; ?>
+                            <th style="width:60px">حذف</th>
+                        </tr></thead>
                         <tbody>
-                        <?php foreach ($inline_rows[$i] as $row): ?>
+                        <?php foreach ($obj ? ($inline_rows[$i] ?? []) : [] as $row): $raw = $row->toArray(); $name = 'inline[' . $i . '][' . $row['id'] . ']'; ?>
                             <tr>
+                                <?php if (!$isRows): ?>
                                 <td>
                                     <?php if ($inl['kind'] === 'image'): ?>
                                         <a href="<?= e(media_url($row[$inl['file']])) ?>" target="_blank"><img src="<?= e(media_url($row[$inl['file']])) ?>" class="admin-thumb" alt=""></a>
@@ -86,35 +96,44 @@
                                         <a href="<?= e($row->get_download_url()) ?>" target="_blank"><i class="fa fa-file-o"></i> <?= e(basename((string) $row[$inl['file']])) ?></a>
                                     <?php endif; ?>
                                 </td>
-                                <?php foreach ($inl['text'] as $col => $lbl): $iname = 'inline[' . $i . '][' . $row['id'] . '][' . $col . ']'; ?>
-                                    <td>
-                                        <input type="text" class="form-control input-sm" name="<?= e($iname) ?>" value="<?= e($row[$col]) ?>">
-                                        <?php if (in_array($col, $inl['model']::translatable(), true)): ?>
-                                            <div class="admin-translations admin-translations-inline">
-                                                <?php foreach (admin_other_langs() as $lang): ?>
-                                                    <div class="admin-tr-row" data-lang="<?= e($lang) ?>">
-                                                        <span class="admin-tr-lang"><?= e(strtoupper($lang)) ?></span>
-                                                        <input type="text" class="form-control input-sm" dir="ltr" lang="<?= e($lang) ?>" name="inline[<?= $i ?>][<?= e($row['id']) ?>][<?= e($col . '_' . $lang) ?>]" value="<?= e($row->toArray()[$col . '_' . $lang] ?? '') ?>" data-tr-of="<?= e($iname) ?>" data-tr-lang="<?= e($lang) ?>">
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        <?php endif; ?>
-                                    </td>
+                                <?php endif; ?>
+                                <?php foreach ($cols as $col => $spec): ?>
+                                    <td><?= admin_inline_input($name, $col, $spec, $raw[$col] ?? '', $inl['model'], $raw) ?></td>
                                 <?php endforeach; ?>
                                 <?php if ($inl['order']): ?>
-                                    <td><input type="number" class="form-control input-sm" name="inline[<?= $i ?>][<?= e($row['id']) ?>][<?= e($inl['order']) ?>]" value="<?= e($row[$inl['order']]) ?>"></td>
+                                    <td><input type="number" class="form-control input-sm" name="<?= e($name . '[' . $inl['order'] . ']') ?>" value="<?= e($raw[$inl['order']] ?? 0) ?>"></td>
                                 <?php endif; ?>
-                                <td class="text-center"><input type="checkbox" name="inline[<?= $i ?>][<?= e($row['id']) ?>][_delete]" value="1"></td>
+                                <td class="text-center"><input type="checkbox" name="<?= e($name . '[_delete]') ?>" value="1" aria-label="حذف"></td>
                             </tr>
                         <?php endforeach; ?>
+                        <?php for ($k = 0; $k < $newRows; $k++): $vals = is_array($postedNew[$k] ?? null) ? $postedNew[$k] : []; $name = 'inline_new[' . $i . '][' . $k . ']'; ?>
+                            <tr class="admin-inline-new">
+                                <?php foreach ($cols as $col => $spec): $def = ($spec['type'] ?? 'text') === 'bool' && !$vals ? ($spec['default'] ?? 0) : ($vals[$col] ?? ($spec['default'] ?? '')); ?>
+                                    <td><?= admin_inline_input($name, $col, $spec + ($k === 0 && !empty($spec['example']) ? ['placeholder' => $spec['example']] : []), $def, $inl['model'], $vals) ?></td>
+                                <?php endforeach; ?>
+                                <?php if ($inl['order']): ?>
+                                    <td><input type="number" class="form-control input-sm" name="<?= e($name . '[' . $inl['order'] . ']') ?>" value="<?= e($vals[$inl['order']] ?? (count($inline_rows[$i] ?? []) + $k + 1)) ?>"></td>
+                                <?php endif; ?>
+                                <td class="text-center text-muted small"><i class="fa fa-plus" title="سطر جديد"></i></td>
+                            </tr>
+                        <?php endfor; ?>
                         </tbody>
                     </table>
+                    </div>
+                    <?php if ($newRows): ?><p class="help-block small text-muted"><i class="fa fa-info-circle"></i> الأسطر الفارغة تُتجاهل. احفظ ثم «حفظ ومتابعة التعديل» لإضافة أسطر أخرى.</p><?php endif; ?>
                 <?php elseif ($obj): ?>
                     <p class="text-muted">لا توجد ملفات مرفقة بعد.</p>
                 <?php endif; ?>
-                <?php if (!$readonly): ?>
+                <?php if (!$readonly && !$isRows): ?>
                     <label>إضافة ملفات جديدة (يمكن اختيار عدة ملفات):</label>
-                    <input type="file" name="inline_new_<?= $i ?>[]" multiple class="form-control" accept="<?= $inl['kind'] === 'image' ? 'image/*' : '.' . e(implode(',.', $inl['ext'] ?? Upload::DOCUMENTS)) ?>">
+                    <div class="admin-inline-upload">
+                        <input type="file" name="inline_new_<?= $i ?>[]" multiple class="form-control" accept="<?= $inl['kind'] === 'image' ? 'image/*' : '.' . e(implode(',.', $inl['ext'] ?? Upload::DOCUMENTS)) ?>">
+                        <?php foreach ($cols as $col => $spec): if (($spec['type'] ?? 'text') !== 'select') { continue; } ?>
+                            <label class="small"><?= e($spec['label']) ?>:
+                                <?= admin_inline_input('inline_new_defaults[' . $i . ']', $col, $spec, $spec['default'] ?? '', $inl['model']) ?>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>

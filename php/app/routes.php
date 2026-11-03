@@ -17,6 +17,14 @@ $router->get('/history/', 'homepage_history', 'homepage:history');
 $router->get('/news/', 'news_list', 'news:news_list');
 $router->get('/news/{slug}/', 'news_detail', 'news:news_detail');
 
+// المسابقات: مسابقات التوظيف + الترشح الإلكتروني + متابعة الطلب
+$router->get('/competitions/', 'competitions_list', 'competitions:list');
+$router->any('/competitions/track/', 'competitions_track', 'competitions:track');
+$router->any('/competitions/receipt/', 'competitions_receipt', 'competitions:receipt');
+$router->get('/competitions/file/{id:int}/', 'competitions_file', 'competitions:file');
+$router->any('/competitions/{slug}/apply/', 'competitions_apply', 'competitions:apply');
+$router->get('/competitions/{slug}/', 'competitions_detail', 'competitions:detail');
+
 // النشاطات
 $router->get('/activities/', 'activity_list', 'activities:activity_list');
 $router->get('/activities/{slug}/', 'activity_detail', 'activities:activity_detail');
@@ -90,6 +98,13 @@ $router->any('/admin/password/', 'admin_password', 'admin:password');
 $router->any('/admin/recover/', 'admin_recover', 'admin:recover');            // نسيت كلمة مرور المدير؟
 $router->post('/admin/translate/', 'admin_translate', 'admin:translate');          // زر «ترجمة تلقائية» (AJAX)
 $router->any('/admin/translate-all/', 'admin_translate_all', 'admin:translate_all'); // ترجمة المحتوى القديم
+// طلبات الترشح للمسابقات (معطيات شخصية: للمدير العام وأصحاب صلاحية «مسابقات التوظيف» فقط)
+$router->any('/admin/recruitment/applications/', 'recruit_admin_applications', 'admin:recruit_applications');
+$router->any('/admin/recruitment/applications/{id:int}/', 'recruit_admin_application', 'admin:recruit_application');
+$router->get('/admin/recruitment/files/{id:int}/', 'recruit_admin_file', 'admin:recruit_file');
+$router->get('/admin/recruitment/export/', 'recruit_admin_export', 'admin:recruit_export');
+$router->get('/admin/recruitment/audit/', 'recruit_admin_audit', 'admin:recruit_audit');
+$router->any('/admin/recruitment/purge/{id:int}/', 'recruit_admin_purge', 'admin:recruit_purge');
 $router->any('/admin/{model}/', 'admin_list', 'admin:list');
 $router->any('/admin/{model}/add/', 'admin_add', 'admin:add');
 $router->any('/admin/{model}/{id:int}/', 'admin_edit', 'admin:edit');

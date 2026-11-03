@@ -27,7 +27,7 @@
     <?php foreach ($admin_menu as $group => $items): ?>
         <div class="admin-nav-group"><?= e($group) ?></div>
         <?php foreach ($items as $item): ?>
-            <a href="<?= e(url('admin:list', $item['key'])) ?>" class="admin-nav-link <?= str_starts_with(request_path(), '/admin/' . $item['key'] . '/') ? 'active' : '' ?>">
+            <a href="<?= e($item['url']) ?>" class="admin-nav-link <?= str_starts_with(request_path(), $item['active']) ? 'active' : '' ?>">
                 <i class="fa <?= e($item['icon']) ?>"></i> <?= e($item['label']) ?>
                 <?php if ($item['badge']): ?><span class="badge admin-badge"><?= e($item['badge']) ?></span><?php endif; ?>
             </a>

@@ -1,0 +1,177 @@
+/* =====================================================================
+   المسابقات (مسابقات التوظيف): القائمة، صفحة المسابقة، استمارة الترشح، الوصل، متابعة الطلب
+   خصائص منطقية (inline-start/end) فتعمل الصفحات بالعربية والفرنسية والإنجليزية
+   ===================================================================== */
+.cmp-page { margin-top: 30px; margin-bottom: 50px; }
+/* القالب العام يفرض text-align: start على كل عنصر (* {...})، فالتوسيط لا يُورَث: نضعه على العناصر نفسها */
+.cmp-cta, .cmp-cta *, .cmp-submit, .cmp-submit *, .cmp-empty, .cmp-empty *, .cmp-code-box, .cmp-code-box *, .cmp-steps li { text-align: center; }
+/* وكذلك يفرض direction: inherit على كل عنصر فتُلغى خاصية dir: نعيدها هنا. و bdi يأخذ اتجاهه من محتواه
+   (حجم الملف «596 B» من اليسار لليمين، واسم ملف عربي من اليمين لليسار) */
+.cmp-page [dir="ltr"], .cmp-home [dir="ltr"] { direction: ltr; }
+.cmp-page [dir="rtl"], .cmp-home [dir="rtl"] { direction: rtl; }
+.cmp-page bdi, .cmp-home bdi, .cmp-page [dir="auto"] { unicode-bidi: plaintext; }
+.cmp-title { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid #8cc040; padding-bottom: 14px; margin-bottom: 18px; }
+.cmp-title h1, .cmp-title h2 { color: #2c3e50; margin: 0; font-size: 28px; line-height: 1.4; }
+.cmp-intro { color: #5d6d7e; font-size: 16px; line-height: 1.9; margin-bottom: 20px; }
+.cmp-muted { color: #7f8c8d; }
+
+/* التبويبات */
+.cmp-tabs { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 22px; }
+.cmp-tabs a { display: inline-block; padding: 8px 16px; border-radius: 20px; background: #f4f6f7; color: #2c3e50; border: 1px solid #e3e8ec; font-weight: bold; }
+.cmp-tabs a:hover, .cmp-tabs a:focus { text-decoration: none; border-color: #8cc040; }
+.cmp-tabs a.active { background: #2c3e50; color: #fff; border-color: #2c3e50; }
+.cmp-tabs .badge { background: #fff; color: #2c3e50; margin-inline-start: 4px; }
+.cmp-tabs a.active .badge { background: #8cc040; color: #fff; }
+
+/* بطاقة مسابقة */
+.cmp-card { position: relative; background: #fff; border: 1px solid #e6eaee; border-inline-start: 5px solid #95a5a6; border-radius: 8px;
+    padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(44, 62, 80, .06); }
+.cmp-card.is-open { border-inline-start-color: #8cc040; }
+.cmp-card.is-upcoming { border-inline-start-color: #3498db; }
+.cmp-card.is-cancelled { border-inline-start-color: #e74c3c; }
+.cmp-card h3 { margin: 8px 0; font-size: 20px; line-height: 1.6; }
+.cmp-card h3 a { color: #2c3e50; }
+.cmp-card h3 a:hover { color: #6a9a2a; text-decoration: none; }
+.cmp-summary { color: #5d6d7e; margin: 0 0 10px; line-height: 1.8; }
+.cmp-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.cmp-badge { display: inline-block; padding: 3px 11px; border-radius: 12px; font-size: 12.5px; font-weight: bold; color: #fff; background: #95a5a6; line-height: 1.6; }
+.cmp-badge.is-open { background: #6aa531; }
+.cmp-badge.is-upcoming { background: #2f86c6; }
+.cmp-badge.is-cancelled { background: #d35445; }
+.cmp-badge.is-results { background: #8e44ad; }
+.cmp-badge.is-draft { background: #34495e; }
+.cmp-mode { color: #7f8c8d; font-size: 13px; }
+.cmp-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; color: #6c7a89; font-size: 14px; margin-bottom: 12px; }
+.cmp-meta i { color: #8cc040; margin-inline-end: 3px; }
+.cmp-countdown { color: #c0392b; font-weight: bold; }
+.cmp-countdown i { color: #c0392b !important; }
+.cmp-card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.cmp-empty { text-align: center; padding: 40px 20px; background: #f8f9fa; border-radius: 8px; color: #7f8c8d; }
+.cmp-empty i { font-size: 42px; color: #bdc3c7; display: block; margin-bottom: 10px; }
+
+/* صفحة المسابقة */
+.cmp-head h1 { color: #2c3e50; font-size: 27px; line-height: 1.5; margin: 10px 0 6px; }
+.cmp-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 20px 0 10px; }
+.cmp-fact { background: #f8f9fa; border: 1px solid #edf0f2; border-radius: 8px; padding: 12px 14px; }
+.cmp-fact small { display: block; color: #7f8c8d; margin-bottom: 3px; }
+.cmp-fact strong { color: #2c3e50; font-size: 16px; }
+.cmp-section { margin-top: 30px; }
+.cmp-section h3 { color: #2c3e50; border-bottom: 2px solid #8cc040; padding-bottom: 8px; font-size: 20px; margin-bottom: 15px; }
+.cmp-text { font-size: 16px; line-height: 1.95; color: #333; text-align: justify; }
+.cmp-list { padding-inline-start: 0; list-style: none; margin: 0; }
+.cmp-list li { position: relative; padding: 7px 0; padding-inline-start: 28px; border-bottom: 1px dashed #e6eaee; line-height: 1.8; }
+.cmp-list li:last-child { border-bottom: 0; }
+.cmp-list li > i:first-child { position: absolute; inset-inline-start: 2px; top: 12px; color: #8cc040; }
+.cmp-posts th { background: #2c3e50; color: #fff; }
+.cmp-posts td.num { font-weight: bold; color: #2c3e50; text-align: center; }
+.cmp-files { list-style: none; padding: 0; margin: 0; }
+.cmp-files li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #e6eaee; border-radius: 8px; margin-bottom: 8px; background: #fff; }
+.cmp-files li > i { font-size: 26px; color: #c0392b; }
+.cmp-files .cmp-file-info { flex: 1; min-width: 0; }
+.cmp-files .cmp-file-info strong { display: block; color: #2c3e50; }
+.cmp-files .cmp-file-info small { color: #7f8c8d; }
+.cmp-files.is-results li { border-color: #d7c4e3; background: #fbf8fd; }
+.cmp-files.is-results li > i { color: #8e44ad; }
+
+/* صندوق الترشح (الشريط الجانبي) */
+.cmp-cta { background: linear-gradient(135deg, #2c3e50, #3d566e); color: #fff; border-radius: 10px; padding: 22px 20px; text-align: center; margin-bottom: 20px; }
+.cmp-cta h4 { margin: 0 0 6px; font-weight: bold; }
+.cmp-cta p { color: #dfe6ec; margin-bottom: 14px; line-height: 1.8; }
+.cmp-cta .btn { font-weight: bold; }
+.cmp-cta .btn + .btn { margin-top: 8px; }
+.cmp-clock { display: flex; justify-content: center; gap: 8px; margin: 12px 0 16px; }
+.cmp-clock div { background: rgba(255, 255, 255, .12); border-radius: 8px; min-width: 58px; padding: 6px 4px; }
+.cmp-clock b { display: block; font-size: 24px; line-height: 1.2; font-family: Consolas, "Courier New", monospace; }
+.cmp-clock span { font-size: 11.5px; color: #dfe6ec; }
+.cmp-side-box { background: #fff; border: 1px solid #e6eaee; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+.cmp-side-box h4 { color: #2c3e50; margin-top: 0; font-weight: bold; }
+
+/* حماية المعطيات */
+.cmp-privacy { background: #f4f8ec; border: 1px solid #d8e9bf; border-radius: 8px; padding: 14px 16px; color: #3d4f2a; line-height: 1.9; margin-bottom: 20px; }
+.cmp-privacy i.fa-shield { color: #6aa531; font-size: 18px; }
+.cmp-privacy ul { margin: 6px 0 0; padding-inline-start: 22px; }
+
+/* استمارة الترشح */
+.cmp-form fieldset { background: #fff; border: 1px solid #e6eaee; border-radius: 10px; padding: 16px 20px 6px; margin-bottom: 20px; }
+.cmp-form legend { width: auto; border: 0; padding: 0 8px; margin-bottom: 0; font-size: 18px; color: #2c3e50; font-weight: bold; }
+.cmp-form legend .cmp-step { display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; background: #8cc040; color: #fff; font-size: 15px; margin-inline-end: 6px; }
+.cmp-form label { color: #2c3e50; }
+.cmp-form .req { color: #c0392b; }
+.cmp-form .help-block { font-size: 13px; }
+.cmp-form .errorlist { list-style: none; padding: 0; margin: 4px 0 0; color: #c0392b; font-size: 13.5px; font-weight: bold; }
+.cmp-form .errorlist.nonfield { background: #fdf0ef; border: 1px solid #f3c3bd; border-radius: 8px; padding: 10px 14px; margin-bottom: 15px; }
+.cmp-form [aria-invalid="true"] { border-color: #c0392b; box-shadow: 0 0 0 2px rgba(192, 57, 43, .12); }
+.cmp-doc { border: 1px dashed #c9d3db; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; background: #fbfcfd; }
+.cmp-doc.is-required { border-color: #b5d58c; }
+.cmp-doc label { display: block; margin-bottom: 6px; }
+.cmp-doc .cmp-file-state { font-size: 13px; margin-top: 4px; }
+.cmp-doc .cmp-file-state.is-bad { color: #c0392b; font-weight: bold; }
+.cmp-doc .cmp-file-state.is-ok { color: #5b8f22; }
+.cmp-check { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
+.cmp-check input { margin-top: 6px; flex: none; }
+.cmp-submit { text-align: center; margin: 10px 0 30px; }
+.cmp-submit .btn { min-width: 240px; font-size: 18px; font-weight: bold; }
+/* حقل فخ للبرامج الآلية: مخفي عن الزوار وقارئات الشاشة */
+.cmp-hp { position: absolute !important; inset-inline-start: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* الوصل */
+.cmp-receipt { max-width: 780px; margin: 0 auto; background: #fff; border: 2px solid #2c3e50; border-radius: 12px; padding: 26px 28px; }
+.cmp-receipt-head { display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #8cc040; padding-bottom: 14px; margin-bottom: 18px; }
+.cmp-receipt-head img { width: 60px; height: 60px; }
+.cmp-receipt-head h1 { font-size: 22px; margin: 0; color: #2c3e50; }
+.cmp-codes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 18px 0; }
+.cmp-code-box { border: 2px dashed #8cc040; border-radius: 10px; text-align: center; padding: 14px 10px; background: #fbfdf7; }
+.cmp-code-box.is-secret { border-color: #e67e22; background: #fffaf3; }
+.cmp-code-box small { display: block; color: #7f8c8d; font-size: 13px; }
+.cmp-code { display: block; font-family: Consolas, "Courier New", monospace; font-size: 26px; font-weight: bold; letter-spacing: 2px; color: #2c3e50; direction: ltr; margin: 4px 0; user-select: all; }
+.cmp-barcode { display: block; margin: 6px auto 0; max-width: 100%; height: 54px; }
+.cmp-warn { background: #fff4e5; border: 1px solid #f5c98b; border-radius: 8px; padding: 12px 16px; color: #8a5300; line-height: 1.9; }
+.cmp-kv { width: 100%; margin-bottom: 14px; }
+.cmp-kv th { width: 34%; color: #7f8c8d; font-weight: normal; padding: 6px 0; vertical-align: top; }
+.cmp-kv td { padding: 6px 0; color: #2c3e50; }
+
+/* متابعة الطلب */
+.cmp-track-form { max-width: 520px; margin: 0 auto; background: #fff; border: 1px solid #e6eaee; border-radius: 12px; padding: 24px; box-shadow: 0 4px 14px rgba(44, 62, 80, .07); }
+.cmp-track-form .form-control { height: 44px; font-size: 18px; text-align: center; letter-spacing: 1px; font-family: Consolas, "Courier New", monospace; }
+.cmp-status { display: flex; gap: 16px; align-items: center; border-radius: 10px; padding: 18px 20px; margin: 18px 0; color: #fff; }
+.cmp-status i { font-size: 38px; }
+.cmp-status h3 { margin: 0 0 4px; font-size: 21px; font-weight: bold; }
+.cmp-status p { margin: 0; line-height: 1.8; }
+.cmp-status.is-pending { background: #d68910; }
+.cmp-status.is-under_review { background: #2e86c1; }
+.cmp-status.is-incomplete { background: #c0392b; }
+.cmp-status.is-accepted { background: #5b9a23; }
+.cmp-status.is-rejected { background: #7f8c8d; }
+.cmp-message { background: #fdfefe; border: 1px solid #d6dbdf; border-inline-start: 5px solid #2e86c1; border-radius: 8px; padding: 14px 16px; line-height: 1.9; }
+.cmp-steps { display: flex; list-style: none; padding: 0; margin: 10px 0 0; counter-reset: s; }
+.cmp-steps li { flex: 1; text-align: center; position: relative; color: #95a5a6; font-size: 13.5px; }
+.cmp-steps li::before { counter-increment: s; content: counter(s); display: block; width: 30px; height: 30px; line-height: 30px; margin: 0 auto 6px; border-radius: 50%; background: #e5e8e8; color: #7f8c8d; font-weight: bold; position: relative; z-index: 1; }
+.cmp-steps li::after { content: ""; position: absolute; top: 15px; inset-inline-start: 50%; width: 100%; height: 3px; background: #e5e8e8; }
+.cmp-steps li:last-child::after { display: none; }
+.cmp-steps li.done { color: #2c3e50; font-weight: bold; }
+.cmp-steps li.done::before { background: #8cc040; color: #fff; }
+.cmp-steps li.done::after { background: #8cc040; }
+
+/* الصفحة الرئيسية: صندوق المسابقات المفتوحة */
+.cmp-home { background: linear-gradient(135deg, #f4f8ec, #eef4f8); border: 1px solid #dfe9d2; border-radius: 10px; padding: 16px 18px; margin: 20px 0 10px; }
+.cmp-home h3 { margin: 0 0 12px; color: #2c3e50; font-size: 20px; font-weight: bold; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.cmp-home-item { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; background: #fff; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; border: 1px solid #e6eaee; }
+.cmp-home-item a.cmp-home-title { color: #2c3e50; font-weight: bold; font-size: 16px; }
+.cmp-home-item small { color: #c0392b; font-weight: bold; }
+
+@media (max-width: 767px) {
+    .cmp-title h1, .cmp-title h2 { font-size: 23px; }
+    .cmp-head h1 { font-size: 22px; }
+    .cmp-receipt { padding: 18px 14px; }
+    .cmp-code { font-size: 21px; }
+}
+
+@media print {
+    .navbar, footer, .footer, .cmp-no-print, .flash-messages, #notification-bar, .notification-bar { display: none !important; }
+    body { background: #fff !important; }
+    .cmp-page { margin: 0; }
+    .cmp-receipt { border: 1px solid #000; box-shadow: none; }
+    .cmp-code-box, .cmp-warn { break-inside: avoid; }
+    a[href]::after { content: none !important; }
+}

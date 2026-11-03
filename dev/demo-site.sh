@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# الموقع التجريبي للنسخة 2.0: كود php/ + بيانات الكتاب التجريبية + ترجمتها (dev/demo-i18n.sql)
+# الموقع التجريبي للنسخة 2.0: كود php/ + بيانات الكتاب التجريبية + ترجمتها (dev/demo-i18n.sql) + مسابقات التوظيف (dev/demo-recruitment.php)
 #   bash dev/demo-site.sh [/tmp/site2]        (قاعدة dou_setif2، والخادم يعمل على المجلد نفسه)
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -19,3 +19,5 @@ foreach (preg_split("/;\n/", file_get_contents($argv[1])) as $sql) {
 }
 echo "ترجمة المحتوى التجريبي: $n سجلاً" . ($miss ? "، لم تُطبَّق على:\n  " . implode("\n  ", $miss) : "") . "\n";
 ' dev/demo-i18n.sql
+# مسابقات التوظيف: مسابقات تجريبية وطلبات ترشح مشفّرة (بكود الموقع نفسه)
+${PHP_BIN:-/tmp/tools/bin/php} dev/demo-recruitment.php "$SITE"

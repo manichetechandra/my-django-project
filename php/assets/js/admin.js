@@ -56,6 +56,13 @@
         });
     }
 
+    // روابط تطلب تأكيداً (مثل تصدير القائمة الكاملة للمترشحين)
+    document.querySelectorAll('a[data-confirm]').forEach(function (a) {
+        a.addEventListener('click', function (ev) {
+            if (!confirm(a.getAttribute('data-confirm'))) { ev.preventDefault(); }
+        });
+    });
+
     // معاينة أيقونات Font Awesome
     document.querySelectorAll('[data-icon-input]').forEach(function (input) {
         var preview = document.querySelector('[data-icon-preview="' + input.id + '"]');

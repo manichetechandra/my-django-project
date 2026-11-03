@@ -118,6 +118,13 @@
             background-color: #8cc040;
         }
         
+        /* عدد المسابقات المفتوحة بجانب «المسابقات» */
+        .nav-count {
+            display: inline-block; min-width: 18px; padding: 0 5px; margin-inline-start: 2px;
+            border-radius: 9px; background: #e74c3c; color: #fff; font-size: 11px; font-weight: bold;
+            line-height: 18px; text-align: center; vertical-align: 1px;
+        }
+        
         .navbar-toggle {
             float: left; float: inline-end;
         }

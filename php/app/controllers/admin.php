@@ -11,7 +11,13 @@ function admin_resources(): array
     if ($all === null) {
         $all = require APP_PATH . '/admin_config.php';
     }
-    return array_filter($all, fn($r) => empty($r['superuser_only']) || is_superuser());
+    return array_filter($all, fn($r) => (empty($r['superuser_only']) || is_superuser()) && admin_has_permission($r['permission'] ?? null));
+}
+
+/** صلاحية إضافية لقسم ('permission' في admin_config): recruitment = مسابقات التوظيف */
+function admin_has_permission(?string $permission): bool
+{
+    return $permission === null || ($permission === 'recruitment' && can_recruit());
 }
 
 function admin_resource(string $key): array
@@ -62,7 +68,17 @@ function admin_menu(): array
             continue;
         }
         $badge = isset($r['badge']) ? (int) ($r['badge'])() : 0;
-        $menu[$r['group']][] = ['key' => $key, 'label' => $r['plural'], 'icon' => $r['icon'], 'badge' => $badge];
+        $menu[$r['group']][] = ['key' => $key, 'label' => $r['plural'], 'icon' => $r['icon'], 'badge' => $badge,
+            'url' => url('admin:list', $key), 'active' => '/admin/' . $key . '/'];
+    }
+    // صفحات خاصة غير مرتبطة بجدول واحد
+    if (can_recruit()) {
+        $menu['مسابقات التوظيف'][] = ['key' => 'recruit_applications', 'label' => 'طلبات الترشح', 'icon' => 'fa-id-card-o',
+            'badge' => recruit_pending_count(), 'url' => url('admin:recruit_applications'), 'active' => '/admin/recruitment/applications/'];
+        if (is_superuser()) {
+            $menu['مسابقات التوظيف'][] = ['key' => 'recruit_audit', 'label' => 'سجل الاطلاع على الملفات', 'icon' => 'fa-history',
+                'badge' => 0, 'url' => url('admin:recruit_audit'), 'active' => '/admin/recruitment/audit/'];
+        }
     }
     return $menu;
 }
@@ -73,8 +89,17 @@ function admin_index(): void
 {
     admin_guard();
     $counts = [];
+    $missing = [];
     foreach (admin_resources() as $key => $r) {
-        $counts[$key] = $r['model']::count();
+        try {
+            $counts[$key] = $r['model']::count();
+        } catch (PDOException $e) {
+            $counts[$key] = 0; // جدول غير موجود: الكود الجديد رُفع دون ترقية قاعدة البيانات
+            $missing[] = $r['model']::table();
+        }
+    }
+    if ($missing) {
+        flash('warning', 'جداول غير موجودة في قاعدة البيانات (' . implode('، ', $missing) . '): استورد ملف الترقية database/migrations/2026_11_recruitment.sql من phpMyAdmin (مرة واحدة).');
     }
     $stats = SiteStatistics::get_stats();
     admin_render('index', [
@@ -433,6 +458,10 @@ function admin_handle_list_post(array $r): void
                 flash('error', 'لا يمكنك حذف حسابك الخاص.');
                 continue;
             }
+            if (isset($r['before_delete']) && ($msg = ($r['before_delete'])($obj))) {
+                flash('error', $msg);
+                continue;
+            }
             admin_delete_object($r, $obj);
             $n++;
         }
@@ -778,45 +807,135 @@ function admin_collect_form(array $r, ?Model $obj): array
     return [$data, $errors, $newFiles, $oldFiles];
 }
 
-/** حفظ الصور/الوثائق المرتبطة (inlines) */
+/**
+ * أعمدة الجدول المرتبط (inline):
+ *   'columns' => ['title' => ['type' => 'text', 'label' => ..., 'max' => 200, 'required' => true], 'positions' => ['type' => 'int', 'min' => 1], ...]
+ *   الأنواع: text, int, bool, select (choices من النموذج)
+ *   أو الصيغة القديمة 'text' => ['caption' => 'التعليق'] (نصوص فقط)
+ */
+function admin_inline_columns(array $inl): array
+{
+    if (isset($inl['columns'])) {
+        return $inl['columns'];
+    }
+    $cols = [];
+    foreach ($inl['text'] ?? [] as $col => $label) {
+        $cols[$col] = ['type' => 'text', 'label' => $label, 'max' => 200];
+    }
+    return $cols;
+}
+
+/** قيمة خانة بعد التحقق حسب نوعها */
+function admin_inline_value(array $spec, $raw, string $model, string $col)
+{
+    switch ($spec['type'] ?? 'text') {
+        case 'int':
+            $v = (int) (is_scalar($raw) ? $raw : 0);
+            if (isset($spec['min'])) {
+                $v = max((int) $spec['min'], $v);
+            }
+            if (isset($spec['max_value'])) {
+                $v = min((int) $spec['max_value'], $v);
+            }
+            return $v;
+        case 'bool':
+            return empty($raw) ? 0 : 1;
+        case 'select':
+            $choices = $model::choiceMap($spec['choices'] ?? $col);
+            $v = is_scalar($raw) ? (string) $raw : '';
+            return array_key_exists($v, $choices) ? $v : (string) ($spec['default'] ?? array_key_first($choices));
+        default:
+            return mb_substr(trim(is_scalar($raw) ? (string) $raw : ''), 0, (int) ($spec['max'] ?? 200));
+    }
+}
+
+/**
+ * قيم صف من النموذج المرسل. $existing: صف موجود (النص المطلوب الفارغ يبقى كما كان).
+ * يرجع null لصف جديد فارغ أو ينقصه نص مطلوب (يُتجاهل).
+ */
+function admin_inline_row_values(array $inl, array $vals, bool $existing): ?array
+{
+    $m = $inl['model'];
+    $data = [];
+    $hasText = false;
+    foreach (admin_inline_columns($inl) as $col => $spec) {
+        $type = $spec['type'] ?? 'text';
+        if ($type === 'bool') {
+            $data[$col] = empty($vals[$col]) ? 0 : 1;
+        } elseif (array_key_exists($col, $vals)) {
+            $v = admin_inline_value($spec, $vals[$col], $m, $col);
+            if ($type === 'text' && $v === '' && !empty($spec['required'])) {
+                if (!$existing) {
+                    return null;
+                }
+            } else {
+                $data[$col] = $v;
+                $hasText = $hasText || ($type === 'text' && $v !== '');
+            }
+        }
+        if ($type === 'text' && in_array($col, $m::translatable(), true)) {
+            $max = admin_translation_max(['max' => (int) ($spec['max'] ?? 200)]) ?? 300;
+            foreach (admin_other_langs() as $lang) {
+                if (isset($vals[$col . '_' . $lang]) && is_scalar($vals[$col . '_' . $lang])) {
+                    $t = mb_substr(trim((string) $vals[$col . '_' . $lang]), 0, $max);
+                    $data[$col . '_' . $lang] = $t === '' ? null : $t;
+                }
+            }
+        }
+    }
+    if (!empty($inl['order']) && isset($vals[$inl['order']]) && is_scalar($vals[$inl['order']])) {
+        $data[$inl['order']] = (int) $vals[$inl['order']];
+    }
+    if (!$existing && !$hasText) {
+        return null;
+    }
+    return $data;
+}
+
+/** حفظ الجداول المرتبطة (inlines): صور/وثائق مرفوعة، أو صفوف بلا ملفات (kind = rows) مثل رتب المسابقة */
 function admin_save_inlines(array $r, Model $obj): void
 {
     foreach ($r['inlines'] as $i => $inl) {
         $m = $inl['model'];
         $private = !empty($inl['private']);
+        $isRows = ($inl['kind'] ?? '') === 'rows';
         // تعديل/حذف الموجود
         foreach ((array) ($_POST['inline'][$i] ?? []) as $rowId => $vals) {
+            if (!is_array($vals)) {
+                continue;
+            }
             $row = $m::firstWhere('id = ? AND `' . $inl['fk'] . '` = ?', [(int) $rowId, (int) $obj['id']]);
             if (!$row) {
                 continue;
             }
             if (!empty($vals['_delete'])) {
-                $path = (string) $row[$inl['file']];
+                $path = $isRows ? '' : (string) $row[$inl['file']];
                 $row->delete();
-                admin_delete_file_if_unused($m::table(), $inl['file'], $path, $private);
+                if (!$isRows) {
+                    admin_delete_file_if_unused($m::table(), $inl['file'], $path, $private);
+                }
                 continue;
             }
-            $upd = [];
-            foreach ($inl['text'] as $col => $lbl) {
-                if (isset($vals[$col])) {
-                    $upd[$col] = mb_substr(trim((string) $vals[$col]), 0, 200);
-                }
-                foreach (in_array($col, $m::translatable(), true) ? admin_other_langs() : [] as $lang) {
-                    if (isset($vals[$col . '_' . $lang])) {
-                        $t = mb_substr(trim((string) $vals[$col . '_' . $lang]), 0, 300);
-                        $upd[$col . '_' . $lang] = $t === '' ? null : $t;
-                    }
-                }
-            }
-            if ($inl['order'] && isset($vals[$inl['order']])) {
-                $upd[$inl['order']] = (int) $vals[$inl['order']];
-            }
+            $upd = admin_inline_row_values($inl, $vals, true);
             if ($upd) {
                 $row->update($upd);
             }
         }
-        // إضافة ملفات جديدة
+        // صفوف جديدة (بلا ملفات)
+        if ($isRows) {
+            foreach ((array) ($_POST['inline_new'][$i] ?? []) as $vals) {
+                $data = is_array($vals) ? admin_inline_row_values($inl, $vals, false) : null;
+                if ($data !== null) {
+                    $data[$inl['fk']] = (int) $obj['id'];
+                    $m::create($data);
+                }
+            }
+            admin_auto_translate_inline($inl, $obj);
+            continue;
+        }
+        // إضافة ملفات جديدة (مع القيم المختارة بجانب زر الرفع، مثل نوع الملف)
         $files = $_FILES['inline_new_' . $i] ?? null;
+        $defaults = (array) ($_POST['inline_new_defaults'][$i] ?? []);
         if ($files && is_array($files['name'])) {
             $ext = $inl['ext'] ?? Upload::IMAGES;
             $max = (float) config($inl['kind'] === 'document' ? 'uploads.max_document_mb' : 'uploads.max_image_mb', 10);
@@ -833,13 +952,51 @@ function admin_save_inlines(array $r, Model $obj): void
                 $dir = strtr($inl['dir'], ['{Y}' => date('Y'), '{m}' => date('m')]);
                 $path = Upload::store($file, $dir, $ext, $max, $private);
                 $data = [$inl['fk'] => (int) $obj['id'], $inl['file'] => $path];
-                foreach ($inl['text'] as $col => $lbl) {
-                    $data[$col] = $inl['kind'] === 'document' ? mb_substr(pathinfo($name, PATHINFO_FILENAME), 0, 200) : '';
+                foreach (admin_inline_columns($inl) as $col => $spec) {
+                    $type = $spec['type'] ?? 'text';
+                    if ($type === 'text') {
+                        $data[$col] = $inl['kind'] === 'document' ? mb_substr(pathinfo($name, PATHINFO_FILENAME), 0, (int) ($spec['max'] ?? 200)) : '';
+                    } elseif (array_key_exists($col, $defaults)) {
+                        $data[$col] = admin_inline_value($spec, $defaults[$col], $m, $col);
+                    }
                 }
                 $m::create($data);
             }
         }
         admin_auto_translate_inline($inl, $obj);
+    }
+}
+
+/** خانة إدخال في جدول مرتبط ($name مثل inline[0][12] أو inline_new[0][1]) — مع حقلي FR و EN تحت النصوص المترجمة */
+function admin_inline_input(string $name, string $col, array $spec, $value, string $model, array $raw = []): string
+{
+    $field = $name . '[' . $col . ']';
+    switch ($spec['type'] ?? 'text') {
+        case 'int':
+            return '<input type="number" class="form-control input-sm" name="' . e($field) . '" value="' . e($value) . '"'
+                . (isset($spec['min']) ? ' min="' . (int) $spec['min'] . '"' : '') . '>';
+        case 'bool':
+            return '<input type="checkbox" name="' . e($field) . '" value="1"' . (!empty($value) ? ' checked' : '') . ' aria-label="' . e($spec['label'] ?? $col) . '">';
+        case 'select':
+            $html = '<select class="form-control input-sm" name="' . e($field) . '">';
+            foreach ($model::choiceMap($spec['choices'] ?? $col) as $k => $label) {
+                $html .= '<option value="' . e($k) . '"' . ((string) $k === (string) $value ? ' selected' : '') . '>' . e($label) . '</option>';
+            }
+            return $html . '</select>';
+        default:
+            $html = '<input type="text" class="form-control input-sm" name="' . e($field) . '" value="' . e($value) . '" maxlength="' . (int) ($spec['max'] ?? 200) . '"'
+                . (!empty($spec['placeholder']) ? ' placeholder="' . e($spec['placeholder']) . '"' : '') . '>';
+            if (in_array($col, $model::translatable(), true)) {
+                $max = admin_translation_max(['max' => (int) ($spec['max'] ?? 200)]) ?? 300;
+                $html .= '<div class="admin-translations admin-translations-inline">';
+                foreach (admin_other_langs() as $lang) {
+                    $html .= '<div class="admin-tr-row" data-lang="' . e($lang) . '"><span class="admin-tr-lang">' . e(strtoupper($lang)) . '</span>'
+                        . '<input type="text" class="form-control input-sm" dir="ltr" lang="' . e($lang) . '" name="' . e($name . '[' . $col . '_' . $lang . ']') . '"'
+                        . ' value="' . e($raw[$col . '_' . $lang] ?? '') . '" maxlength="' . $max . '" data-tr-of="' . e($field) . '" data-tr-lang="' . e($lang) . '"></div>';
+                }
+                $html .= '</div>';
+            }
+            return $html;
     }
 }
 
@@ -923,11 +1080,12 @@ function admin_auto_translate(array $r, array $data): array
     return $data;
 }
 
-/** ترجمة تعليقات الصور المرفقة الفارغة (طلب واحد لكل صور السجل) */
+/** ترجمة النصوص الفارغة في الجداول المرتبطة (تعليقات الصور، رتب المسابقة...) بطلب واحد لكل السجل */
 function admin_auto_translate_inline(array $inl, Model $obj): void
 {
     $m = $inl['model'];
-    $cols = array_values(array_intersect(array_keys($inl['text']), $m::translatable()));
+    $specs = array_filter(admin_inline_columns($inl), fn($spec) => ($spec['type'] ?? 'text') === 'text');
+    $cols = array_values(array_intersect(array_keys($specs), $m::translatable()));
     if (!$cols || !config('translation.auto_on_save', true) || !Translator::enabled()) {
         return;
     }
@@ -954,7 +1112,7 @@ function admin_auto_translate_inline(array $inl, Model $obj): void
             $upd = [];
             foreach (admin_other_langs() as $lang) {
                 if (trim((string) ($rows[$id]->toArray()[$col . '_' . $lang] ?? '')) === '' && $tr[$lang][$key] !== '') {
-                    $upd[$col . '_' . $lang] = mb_substr($tr[$lang][$key], 0, 300);
+                    $upd[$col . '_' . $lang] = mb_substr($tr[$lang][$key], 0, admin_translation_max(['max' => (int) ($specs[$col]['max'] ?? 200)]) ?? 300);
                 }
             }
             if ($upd) {
@@ -962,7 +1120,7 @@ function admin_auto_translate_inline(array $inl, Model $obj): void
             }
         }
     } catch (Throwable $e) {
-        flash('warning', 'تعذرت ترجمة تعليقات الصور: ' . $e->getMessage());
+        flash('warning', 'تعذرت ترجمة ' . $inl['label'] . ': ' . $e->getMessage());
     }
 }
 
@@ -1035,6 +1193,10 @@ function admin_delete(string $key, $id): void
             flash('error', 'لا يمكنك حذف حسابك الخاص.');
             redirect_to('admin:edit', $key, $id);
         }
+        if (isset($r['before_delete']) && ($msg = ($r['before_delete'])($obj))) {
+            flash('error', $msg);
+            redirect_to('admin:edit', $key, $id);
+        }
         $name = (string) $obj;
         admin_delete_object($r, $obj);
         flash('success', 'تم حذف "' . $name . '" بنجاح.');
@@ -1053,6 +1215,9 @@ function admin_delete_object(array $r, Model $obj): void
         }
     }
     foreach ($r['inlines'] as $inl) {
+        if (empty($inl['file'])) {
+            continue; // جدول بلا ملفات (rows): يُحذف تلقائياً مع السجل (ON DELETE CASCADE)
+        }
         foreach ($inl['model']::where('`' . $inl['fk'] . '` = ?', [(int) $obj['id']]) as $row) {
             $files[] = [null, (string) $row[$inl['file']], !empty($inl['private']), $inl['model']::table(), $inl['file']];
         }
@@ -1105,7 +1270,8 @@ function admin_column_label(array $r, string $col): string
 function admin_cell(array $r, Model $obj, string $col): string
 {
     if (isset($r['columns'][$col])) {
-        return e(($r['columns'][$col]['value'])($obj));
+        $value = ($r['columns'][$col]['value'])($obj);
+        return !empty($r['columns'][$col]['html']) ? (string) $value : e($value);
     }
     $spec = $r['fields'][$col] ?? ['type' => in_array($col, ['created_at', 'updated_at', 'uploaded_at'], true) ? 'datetime' : 'text'];
     $v = $obj[$col];

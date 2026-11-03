@@ -50,8 +50,9 @@
                 <li><a href="<?= e(url('news:news_list')) ?>"><i class="fa fa-newspaper-o"></i> <?= t('الأخبار') ?></a></li>
                 
                 <li>
-                    <a href="#">
+                    <a href="<?= e(url('competitions:list')) ?>">
                         <i class="fa fa-trophy"></i> <?= t('المسابقات') ?>
+                        <?php if ($__openCompetitions = Competition::openCount()): ?><span class="nav-count" title="<?= t('مسابقات مفتوحة للترشح') ?>"><?= $__openCompetitions ?></span><?php endif; ?>
                     </a>
                 </li>
                 

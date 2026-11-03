@@ -2,6 +2,7 @@
 <?php block('title'); ?><?= t('الصفحة الرئيسية - مديرية الخدمات الجامعية سطيف') ?><?php endblock(); ?>
 
 <?php block('extra_css'); ?>
+<?php if (!empty($open_competitions)): ?><link rel="stylesheet" href="<?= asset('css/competitions.css') ?>"><?php endif; ?>
 <style>
     /* السلايدر */
     .carousel-inner > .item > img {
@@ -304,6 +305,29 @@
         </div>
     </div>
 </div>
+
+<?php if (!empty($open_competitions)): ?>
+<!-- مسابقات التوظيف المفتوحة (يظهر الصندوق فقط عند وجود مسابقة مفتوحة) -->
+<div class="container">
+    <div class="cmp-home">
+        <h3>
+            <span><i class="fa fa-trophy" style="color:#e67e22"></i> <?= t('مسابقات توظيف مفتوحة للترشح') ?></span>
+            <a href="<?= e(url('competitions:list')) ?>" class="btn btn-sm btn-success"><i class="fa fa-arrow-left"></i> <?= t('كل المسابقات') ?></a>
+        </h3>
+        <?php foreach ($open_competitions as $oc): ?>
+            <div class="cmp-home-item">
+                <a class="cmp-home-title" href="<?= e($oc->get_absolute_url()) ?>"><?= e($oc['title']) ?></a>
+                <span>
+                    <small><i class="fa fa-hourglass-half"></i> <?= t('يتبقى: {time}', ['time' => $oc->remaining_text()]) ?></small>
+                    <?php if ($oc->accepts_applications()): ?>
+                        <a class="btn btn-xs btn-success" href="<?= e(url('competitions:apply', $oc['slug'])) ?>"><?= t('ترشح الآن') ?></a>
+                    <?php endif; ?>
+                </span>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- عنوان آخر الأخبار -->
 <div class="container">

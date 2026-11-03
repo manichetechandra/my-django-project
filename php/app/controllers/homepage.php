@@ -16,6 +16,7 @@ function homepage_index(): void
         'statistics'          => Statistic::where('is_active = 1', [], '`order`', 4),
         'director_word'       => DirectorWord::firstWhere('is_active = 1', [], 'created_at DESC'),
         'site_stats'          => site_stats(),
+        'open_competitions'   => Competition::openNow(3), // صندوق «مسابقات توظيف مفتوحة» يظهر فقط عند وجودها
     ]);
 }
 

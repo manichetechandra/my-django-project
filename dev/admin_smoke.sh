@@ -12,7 +12,8 @@ curl -s -c "$JAR" -b "$JAR" -o /dev/null -X POST "$B/admin/login/" \
 # المسارات: من admin_config نفسه (القائمة، الإضافة إن كانت مسموحة، أول سجل)
 URLS=$(cd "$SITE" && DB_NAME=${DB_NAME:-dou_setif2} $PHP -r '
 require "app/bootstrap.php";
-foreach (admin_resources() as $key => $r) {
+// كل الأقسام (حتى superuser_only و permission): نختبر بحساب المدير العام، و admin_resources() في سطر الأوامر بلا مستخدم
+foreach ((require APP_PATH . "/admin_config.php") as $key => $r) {
     echo "/admin/$key/\n";
     if ($r["can_add"] ?? true) echo "/admin/$key/add/\n";
     $id = DB::value("SELECT id FROM `" . $r["model"]::table() . "` ORDER BY id LIMIT 1");
@@ -20,7 +21,13 @@ foreach (admin_resources() as $key => $r) {
 }
 echo "/admin/\n/admin/password/\n";
 // الترجمة الجماعية في النسخة 2.0 فقط
-if (is_file("app/views/admin/translate_all.php")) echo "/admin/translate-all/\n";')
+if (is_file("app/views/admin/translate_all.php")) echo "/admin/translate-all/\n";
+// طلبات الترشح للمسابقات (النسخة 2.0)
+if (is_file("app/controllers/recruitment_admin.php")) {
+    echo "/admin/recruitment/applications/\n/admin/recruitment/audit/\n/admin/recruitment/export/\n";
+    if ($a = DB::value("SELECT id FROM competition_applications ORDER BY id LIMIT 1")) echo "/admin/recruitment/applications/$a/\n";
+    if ($c = DB::value("SELECT id FROM competitions ORDER BY id LIMIT 1")) echo "/admin/recruitment/purge/$c/\n/admin/recruitment/applications/?competition=$c\n";
+}')
 fail=0; n=0
 for u in $URLS; do
   code=$(curl -s -b "$JAR" -o /tmp/admin_smoke.html -w "%{http_code}" "$B$u")

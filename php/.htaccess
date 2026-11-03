@@ -22,7 +22,7 @@ AddDefaultCharset UTF-8
 </IfModule>
 
 # منع قراءة ملفات حساسة
-<FilesMatch "^(config\.php|config\.local\.php|.*\.sql|.*\.md|.*\.log|.*\.bak|.*\.swp|composer\.(json|lock))$">
+<FilesMatch "^(config\.php|config\.local\.php|.*\.sql|.*\.md|.*\.log|.*\.bak|.*\.swp|.*\.key|.*\.enc|composer\.(json|lock))$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>

@@ -251,6 +251,13 @@ function input(string $key, $default = null)
     return $_POST[$key] ?? $_GET[$key] ?? $default;
 }
 
+/** نص من POST (أي قيمة ليست نصاً — مثل name[]=... — تُعامل كفارغة)، مقصوص إلى $max حرف */
+function post_text(string $key, int $max = 1000): string
+{
+    $v = $_POST[$key] ?? '';
+    return is_string($v) ? mb_substr(trim($v), 0, $max) : '';
+}
+
 function query(string $key, $default = '')
 {
     $v = $_GET[$key] ?? $default;
@@ -352,6 +359,24 @@ function security_log(string $event, array $data = []): void
     }
     $line = json_encode(['time' => date('c'), 'event' => $event, 'ip' => client_ip()] + $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     @file_put_contents($dir . '/security.log', $line . "\n", FILE_APPEND | LOCK_EX);
+}
+
+/** قيمة من php.ini مثل "20M" بالبايت (0 = بلا حد) */
+function ini_bytes(string $value): int
+{
+    $value = trim($value);
+    $n = (int) $value;
+    switch (strtolower(substr($value, -1))) {
+        case 'g':
+            $n *= 1024;
+            // no break
+        case 'm':
+            $n *= 1024;
+            // no break
+        case 'k':
+            $n *= 1024;
+    }
+    return max(0, $n);
 }
 
 function json_response($data, int $status = 200): void
@@ -511,6 +536,16 @@ function is_superuser(): bool
 {
     $u = Auth::user();
     return $u !== null && $u['is_active'] && $u['is_superuser'];
+}
+
+/**
+ * صلاحية مسابقات التوظيف: إدارة المسابقات والاطلاع على ملفات المترشحين (معطيات شخصية).
+ * للمدير العام، وللموظفين الذين منحهم المدير الصلاحية من «المستخدمون» ← «صلاحية مسابقات التوظيف».
+ */
+function can_recruit(): bool
+{
+    $u = Auth::user();
+    return is_superuser() || (is_staff() && !empty($u['can_recruit']));
 }
 
 /** مثل @login_required(login_url='students:login') */
@@ -720,6 +755,28 @@ function timesince($value, $now = null): string
 }
 
 /** عدد + وحدة بصيغة اللغة: العربية (مفرد، مثنى، جمع) أو الفرنسية والإنجليزية (مفرد، جمع) */
+/** مدة متبقية بلغة الصفحة: «5 أيام و3 ساعات» / «5 jours et 3 heures» (العد التنازلي لآجال المسابقات) */
+function time_left(int $seconds): string
+{
+    $names = [
+        'ar' => [['يوم', 'يومان', 'أيام'], ['ساعة', 'ساعتان', 'ساعات'], ['دقيقة', 'دقيقتان', 'دقائق']],
+        'fr' => [['jour', 'jours'], ['heure', 'heures'], ['minute', 'minutes']],
+        'en' => [['day', 'days'], ['hour', 'hours'], ['minute', 'minutes']],
+    ];
+    $forms = $names[lang()] ?? $names['ar'];
+    $and = ['fr' => ' et ', 'en' => ' and '][lang()] ?? ' و';
+    $d = intdiv($seconds, 86400);
+    $h = intdiv($seconds % 86400, 3600);
+    $m = intdiv($seconds % 3600, 60);
+    if ($d > 0) {
+        return plural_unit($d, $forms[0]) . ($h ? $and . plural_unit($h, $forms[1]) : '');
+    }
+    if ($h > 0) {
+        return plural_unit($h, $forms[1]) . ($m ? $and . plural_unit($m, $forms[2]) : '');
+    }
+    return plural_unit(max(1, $m), $forms[2]);
+}
+
 function plural_unit(int $n, array $forms): string
 {
     if (count($forms) === 3) {
