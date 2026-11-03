@@ -63,6 +63,8 @@ $exportQs = http_build_query(array_filter(['competition' => $active['competition
         <i class="fa fa-trophy"></i> <a href="<?= e(url('admin:edit', 'competitions', $current['id'])) ?>"><?= e($current['title']) ?></a>
         — الإيداع من <?= e(format_date($current['opens_at'], 'd/m/Y')) ?> إلى <?= e(format_date($current['closes_at'], 'd/m/Y')) ?>
         (<?= e(Competition::PHASES[$current->phase()]) ?>)
+        — <a href="<?= e(url('admin:recruit_results') . '?competition=' . (int) $current['id']) ?>"><i class="fa fa-list-ol"></i> النتائج</a>
+          <?= $current->results_published() ? '<span class="label label-success">منشورة</span>' : '' ?>
         <?php if (is_superuser()): ?>
             — <a href="<?= e(url('admin:recruit_purge', $current['id'])) ?>" class="text-danger"><i class="fa fa-trash"></i> حذف معطيات المترشحين بعد انتهاء المسابقة</a>
         <?php endif; ?>
@@ -71,12 +73,28 @@ $exportQs = http_build_query(array_filter(['competition' => $active['competition
 
 <form method="post" id="admin-list-form">
     <?= csrf_field() ?>
-    <div class="admin-actions form-inline">
-        <select name="new_status" class="form-control input-sm">
-            <option value="">— تغيير حالة الطلبات المحددة إلى —</option>
-            <?php foreach ($statuses as $k => $label): ?><option value="<?= e($k) ?>"><?= e($label) ?></option><?php endforeach; ?>
-        </select>
-        <button type="submit" class="btn btn-sm btn-primary">تطبيق</button>
+    <div class="admin-actions form-inline recruit-bulk">
+        <span class="recruit-bulk-group">
+            <select name="new_status" class="form-control input-sm" aria-label="الحالة الجديدة">
+                <option value="">— تغيير حالة الطلبات المحددة إلى —</option>
+                <?php foreach ($statuses as $k => $label): ?><option value="<?= e($k) ?>"><?= e($label) ?></option><?php endforeach; ?>
+            </select>
+            <button type="submit" name="do" value="status" class="btn btn-sm btn-primary">تطبيق</button>
+        </span>
+        <?php if ($current && $exams): ?>
+            <span class="recruit-bulk-group">
+                <select name="exam_id" class="form-control input-sm" aria-label="موعد الاستدعاء">
+                    <option value="">— استدعاء المحددين (الملفات المقبولة) إلى —</option>
+                    <?php foreach ($exams as $ex): ?><option value="<?= e($ex['id']) ?>"><?= e($ex->label()) ?> (<?= $ex->convoked_count() ?>)</option><?php endforeach; ?>
+                </select>
+                <button type="submit" name="do" value="convoke" class="btn btn-sm btn-success"><i class="fa fa-calendar-check-o"></i> استدعاء</button>
+                <button type="submit" name="do" value="unconvoke" class="btn btn-sm btn-default" data-confirm="إلغاء استدعاء المترشحين المحددين؟ يختفي الاستدعاء من صفحاتهم.">إلغاء الاستدعاء</button>
+            </span>
+        <?php elseif ($current): ?>
+            <span class="small text-muted"><i class="fa fa-calendar-o"></i> للاستدعاء: أضف مواعيد الاختبار في <a href="<?= e(url('admin:edit', 'competitions', $current['id'])) ?>#inline-exams">صفحة المسابقة</a>.</span>
+        <?php else: ?>
+            <span class="small text-muted"><i class="fa fa-calendar-o"></i> للاستدعاء: اختر المسابقة أولاً.</span>
+        <?php endif; ?>
         <span class="text-muted small" data-selected-count></span>
     </div>
     <div class="table-responsive admin-table-wrap">
@@ -91,6 +109,7 @@ $exportQs = http_build_query(array_filter(['competition' => $active['competition
                 <th>الوثائق</th>
                 <th>تاريخ الترشح</th>
                 <th>الحالة</th>
+                <th>الاستدعاء / النتيجة</th>
             </tr>
             </thead>
             <tbody>
@@ -106,11 +125,23 @@ $exportQs = http_build_query(array_filter(['competition' => $active['competition
                     <td><?= e($a['diploma']) ?><div class="small text-muted"><?= e($a['specialty']) ?> (<?= e($a['graduation_year']) ?>)</div></td>
                     <td class="text-center"><i class="fa fa-file-pdf-o text-danger"></i> <?= (int) ($doc_counts[(int) $a['id']] ?? 0) ?></td>
                     <td class="small"><?= e(format_date($a['submitted_at'], 'd/m/Y H:i')) ?></td>
-                    <td><span class="label label-<?= e($a->status_color()) ?>"><?= e($a->get_status_display()) ?></span></td>
+                    <td><span class="label label-<?= e($a->status_color()) ?>"><?= e($a->get_status_display()) ?></span>
+                        <?php if ($a['status'] === 'pending' && $a['completed_at']): ?><div><span class="label label-info" title="<?= e(format_date($a['completed_at'], 'd/m/Y H:i')) ?>">أكمل ملفه</span></div><?php endif; ?>
+                        <?php if ($a['status'] === 'incomplete' && $a['complete_until']): ?><div class="small text-muted">حتى <?= e(format_date($a['complete_until'], 'd/m')) ?></div><?php endif; ?>
+                    </td>
+                    <td class="small">
+                        <?php $ex = $exams_by_id[(int) $a['exam_id']] ?? null; ?>
+                        <?php if ($ex && $a['status'] === 'accepted'): ?>
+                            <div title="<?= e($ex['title']) ?>"><i class="fa fa-calendar-check-o text-success"></i> <?= e(format_date($ex['starts_at'], 'd/m H:i')) ?> — <strong class="recruit-code"><?= e($a['seat_number']) ?></strong></div>
+                        <?php endif; ?>
+                        <?php if ($a['result']): ?>
+                            <span class="label label-<?= e($a->result_color()) ?>"><?= e($a->get_result_display()) ?></span><?= $a->score_text() !== '' ? ' <bdi>' . e($a->score_text()) . '</bdi>' : '' ?>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             <?php if ($page->isEmpty()): ?>
-                <tr><td colspan="8" class="text-center text-muted" style="padding:40px">لا توجد طلبات ترشح<?= $active ? ' مطابقة للتصفية' : '' ?>.</td></tr>
+                <tr><td colspan="9" class="text-center text-muted" style="padding:40px">لا توجد طلبات ترشح<?= $active ? ' مطابقة للتصفية' : '' ?>.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

@@ -156,3 +156,21 @@ body.admin-login-body {
 .recruit-history { max-height: 460px; overflow-y: auto; }
 .recruit-history .list-group-item { font-size: 13px; }
 .recruit-key-alert code { font-size: 13px; }
+/* الاستدعاءات والنتائج */
+.recruit-bulk { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.recruit-bulk-group { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.recruit-bulk-group select { max-width: 340px; }
+.recruit-late-file { background: #eef7fb; }
+.recruit-outcome .panel-heading { background: #eef6e6; }
+.recruit-publish { border: 1px solid #f0d58c; background: #fdf8e8; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; }
+.recruit-publish.is-published { border-color: #b5d58c; background: #f1f8e8; }
+.recruit-publish-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin: 0; }
+.recruit-results-summary { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 10px; }
+.recruit-results-summary .label { font-size: 12px; padding: 4px 8px; }
+.recruit-results-filter { margin-inline-start: auto; }
+.recruit-results-table td { vertical-align: middle !important; }
+.recruit-results-table tr.recruit-res-passed td:first-child { box-shadow: inset -4px 0 0 #5cb85c; }
+.recruit-results-table tr.recruit-res-reserve td:first-child { box-shadow: inset -4px 0 0 #5bc0de; }
+.recruit-results-table tr.recruit-res-failed td:first-child { box-shadow: inset -4px 0 0 #d9534f; }
+.recruit-results-table tr.recruit-res-absent td:first-child { box-shadow: inset -4px 0 0 #999; }
+.recruit-results-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 14px; }

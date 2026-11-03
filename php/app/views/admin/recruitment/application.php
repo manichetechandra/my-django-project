@@ -29,6 +29,16 @@
                 <?php if ($app['reviewed_at']): ?>
                     <tr><th>آخر مراجعة</th><td><?= e(format_date($app['reviewed_at'], 'd/m/Y H:i')) ?><?= $app['reviewed_by'] ? ' — ' . e($app['reviewed_by']->display_name()) : '' ?></td></tr>
                 <?php endif; ?>
+                <?php if ($app['status'] === 'incomplete' && $app['complete_until']): ?>
+                    <tr><th>أجل إكمال الملف</th><td><?= e(format_date($app['complete_until'], 'd/m/Y')) ?>
+                        <?= $app->can_complete() ? '<span class="label label-info">المترشح يستطيع رفع الوثائق الناقصة</span>' : '<span class="label label-default">انتهى الأجل</span>' ?></td></tr>
+                <?php endif; ?>
+                <?php if ($app['completed_at']): ?>
+                    <tr><th>أكمل المترشح ملفه</th><td><?= e(format_date($app['completed_at'], 'd/m/Y H:i')) ?></td></tr>
+                <?php endif; ?>
+                <?php if ($app->is_convoked()): ?>
+                    <tr><th>الاستدعاء</th><td><i class="fa fa-calendar-check-o text-success"></i> <?= e($app['exam']->label()) ?> — رقم التسجيل <strong class="recruit-code"><?= e($app['seat_number']) ?></strong></td></tr>
+                <?php endif; ?>
             </table>
         </div>
 
@@ -68,20 +78,21 @@
         <div class="panel panel-default admin-panel">
             <div class="panel-heading"><strong><i class="fa fa-file-pdf-o"></i> الوثائق المرفوعة (<?= count($files) ?>)</strong></div>
             <table class="table table-condensed recruit-files">
-                <thead><tr><th>الوثيقة</th><th>اسم الملف</th><th>الحجم</th><th style="width:170px"></th></tr></thead>
+                <thead><tr><th>الوثيقة</th><th>اسم الملف</th><th>الحجم</th><th>الرفع</th><th style="width:170px"></th></tr></thead>
                 <tbody>
-                <?php foreach ($files as $f): ?>
-                    <tr>
-                        <td><strong><?= e($f['label']) ?></strong></td>
+                <?php foreach ($files as $f): $late = !empty($f['added_later']); ?>
+                    <tr<?= $late ? ' class="recruit-late-file"' : '' ?>>
+                        <td><strong><?= e($f['label']) ?></strong><?php if ($late): ?> <span class="label label-info" title="رفعها المترشح من صفحة متابعة طلبه بعد أن كان ملفه ناقصاً">إكمال</span><?php endif; ?></td>
                         <td class="small" dir="auto"><?= e($f['original_name']) ?></td>
                         <td class="small"><bdi><?= e(human_filesize($f['size'])) ?></bdi></td>
+                        <td class="small"><?= e(format_date($f['uploaded_at'], 'd/m/Y H:i')) ?></td>
                         <td>
                             <a href="<?= e(url('admin:recruit_file', $f['id'])) ?>" target="_blank" rel="noopener" class="btn btn-xs btn-primary"><i class="fa fa-eye"></i> عرض</a>
                             <a href="<?= e(url('admin:recruit_file', $f['id']) . '?dl=1') ?>" class="btn btn-xs btn-default"><i class="fa fa-download"></i> تحميل</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
-                <?php if (!$files): ?><tr><td colspan="4" class="text-muted text-center">لا توجد وثائق.</td></tr><?php endif; ?>
+                <?php if (!$files): ?><tr><td colspan="5" class="text-muted text-center">لا توجد وثائق.</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -90,6 +101,7 @@
     <div class="col-md-4">
         <form method="post" class="panel panel-default admin-panel recruit-decision">
             <?= csrf_field() ?>
+            <input type="hidden" name="form" value="review">
             <div class="panel-heading"><strong><i class="fa fa-gavel"></i> دراسة الطلب</strong></div>
             <div class="panel-body">
                 <div class="form-group">
@@ -99,6 +111,12 @@
                             <option value="<?= e($k) ?>"<?= $app['status'] === $k ? ' selected' : '' ?>><?= e($label) ?></option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+                <div class="form-group" data-show-when="status=incomplete">
+                    <label for="r_until">آخر أجل لإكمال الملف</label>
+                    <input type="date" name="complete_until" id="r_until" class="form-control" min="<?= e(date('Y-m-d')) ?>"
+                           value="<?= e($app['status'] === 'incomplete' && $app['complete_until'] ? $app['complete_until'] : $default_until) ?>">
+                    <span class="help-block small">قبل نهاية هذا اليوم يستطيع المترشح رفع الوثائق الناقصة بنفسه من صفحة «متابعة طلب»، فيعود طلبه إلى «قيد الانتظار». اكتب في الرسالة ما ينقص ملفه.</span>
                 </div>
                 <div class="form-group">
                     <label for="r_msg">رسالة للمترشح</label>
@@ -111,6 +129,61 @@
                     <span class="help-block small">للموظفين فقط، لا يراها المترشح.</span>
                 </div>
                 <button type="submit" class="btn btn-success btn-block"><i class="fa fa-save"></i> حفظ</button>
+            </div>
+        </form>
+
+        <form method="post" class="panel panel-default admin-panel recruit-outcome" id="outcome">
+            <?= csrf_field() ?>
+            <input type="hidden" name="form" value="outcome">
+            <div class="panel-heading"><strong><i class="fa fa-calendar-check-o"></i> الاستدعاء والنتيجة</strong></div>
+            <div class="panel-body">
+                <?php if ($app['status'] !== 'accepted'): ?>
+                    <p class="small text-muted"><i class="fa fa-info-circle"></i> الاستدعاء والنتيجة للمترشحين الذين قُبلت ملفاتهم فقط.</p>
+                <?php endif; ?>
+                <div class="form-group">
+                    <label for="r_exam">الاستدعاء إلى</label>
+                    <select name="exam_id" id="r_exam" class="form-control"<?= $app['status'] !== 'accepted' && !$app['exam_id'] ? ' disabled' : '' ?>>
+                        <option value="0">— غير مستدعى —</option>
+                        <?php foreach ($exams as $ex): ?>
+                            <option value="<?= e($ex['id']) ?>"<?= (int) $app['exam_id'] === (int) $ex['id'] ? ' selected' : '' ?>><?= e($ex->label()) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if (!$exams && $c): ?>
+                        <span class="help-block small">لا توجد مواعيد. أضفها في <a href="<?= e(url('admin:edit', 'competitions', $c['id'])) ?>#inline-exams">صفحة المسابقة ← مواعيد الاختبارات</a>.</span>
+                    <?php elseif ($app['seat_number']): ?>
+                        <span class="help-block small">رقم التسجيل: <strong class="recruit-code"><?= e($app['seat_number']) ?></strong></span>
+                    <?php endif; ?>
+                </div>
+                <div class="row">
+                    <div class="col-xs-7 form-group">
+                        <label for="r_result">النتيجة</label>
+                        <select name="result" id="r_result" class="form-control">
+                            <option value="">— لم تُسجَّل —</option>
+                            <?php foreach ($results as $k => $label): ?>
+                                <option value="<?= e($k) ?>"<?= (string) $app['result'] === $k ? ' selected' : '' ?>><?= e($label) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-xs-5 form-group">
+                        <label for="r_score">العلامة /20</label>
+                        <input type="text" name="score" id="r_score" class="form-control" inputmode="decimal" maxlength="5" dir="ltr" placeholder="14,50" value="<?= e($app->score_text()) ?>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="r_rank">الترتيب</label>
+                    <input type="number" name="result_rank" id="r_rank" class="form-control" min="1" max="65535" value="<?= e($app['result_rank']) ?>">
+                </div>
+                <div class="form-group">
+                    <label for="r_rnote">ملاحظة تظهر للمترشح مع النتيجة</label>
+                    <textarea name="result_note" id="r_rnote" class="form-control" rows="2" maxlength="500" placeholder="مثال: يرجى الحضور يوم 1 ديسمبر لاستكمال ملف التوظيف."><?= e($app['result_note']) ?></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-save"></i> حفظ الاستدعاء والنتيجة</button>
+                <?php if ($c): ?>
+                    <p class="small text-muted" style="margin:10px 0 0">
+                        <?= $c->results_published() ? '<i class="fa fa-globe text-success"></i> نتائج هذه المسابقة منشورة: المترشح يرى نتيجته.' : '<i class="fa fa-eye-slash"></i> النتائج غير منشورة بعد: لا يراها المترشح.' ?>
+                        <a href="<?= e(url('admin:recruit_results') . '?competition=' . (int) $c['id']) ?>">صفحة نتائج المسابقة</a>
+                    </p>
+                <?php endif; ?>
             </div>
         </form>
 

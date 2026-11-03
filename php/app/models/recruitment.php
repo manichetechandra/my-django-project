@@ -6,6 +6,7 @@
  *  CompetitionPost        ← رتبة/منصب داخل المسابقة (عدد المناصب، الشهادة المطلوبة)
  *  CompetitionRequirement ← وثيقة مطلوبة في ملف الترشح (= خانة رفع PDF في الاستمارة)
  *  CompetitionFile        ← ملف منشور للجميع (الإعلان، الاستمارة، قائمة المقبولين، النتائج)
+ *  CompetitionExam        ← موعد اختبار أو مقابلة (يُستدعى إليه المترشحون المقبولة ملفاتهم)
  *  CompetitionApplication ← طلب ترشح (المعطيات الحساسة مشفّرة في personal_data)
  *  CandidateFile          ← وثيقة مترشح (مشفّرة في storage/private/recruitment/)
  *  RecruitmentAudit       ← سجل الاطلاع على ملفات المترشحين
@@ -29,6 +30,7 @@ class Competition extends Model
         'posts'        => [CompetitionPost::class, 'competition_id', 'ORDER BY `order`, id'],
         'requirements' => [CompetitionRequirement::class, 'competition_id', 'ORDER BY `order`, id'],
         'files'        => [CompetitionFile::class, 'competition_id', 'ORDER BY `order`, id'],
+        'exams'        => [CompetitionExam::class, 'competition_id', 'ORDER BY starts_at, `order`, id'],
     ];
     protected static array $defaults = ['reference' => '', 'summary' => '', 'description' => '', 'conditions' => '',
         'recruitment_mode' => 'qualification', 'online_apply' => 1, 'status' => 'published', 'views_count' => 0];
@@ -171,6 +173,12 @@ class Competition extends Model
         return (bool) DB::value("SELECT 1 FROM competition_files WHERE competition_id = ? AND kind IN ('admitted', 'results') LIMIT 1", [(int) $this->attributes['id']]);
     }
 
+    /** هل نُشرت النتائج الفردية؟ (قبل النشر لا يرى أي مترشح نتيجته، حتى لو سجّلها الموظفون) */
+    public function results_published(): bool
+    {
+        return !empty($this->attributes['results_published_at']);
+    }
+
     public function applications_count(?string $status = null): int
     {
         return CompetitionApplication::count('competition_id = ?' . ($status ? ' AND status = ?' : ''), $status ? [(int) $this->attributes['id'], $status] : [(int) $this->attributes['id']]);
@@ -238,20 +246,49 @@ class CompetitionFile extends Model
     }
 }
 
+class CompetitionExam extends Model
+{
+    protected static string $table = 'competition_exams';
+    protected static array $translatable = ['title', 'place', 'instructions'];
+    protected static array $belongsTo = ['competition' => [Competition::class, 'competition_id']];
+    protected static array $defaults = ['place' => '', 'instructions' => '', 'order' => 0];
+
+    /** «المقابلة الشفهية — 24/11/2026 09:00» (لقوائم الاختيار في لوحة الإدارة) */
+    public function label(): string
+    {
+        return $this->attributes['title'] . ' — ' . date('d/m/Y H:i', (int) strtotime((string) $this->attributes['starts_at']));
+    }
+
+    public function is_past(): bool
+    {
+        return strtotime((string) $this->attributes['starts_at']) < time();
+    }
+
+    public function convoked_count(): int
+    {
+        return CompetitionApplication::count('exam_id = ?', [(int) $this->attributes['id']]);
+    }
+}
+
 class CompetitionApplication extends Model
 {
     protected static string $table = 'competition_applications';
     protected static array $choices = [
         'status' => ['pending' => 'قيد الانتظار', 'under_review' => 'قيد الدراسة', 'incomplete' => 'ملف ناقص',
-                     'accepted' => 'مقبول', 'rejected' => 'مرفوض'],
+                     'accepted' => 'ملف مقبول', 'rejected' => 'ملف مرفوض'],
+        'result' => ['passed' => 'ناجح', 'reserve' => 'في القائمة الاحتياطية', 'failed' => 'غير ناجح', 'absent' => 'غائب'],
         'gender' => ['M' => 'ذكر', 'F' => 'أنثى'],
         'national_service' => ['done' => 'مؤداة', 'exempt' => 'معفى', 'deferred' => 'مؤجل', 'na' => 'غير معني'],
     ];
     public const STATUS_COLORS = ['pending' => 'warning', 'under_review' => 'info', 'incomplete' => 'danger', 'accepted' => 'success', 'rejected' => 'default'];
+    public const RESULT_COLORS = ['passed' => 'success', 'reserve' => 'info', 'failed' => 'danger', 'absent' => 'default'];
+    /** المدة الافتراضية لإكمال الملف الناقص (أيام) */
+    public const COMPLETE_DAYS = 7;
     protected static array $belongsTo = [
         'competition' => [Competition::class, 'competition_id'],
         'post'        => [CompetitionPost::class, 'post_id'],
         'reviewed_by' => [User::class, 'reviewed_by_id'],
+        'exam'        => [CompetitionExam::class, 'exam_id'],
     ];
     protected static array $hasMany = ['files' => [CandidateFile::class, 'application_id', 'ORDER BY id']];
 
@@ -350,6 +387,42 @@ class CompetitionApplication extends Model
         return self::STATUS_COLORS[$this->attributes['status']] ?? 'default';
     }
 
+    /** يستطيع المترشح رفع الوثائق الناقصة بنفسه: ملف ناقص + لم ينته الأجل (نهاية يوم complete_until) */
+    public function can_complete(): bool
+    {
+        if ($this->attributes['status'] !== 'incomplete') {
+            return false;
+        }
+        $until = $this->attributes['complete_until'] ?? null;
+        return $until === null || $until === '' || Competition::today() <= $until;
+    }
+
+    /** مستدعى إلى موعد ما زال موجوداً، وملفه مقبول */
+    public function is_convoked(): bool
+    {
+        return !empty($this->attributes['exam_id']) && !empty($this->attributes['convoked_at'])
+            && $this->attributes['status'] === 'accepted' && $this['exam'] !== null;
+    }
+
+    /** النتيجة تظهر للمترشح فقط بعد نشر نتائج المسابقة */
+    public function result_visible(): bool
+    {
+        $c = $this['competition'];
+        return !empty($this->attributes['result']) && $c && $c->results_published();
+    }
+
+    public function result_color(): string
+    {
+        return self::RESULT_COLORS[$this->attributes['result']] ?? 'default';
+    }
+
+    /** العلامة كما تُكتب في الجزائر: 14,50 */
+    public function score_text(): string
+    {
+        $s = $this->attributes['score'] ?? null;
+        return $s === null || $s === '' ? '' : number_format((float) $s, 2, ',', '');
+    }
+
     /** نص اختيار من القائمة (للقيم داخل البيانات المشفّرة مثل الخدمة الوطنية) */
     public static function choiceLabel(string $field, ?string $value): string
     {
@@ -360,6 +433,8 @@ class CompetitionApplication extends Model
 class CandidateFile extends Model
 {
     protected static string $table = 'competition_application_files';
+    protected static array $booleans = ['added_later'];
+    protected static array $defaults = ['added_later' => 0];
     protected static array $belongsTo = ['application' => [CompetitionApplication::class, 'application_id']];
     protected static array $createdFields = ['uploaded_at'];
 

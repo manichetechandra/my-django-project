@@ -16,6 +16,7 @@ SET time_zone = '+01:00';
 DROP TABLE IF EXISTS `recruitment_audit`;
 DROP TABLE IF EXISTS `competition_application_files`;
 DROP TABLE IF EXISTS `competition_applications`;
+DROP TABLE IF EXISTS `competition_exams`;
 DROP TABLE IF EXISTS `competition_files`;
 DROP TABLE IF EXISTS `competition_requirements`;
 DROP TABLE IF EXISTS `competition_posts`;
@@ -632,6 +633,7 @@ CREATE TABLE `competitions` (
   `views_count`      INT UNSIGNED NOT NULL DEFAULT 0,
   `created_at`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `results_published_at` DATETIME NULL COMMENT 'وقت نشر النتائج الفردية للمترشحين (NULL = غير منشورة)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_competitions_slug` (`slug`),
   KEY `idx_competitions_dates` (`status`, `opens_at`, `closes_at`)
@@ -689,6 +691,26 @@ CREATE TABLE `competition_files` (
   CONSTRAINT `fk_competition_files_competition` FOREIGN KEY (`competition_id`) REFERENCES `competitions` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- مواعيد الاختبارات والمقابلات (يُستدعى إليها المترشحون — فوج لكل موعد)
+CREATE TABLE `competition_exams` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `competition_id`  INT UNSIGNED NOT NULL,
+  `title`           VARCHAR(200) NOT NULL COMMENT 'مثل: المقابلة الشفهية — الفوج الأول',
+  `title_fr`        VARCHAR(300) NULL DEFAULT NULL,
+  `title_en`        VARCHAR(300) NULL DEFAULT NULL,
+  `starts_at`       DATETIME     NOT NULL COMMENT 'تاريخ وساعة الاختبار',
+  `place`           VARCHAR(300) NOT NULL DEFAULT '',
+  `place_fr`        VARCHAR(500) NULL DEFAULT NULL,
+  `place_en`        VARCHAR(500) NULL DEFAULT NULL,
+  `instructions`    VARCHAR(500) NOT NULL DEFAULT '' COMMENT 'تعليمات تظهر في الاستدعاء',
+  `instructions_fr` VARCHAR(800) NULL DEFAULT NULL,
+  `instructions_en` VARCHAR(800) NULL DEFAULT NULL,
+  `order`           INT          NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `idx_competition_exams_competition` (`competition_id`, `starts_at`),
+  CONSTRAINT `fk_competition_exams_competition` FOREIGN KEY (`competition_id`) REFERENCES `competitions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ---------------------------------------------------------------------
 -- طلبات الترشح الإلكتروني (معطيات شخصية محمية)
 -- ---------------------------------------------------------------------
@@ -717,13 +739,23 @@ CREATE TABLE `competition_applications` (
   `updated_at`        DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `reviewed_at`       DATETIME          NULL,
   `reviewed_by_id`    INT UNSIGNED      NULL,
+  `complete_until`    DATE              NULL COMMENT 'آخر أجل ليرفع المترشح الوثائق الناقصة بنفسه',
+  `completed_at`      DATETIME          NULL COMMENT 'آخر مرة أكمل فيها المترشح ملفه',
+  `exam_id`           INT UNSIGNED      NULL COMMENT 'الاستدعاء: موعد الاختبار',
+  `seat_number`       VARCHAR(20)       NULL COMMENT 'رقم التسجيل في الاختبار',
+  `convoked_at`       DATETIME          NULL,
+  `result`            VARCHAR(20)       NULL COMMENT 'passed | reserve | failed | absent',
+  `score`             DECIMAL(5,2)      NULL COMMENT 'العلامة من 20',
+  `result_rank`       SMALLINT UNSIGNED NULL COMMENT 'الترتيب',
+  `result_note`       VARCHAR(500)      NULL COMMENT 'ملاحظة تظهر للمترشح مع النتيجة',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_competition_applications_tracking` (`tracking_code`),
   UNIQUE KEY `uq_competition_applications_nin` (`competition_id`, `nin_hash`),
   KEY `idx_competition_applications_status` (`competition_id`, `status`, `submitted_at`),
   CONSTRAINT `fk_competition_applications_competition` FOREIGN KEY (`competition_id`) REFERENCES `competitions` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `fk_competition_applications_post` FOREIGN KEY (`post_id`) REFERENCES `competition_posts` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_competition_applications_reviewer` FOREIGN KEY (`reviewed_by_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+  CONSTRAINT `fk_competition_applications_reviewer` FOREIGN KEY (`reviewed_by_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_competition_applications_exam` FOREIGN KEY (`exam_id`) REFERENCES `competition_exams` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- وثائق المترشحين: ملفات مشفّرة بأسماء عشوائية في storage/private/recruitment/<رقم المسابقة>/
@@ -737,6 +769,7 @@ CREATE TABLE `competition_application_files` (
   `size`           INT UNSIGNED NOT NULL,
   `sha256`         CHAR(64)     NOT NULL COMMENT 'بصمة الملف الأصلي للتحقق من سلامته',
   `uploaded_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `added_later`    TINYINT(1)   NOT NULL DEFAULT 0 COMMENT 'رفعها المترشح بعد الإرسال (إكمال ملف ناقص)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_competition_application_files_stored` (`stored_name`),
   KEY `idx_competition_application_files_application` (`application_id`),

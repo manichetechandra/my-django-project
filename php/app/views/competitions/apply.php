@@ -42,7 +42,11 @@ $field = function (string $name, string $help = '') use ($form): string {
             </ul>
         </div>
 
-        <form method="post" enctype="multipart/form-data" class="cmp-form" id="cmp-apply" accept-charset="UTF-8">
+        <form method="post" enctype="multipart/form-data" class="cmp-form" id="cmp-apply" accept-charset="UTF-8" data-pdf-upload
+              data-max-total="<?= (int) $limits['total'] ?>"
+              data-msg-big="<?= t('الملف أكبر من الحد المسموح ({mb} ميغابايت).', ['mb' => $limits['file_mb']]) ?>"
+              data-msg-type="<?= t('يُقبل ملف PDF فقط.') ?>"
+              data-msg-total="<?= t('مجموع أحجام الوثائق أكبر من {mb} ميغابايت. قلّل حجم الملفات (مسح ضوئي بدقة 150 نقطة يكفي).', ['mb' => $limits['total_mb']]) ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="_ft" value="<?= e($form_token) ?>">
             <div class="cmp-hp" aria-hidden="true">
@@ -133,37 +137,7 @@ $field = function (string $name, string $help = '') use ($form): string {
 
 <?php block('extra_js'); ?>
 <?php if ($blocked === null): ?>
-<script>
-// فحص أولي في المتصفح (الحجم والنوع) قبل رفع الملفات — الفحص الحقيقي يتم في الخادم
-(function () {
-    var form = document.getElementById('cmp-apply');
-    var maxTotal = <?= (int) $limits['total'] ?>;
-    var msgBig = <?= js_t('الملف أكبر من الحد المسموح ({mb} ميغابايت).', ['mb' => $limits['file_mb']]) ?>;
-    var msgType = <?= js_t('يُقبل ملف PDF فقط.') ?>;
-    var msgTotal = <?= js_t('مجموع أحجام الوثائق أكبر من {mb} ميغابايت. قلّل حجم الملفات (مسح ضوئي بدقة 150 نقطة يكفي).', ['mb' => $limits['total_mb']]) ?>;
-    function size(b) { return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.ceil(b / 1024) + ' KB'; }
-    form.querySelectorAll('input.cmp-file').forEach(function (input) {
-        input.addEventListener('change', function () {
-            var state = input.parentNode.querySelector('.cmp-file-state');
-            var f = input.files[0];
-            input.setCustomValidity('');
-            state.className = 'cmp-file-state';
-            state.textContent = '';
-            if (!f) { return; }
-            var bad = !/\.pdf$/i.test(f.name) ? msgType : (f.size > parseInt(input.getAttribute('data-max'), 10) ? msgBig : '');
-            input.setCustomValidity(bad);
-            state.className = 'cmp-file-state ' + (bad ? 'is-bad' : 'is-ok');
-            state.textContent = bad ? '✗ ' + bad : '✓ ' + f.name + ' (' + size(f.size) + ')';
-        });
-    });
-    form.addEventListener('submit', function (ev) {
-        var total = 0;
-        form.querySelectorAll('input.cmp-file').forEach(function (i) { if (i.files[0]) { total += i.files[0].size; } });
-        if (total > maxTotal) { ev.preventDefault(); alert(msgTotal); return; }
-        var btn = form.querySelector('button[type=submit]');
-        setTimeout(function () { btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> ' + btn.getAttribute('data-sending'); }, 0);
-    });
-})();
-</script>
+<!-- فحص أولي في المتصفح (الحجم والنوع) قبل رفع الملفات — الفحص الحقيقي يتم في الخادم -->
+<script src="<?= asset('js/competitions.js') ?>"></script>
 <?php endif; ?>
 <?php endblock(); ?>

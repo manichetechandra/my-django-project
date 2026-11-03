@@ -27,6 +27,11 @@ if (is_file("app/controllers/recruitment_admin.php")) {
     echo "/admin/recruitment/applications/\n/admin/recruitment/audit/\n/admin/recruitment/export/\n";
     if ($a = DB::value("SELECT id FROM competition_applications ORDER BY id LIMIT 1")) echo "/admin/recruitment/applications/$a/\n";
     if ($c = DB::value("SELECT id FROM competitions ORDER BY id LIMIT 1")) echo "/admin/recruitment/purge/$c/\n/admin/recruitment/applications/?competition=$c\n";
+    // الاستدعاءات والنتائج (ترقية 2026_11_recruitment_2_convocations.sql)
+    if (is_file("app/views/admin/recruitment/results.php")) {
+        echo "/admin/recruitment/results/\n";
+        foreach (DB::all("SELECT id FROM competitions ORDER BY id") as $row) echo "/admin/recruitment/results/?competition=" . $row["id"] . "\n";
+    }
 }')
 fail=0; n=0
 for u in $URLS; do

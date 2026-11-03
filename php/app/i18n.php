@@ -125,6 +125,12 @@ function t(string $text, array $params = []): string
     return e(__($text, $params));
 }
 
+/** النقطتان بعد عنوان حسب قواعد كل لغة: «Date :» بالفرنسية (فراغ غير منكسر قبلها)، و«التاريخ:» بالعربية والإنجليزية */
+function colon(): string
+{
+    return lang() === 'fr' ? "\u{00A0}:" : ':';
+}
+
 /** ترجمة جاهزة داخل JavaScript:  confirm(<?= js_t('هل أنت متأكد؟') ?>) */
 function js_t(string $text, array $params = []): string
 {

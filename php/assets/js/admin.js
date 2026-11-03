@@ -56,11 +56,23 @@
         });
     }
 
-    // روابط تطلب تأكيداً (مثل تصدير القائمة الكاملة للمترشحين)
-    document.querySelectorAll('a[data-confirm]').forEach(function (a) {
+    // روابط وأزرار تطلب تأكيداً (مثل تصدير القائمة الكاملة للمترشحين، نشر النتائج)
+    document.querySelectorAll('a[data-confirm], button[data-confirm]').forEach(function (a) {
         a.addEventListener('click', function (ev) {
             if (!confirm(a.getAttribute('data-confirm'))) { ev.preventDefault(); }
         });
+    });
+
+    // خانة تظهر حسب قيمة خانة أخرى في نفس النموذج: data-show-when="status=incomplete" (أو "status=a|b")
+    document.querySelectorAll('[data-show-when]').forEach(function (el) {
+        var rule = el.getAttribute('data-show-when').split('=');
+        var form = el.closest('form');
+        var field = form && form.elements[rule[0]];
+        if (!field || rule.length !== 2) { return; }
+        var values = rule[1].split('|');
+        function sync() { el.style.display = values.indexOf(field.value) >= 0 ? '' : 'none'; }
+        field.addEventListener('change', sync);
+        sync();
     });
 
     // معاينة أيقونات Font Awesome

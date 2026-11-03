@@ -1,0 +1,76 @@
+/* =====================================================================
+   وثائق المترشح الرسمية للطباعة: الاستدعاء وإشعار النتيجة (ورقة A4)
+   خصائص منطقية (inline-start/end) فتُطبع بالعربية والفرنسية والإنجليزية
+   ===================================================================== */
+* { box-sizing: border-box; }
+@page { size: A4; margin: 12mm; }
+html { background: #e9edf0; }
+body { margin: 0; font-family: Tahoma, "Segoe UI", Arial, sans-serif; color: #1c2833; font-size: 14px; line-height: 1.6; }
+[dir="ltr"] { direction: ltr; }
+bdi { unicode-bidi: isolate; }
+
+/* شريط الأزرار (لا يُطبع) */
+.doc-toolbar { max-width: 210mm; margin: 14px auto 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 0 4px; }
+.doc-btn { display: inline-block; padding: 8px 16px; border-radius: 6px; border: 1px solid #b3bcc4; background: #fff; color: #2c3e50; font: inherit; text-decoration: none; cursor: pointer; }
+.doc-btn-primary { background: #5b9a23; border-color: #4e8a1c; color: #fff; font-weight: bold; }
+.doc-tip { color: #5d6d7e; font-size: 12.5px; }
+
+/* الورقة */
+.doc-sheet { width: 210mm; max-width: 100%; min-height: 270mm; margin: 12px auto 24px; background: #fff; padding: 14mm 15mm 12mm; box-shadow: 0 2px 14px rgba(0, 0, 0, .12); display: flex; flex-direction: column; }
+.doc-head { text-align: center; border-bottom: 3px double #2c3e50; padding-bottom: 8px; }
+.doc-republic { font-weight: bold; font-size: 15px; letter-spacing: .3px; margin-bottom: 6px; text-align: center; }
+.doc-head-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.doc-head-org { text-align: start; font-size: 13px; line-height: 1.7; }
+.doc-org-name { font-weight: bold; font-size: 14px; }
+.doc-logo { width: 58px; height: 58px; }
+.doc-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; font-size: 13px; }
+.doc-title { text-align: center; font-size: 30px; margin: 14px 0 4px; letter-spacing: 1px; }
+.doc-subtitle { text-align: center; font-size: 17px; margin: 0; }
+.doc-competition { text-align: center; color: #34495e; margin: 6px 0 14px; }
+
+.doc-box { border: 1px solid #aab7b8; border-radius: 6px; padding: 8px 14px 6px; margin: 10px 0; }
+.doc-box h2, .doc-rules h2 { font-size: 14px; margin: 0 0 6px; color: #2c3e50; border-bottom: 1px solid #e5e8e8; padding-bottom: 4px; }
+.doc-box-strong { border: 2px solid #2c3e50; background: #f8f9f9; }
+.doc-kv { width: 100%; border-collapse: collapse; }
+.doc-kv th { width: 34%; text-align: start; font-weight: normal; color: #4d5656; padding: 4px 0; vertical-align: top; }
+.doc-kv td { text-align: start; padding: 4px 0; }
+.doc-latin { font-family: Arial, sans-serif; letter-spacing: .3px; }
+.doc-seat { display: inline-block; border: 2px solid #1c2833; border-radius: 4px; padding: 0 12px; font-family: Consolas, "Courier New", monospace; font-size: 20px; font-weight: bold; letter-spacing: 2px; direction: ltr; }
+
+.doc-rules { margin: 10px 0; }
+.doc-rules ul { margin: 0; padding-inline-start: 22px; }
+.doc-rules li { margin: 3px 0; }
+.doc-rules p { margin: 0; }
+
+.doc-result { border: 3px solid #1c2833; border-radius: 8px; text-align: center; padding: 12px; margin: 14px 0; }
+.doc-result * { text-align: center; }
+.doc-result-label { font-size: 14px; color: #4d5656; }
+.doc-result-value { font-size: 30px; font-weight: bold; margin: 2px 0 6px; }
+.doc-result-figures { display: flex; justify-content: center; gap: 30px; font-size: 16px; }
+.doc-result.is-passed { border-color: #1e8449; }
+.doc-result.is-passed .doc-result-value { color: #1e8449; }
+.doc-result.is-reserve { border-color: #1f618d; }
+.doc-result.is-reserve .doc-result-value { color: #1f618d; }
+.doc-published { color: #4d5656; font-size: 13px; }
+
+.doc-bottom { margin-top: auto; padding-top: 16px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+.doc-barcode { text-align: center; }
+.doc-barcode img { height: 46px; display: block; margin: 0 auto 2px; }
+.doc-barcode div { font-family: Consolas, "Courier New", monospace; font-size: 13px; text-align: center; }
+.doc-sign { min-width: 55mm; text-align: center; font-weight: bold; }
+.doc-sign div { text-align: center; }
+.doc-sign-space { height: 22mm; }
+.doc-foot { border-top: 1px solid #aab7b8; margin-top: 10px; padding-top: 6px; font-size: 11.5px; color: #4d5656; text-align: center; }
+
+@media (max-width: 820px) {
+    .doc-sheet { padding: 18px 14px; min-height: 0; }
+    .doc-title { font-size: 25px; }
+}
+
+@media print {
+    html, body { background: #fff; }
+    .doc-toolbar { display: none !important; }
+    .doc-sheet { width: auto; min-height: 268mm; margin: 0; padding: 0; box-shadow: none; }
+    .doc-box-strong { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .doc-box, .doc-result, .doc-rules, .doc-bottom { break-inside: avoid; }
+}

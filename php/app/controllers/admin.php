@@ -75,6 +75,8 @@ function admin_menu(): array
     if (can_recruit()) {
         $menu['مسابقات التوظيف'][] = ['key' => 'recruit_applications', 'label' => 'طلبات الترشح', 'icon' => 'fa-id-card-o',
             'badge' => recruit_pending_count(), 'url' => url('admin:recruit_applications'), 'active' => '/admin/recruitment/applications/'];
+        $menu['مسابقات التوظيف'][] = ['key' => 'recruit_results', 'label' => 'نتائج المسابقات', 'icon' => 'fa-list-ol',
+            'badge' => 0, 'url' => url('admin:recruit_results'), 'active' => '/admin/recruitment/results/'];
         if (is_superuser()) {
             $menu['مسابقات التوظيف'][] = ['key' => 'recruit_audit', 'label' => 'سجل الاطلاع على الملفات', 'icon' => 'fa-history',
                 'badge' => 0, 'url' => url('admin:recruit_audit'), 'active' => '/admin/recruitment/audit/'];
@@ -99,7 +101,13 @@ function admin_index(): void
         }
     }
     if ($missing) {
-        flash('warning', 'جداول غير موجودة في قاعدة البيانات (' . implode('، ', $missing) . '): استورد ملف الترقية database/migrations/2026_11_recruitment.sql من phpMyAdmin (مرة واحدة).');
+        flash('warning', 'جداول غير موجودة في قاعدة البيانات (' . implode('، ', $missing) . '): استورد ملفي الترقية database/migrations/2026_11_recruitment.sql ثم 2026_11_recruitment_2_convocations.sql من phpMyAdmin (مرة واحدة، بهذا الترتيب).');
+    } else {
+        try {
+            DB::value('SELECT 1 FROM competition_exams LIMIT 1');
+        } catch (PDOException $e) {
+            flash('warning', 'ترقية قاعدة البيانات ناقصة (الاستدعاءات والنتائج وإكمال الملفات): استورد الملف database/migrations/2026_11_recruitment_2_convocations.sql من phpMyAdmin (مرة واحدة).');
+        }
     }
     $stats = SiteStatistics::get_stats();
     admin_render('index', [
@@ -810,7 +818,7 @@ function admin_collect_form(array $r, ?Model $obj): array
 /**
  * أعمدة الجدول المرتبط (inline):
  *   'columns' => ['title' => ['type' => 'text', 'label' => ..., 'max' => 200, 'required' => true], 'positions' => ['type' => 'int', 'min' => 1], ...]
- *   الأنواع: text, int, bool, select (choices من النموذج)
+ *   الأنواع: text, int, bool, select (choices من النموذج), datetime (تاريخ وساعة)
  *   أو الصيغة القديمة 'text' => ['caption' => 'التعليق'] (نصوص فقط)
  */
 function admin_inline_columns(array $inl): array
@@ -844,34 +852,45 @@ function admin_inline_value(array $spec, $raw, string $model, string $col)
             $choices = $model::choiceMap($spec['choices'] ?? $col);
             $v = is_scalar($raw) ? (string) $raw : '';
             return array_key_exists($v, $choices) ? $v : (string) ($spec['default'] ?? array_key_first($choices));
+        case 'datetime':
+            // <input type="datetime-local"> يرسل 2026-11-24T09:00 — قيمة غير صالحة = فارغة
+            $v = trim(is_scalar($raw) ? (string) $raw : '');
+            foreach (['Y-m-d\TH:i', 'Y-m-d\TH:i:s', 'Y-m-d H:i', 'Y-m-d H:i:s'] as $format) {
+                $dt = DateTime::createFromFormat('!' . $format, $v);
+                if ($dt && $dt->format($format) === $v && (int) $dt->format('Y') >= 2000 && (int) $dt->format('Y') <= 2100) {
+                    return $dt->format('Y-m-d H:i:s');
+                }
+            }
+            return '';
         default:
             return mb_substr(trim(is_scalar($raw) ? (string) $raw : ''), 0, (int) ($spec['max'] ?? 200));
     }
 }
 
 /**
- * قيم صف من النموذج المرسل. $existing: صف موجود (النص المطلوب الفارغ يبقى كما كان).
- * يرجع null لصف جديد فارغ أو ينقصه نص مطلوب (يُتجاهل).
+ * قيم صف من النموذج المرسل. $existing: صف موجود (الخانة المطلوبة الفارغة تبقى كما كانت).
+ * يرجع null لصف جديد فارغ (يُتجاهل بصمت) أو ينقصه حقل مطلوب (يُتجاهل مع تنبيه).
  */
 function admin_inline_row_values(array $inl, array $vals, bool $existing): ?array
 {
     $m = $inl['model'];
     $data = [];
     $hasText = false;
+    $missing = [];
     foreach (admin_inline_columns($inl) as $col => $spec) {
         $type = $spec['type'] ?? 'text';
         if ($type === 'bool') {
             $data[$col] = empty($vals[$col]) ? 0 : 1;
         } elseif (array_key_exists($col, $vals)) {
             $v = admin_inline_value($spec, $vals[$col], $m, $col);
-            if ($type === 'text' && $v === '' && !empty($spec['required'])) {
-                if (!$existing) {
-                    return null;
-                }
+            if (in_array($type, ['text', 'datetime'], true) && $v === '' && !empty($spec['required'])) {
+                $missing[] = $spec['label'] ?? $col;
             } else {
                 $data[$col] = $v;
                 $hasText = $hasText || ($type === 'text' && $v !== '');
             }
+        } elseif (!$existing && !empty($spec['required'])) {
+            $missing[] = $spec['label'] ?? $col;
         }
         if ($type === 'text' && in_array($col, $m::translatable(), true)) {
             $max = admin_translation_max(['max' => (int) ($spec['max'] ?? 200)]) ?? 300;
@@ -887,6 +906,10 @@ function admin_inline_row_values(array $inl, array $vals, bool $existing): ?arra
         $data[$inl['order']] = (int) $vals[$inl['order']];
     }
     if (!$existing && !$hasText) {
+        return null;
+    }
+    if (!$existing && $missing) {
+        flash('warning', 'لم يُحفظ سطر جديد في «' . ($inl['label'] ?? '') . '»: الحقل «' . implode('» و«', $missing) . '» مطلوب.');
         return null;
     }
     return $data;
@@ -977,6 +1000,10 @@ function admin_inline_input(string $name, string $col, array $spec, $value, stri
                 . (isset($spec['min']) ? ' min="' . (int) $spec['min'] . '"' : '') . '>';
         case 'bool':
             return '<input type="checkbox" name="' . e($field) . '" value="1"' . (!empty($value) ? ' checked' : '') . ' aria-label="' . e($spec['label'] ?? $col) . '">';
+        case 'datetime':
+            $ts = $value ? strtotime((string) $value) : false;
+            return '<input type="datetime-local" class="form-control input-sm" name="' . e($field) . '" value="' . ($ts ? date('Y-m-d\TH:i', $ts) : '') . '"'
+                . (!empty($spec['required']) ? ' data-required="1"' : '') . ' aria-label="' . e($spec['label'] ?? $col) . '">';
         case 'select':
             $html = '<select class="form-control input-sm" name="' . e($field) . '">';
             foreach ($model::choiceMap($spec['choices'] ?? $col) as $k => $label) {

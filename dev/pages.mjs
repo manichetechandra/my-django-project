@@ -69,6 +69,10 @@ ${['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'Arial', 'Helvetica', 'Helvetica N
 
 const STUDENT = ['1234566', 'Talib2026x'];
 const STAFF = ['miloudsellam', 'AdminDemo2026', '/admin/login/']; // الموظفون يدخلون من واجهة الإدارة
+// مترشحون تجريبيون (dev/demo-recruitment.php): الدخول برقم المتابعة والرمز السري في صفحة «متابعة طلب»
+const KARIM = ['C26-KMZ4N7Q2', 'DEMO2-KARIM', 'track']; // ملف مقبول ومستدعى
+const AMINA = ['C26-AHM8D3R5', 'DEMO2-AMINA', 'track']; // ملف ناقص (يرفع الوثيقة الناقصة بنفسه)
+const NAJAH = ['C26-RSN7T9P3', 'DEMO2-NAJAH', 'track']; // نتيجة منشورة: ناجح
 
 // [الاسم, المسار, الدخول] — {first:LIST:SELECTOR} = أول رابط في صفحة القائمة
 const PAGES = [
@@ -96,6 +100,11 @@ const PAGES = [
   ['competition-results', '{first:/competitions/?tab=closed:.cmp-card h3 a}'],
   ['competition-apply', '{first:/competitions/:a[href*="/apply/"]}'],
   ['competition-track', '/competitions/track/'],
+  ['cand-incomplete', '/competitions/track/', AMINA],
+  ['cand-convoked', '/competitions/track/', KARIM],
+  ['cand-convocation', '/competitions/track/convocation/', KARIM],
+  ['cand-result', '/competitions/track/', NAJAH],
+  ['cand-result-print', '/competitions/track/result/', NAJAH],
   ['faq', '/faq/'],
   ['faq-detail', '/faq/3/'],
   ['search', '/search/?q=%D8%A7%D9%84%D8%A5%D9%82%D8%A7%D9%85%D8%A9'],
@@ -124,6 +133,10 @@ const PAGES = [
   ['admin-recruit-list', '{abs:/admin/recruitment/applications/}', STAFF],
   ['admin-recruit-detail', '{abs:/admin/recruitment/applications/2/}', STAFF],
   ['admin-recruit-audit', '{abs:/admin/recruitment/audit/}', STAFF],
+  ['admin-recruit-list-c1', '{abs:/admin/recruitment/applications/?competition=1}', STAFF],
+  ['admin-recruit-list-c4', '{abs:/admin/recruitment/applications/?competition=4}', STAFF],
+  ['admin-recruit-results-index', '{abs:/admin/recruitment/results/}', STAFF],
+  ['admin-recruit-results', '{abs:/admin/recruitment/results/?competition=4}', STAFF],
   ['staff-app-detail', '{first:/students/admin/applications/:a[href*="/students/admin/applications/"][href$="/"]:not([href*="export"]):not([href$="/applications/"])}', STAFF],
 ];
 
@@ -156,6 +169,13 @@ async function newPage(ctx) {
 }
 
 async function login(page, [user, pass, loginPath]) {
+  if (loginPath === 'track') {
+    await page.goto(BASE + LANG + '/competitions/track/', { waitUntil: 'networkidle0' });
+    await page.type('#tracking_code', user);
+    await page.type('#secret', pass);
+    await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('.cmp-track-form [type=submit]')]);
+    return;
+  }
   await page.goto(BASE + (loginPath || LANG + '/students/login/'), { waitUntil: 'networkidle0' });
   await page.type('input[name=username]', user);
   await page.type('input[name=password]', pass);

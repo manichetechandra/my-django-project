@@ -70,7 +70,7 @@
     </div>
 
     <?php foreach ($r['inlines'] as $i => $inl): $cols = admin_inline_columns($inl); $isRows = ($inl['kind'] ?? '') === 'rows'; ?>
-        <div class="panel panel-default admin-panel">
+        <div class="panel panel-default admin-panel" id="inline-<?= e($inl['anchor'] ?? $i) ?>">
             <div class="panel-heading"><strong><i class="fa <?= e($inl['icon'] ?? ($inl['kind'] === 'document' ? 'fa-paperclip' : ($isRows ? 'fa-list' : 'fa-picture-o'))) ?>"></i> <?= e($inl['label']) ?></strong>
                 <?php if (!empty($inl['help'])): ?><div class="small text-muted"><?= e($inl['help']) ?></div><?php endif; ?>
             </div>

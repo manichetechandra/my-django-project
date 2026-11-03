@@ -160,8 +160,57 @@
 .cmp-home-item a.cmp-home-title { color: #2c3e50; font-weight: bold; font-size: 16px; }
 .cmp-home-item small { color: #c0392b; font-weight: bold; }
 
+/* فضاء المترشح: المرحلة الحالية، الاستدعاء، النتيجة، إكمال الملف الناقص */
+.cmp-steps li.current { color: #2c3e50; font-weight: bold; }
+.cmp-steps li.current::before { background: #fff; color: #5b8f22; box-shadow: inset 0 0 0 3px #8cc040; }
+.cmp-h4 { margin-top: 26px; color: #2c3e50; }
+.cmp-card { background: #fff; border: 1px solid #dfe5ea; border-radius: 12px; margin: 22px 0; overflow: hidden; box-shadow: 0 3px 12px rgba(44, 62, 80, .06); }
+.cmp-card-head { display: flex; align-items: center; gap: 10px; padding: 12px 18px; background: #f4f7f9; border-bottom: 1px solid #e3e8ec; }
+.cmp-card-head i { font-size: 22px; color: #2e86c1; }
+.cmp-card-head h3 { margin: 0; font-size: 18px; font-weight: bold; color: #2c3e50; line-height: 1.5; }
+.cmp-card-body { padding: 16px 18px; }
+.cmp-card-body > p { line-height: 1.9; }
+.cmp-convocation { border-color: #b5d58c; }
+.cmp-convocation .cmp-card-head { background: #f1f8e8; border-bottom-color: #dcebc6; }
+.cmp-convocation .cmp-card-head i { color: #5b9a23; }
+.cmp-when { display: flex; gap: 18px; align-items: flex-start; }
+.cmp-when .cmp-kv { margin-bottom: 8px; }
+.cmp-when-day { flex: 0 0 96px; border-radius: 10px; overflow: hidden; border: 2px solid #5b9a23; background: #fff; }
+.cmp-when-day, .cmp-when-day * { text-align: center; }
+.cmp-when-day b { display: block; font-size: 38px; line-height: 1.25; color: #2c3e50; padding-top: 4px; }
+.cmp-when-day span { display: block; background: #5b9a23; color: #fff; font-size: 13px; padding: 3px 2px; }
+.cmp-seat { display: inline-block; font-family: Consolas, "Courier New", monospace; font-size: 20px; font-weight: bold; letter-spacing: 2px; color: #fff; background: #2c3e50; border-radius: 6px; padding: 1px 12px; direction: ltr; }
+.cmp-instructions { background: #fffbea; border: 1px solid #f5e3a3; border-radius: 8px; padding: 10px 12px; line-height: 1.9; }
+.cmp-inline-help { display: inline-block; margin: 0 10px; }
+.cmp-result-main { display: flex; align-items: center; gap: 16px; padding: 18px 20px; color: #fff; background: #7f8c8d; }
+.cmp-result-main i { font-size: 42px; }
+.cmp-result-main small { display: block; font-size: 14px; opacity: .9; }
+.cmp-result-main strong { display: block; font-size: 26px; line-height: 1.35; }
+.cmp-result.is-passed .cmp-result-main { background: linear-gradient(135deg, #4e8a1c, #79b33a); }
+.cmp-result.is-reserve .cmp-result-main { background: linear-gradient(135deg, #21618c, #3498db); }
+.cmp-result.is-failed .cmp-result-main { background: #8e5a54; }
+.cmp-result.is-absent .cmp-result-main { background: #7f8c8d; }
+.cmp-result .cmp-message { margin-bottom: 14px; }
+.cmp-lead { font-size: 16px; color: #2c3e50; }
+.cmp-figures { display: flex; flex-wrap: wrap; gap: 12px; margin: 4px 0 14px; }
+.cmp-figures > div { flex: 0 1 170px; border: 1px solid #e3e8ec; border-radius: 10px; padding: 8px 10px; background: #fafbfc; }
+.cmp-figures > div, .cmp-figures > div * { text-align: center; }
+.cmp-figures span { display: block; color: #7f8c8d; font-size: 13px; }
+.cmp-figures b { display: block; font-size: 24px; color: #2c3e50; }
+.cmp-complete { border-color: #e6b0aa; }
+.cmp-complete .cmp-card-head { background: #fdf2f1; border-bottom-color: #f2d7d5; }
+.cmp-complete .cmp-card-head i { color: #c0392b; }
+.cmp-deadline { background: #fdf2f1; border-radius: 8px; padding: 8px 12px; color: #922b21; }
+.cmp-sent { color: #5b8f22; font-weight: normal; margin-inline-start: 6px; }
+.cmp-complete .cmp-doc input[type=file] { max-width: 100%; }
+.cmp-closed-note { margin-top: 20px; }
+
 @media (max-width: 767px) {
     .cmp-title h1, .cmp-title h2 { font-size: 23px; }
+    .cmp-when { flex-direction: column; }
+    .cmp-when-day { flex-basis: auto; width: 110px; }
+    .cmp-result-main strong { font-size: 22px; }
+    .cmp-inline-help { display: block; margin: 8px 0 0; }
     .cmp-head h1 { font-size: 22px; }
     .cmp-receipt { padding: 18px 14px; }
     .cmp-code { font-size: 21px; }

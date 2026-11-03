@@ -20,6 +20,9 @@ $router->get('/news/{slug}/', 'news_detail', 'news:news_detail');
 // المسابقات: مسابقات التوظيف + الترشح الإلكتروني + متابعة الطلب
 $router->get('/competitions/', 'competitions_list', 'competitions:list');
 $router->any('/competitions/track/', 'competitions_track', 'competitions:track');
+$router->any('/competitions/track/complete/', 'competitions_track_complete', 'competitions:track_complete');
+$router->get('/competitions/track/convocation/', 'competitions_track_convocation', 'competitions:track_convocation');
+$router->get('/competitions/track/result/', 'competitions_track_result', 'competitions:track_result');
 $router->any('/competitions/receipt/', 'competitions_receipt', 'competitions:receipt');
 $router->get('/competitions/file/{id:int}/', 'competitions_file', 'competitions:file');
 $router->any('/competitions/{slug}/apply/', 'competitions_apply', 'competitions:apply');
@@ -103,6 +106,7 @@ $router->any('/admin/recruitment/applications/', 'recruit_admin_applications', '
 $router->any('/admin/recruitment/applications/{id:int}/', 'recruit_admin_application', 'admin:recruit_application');
 $router->get('/admin/recruitment/files/{id:int}/', 'recruit_admin_file', 'admin:recruit_file');
 $router->get('/admin/recruitment/export/', 'recruit_admin_export', 'admin:recruit_export');
+$router->any('/admin/recruitment/results/', 'recruit_admin_results', 'admin:recruit_results');
 $router->get('/admin/recruitment/audit/', 'recruit_admin_audit', 'admin:recruit_audit');
 $router->any('/admin/recruitment/purge/{id:int}/', 'recruit_admin_purge', 'admin:recruit_purge');
 $router->any('/admin/{model}/', 'admin_list', 'admin:list');

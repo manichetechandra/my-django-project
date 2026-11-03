@@ -278,6 +278,47 @@ class RecruitDuplicate extends RuntimeException
 {
 }
 
+/** مجلد وثائق مسابقة (يُنشأ عند أول وثيقة، بصلاحيات 0700، ومحمي بـ .htaccess) */
+function recruit_files_dir(int $competitionId): string
+{
+    $dir = CandidateFile::dir($competitionId);
+    if (!is_dir($dir) && !@mkdir($dir, 0700, true) && !is_dir($dir)) {
+        throw new RuntimeException('تعذر إنشاء مجلد وثائق المسابقة في storage/private/recruitment');
+    }
+    $root = dirname($dir);
+    if (!is_file($root . '/.htaccess')) {
+        @file_put_contents($root . '/.htaccess', "Require all denied\nDeny from all\n");
+    }
+    return $dir;
+}
+
+/**
+ * تشفير الوثائق وحفظها: $items = [[الوثيقة المطلوبة, الملف المرفوع], ...]
+ * يُستدعى داخل معاملة؛ $written يجمع الملفات المكتوبة لتُحذف إن فشلت المعاملة.
+ * $later: وثائق أضافها المترشح بعد الإرسال (إكمال ملف ناقص)
+ */
+function recruit_store_files(CompetitionApplication $app, array $items, string $dir, array &$written, bool $later = false): int
+{
+    foreach ($items as [$r, $file]) {
+        $plain = (string) file_get_contents($file['tmp_name']);
+        $stored = CandidateFile::newStoredName();
+        Crypto::encryptToFile($plain, $dir . '/' . $stored, CandidateFile::cryptoContext((int) $app['id'], $stored));
+        $written[] = $dir . '/' . $stored;
+        CandidateFile::create([
+            'application_id' => (int) $app['id'],
+            'requirement_id' => (int) $r['id'],
+            'label'          => mb_substr((string) $r->toArray()['label'], 0, 200),
+            'original_name'  => recruit_safe_filename($file['name']),
+            'stored_name'    => $stored,
+            'size'           => strlen($plain),
+            'sha256'         => hash('sha256', $plain),
+            'added_later'    => $later ? 1 : 0,
+        ]);
+        @unlink($file['tmp_name']); // النسخة غير المشفّرة المؤقتة
+    }
+    return count($items);
+}
+
 /**
  * حفظ الطلب: البيانات الحساسة مشفّرة، والوثائق تُشفّر في storage/private/recruitment/<المسابقة>/
  * كل شيء داخل معاملة واحدة، وتُحذف الملفات المكتوبة إن فشلت أي خطوة.
@@ -295,14 +336,7 @@ function recruit_store_application(Competition $c, array $d, array $posts, array
             $post = $p;
         }
     }
-    $dir = CandidateFile::dir((int) $c['id']);
-    if (!is_dir($dir) && !@mkdir($dir, 0700, true) && !is_dir($dir)) {
-        throw new RuntimeException('تعذر إنشاء مجلد وثائق المسابقة في storage/private/recruitment');
-    }
-    $root = dirname($dir);
-    if (!is_file($root . '/.htaccess')) {
-        @file_put_contents($root . '/.htaccess', "Require all denied\nDeny from all\n");
-    }
+    $dir = recruit_files_dir((int) $c['id']);
     $tracking = CompetitionApplication::newTrackingCode();
     $secret = CompetitionApplication::newSecret();
     $personal = [
@@ -334,26 +368,13 @@ function recruit_store_application(Competition $c, array $d, array $posts, array
                 'submitted_at'     => now(),
                 'updated_at'       => now(),
             ]);
+            $items = [];
             foreach ($requirements as $r) {
-                $file = $d['doc_' . $r['id']] ?? null;
-                if (!$file) {
-                    continue;
+                if (!empty($d['doc_' . $r['id']])) {
+                    $items[] = [$r, $d['doc_' . $r['id']]];
                 }
-                $plain = (string) file_get_contents($file['tmp_name']);
-                $stored = CandidateFile::newStoredName();
-                Crypto::encryptToFile($plain, $dir . '/' . $stored, CandidateFile::cryptoContext((int) $app['id'], $stored));
-                $written[] = $dir . '/' . $stored;
-                CandidateFile::create([
-                    'application_id' => (int) $app['id'],
-                    'requirement_id' => (int) $r['id'],
-                    'label'          => mb_substr((string) $r->toArray()['label'], 0, 200),
-                    'original_name'  => recruit_safe_filename($file['name']),
-                    'stored_name'    => $stored,
-                    'size'           => strlen($plain),
-                    'sha256'         => hash('sha256', $plain),
-                ]);
-                @unlink($file['tmp_name']); // النسخة غير المشفّرة المؤقتة
             }
+            recruit_store_files($app, $items, $dir, $written);
             return $app;
         });
     } catch (Throwable $e) {
@@ -452,17 +473,66 @@ function competitions_receipt(): void
     ]);
 }
 
-/** متابعة الطلب برقم المتابعة + الرمز السري (POST فقط، بلا وضع الرمز في الرابط) */
-function competitions_track(): void
+/** مدة «فضاء المترشح» بعد إدخال الرمزين (ثابتة لا تتجدد: أجهزة مقاهي الإنترنت المشتركة) */
+const RECRUIT_GRANT_TTL = 1200;
+
+/**
+ * الطلب المفتوح في هذه الجلسة بعد التحقق من رقم المتابعة والرمز السري، أو null.
+ * لا رقم طلب في أي رابط: الإذن محفوظ في الجلسة فقط ومربوط برقم المتابعة.
+ * $grace: مهلة إضافية لإرسال وثائق بدأ رفعها قبل انتهاء الجلسة (اتصال بطيء).
+ */
+function recruit_grant(int $grace = 0): ?CompetitionApplication
+{
+    $g = $_SESSION['recruit_track'] ?? null;
+    if (!is_array($g) || (int) ($g['until'] ?? 0) + $grace < time()) {
+        unset($_SESSION['recruit_track']);
+        return null;
+    }
+    $app = CompetitionApplication::find((int) ($g['id'] ?? 0));
+    if (!$app || !hash_equals((string) $app['tracking_code'], (string) ($g['code'] ?? ''))) {
+        unset($_SESSION['recruit_track']);
+        return null;
+    }
+    return $app;
+}
+
+/** ترويسات كل صفحات فضاء المترشح: لا تخزين، لا فهرسة، لا Referer */
+function recruit_private_headers(): void
 {
     never_cache();
     header('X-Robots-Tag: noindex, nofollow');
     header('Referrer-Policy: no-referrer');
-    $app = null;
+}
+
+/** إعادة إلى فضاء المترشح بعد انتهاء الجلسة */
+function recruit_grant_or_login(int $grace = 0): CompetitionApplication
+{
+    $app = recruit_grant($grace);
+    if (!$app) {
+        flash('info', __('انتهت مدة الجلسة. أدخل رقم المتابعة والرمز السري من جديد.'));
+        redirect(url('competitions:track'));
+    }
+    return $app;
+}
+
+/**
+ * فضاء المترشح: إدخال رقم المتابعة + الرمز السري (POST فقط، بلا وضع الرمز في الرابط)
+ * ثم صفحة الطلب: الحالة، رسالة الإدارة، إكمال الملف الناقص، الاستدعاء، النتيجة.
+ */
+function competitions_track(): void
+{
+    recruit_private_headers();
     $error = null;
     $status = 200;
     $code = '';
     if (is_post()) {
+        if (isset($_POST['logout'])) {
+            unset($_SESSION['recruit_track']);
+            flash('info', __('تم إغلاق صفحة طلبك.'));
+            redirect(url('competitions:track'));
+        }
+        // محاولة دخول جديدة تُغلق أي طلب مفتوح في هذا المتصفح أولاً (جهاز مشترك)
+        unset($_SESSION['recruit_track']);
         $code = post_text('tracking_code', 40);
         $secret = post_text('secret', 40);
         $norm = substr(CompetitionApplication::normalizeCode($code), 0, 20);
@@ -481,24 +551,156 @@ function competitions_track(): void
         } else {
             $found = CompetitionApplication::findByTracking($code);
             if (CompetitionApplication::verifySecret($found, $secret)) {
-                $app = $found;
-                RecruitmentAudit::log('track', $app, null, '', true);
-            } else {
-                RateLimit::hit($ipKey, $window);
-                if ($norm !== '') {
-                    RateLimit::hit($codeKey, $window);
-                }
-                $error = __('رقم المتابعة أو الرمز السري غير صحيح.');
-                security_log('recruitment_track_failed', ['code' => $norm]);
+                // معرّف جلسة جديد عند فتح الطلب (منع تثبيت الجلسة Session Fixation)
+                session_regenerate_id(true);
+                $_SESSION['recruit_track'] = ['id' => (int) $found['id'], 'code' => (string) $found['tracking_code'], 'until' => time() + RECRUIT_GRANT_TTL];
+                RecruitmentAudit::log('track', $found, null, '', true);
+                // PRG: إعادة التحميل لا تعيد إرسال الرمز، وزر «رجوع» لا يعرض نموذجاً مملوءاً
+                redirect(url('competitions:track'));
             }
+            RateLimit::hit($ipKey, $window);
+            if ($norm !== '') {
+                RateLimit::hit($codeKey, $window);
+            }
+            $error = __('رقم المتابعة أو الرمز السري غير صحيح.');
+            security_log('recruitment_track_failed', ['code' => $norm]);
         }
     }
+    $app = $error === null ? recruit_grant() : null;
+    $c = $app ? $app['competition'] : null;
     render('competitions/track', [
-        'app'        => $app,
-        'c'          => $app ? $app['competition'] : null,
-        'files'      => $app ? $app['files'] : [],
-        'error'      => $error,
-        'code'       => $app ? '' : $code,
-        'page_title' => __('متابعة طلب ترشح'),
+        'app'          => $app,
+        'c'            => $c,
+        'files'        => $app ? $app['files'] : [],
+        'requirements' => $app && $app->can_complete() ? $c['requirements'] : [],
+        'limits'       => recruit_limits(),
+        'exam'         => $app && $app->is_convoked() ? $app['exam'] : null,
+        'show_result'  => $app && $app->result_visible(),
+        'expires_in'   => $app ? max(0, (int) $_SESSION['recruit_track']['until'] - time()) : 0,
+        'error'        => $error,
+        'code'         => $code,
+        'page_title'   => __('متابعة طلب ترشح'),
     ], $status);
+}
+
+/** المترشح يرفع الوثائق الناقصة بنفسه (ملف ناقص + قبل الأجل الذي حدده الموظف) */
+function competitions_track_complete(): void
+{
+    recruit_private_headers();
+    if (!is_post()) {
+        redirect(url('competitions:track')); // بعد رسالة «حجم البيانات أكبر من الحد» في index.php
+    }
+    $app = recruit_grant_or_login(600);
+    if (!$app->can_complete()) {
+        flash('error', __('لا يمكن إضافة وثائق إلى هذا الملف الآن.'));
+        redirect(url('competitions:track'));
+    }
+    $ipKey = 'complete-ip:' . client_ip();
+    $appKey = 'complete-app:' . (int) $app['id'];
+    $wait = max(RateLimit::retryAfter($ipKey, 20, 3600), RateLimit::retryAfter($appKey, 10, 86400));
+    if ($wait > 0) {
+        security_log('recruitment_complete_throttled', ['application' => (int) $app['id']]);
+        flash('error', too_many_attempts_message($wait));
+        redirect(url('competitions:track'));
+    }
+    RateLimit::hit($ipKey, 3600);
+    RateLimit::hit($appKey, 86400);
+
+    $c = $app['competition'];
+    $limits = recruit_limits();
+    $items = [];
+    $errors = [];
+    $total = 0;
+    foreach ($c['requirements'] as $r) {
+        $file = $_FILES['doc_' . $r['id']] ?? null;
+        if (!is_array($file) || is_array($file['error'] ?? null) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+        $label = (string) $r['label'];
+        if ((int) $file['error'] !== UPLOAD_ERR_OK) {
+            $errors[] = $label . ': ' . ((int) $file['error'] === UPLOAD_ERR_INI_SIZE || (int) $file['error'] === UPLOAD_ERR_FORM_SIZE
+                ? __('حجم الملف أكبر من {mb} ميغابايت.', ['mb' => $limits['file_mb']]) : __('تعذر رفع الملف، أعد المحاولة.'));
+            continue;
+        }
+        if ($err = recruit_check_pdf($file, $limits)) {
+            $errors[] = $label . ': ' . $err;
+            continue;
+        }
+        $total += (int) $file['size'];
+        $items[] = [$r, $file];
+    }
+    if (!$items && !$errors) {
+        $errors[] = __('اختر وثيقة واحدة على الأقل (ملف PDF).');
+    }
+    if ($total > $limits['total']) {
+        $errors[] = __('مجموع أحجام الوثائق أكبر من {mb} ميغابايت. قلّل حجم الملفات (مسح ضوئي بدقة 150 نقطة يكفي).', ['mb' => $limits['total_mb']]);
+    }
+    // سقف لعدد الوثائق في ملف واحد (منع ملء القرص بإعادة الرفع)
+    $existing = CandidateFile::count('application_id = ?', [(int) $app['id']]);
+    if (!$errors && $existing + count($items) > max(20, 3 * count($c['requirements']))) {
+        $errors[] = __('بلغ ملفك الحد الأقصى لعدد الوثائق. اتصل بمصلحة المستخدمين.');
+    }
+    if ($errors) {
+        foreach ($errors as $e) {
+            flash('error', $e);
+        }
+        redirect(url('competitions:track'));
+    }
+
+    $dir = recruit_files_dir((int) $c['id']);
+    $written = [];
+    try {
+        DB::transaction(function () use ($app, $items, $dir, &$written) {
+            recruit_store_files($app, $items, $dir, $written, true);
+            // يعود الملف إلى «قيد الانتظار» ليُدرس من جديد (يظهر للموظفين في عدد الطلبات الجديدة)
+            $app->update(['status' => 'pending', 'completed_at' => now(), 'updated_at' => now()]);
+        });
+    } catch (Throwable $e) {
+        foreach ($written as $w) {
+            @unlink($w);
+        }
+        throw $e;
+    }
+    RecruitmentAudit::log('complete', $app, null, count($items) . ' — ' . implode('، ', array_map(fn($it) => (string) $it[0]->toArray()['label'], $items)), true);
+    flash('success', __('تم استلام وثائقك. عاد ملفك إلى «قيد الانتظار» وستدرسه اللجنة من جديد.'));
+    redirect(url('competitions:track'));
+}
+
+/** وثيقة للطباعة (الاستدعاء أو إشعار النتيجة) للمترشح صاحب الجلسة فقط */
+function recruit_print_context(CompetitionApplication $app): array
+{
+    $personal = [];
+    try {
+        $p = $app->personal();
+        // تاريخ ومكان الميلاد فقط: يكفيان للتعرف على المترشح يوم الاختبار (لا رقم تعريف ولا عنوان على الورقة)
+        $personal = ['birth_date' => (string) ($p['birth_date'] ?? ''), 'birth_place' => (string) ($p['birth_place'] ?? '')];
+    } catch (Throwable $e) {
+        security_log('recruitment_decrypt_failed', ['application' => (int) $app['id']]);
+    }
+    return [
+        'app'      => $app,
+        'c'        => $app['competition'],
+        'personal' => $personal,
+        'barcode'  => barcode_data_uri((string) $app['tracking_code'], 2, 46),
+    ];
+}
+
+function competitions_track_convocation(): void
+{
+    recruit_private_headers();
+    $app = recruit_grant_or_login();
+    if (!$app->is_convoked()) {
+        abort(404);
+    }
+    render('competitions/print_convocation', recruit_print_context($app) + ['exam' => $app['exam']]);
+}
+
+function competitions_track_result(): void
+{
+    recruit_private_headers();
+    $app = recruit_grant_or_login();
+    if (!$app->result_visible()) {
+        abort(404);
+    }
+    render('competitions/print_result', recruit_print_context($app));
 }

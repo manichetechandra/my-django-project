@@ -478,7 +478,7 @@ return [
     'competitions' => [
         'model' => Competition::class, 'group' => 'مسابقات التوظيف', 'icon' => 'fa-trophy', 'permission' => 'recruitment',
         'label' => 'مسابقة', 'plural' => 'المسابقات', 'per_page' => 25,
-        'list' => ['title', 'reference', 'opens_at', 'closes_at', 'phase', 'online_apply', 'applications'], 'links' => ['title'],
+        'list' => ['title', 'reference', 'opens_at', 'closes_at', 'phase', 'online_apply', 'applications', 'results'], 'links' => ['title'],
         'editable' => ['online_apply'], 'filters' => ['status', 'recruitment_mode', 'online_apply'],
         'search' => ['title', 'reference', 'summary'], 'order_by' => 'closes_at DESC, id DESC',
         'view_url' => fn($o) => url('competitions:detail', $o['slug']),
@@ -492,6 +492,8 @@ return [
                 return '<a href="' . e(url('admin:recruit_applications') . '?competition=' . (int) $o['id']) . '"><i class="fa fa-id-card-o"></i> ' . $n . '</a>'
                     . ($pending ? ' <span class="badge admin-badge" title="قيد الانتظار">' . $pending . '</span>' : '');
             }],
+            'results' => ['label' => 'النتائج', 'html' => true, 'value' => fn($o) => '<a href="' . e(url('admin:recruit_results') . '?competition=' . (int) $o['id']) . '">'
+                . ($o->results_published() ? '<span class="label label-success"><i class="fa fa-globe"></i> منشورة</span>' : '<span class="label label-default">غير منشورة</span>') . '</a>'],
         ],
         'actions' => [
             'publish' => ['label' => 'نشر المسابقات المحددة', 'set' => ['status' => 'published'], 'message' => 'تم نشر %d مسابقة'],
@@ -515,6 +517,7 @@ return [
             'online_apply' => $bool('قبول الترشح الإلكتروني (استمارة + رفع الوثائق PDF)'),
             'status' => ['type' => 'select', 'label' => 'الحالة', 'default' => 'published'],
             'views_count' => ['type' => 'readonly', 'label' => 'عدد المشاهدات'],
+            'results_published_at' => ['type' => 'readonly', 'label' => 'نشر النتائج الفردية', 'help' => 'يُنشر ويُلغى من صفحة «نتائج المسابقة» في لوحة الإدارة'],
             'created_at' => $created, 'updated_at' => $updated,
         ],
         'inlines' => [
@@ -535,6 +538,17 @@ return [
                 'columns' => [
                     'label' => ['type' => 'text', 'label' => 'الوثيقة', 'max' => 200, 'required' => true, 'example' => 'نسخة من الشهادة أو ما يعادلها'],
                     'is_required' => ['type' => 'bool', 'label' => 'إلزامية', 'default' => 1],
+                ],
+            ],
+            [
+                'model' => CompetitionExam::class, 'fk' => 'competition_id', 'label' => 'مواعيد الاختبارات والمقابلات (الاستدعاءات)', 'kind' => 'rows', 'icon' => 'fa-calendar-check-o',
+                'order' => 'order', 'new_rows' => 2, 'anchor' => 'exams',
+                'help' => 'كل سطر = موعد (فوج) يُستدعى إليه المترشحون المقبولة ملفاتهم من صفحة «طلبات الترشح». أي تعديل هنا (الساعة، المكان) يظهر فوراً في استدعاءات المترشحين. حذف موعد يلغي استدعاء المترشحين إليه.',
+                'columns' => [
+                    'title' => ['type' => 'text', 'label' => 'الاختبار أو المقابلة', 'max' => 200, 'required' => true, 'example' => 'المقابلة الشفهية — الفوج الأول'],
+                    'starts_at' => ['type' => 'datetime', 'label' => 'التاريخ والساعة', 'required' => true],
+                    'place' => ['type' => 'text', 'label' => 'المكان', 'max' => 300, 'example' => 'مقر المديرية، قاعة الاجتماعات'],
+                    'instructions' => ['type' => 'text', 'label' => 'تعليمات تظهر في الاستدعاء', 'max' => 500, 'example' => 'أحضر نسخة أصلية من الشهادة'],
                 ],
             ],
             [

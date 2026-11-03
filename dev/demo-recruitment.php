@@ -4,6 +4,8 @@
  *   DB_NAME=dou_setif2 php dev/demo-recruitment.php /tmp/site2      (تستدعيه dev/demo-site.sh)
  * يستعمل كود الموقع نفسه (Crypto، recruit_store_application) فيُنشأ مفتاح التشفير في storage/private/ للموقع.
  * التواريخ نسبية لليوم: مسابقتان مفتوحتان (إحداهما تنتهي بعد 3 أيام)، واحدة قريبة، واحدة منتهية بنتائجها، وواحدة بالإيداع الورقي.
+ * المرحلة 2: مواعيد اختبار + مترشح مستدعى + مترشحة ملفها ناقص (بأجل إكمال) + نتائج فردية منشورة للامتحان المهني.
+ * ثلاثة مترشحين برموز ثابتة لتجربة «متابعة طلب» (تُطبع في آخر التنفيذ) — في قاعدة التجربة فقط.
  */
 $site = rtrim($argv[1] ?? '/tmp/site2', '/');
 chdir($site);
@@ -180,8 +182,8 @@ foreach ($competitions as $i => $d) {
 // ------------------------------------------------------------------ طلبات ترشح للمسابقة الأولى (بنفس كود الموقع: تشفير + وثائق)
 $people = [
     ['بن علي', 'سارة', 'BENALI', 'Sara', 'F', '1996-03-14', 'سطيف', '109961403000118457', '0661223344', 'sara.benali@example.dz', 'حي 1006 مسكن، عمارة 12', 'سطيف', 'na', 'ليسانس في العلوم القانونية', 'قانون إداري', 2018, 3, 0, 'under_review', ''],
-    ['مزياني', 'كريم', 'MEZIANI', 'Karim', 'M', '1993-11-02', 'العلمة', '109931102000215890', '0770112233', 'k.meziani@example.dz', 'حي الهضاب، شارع 5', 'سطيف', 'done', 'ماستر في علوم التسيير', 'تسيير الموارد البشرية', 2017, 5, 0, 'accepted', 'تهانينا، ملفك مقبول. تُستدعى لإجراء المقابلة يوم الاختبار المذكور في صفحة المسابقة على الساعة 08:30.'],
-    ['حمدي', 'أمينة', 'HAMDI', 'Amina', 'F', '1998-07-21', 'بجاية', '109980721000312345', '0550998877', '', 'حي إحدادن', 'بجاية', 'na', 'ليسانس في العلوم الاقتصادية', 'اقتصاد نقدي وبنكي', 2020, 1, 0, 'incomplete', 'ملفك ناقص: كشوف النقاط غير واضحة. يرجى إحضار النسخ الأصلية يوم المقابلة.'],
+    ['مزياني', 'كريم', 'MEZIANI', 'Karim', 'M', '1993-11-02', 'العلمة', '109931102000215890', '0770112233', 'k.meziani@example.dz', 'حي الهضاب، شارع 5', 'سطيف', 'done', 'ماستر في علوم التسيير', 'تسيير الموارد البشرية', 2017, 5, 0, 'accepted', 'تهانينا، ملفك مقبول. اطبع استدعاءك من هذه الصفحة واحضر به يوم المقابلة.'],
+    ['حمدي', 'أمينة', 'HAMDI', 'Amina', 'F', '1998-07-21', 'بجاية', '109980721000312345', '0550998877', '', 'حي إحدادن', 'بجاية', 'na', 'ليسانس في العلوم الاقتصادية', 'اقتصاد نقدي وبنكي', 2020, 1, 0, 'incomplete', 'ملفك ناقص: كشف نقاط السنة الثالثة غير واضح. ارفع نسخة واضحة (مسح ضوئي) من هذه الصفحة قبل الأجل.'],
     ['بوزيد', 'ياسين', 'BOUZID', 'Yacine', 'M', '1995-01-30', 'عين ولمان', '109950130000498765', '0698765432', 'yacine.bz@example.dz', 'وسط المدينة', 'سطيف', 'exempt', 'تقني سامي في الإدارة', 'إدارة الأعمال', 2016, 6, 1, 'pending', ''],
     ['قاسمي', 'نور الهدى', 'KACEMI', 'Nour El Houda', 'F', '1999-09-09', 'برج بوعريريج', '109990909000587654', '0662345678', 'nour.kacemi@example.dz', 'حي 500 مسكن', 'برج بوعريريج', 'na', 'تقني سامي في المحاسبة', 'محاسبة وجباية', 2021, 2, 1, 'pending', ''],
     ['رحماني', 'عبد الرؤوف', 'RAHMANI', 'Abderraouf', 'M', '1990-05-17', 'سطيف', '109900517000676543', '0771456789', '', 'حي يحياوي', 'سطيف', 'done', 'ليسانس في الحقوق', 'قانون خاص', 2014, 8, 0, 'rejected', 'نأسف، تخصصك لا يطابق الشروط المطلوبة لهذه الرتبة.'],
@@ -222,6 +224,83 @@ foreach (array_slice($created, 0, 3) as $k => $app) {
             'application_id' => (int) $app['id'], 'details' => $details, 'ip_address' => '41.111.20.5', 'created_at' => $at(1, sprintf('10:%02d', 10 + 3 * $k + $j))]);
     }
 }
+// ------------------------------------------------------------------ المرحلة 2: الاستدعاءات، إكمال الملف، النتائج الفردية
+$adminId = (int) $admin['id'];
+
+/** رموز ثابتة لمترشح تجريبي (يُعاد تشفير معطياته لأنها مربوطة برقم المتابعة) */
+function demo_fixed_codes(CompetitionApplication $app, string $tracking, string $secret): void
+{
+    $p = $app->personal();
+    $app->update(['tracking_code' => $tracking, 'secret_hash' => CompetitionApplication::hashSecret($secret),
+        'personal_data' => Crypto::encryptArray($p, 'application:' . $tracking)]);
+}
+
+$examFields = fn(Competition $c, array $t, string $when, array $place, array $instr, int $order) => CompetitionExam::create([
+    'competition_id' => (int) $c['id'], 'title' => $t[0], 'title_fr' => $t[1], 'title_en' => $t[2], 'starts_at' => $when,
+    'place' => $place[0], 'place_fr' => $place[1], 'place_en' => $place[2],
+    'instructions' => $instr[0], 'instructions_fr' => $instr[1], 'instructions_en' => $instr[2], 'order' => $order]);
+$hq = ['مقر المديرية، قاعة الاجتماعات (حي 08 ماي 1945، سطيف)', 'Siège de la direction, salle de réunion (cité 08 Mai 1945, Sétif)', 'Directorate headquarters, meeting room (08 May 1945 district, Sétif)'];
+$originals = ['أحضر النسخ الأصلية للشهادة وكشوف النقاط.', 'Apportez les originaux du diplôme et des relevés de notes.', 'Bring the originals of your diploma and transcripts.'];
+$ex1 = $examFields($first, ['المقابلة مع لجنة الانتقاء — الفوج الأول', 'Entretien avec le jury — 1er groupe', 'Interview with the selection board — group 1'], $day(30) . ' 08:30:00', $hq, $originals, 1);
+$examFields($first, ['المقابلة مع لجنة الانتقاء — الفوج الثاني', 'Entretien avec le jury — 2e groupe', 'Interview with the selection board — group 2'], $day(31) . ' 08:30:00', $hq, $originals, 2);
+
+// كريم (ملف مقبول) مستدعى للفوج الأول، وأمينة (ملف ناقص) تستطيع رفع الوثيقة الناقصة قبل أجل 5 أيام
+[$karim, $amina] = [$created[1], $created[2]];
+recruit_convoke($ex1, [(int) $karim['id']]);
+$amina->update(['complete_until' => $day(5)]);
+demo_fixed_codes(CompetitionApplication::find((int) $karim['id']), 'C26-KMZ4N7Q2', 'DEMO2-KARIM');
+demo_fixed_codes(CompetitionApplication::find((int) $amina['id']), 'C26-AHM8D3R5', 'DEMO2-AMINA');
+
+// الامتحان المهني (منتهٍ): 6 مترشحين، 5 ملفات مقبولة ومستدعاة، ونتائج فردية منشورة
+$pro = Competition::firstWhere('reference = ?', ['03/2026']);
+$proPeople = [
+    ['بلقاسمي', 'مراد', 'BELKACEMI', 'Mourad', 'M', '1984-02-11', 'سطيف', '109840211000123456', 'passed', '16.25'],
+    ['زروقي', 'حنان', 'ZERROUKI', 'Hanane', 'F', '1986-06-25', 'العلمة', '109860625000234567', 'passed', '14.75'],
+    ['عيساوي', 'رشيد', 'AISSAOUI', 'Rachid', 'M', '1982-10-03', 'بوقاعة', '109821003000345678', 'reserve', '13.50'],
+    ['دراجي', 'سميرة', 'DERRADJI', 'Samira', 'F', '1987-04-19', 'سطيف', '109870419000456789', 'failed', '08.75'],
+    ['مناصري', 'فاتح', 'MENASRI', 'Fateh', 'M', '1985-12-08', 'عين أرنات', '109851208000567890', 'absent', null],
+    ['لعريبي', 'وردة', 'LARIBI', 'Warda', 'F', '1989-08-30', 'سطيف', '109890830000678901', null, null],
+];
+$proPosts = $pro['posts'];
+$proReqs = $pro['requirements'];
+$proApps = [];
+foreach ($proPeople as $n => [$ln, $fn, $lnl, $fnl, $g, $bd, $bp, $nin, $res, $score]) {
+    $d = ['post_id' => (int) $proPosts[0]['id'], 'last_name' => $ln, 'first_name' => $fn, 'last_name_latin' => $lnl, 'first_name_latin' => $fnl,
+          'gender' => $g, 'birth_date' => $bd, 'birth_place' => $bp, 'nin' => $nin, 'phone' => '06612' . sprintf('%05d', 34500 + $n), 'email' => '',
+          'address' => 'حي المعبودة', 'wilaya' => 'سطيف', 'national_service' => $g === 'M' ? 'done' : 'na', 'diploma' => 'ليسانس في العلوم القانونية والإدارية',
+          'specialty' => 'إدارة عامة', 'graduation_year' => 2008 + $n, 'experience_years' => 9 + $n];
+    foreach ($proReqs as $k => $r) {
+        $path = "$tmp/pro-$n-$k.pdf";
+        file_put_contents($path, demo_pdf('Arrete de titularisation', "$lnl $fnl"));
+        $d['doc_' . $r['id']] = ['name' => 'Arrêté de titularisation - ' . $fnl . '.pdf', 'tmp_name' => $path, 'size' => filesize($path), 'error' => 0];
+    }
+    [$app] = recruit_store_application($pro, $d, $proPosts, $proReqs);
+    $when = $at(55 - 2 * $n, sprintf('%02d:%02d', 9 + $n, 11 * $n % 60));
+    $accepted = $n < 5;
+    $app->update(['submitted_at' => $when, 'updated_at' => $when, 'status' => $accepted ? 'accepted' : 'rejected',
+        'candidate_message' => $accepted ? null : 'نأسف، لم تستوفِ شرط 5 سنوات من الخدمة الفعلية في رتبة متصرف.',
+        'reviewed_at' => $at(38, '10:' . (10 + $n)), 'reviewed_by_id' => $adminId]);
+    DB::query('UPDATE recruitment_audit SET created_at = ?, ip_address = ? WHERE application_id = ?', [$when, '197.201.' . (30 + $n) . '.' . (40 + $n), (int) $app['id']]);
+    $proApps[] = $app;
+}
+$proExam = $examFields($pro, ['الامتحان المهني — الاختبار الكتابي', 'Examen professionnel — épreuve écrite', 'Professional exam — written test'],
+    $day(-25) . ' 09:00:00', ['جامعة فرحات عباس سطيف 1، المدرج 5', 'Université Ferhat Abbas Sétif 1, amphithéâtre 5', 'Ferhat Abbas University Sétif 1, lecture hall 5'],
+    ['مدة الاختبار ثلاث ساعات. يُسمح بالقلم الأزرق فقط.', 'Durée de l\'épreuve : trois heures. Stylo bleu uniquement.', 'The test lasts three hours. Blue pen only.'], 1);
+recruit_convoke($proExam, array_map(fn($a) => (int) $a['id'], array_slice($proApps, 0, 5)));
+$rank = 0;
+foreach (array_slice($proPeople, 0, 5) as $n => $p) {
+    $app = CompetitionApplication::find((int) $proApps[$n]['id']);
+    $note = ['passed' => 'يرجى الحضور إلى مصلحة المستخدمين لاستكمال ملف الترقية قبل نهاية الشهر.', 'reserve' => 'القائمة الاحتياطية صالحة لمدة سنة.'][$p[8]] ?? '';
+    recruit_save_result($app, (string) $p[8], (string) $p[9], $p[9] !== null ? (string) ++$rank : '', $note);
+}
+$pro->update(['results_published_at' => $at(10, '14:00')]);
+RecruitmentAudit::log('publish', null, (int) $pro['id'], $pro['title'] . ' — 5 نتيجة');
+demo_fixed_codes(CompetitionApplication::find((int) $proApps[0]['id']), 'C26-RSN7T9P3', 'DEMO2-NAJAH');
+// أحداث الموظفين المسجّلة من سطر الأوامر (بلا مستخدم) تُنسب للمدير التجريبي
+DB::query("UPDATE recruitment_audit SET user_id = ?, username = ? WHERE user_id IS NULL AND action IN ('convoke', 'unconvoke', 'result', 'publish', 'unpublish', 'status', 'update')",
+    [$adminId, (string) $admin['username']]);
+
 @array_map('unlink', glob("$tmp/*.pdf"));
 // الموظف التجريبي hicham41 بلا «صلاحية مسابقات التوظيف» عمداً: لا يرى المسابقات ولا ملفات المترشحين (لاختبار الصلاحيات)
-echo 'المسابقات التجريبية: ' . count($competitions) . ' مسابقات، ' . count($created) . " طلبات ترشح مشفّرة\n";
+echo 'المسابقات التجريبية: ' . count($competitions) . ' مسابقات، ' . (count($created) + count($proApps)) . " طلبات ترشح مشفّرة\n";
+echo "رموز تجريبية لصفحة «متابعة طلب»: C26-KMZ4N7Q2 / DEMO2-KARIM (مستدعى)، C26-AHM8D3R5 / DEMO2-AMINA (ملف ناقص)، C26-RSN7T9P3 / DEMO2-NAJAH (ناجح)\n";

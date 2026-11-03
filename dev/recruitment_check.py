@@ -241,10 +241,14 @@ print('3) متابعة الطلب: رقم المتابعة وحده لا يكف�
 clear_ratelimit()
 
 
-def track(code, secret, client=None, headers=None):
+def track(code, secret, client=None, headers=None, follow=True):
+    """الدخول إلى فضاء المترشح: POST ← 302 (PRG) ← صفحة الطلب (follow) — أو صفحة الخطأ مباشرة"""
     cl = client or Client()
     t, _ = cl.token('/competitions/track/')
-    return cl.text('POST', '/competitions/track/', data={'csrfmiddlewaretoken': t, 'tracking_code': code, 'secret': secret}, headers=headers)
+    s, h, b = cl.text('POST', '/competitions/track/', data={'csrfmiddlewaretoken': t, 'tracking_code': code, 'secret': secret}, headers=headers)
+    if follow and s == 302:
+        return cl.text('GET', urllib.parse.urlparse(location(h)).path)
+    return s, h, b
 
 
 s, h, b = track(TRACK, SECRET)
@@ -382,7 +386,8 @@ print('9) صلاحيات لوحة الإدارة')
 APP_ID = int(row['id'])
 FILE_ID = int(q('SELECT id FROM competition_application_files WHERE application_id = ? ORDER BY id LIMIT 1', [APP_ID])[0]['id'])
 admin_paths = ['/admin/recruitment/applications/', f'/admin/recruitment/applications/{APP_ID}/', f'/admin/recruitment/files/{FILE_ID}/',
-               '/admin/recruitment/export/?mode=full', '/admin/recruitment/audit/', f'/admin/recruitment/purge/{CID}/']
+               '/admin/recruitment/export/?mode=full', '/admin/recruitment/audit/', f'/admin/recruitment/purge/{CID}/',
+               f'/admin/recruitment/results/?competition={CID}']
 for p in admin_paths:
     s, h, _b = Client().text('GET', p)
     check(s == 302 and '/admin/login/' in location(h), f'زائر: {p} ← صفحة دخول الإدارة')
@@ -438,7 +443,7 @@ check(any(a['action'] == 'export' and 'قائمة كاملة' in a['details'] fo
 # ----------------------------------------------------------------------------------------------
 print('10) دراسة الطلب: الحالة ورسالة المترشح')
 t, _ = adm.token(f'/admin/recruitment/applications/{APP_ID}/')
-s, h, _b = adm.text('POST', f'/admin/recruitment/applications/{APP_ID}/', data={'csrfmiddlewaretoken': t, 'status': 'incomplete',
+s, h, _b = adm.text('POST', f'/admin/recruitment/applications/{APP_ID}/', data={'csrfmiddlewaretoken': t, 'form': 'review', 'status': 'incomplete',
                     'candidate_message': 'ينقص ملفك <script>alert(1)</script> كشف النقاط', 'internal_notes': 'ملاحظة داخلية سرية'})
 check(s == 302, 'تغيير الحالة إلى «ملف ناقص» مع رسالة')
 s, _h, b = track(TRACK, SECRET)
@@ -481,7 +486,286 @@ s, _h, raw = Client().req('GET', '/' + rel)
 check(s in (403, 404) and not raw.startswith(b'DOUENC1'), f'/{rel[:40]}... من المتصفح ← {s}')
 
 # ----------------------------------------------------------------------------------------------
-print('12) حذف معطيات المترشحين بعد انتهاء المسابقة (المدير العام)')
+def new_app(nin, last, first, last_lat, first_lat):
+    """طلب جديد في مسابقة الاختبار ← (رقمه, رقم المتابعة, الرمز السري)"""
+    cl, _s, _h, _b = submit(data={**VALID, 'nin': nin, 'last_name': last, 'first_name': first, 'last_name_latin': last_lat, 'first_name_latin': first_lat})
+    _s, _h, b = cl.text('GET', '/competitions/receipt/')
+    codes = dict(re.findall(r'class="cmp-code" id="cmp-(tracking|secret)">([^<]+)<', b))
+    return int(q('SELECT id FROM competition_applications WHERE tracking_code = ?', [codes['tracking']])[0]['id']), codes['tracking'], codes['secret']
+
+
+def candidate(code, secret):
+    cl = Client()
+    track(code, secret, client=cl)
+    return cl
+
+
+def complete(cl, files, csrf=True):
+    t, _ = cl.token('/competitions/track/')
+    return cl.text('POST', '/competitions/track/complete/', data={'csrfmiddlewaretoken': t} if csrf else {}, files=files)
+
+
+def review(app_id, status, until=None, msg=''):
+    t, _ = adm.token(f'/admin/recruitment/applications/{app_id}/')
+    d = {'csrfmiddlewaretoken': t, 'form': 'review', 'status': status, 'candidate_message': msg, 'internal_notes': ''}
+    if until is not None:
+        d['complete_until'] = until
+    return adm.text('POST', f'/admin/recruitment/applications/{app_id}/', data=d)
+
+
+def app_row(app_id):
+    return q('SELECT * FROM competition_applications WHERE id = ?', [app_id])[0]
+
+
+def file_count(app_id):
+    return int(q('SELECT COUNT(*) n FROM competition_application_files WHERE application_id = ?', [app_id])[0]['n'])
+
+
+def session_file(cl):
+    return os.path.join(SITE, 'storage', 'sessions', 'sess_' + cl.cookies.get('dou_session', ''))
+
+
+print('12) فضاء المترشح: الجلسة (تثبيت الجلسة، المدة، الإغلاق، لا أرقام في الروابط)')
+clear_ratelimit()
+cl = Client()
+cl.token('/competitions/track/')
+sid_before = cl.cookies.get('dou_session', '')
+s, h, _b = track(TRACK, SECRET, client=cl, follow=False)
+sid_after = cl.cookies.get('dou_session', '')
+check(s == 302 and location(h).endswith('/competitions/track/'), f'الرمزان الصحيحان ← 302 إلى صفحة الطلب (PRG: إعادة التحميل لا تعيد إرسال الرمز) ({s})')
+check(sid_before != '' and sid_after != '' and sid_before != sid_after, 'معرّف جلسة جديد بعد الدخول (منع تثبيت الجلسة Session Fixation)')
+old_cl = Client()
+old_cl.cookies = {'dou_session': sid_before}
+s, _h, b = old_cl.text('GET', '/competitions/track/')
+check('cmp-track-form' in b and 'cmp-status' not in b, 'المعرّف القديم (قبل الدخول) لا يفتح صفحة الطلب')
+s, h, b = cl.text('GET', '/competitions/track/')
+check(s == 200 and 'cmp-status' in b and 'no-store' in h.get('cache-control', '') and 'noindex' in h.get('x-robots-tag', '') and h.get('referrer-policy') == 'no-referrer',
+      'صفحة الطلب: no-store و noindex و Referrer-Policy: no-referrer')
+check(SECRET not in b and SECRET.replace('-', '') not in b, '  والرمز السري لا يظهر فيها')
+check(php('echo RECRUIT_GRANT_TTL;') == '1200', 'مدة فضاء المترشح 20 دقيقة (ثابتة لا تتجدد)')
+grant = php(f"""$a = CompetitionApplication::findByTracking('{TRACK}'); $id = (int) $a['id']; $o = [];
+$_SESSION = ['recruit_track' => ['id' => $id, 'code' => '{TRACK}', 'until' => time() + 60]]; $o[] = recruit_grant() !== null;
+$_SESSION = ['recruit_track' => ['id' => $id, 'code' => '{TRACK}', 'until' => time() - 1]]; $o[] = recruit_grant() === null && !isset($_SESSION['recruit_track']);
+$_SESSION = ['recruit_track' => ['id' => $id, 'code' => '{TRACK}', 'until' => time() - 300]]; $o[] = recruit_grant(600) !== null;
+$_SESSION = ['recruit_track' => ['id' => $id, 'code' => 'C26-ZZZZZZZZ', 'until' => time() + 60]]; $o[] = recruit_grant() === null;
+$_SESSION = ['recruit_track' => ['id' => $id + 1, 'code' => '{TRACK}', 'until' => time() + 60]]; $o[] = recruit_grant() === null;
+$_SESSION = ['recruit_track' => 'x']; $o[] = recruit_grant() === null;
+echo json_encode($o);""")
+check(grant == '[true,true,true,true,true,true]', f'الإذن: ينتهي بعد مدته، ومربوط برقم المتابعة (رقم طلب آخر أو رقم متابعة آخر ← مرفوض) {grant}')
+sf = session_file(cl)
+raw = open(sf).read() if os.path.exists(sf) else ''
+with open(sf, 'w') as f:
+    f.write(re.sub(r'(s:5:"until";i:)\d+;', lambda m: m.group(1) + str(int(time.time()) - 5) + ';', raw))
+s, _h, b = cl.text('GET', '/competitions/track/')
+check('until' in raw and 'cmp-track-form' in b and 'cmp-status' not in b, 'بعد انتهاء المدة (في ملف الجلسة نفسه): نموذج الدخول من جديد')
+for path in ['/competitions/track/convocation/', '/competitions/track/result/']:
+    s, h, _b = Client().text('GET', path)
+    check(s == 302 and location(h).endswith('/competitions/track/'), f'{path} بلا جلسة ← نموذج الدخول ({s})')
+cl = candidate(TRACK, SECRET)
+t, _ = cl.token('/competitions/track/')
+cl.text('POST', '/competitions/track/', data={'csrfmiddlewaretoken': t, 'logout': '1'})
+s, _h, b = cl.text('GET', '/competitions/track/')
+check('cmp-track-form' in b and 'cmp-status' not in b, '«إغلاق صفحة طلبي» ينهي الوصول فوراً')
+s, _h, b = Client().text('POST', '/competitions/track/complete/', data={'x': '1'})
+check(s == 403, f'رفع وثائق بلا رمز CSRF ← 403 ({s})')
+cl = candidate(TRACK, SECRET)
+s, _h, b = track(TRACK, 'WRONG-SECRT', client=cl)
+s, _h, b = cl.text('GET', '/competitions/track/')
+check('cmp-track-form' in b and 'cmp-status' not in b, 'محاولة دخول خاطئة في متصفح مفتوح على طلب ← يُغلق الطلب المفتوح (جهاز مشترك)')
+clear_ratelimit()
+
+# ----------------------------------------------------------------------------------------------
+print('13) إكمال الملف الناقص من طرف المترشح')
+B_ID, B_TRACK, B_SECRET = new_app('109950101000555111', 'عباسي', 'نادية', 'Abbassi', 'nadia')
+cb = candidate(B_TRACK, B_SECRET)
+s, _h, b = cb.text('GET', '/competitions/track/')
+check('id="cmp-complete"' not in b, 'طلب «قيد الانتظار»: لا نموذج إكمال')
+n0 = file_count(B_ID)
+s, h, _b = complete(cb, {f'doc_{T["r2"]}': ('extra.pdf', PDF['ok_simple.pdf'], 'application/pdf')})
+check(s == 302 and file_count(B_ID) == n0, 'رفع وثيقة لطلب غير ناقص (بتجاوز الواجهة) ← مرفوض')
+review(B_ID, 'incomplete', msg='ينقص ملفك الوثيقة الاختيارية')
+row_b = app_row(B_ID)
+default_until = time.strftime('%Y-%m-%d', time.localtime(time.time() + 7 * 86400))
+check(row_b['status'] == 'incomplete' and row_b['complete_until'] == default_until, f'«ملف ناقص» بلا تاريخ ← أجل افتراضي بعد 7 أيام ({row_b["complete_until"]})')
+s, _h, b = review(B_ID, 'incomplete', until='2001-01-01')
+check(app_row(B_ID)['complete_until'] == default_until, 'أجل في الماضي من لوحة الإدارة ← مرفوض')
+s, _h, b = cb.text('GET', '/competitions/track/')
+check('id="cmp-complete"' in b and f'name="doc_{T["r1"]}"' in b and f'name="doc_{T["r2"]}"' in b and 'ينقص ملفك الوثيقة الاختيارية' in b,
+      'المترشح يرى رسالة الإدارة ونموذج رفع الوثائق الناقصة')
+clear_ratelimit()
+before = set(enc_files())
+for name in ['bad_js_openaction.pdf', 'bad_php_polyglot.pdf', 'bad_png_renamed.pdf', 'bad_encrypted.pdf', 'bad_launch.pdf']:
+    complete(cb, {f'doc_{T["r2"]}': (name, PDF[name], 'application/pdf')})
+check(file_count(B_ID) == n0 and app_row(B_ID)['status'] == 'incomplete' and set(enc_files()) == before, 'وثائق خبيثة أو تالفة ← مرفوضة، لا يُحفظ شيء، والطلب يبقى ناقصاً')
+complete(cb, {f'doc_{T["r2"]}': ('shell.php', PDF['ok_simple.pdf'], 'application/pdf')})
+check(file_count(B_ID) == n0, 'ملف PDF سليم باسم shell.php ← مرفوض')
+complete(cb, {f'doc_{T["other_post"] + 100000}': ('x.pdf', PDF['ok_simple.pdf'], 'application/pdf')})
+check(file_count(B_ID) == n0, 'خانة لوثيقة لا تنتمي لهذه المسابقة ← تُتجاهل')
+big = PDF['ok_simple.pdf'][:-6] + b' ' * (3 * 1024 * 1024 + 10) + b'%%EOF\n'
+complete(cb, {f'doc_{T["r2"]}': ('big.pdf', big, 'application/pdf')})
+check(file_count(B_ID) == n0, 'ملف أكبر من 3 ميغابايت ← مرفوض')
+clear_ratelimit()
+s, h, _b = complete(cb, {f'doc_{T["r2"]}': ('كشف النقاط.pdf', PDF['ok_scan.pdf'], 'application/pdf')})
+row_b = app_row(B_ID)
+newf = sorted(set(enc_files()) - before)
+added = q('SELECT original_name, added_later, sha256 FROM competition_application_files WHERE application_id = ? ORDER BY id DESC LIMIT 1', [B_ID])[0]
+check(s == 302 and file_count(B_ID) == n0 + 1 and row_b['status'] == 'pending' and row_b['completed_at'], 'وثيقة صحيحة ← محفوظة، والطلب يعود «قيد الانتظار» مع وقت الإكمال')
+check(len(newf) == 1 and open(newf[0], 'rb').read().startswith(b'DOUENC1') and b'%PDF' not in open(newf[0], 'rb').read() and oct(os.stat(newf[0]).st_mode)[-3:] == '600',
+      '  الوثيقة مشفّرة على القرص باسم عشوائي وصلاحيات 600')
+check(added['original_name'] == 'كشف النقاط.pdf' and str(added['added_later']) == '1' and added['sha256'] == hashlib.sha256(PDF['ok_scan.pdf']).hexdigest(),
+      '  معلَّمة «أُضيفت لاحقاً» مع بصمة sha256')
+fid = int(q('SELECT id FROM competition_application_files WHERE application_id = ? ORDER BY id DESC LIMIT 1', [B_ID])[0]['id'])
+s, _h, raw = adm.req('GET', f'/admin/recruitment/files/{fid}/')
+check(s == 200 and raw == PDF['ok_scan.pdf'], '  الإدارة تفتحها مطابقة للأصل')
+s, _h, b = adm.text('GET', f'/admin/recruitment/applications/{B_ID}/')
+check('recruit-late-file' in b, '  وتظهر للإدارة بعلامة «إكمال»')
+aud = q("SELECT username FROM recruitment_audit WHERE application_id = ? AND action = 'complete'", [B_ID])
+check(len(aud) == 1 and aud[0]['username'] == '', 'سجل الاطلاع: «إكمال الملف» باسم المترشح')
+s, _h, b = cb.text('GET', '/competitions/track/')
+check('id="cmp-complete"' not in b and 'cmp-status is-pending' in b, 'بعد الإكمال: يختفي النموذج')
+complete(cb, {f'doc_{T["r2"]}': ('again.pdf', PDF['ok_simple.pdf'], 'application/pdf')})
+check(file_count(B_ID) == n0 + 1, 'ولا يمكن رفع وثيقة أخرى بعده')
+review(B_ID, 'incomplete')
+x('UPDATE competition_applications SET complete_until = ? WHERE id = ?', [time.strftime('%Y-%m-%d', time.localtime(time.time() - 86400)), B_ID])
+s, _h, b = cb.text('GET', '/competitions/track/')
+check('id="cmp-complete"' not in b and 'cmp-closed-note' in b, 'بعد انتهاء أجل الإكمال: لا نموذج، ورسالة «انتهى الأجل»')
+complete(cb, {f'doc_{T["r2"]}': ('late.pdf', PDF['ok_simple.pdf'], 'application/pdf')})
+check(file_count(B_ID) == n0 + 1, '  والرفع (بتجاوز الواجهة) مرفوض في الخادم')
+x('UPDATE competition_applications SET complete_until = ? WHERE id = ?', [default_until, B_ID])
+clear_ratelimit()
+for i in range(10):
+    complete(cb, {f'doc_{T["r2"]}': (f'bad{i}.pdf', PDF['bad_png_renamed.pdf'], 'application/pdf')})
+complete(cb, {f'doc_{T["r2"]}': ('ok.pdf', PDF['ok_simple.pdf'], 'application/pdf')})
+check(file_count(B_ID) == n0 + 1 and app_row(B_ID)['status'] == 'incomplete', '10 محاولات رفع في اليوم لكل طلب ← المحاولة 11 مرفوضة حتى بملف صحيح')
+clear_ratelimit()
+php(f"for ($i = 0; $i < 25; $i++) {{ DB::insert('competition_application_files', ['application_id' => {B_ID}, 'label' => 'x', 'original_name' => 'x.pdf', "
+    f"'stored_name' => bin2hex(random_bytes(16)) . '.enc', 'size' => 1, 'sha256' => str_repeat('0', 64)]); }}")
+complete(cb, {f'doc_{T["r2"]}': ('ok.pdf', PDF['ok_simple.pdf'], 'application/pdf')})
+check(app_row(B_ID)['status'] == 'incomplete', 'سقف لعدد الوثائق في الطلب الواحد (منع ملء القرص)')
+x("DELETE FROM competition_application_files WHERE application_id = ? AND label = 'x' AND size = 1", [B_ID])
+clear_ratelimit()
+
+# ----------------------------------------------------------------------------------------------
+print('14) الاستدعاء ورقم التسجيل')
+exams = json.loads(php(f"""$e1 = CompetitionExam::create(['competition_id' => {CID}, 'title' => 'المقابلة <img src=x onerror=alert(1)>', 'starts_at' => date('Y-m-d', strtotime('+20 days')) . ' 09:00:00',
+    'place' => 'قاعة الاختبار 3', 'instructions' => 'أحضر القلم']);
+$e2 = CompetitionExam::create(['competition_id' => {CID}, 'title' => 'الفوج الثاني', 'starts_at' => date('Y-m-d', strtotime('+21 days')) . ' 09:00:00']);
+$eo = CompetitionExam::create(['competition_id' => {T['other_id']}, 'title' => 'موعد مسابقة أخرى', 'starts_at' => date('Y-m-d', strtotime('+21 days')) . ' 09:00:00']);
+echo json_encode([(int) $e1['id'], (int) $e2['id'], (int) $eo['id']]);"""))
+E1, E2, EO = exams
+C_ID, C_TRACK, C_SECRET = new_app('109960202000666222', 'أحمدي', 'سليم', 'Ahmedi', 'salim')
+x("UPDATE competition_applications SET status = 'accepted' WHERE id = ?", [C_ID])
+
+
+def bulk(do, ids, exam=None, competition=CID):
+    path = '/admin/recruitment/applications/' + (f'?competition={competition}' if competition else '')
+    t, _ = adm.token(path)
+    d = {'csrfmiddlewaretoken': t, 'do': do, 'ids[]': [str(i) for i in ids]}
+    if exam is not None:
+        d['exam_id'] = str(exam)
+    return adm.text('POST', path, data=d)
+
+
+bulk('convoke', [APP_ID, C_ID], exam=E1, competition=None)
+check(app_row(APP_ID)['exam_id'] is None, 'استدعاء جماعي بلا اختيار المسابقة ← مرفوض')
+bulk('convoke', [APP_ID, C_ID], exam=EO)
+check(app_row(APP_ID)['exam_id'] is None, 'موعد من مسابقة أخرى ← مرفوض')
+bulk('convoke', [APP_ID, C_ID, B_ID], exam=E1)
+ra, rc, rb = app_row(APP_ID), app_row(C_ID), app_row(B_ID)
+check(int(ra['exam_id'] or 0) == E1 and int(rc['exam_id'] or 0) == E1 and rb['exam_id'] is None, 'استدعاء الملفات المقبولة فقط (الطلب الناقص يُتجاهل)')
+check(rc['seat_number'] == '001' and ra['seat_number'] == '002', f'أرقام التسجيل بالتسلسل حسب الترتيب الأبجدي للقب (أحمدي 001، بن يحيى 002) ← {rc["seat_number"]}، {ra["seat_number"]}')
+bulk('convoke', [APP_ID], exam=E2)
+check(int(app_row(APP_ID)['exam_id']) == E2 and app_row(APP_ID)['seat_number'] == '002', 'نقل مترشح إلى موعد آخر يحتفظ برقم تسجيله')
+ca = candidate(TRACK, SECRET)
+s, _h, b = ca.text('GET', '/competitions/track/')
+check('cmp-convocation' in b and '002' in b and 'الفوج الثاني' in b, 'المترشح يرى استدعاءه ورقم تسجيله')
+s, h, b = ca.text('GET', '/competitions/track/convocation/')
+check(s == 200 and 'doc-seat' in b and '002' in b and '12/04/1997' in b and 'no-store' in h.get('cache-control', '') and 'noindex' in h.get('x-robots-tag', ''),
+      'الاستدعاء المطبوع: رقم التسجيل + تاريخ الميلاد (مفكوك التشفير لصاحبه فقط)، no-store و noindex')
+check(VALID['nin'] not in b and VALID['phone'] not in b and 'حي 1014' not in b and 'example.dz' not in b.lower(), '  بلا رقم التعريف ولا الهاتف ولا العنوان ولا البريد')
+s, _h, b = ca.text('GET', f'/competitions/track/convocation/?id={C_ID}&tracking_code={C_TRACK}')
+check('002' in b and 'بن يحيى مريم' in b and 'أحمدي سليم' not in b, 'إضافة رقم طلب آخر في الرابط ← تُتجاهل (لا IDOR: الجلسة وحدها تحدد الطلب)')
+bulk('convoke', [C_ID], exam=E1)
+cc = candidate(C_TRACK, C_SECRET)
+s, _h, b = cc.text('GET', '/competitions/track/convocation/')
+check('&lt;img src=x onerror=alert(1)&gt;' in b and '<img src=x' not in b, 'عنوان موعد فيه HTML ← مُهرَّب في الاستدعاء')
+s, _h, b = cc.text('GET', '/competitions/track/')
+check('&lt;img src=x onerror=alert(1)&gt;' in b and '<img src=x' not in b, '  وفي صفحة المترشح')
+s, _h, b = cb.text('GET', '/competitions/track/convocation/')
+check(s == 404, f'مترشح غير مستدعى ← الاستدعاء غير موجود (404) ({s})')
+review(C_ID, 'under_review')
+check(app_row(C_ID)['exam_id'] is None, 'سحب القبول من مترشح مستدعى يلغي استدعاءه')
+s, _h, _b = cc.text('GET', '/competitions/track/convocation/')
+check(s == 404, '  ويختفي استدعاؤه')
+x("UPDATE competition_applications SET status = 'accepted' WHERE id = ?", [C_ID])
+t, _ = adm.token(f'/admin/recruitment/applications/{B_ID}/')
+adm.text('POST', f'/admin/recruitment/applications/{B_ID}/', data={'csrfmiddlewaretoken': t, 'form': 'outcome', 'exam_id': str(E1), 'result': '', 'score': '', 'result_rank': '', 'result_note': ''})
+check(app_row(B_ID)['exam_id'] is None, 'صفحة الطلب: استدعاء ملف غير مقبول ← مرفوض')
+bulk('convoke', [C_ID], exam=E1)
+bulk('unconvoke', [C_ID])
+check(app_row(C_ID)['exam_id'] is None and app_row(C_ID)['seat_number'] == '001', 'إلغاء الاستدعاء (رقم التسجيل يبقى محجوزاً له)')
+acts = [a['action'] for a in q('SELECT action FROM recruitment_audit WHERE application_id = ? ORDER BY id', [C_ID])]
+check('convoke' in acts and 'unconvoke' in acts, 'سجل الاطلاع: الاستدعاء وإلغاؤه')
+
+# ----------------------------------------------------------------------------------------------
+print('15) النتيجة الفردية والنشر')
+RES = f'/admin/recruitment/results/?competition={CID}'
+
+
+def results_post(action, rows=None):
+    t, _ = adm.token(RES)
+    d = {'csrfmiddlewaretoken': t, 'action': action}
+    for app_id, vals in (rows or {}).items():
+        for k, v in vals.items():
+            d[f'r[{app_id}][{k}]'] = v
+    return adm.text('POST', RES, data=d)
+
+
+s, _h, b = adm.text('GET', RES)
+check(s == 200 and TRACK in b and C_TRACK in b and B_TRACK not in b, 'صفحة النتائج: الملفات المقبولة فقط')
+results_post('publish')
+check(q('SELECT results_published_at FROM competitions WHERE id = ?', [CID])[0]['results_published_at'] is None, 'نشر نتائج بلا أي نتيجة مسجّلة ← مرفوض')
+results_post('save', {APP_ID: {'result': 'passed', 'score': '25', 'rank': '1', 'note': ''}})
+check(app_row(APP_ID)['result'] is None, 'علامة أكبر من 20 ← مرفوضة (لا يُحفظ شيء من السطر)')
+results_post('save', {APP_ID: {'result': 'hacked', 'score': '12', 'rank': '', 'note': ''}})
+check(app_row(APP_ID)['result'] is None, 'نتيجة غير معروفة ← مرفوضة')
+results_post('save', {APP_ID: {'result': 'passed', 'score': '12', 'rank': '-3', 'note': ''}})
+check(app_row(APP_ID)['result'] is None, 'ترتيب سالب ← مرفوض')
+results_post('save', {APP_ID: {'result': 'passed', 'score': '14,5', 'rank': '', 'note': 'احضر يوم <b>الأحد</b>'},
+                      C_ID: {'result': 'reserve', 'score': '12.75', 'rank': '', 'note': ''}, B_ID: {'result': 'passed', 'score': '20', 'rank': '', 'note': ''}})
+ra, rc, rb = app_row(APP_ID), app_row(C_ID), app_row(B_ID)
+check(ra['result'] == 'passed' and ra['score'] == '14.50' and rc['result'] == 'reserve' and rc['score'] == '12.75', 'حفظ النتائج: العلامة بفاصلة أو نقطة (14,5 ← 14.50)')
+check(rb['result'] is None, '  ونتيجة لطلب غير مقبول (بتجاوز الواجهة) ← مرفوضة')
+results_post('autorank')
+check(app_row(APP_ID)['result_rank'] == '1' and app_row(C_ID)['result_rank'] == '2', 'الترتيب التلقائي حسب العلامة (14,50 ← 1، 12,75 ← 2)')
+s, _h, b = ca.text('GET', '/competitions/track/')
+check('cmp-result' not in b, 'قبل النشر: المترشح لا يرى نتيجته')
+s, _h, _b = ca.text('GET', '/competitions/track/result/')
+check(s == 404, f'  وإشعار النتيجة غير موجود (404) ({s})')
+results_post('publish')
+check(q('SELECT results_published_at FROM competitions WHERE id = ?', [CID])[0]['results_published_at'] is not None, 'نشر النتائج')
+s, _h, b = ca.text('GET', '/competitions/track/')
+check('cmp-result is-passed' in b and '14,50' in b and 'احضر يوم &lt;b&gt;الأحد&lt;/b&gt;' in b, 'بعد النشر: المترشح يرى نتيجته وعلامته والملاحظة (مع تهريب HTML)')
+check('12,75' not in b and 'أحمدي' not in b, '  ولا يرى نتائج غيره')
+s, h, b = ca.text('GET', '/competitions/track/result/')
+check(s == 200 and 'doc-result-value' in b and '14,50' in b and 'no-store' in h.get('cache-control', ''), 'إشعار النتيجة للطباعة (no-store)')
+s, _h, b = cc.text('GET', '/competitions/track/')
+check('cmp-result is-reserve' in b and '12,75' in b, 'مترشح آخر يرى نتيجته هو (القائمة الاحتياطية)')
+results_post('unpublish')
+s, _h, _b = ca.text('GET', '/competitions/track/result/')
+check(s == 404, 'إلغاء النشر ← تختفي النتائج فوراً')
+staff2 = Client()
+staff2.login(*STAFF)
+s, _h, _b = staff2.text('POST', RES, data={'csrfmiddlewaretoken': staff2.token('/admin/')[0], 'action': 'publish'})
+check(s == 403 and q('SELECT results_published_at FROM competitions WHERE id = ?', [CID])[0]['results_published_at'] is None, f'موظف بلا صلاحية المسابقات: نشر النتائج ← 403 ({s})')
+acts = [a['action'] for a in q('SELECT action FROM recruitment_audit WHERE competition_id = ? AND username = ?', [CID, 'miloudsellam'])]
+check(all(a in acts for a in ('result', 'publish', 'unpublish')), 'سجل الاطلاع: تسجيل النتائج ونشرها وإلغاء النشر باسم الموظف')
+s, h, raw = adm.req('GET', f'/admin/recruitment/export/?competition={CID}&status=accepted')
+xml = zipfile.ZipFile(io.BytesIO(raw)).read('xl/worksheets/sheet1.xml').decode() if raw[:2] == b'PK' else ''
+check('رقم التسجيل' in xml and 'النتيجة' in xml and '14,50' in xml and 'في القائمة الاحتياطية' in xml, 'التصدير: أعمدة الاستدعاء ورقم التسجيل والنتيجة والعلامة والترتيب')
+
+# ----------------------------------------------------------------------------------------------
+print('16) حذف معطيات المترشحين بعد انتهاء المسابقة (المدير العام)')
 t, _ = adm.token(f'/admin/recruitment/purge/{CID}/')
 adm.text('POST', f'/admin/recruitment/purge/{CID}/', data={'csrfmiddlewaretoken': t, 'confirm': 'حذف'})
 check(app_count() > 0, 'قبل انتهاء الأجل: الحذف مرفوض')
