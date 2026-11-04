@@ -122,8 +122,8 @@
                     </h3>
                 </div>
                 <div class="panel-body">
-                    <div class="description-box">
-                        <?= linebreaks($cite['description']) ?>
+                    <div class="description-box rich-text">
+                        <?= rich_text($cite['description']) ?>
                     </div>
                 </div>
             </div>

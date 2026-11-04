@@ -311,7 +311,7 @@
                             <i class="fa fa-chevron-down toggle-icon"></i>
                         </div>
                         <div class="faq-answer">
-                            <p><?= linebreaks($faq['answer']) ?></p>
+                            <div class="rich-text"><?= rich_text($faq['answer']) ?></div>
                             <div class="faq-meta">
                                 <span>
                                     <i class="fa fa-eye"></i> <?= t('{count} مشاهدة', ['count' => $faq['views_count']]) ?>

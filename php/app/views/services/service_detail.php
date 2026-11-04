@@ -152,14 +152,14 @@
             <!-- الوصف التفصيلي -->
             <div class="content-section">
                 <h3><i class="fa fa-info-circle"></i> <?= t('نبذة عن الخدمة') ?></h3>
-                <p><?= linebreaks($service['detailed_description']) ?></p>
+                <div class="rich-text"><?= rich_text($service['detailed_description']) ?></div>
             </div>
             
             <!-- الشروط والمتطلبات -->
             <?php if (!empty($service['requirements'])): ?>
             <div class="content-section">
                 <h3><i class="fa fa-list-ul"></i> <?= t('الشروط والمتطلبات') ?></h3>
-                <p><?= linebreaks($service['requirements']) ?></p>
+                <div class="rich-text"><?= rich_text($service['requirements']) ?></div>
             </div>
             <?php endif; ?>
             
@@ -167,7 +167,7 @@
             <?php if (!empty($service['how_to_apply'])): ?>
             <div class="content-section">
                 <h3><i class="fa fa-file-text"></i> <?= t('كيفية التقديم') ?></h3>
-                <p><?= linebreaks($service['how_to_apply']) ?></p>
+                <div class="rich-text"><?= rich_text($service['how_to_apply']) ?></div>
             </div>
             <?php endif; ?>
             
@@ -180,7 +180,7 @@
             <?php if (!empty($service['contact_info'])): ?>
             <div class="info-box">
                 <h4><i class="fa fa-phone"></i> <?= t('معلومات الاتصال') ?></h4>
-                <p style="margin: 0;"><?= linebreaks($service['contact_info']) ?></p>
+                <div class="rich-text" style="margin: 0;"><?= rich_text($service['contact_info']) ?></div>
             </div>
             <?php endif; ?>
             

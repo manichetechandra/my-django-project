@@ -82,14 +82,19 @@ await page.click('[data-auto-translate]');
 check((await page.$eval('[data-tr-status]', (e) => e.textContent)).includes('اكتب النص العربي'), 'بلا نص عربي: رسالة «اكتب النص العربي أولاً»');
 await page.type('#f_title', 'صرف المنحة للطلبة');
 await page.type('#f_summary', 'خبر تجريبي من سطيف');
-await page.type('#f_content', 'خبر تجريبي\nالإقامة الجامعية في سطيف');
+// «المحتوى» نص منسّق: محرر CKEditor (admin-richtext.js) — نكتب فيه كما يفعل الموظف، وEnter = فقرة جديدة
+await page.waitForSelector('.ck-editor__editable[lang=ar]', { timeout: 15000 });
+await page.click('.ck-editor__editable[lang=ar]');
+await page.keyboard.type('خبر تجريبي');
+await page.keyboard.press('Enter');
+await page.keyboard.type('الإقامة الجامعية في سطيف');
 await page.click('[data-auto-translate]');
 await page.waitForFunction(() => /✓|✗/.test(document.querySelector('[data-tr-status]').textContent), { timeout: 15000 });
 const status1 = await page.$eval('[data-tr-status]', (e) => e.textContent);
 check(status1.includes('✓') && status1.includes('gemini'), 'الزر ترجم عبر gemini: ' + status1.trim());
 check(await val('[name=title_fr]') === 'Versement de la bourse للطلبة', 'title_fr = ' + await val('[name=title_fr]'));
 check(await val('[name=title_en]') === 'Scholarship payment للطلبة', 'title_en = ' + await val('[name=title_en]'));
-check((await val('[name=content_en]')).includes('\n'), 'أسطر المحتوى محفوظة في الترجمة');
+check(/^<p>[^<]+<\/p><p>[^<]+<\/p>$/.test(await val('[name=content_en]')), 'فقرتا المحتوى محفوظتان في الترجمة (محرر EN): ' + await val('[name=content_en]'));
 await shot('1-add-translated');
 
 // تعديل الترجمة يدوياً ثم الضغط مرة أخرى مع «إلغاء» = لا نستبدل الموجود
@@ -104,7 +109,7 @@ check(await val('[name=summary_en]') === 'news test من Sétif', '… ويمل�
 confirmAnswer = true;
 
 // ---------------------------------------------------------------- 2) الحفظ: ترجمة الحقول الفارغة تلقائياً
-await page.$eval('[name=content_fr]', (e) => { e.value = ''; });
+await page.$eval('[name=content_fr]', (e) => { if (e.ckeditorInstance) { e.ckeditorInstance.setData(''); } else { e.value = ''; } });
 await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('button[name=_continue]')]);
 const f2 = await flash();
 check(f2.includes('الفارغة (1)'), 'الحفظ ترجم الحقل الفارغ الوحيد: ' + f2);

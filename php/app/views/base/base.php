@@ -22,6 +22,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
     
+    <!-- النصوص المنسّقة من محرر لوحة الإدارة (الأخبار، الأوصاف، الأسئلة الشائعة...) -->
+    <link rel="stylesheet" href="<?= asset('css/rich-text.css') ?>">
+
     <!-- CSS الموقع: مكتوب بخصائص منطقية (start/end بدل right/left) فيعمل بالعربية والفرنسية والإنجليزية -->
     <style>
         /* الاتجاه من <html dir="rtl|ltr">: كل عنصر يرث اتجاه أبيه، والنص يبدأ من بداية السطر */
@@ -379,8 +382,22 @@ setTimeout(function() {
         function mobileOpen() {
             return !!toggle && toggle.offsetWidth > 0 && (menu.classList.contains('in') || menu.classList.contains('collapsing'));
         }
+        // إن تغيّر ارتفاع الشريط بعد الوصول إلى قسم (/#cite) — مثل عداد الإشعارات أو الخطوط بعد التحميل — نعيد ضبط
+        // الموضع، ما لم يحرّك الزائر الصفحة بنفسه، وخلال الثواني الأولى فقط
+        var last = -1, settleUntil = Date.now() + 4000, userMoved = false;
+        ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (t) {
+            window.addEventListener(t, function () { userMoved = true; }, {passive: true});
+        });
+        window.addEventListener('hashchange', function () { userMoved = false; settleUntil = Date.now() + 4000; });
         function update() {
-            document.documentElement.style.setProperty('--navbar-h', (nav.offsetHeight - (mobileOpen() ? menu.offsetHeight : 0)) + 'px');
+            var h = nav.offsetHeight - (mobileOpen() ? menu.offsetHeight : 0);
+            if (h === last) return;
+            var first = last < 0;
+            last = h;
+            document.documentElement.style.setProperty('--navbar-h', h + 'px');
+            var target = !first && !userMoved && Date.now() < settleUntil && location.hash.length > 1
+                && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+            if (target) target.scrollIntoView();
         }
         update();
         if (window.ResizeObserver) new ResizeObserver(update).observe(nav); else window.addEventListener('resize', update);

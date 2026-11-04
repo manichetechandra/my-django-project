@@ -69,8 +69,10 @@ class Translator
                     default    => self::test($todo, $targets),
                 };
                 foreach ($targets as $lang) {
-                    foreach ($todo as $key => $_) {
-                        $result[$lang][$key] = trim((string) ($out[$lang][$key] ?? ''));
+                    foreach ($todo as $key => $source) {
+                        $value = trim((string) ($out[$lang][$key] ?? ''));
+                        // نص منسّق (محرر CKEditor): الترجمة HTML أيضاً، ولا نثق بها قبل التنظيف بقائمة السماح
+                        $result[$lang][$key] = RichText::isHtml($source) ? RichText::normalize($value) : $value;
                     }
                 }
                 self::$usedProvider = $provider;
@@ -199,8 +201,9 @@ class Translator
         $system = 'You are the professional translator of the official website of the Directorate of University Services '
             . '(Direction des Œuvres Universitaires, DOU) of Sétif, Algeria. Translate Arabic administrative texts and news '
             . 'into natural, formal French and English as used in Algeria. Rules: translate the meaning faithfully without adding '
-            . 'or removing information; keep line breaks, lists, numbers, dates, times, phone numbers, emails, URLs and any HTML '
-            . 'tags exactly as they are; write Algerian names of people and places in their usual French spelling '
+            . 'or removing information; keep line breaks, lists, numbers, dates, times, phone numbers, emails and URLs exactly as they are; '
+            . 'some values are HTML from a rich-text editor: keep every HTML tag and attribute (and the href of links) exactly as it is '
+            . 'and translate only the human-readable text between the tags; write Algerian names of people and places in their usual French spelling '
             . '(سطيف = Sétif, الباز = El Bez, عين الفوارة = Aïn El Fouara); use "Direction des Œuvres Universitaires" / '
             . '"Directorate of University Services" for مديرية الخدمات الجامعية.';
         $prompt = "Translate every value of the following JSON object from Arabic into $langs.\n"
@@ -271,6 +274,11 @@ class Translator
         $out = [];
         foreach ($targets as $lang) {
             foreach ($texts as $key => $text) {
+                if (RichText::isHtml($text)) {
+                    // نص منسّق: MyMemory لا يفهم HTML — نترجم نص كل كتلة وحده ويبقى الهيكل (التنسيق داخل الفقرة لا يبقى)
+                    $out[$lang][$key] = RichText::mapText($text, fn(string $plain) => self::mymemory([$plain], [$lang])[$lang][0]);
+                    continue;
+                }
                 // نقسم النص إلى أسطر ثم جمل، وكل قطعة أقل من 450 بايت
                 $lines = preg_split('/(\R)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
                 $translated = '';
@@ -346,7 +354,8 @@ class Translator
         $out = [];
         foreach ($targets as $lang) {
             foreach ($texts as $key => $text) {
-                $out[$lang][$key] = '[' . strtoupper($lang) . '] ' . $text;
+                $tag = '[' . strtoupper($lang) . '] ';
+                $out[$lang][$key] = RichText::isHtml($text) ? RichText::mapText($text, fn(string $t) => $tag . $t) : $tag . $text;
             }
         }
         return $out;

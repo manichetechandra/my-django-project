@@ -77,7 +77,7 @@
                 <!-- المحتوى -->
                 <div class="panel-body" style="min-height: 200px;">
                     <h3 style="color: #2c3e50;"><?= e($cite['name']) ?></h3>
-                    <p><?= e(truncatewords($cite['description'], 20)) ?></p>
+                    <p><?= e(truncatewords(plain_text($cite['description']), 20)) ?></p>
                     
                     <?php if (!empty($cite['capacity'])): ?>
                     <p><i class="fa fa-users"></i> <strong><?= t('السعة:') ?></strong> <?= t('{count} طالب', ['count' => $cite['capacity']]) ?></p>

@@ -54,7 +54,11 @@
                             <?php foreach (admin_other_langs() as $lang): $col = $f . '_' . $lang; $max = admin_translation_max($spec); ?>
                                 <div class="admin-tr-row <?= isset($errors[$col]) ? 'has-error' : '' ?>" data-lang="<?= e($lang) ?>">
                                     <label class="admin-tr-lang" for="f_<?= e($col) ?>" title="<?= $lang === 'fr' ? 'الفرنسية' : 'الإنجليزية' ?>"><?= e(strtoupper($lang)) ?></label>
-                                    <?php if ($spec['type'] === 'textarea'): ?>
+                                    <?php if ($spec['type'] === 'richtext' && $readonly): ?>
+                                        <div class="form-control-static admin-richtext-view" dir="ltr" lang="<?= e($lang) ?>"><?= RichText::render($values[$col] ?? '') ?></div>
+                                    <?php elseif ($spec['type'] === 'richtext'): ?>
+                                        <textarea name="<?= e($col) ?>" id="f_<?= e($col) ?>" class="form-control input-sm admin-richtext" rows="<?= max(3, (int) ceil(($spec['rows'] ?? 8) / 2)) ?>" dir="ltr" lang="<?= e($lang) ?>" data-richtext="<?= e($lang) ?>" data-tr-of="<?= e($f) ?>" data-tr-lang="<?= e($lang) ?>"><?= e(RichText::forEditor($values[$col] ?? '')) ?></textarea>
+                                    <?php elseif ($spec['type'] === 'textarea'): ?>
                                         <textarea name="<?= e($col) ?>" id="f_<?= e($col) ?>" class="form-control input-sm" rows="<?= max(2, (int) ceil(($spec['rows'] ?? 4) / 2)) ?>" dir="ltr" lang="<?= e($lang) ?>" data-tr-of="<?= e($f) ?>" data-tr-lang="<?= e($lang) ?>"<?= $readonly ? ' disabled' : '' ?>><?= e($values[$col] ?? '') ?></textarea>
                                     <?php else: ?>
                                         <input type="text" name="<?= e($col) ?>" id="f_<?= e($col) ?>" class="form-control input-sm" dir="ltr" lang="<?= e($lang) ?>" value="<?= e($values[$col] ?? '') ?>"<?= $max ? ' maxlength="' . $max . '"' : '' ?> data-tr-of="<?= e($f) ?>" data-tr-lang="<?= e($lang) ?>"<?= $readonly ? ' disabled' : '' ?>>
@@ -158,3 +162,15 @@
     <?php endif; ?>
 </form>
 <?php endblock(); ?>
+
+<?php if (!$readonly && array_filter($r['fields'], fn($spec) => $spec['type'] === 'richtext')): ?>
+<?php /* محرر النصوص المنسّقة: CKEditor 5 (نسخة محلية في assets/vendor/ckeditor5 — بلا CDN، يعمل بلا إنترنت) */ ?>
+<?php block('extra_css'); ?>
+    <link rel="stylesheet" href="<?= asset('vendor/ckeditor5/ckeditor5.css') ?>">
+<?php endblock(); ?>
+<?php block('extra_js'); ?>
+<script src="<?= asset('vendor/ckeditor5/ckeditor5.umd.js') ?>"></script>
+<script src="<?= asset('vendor/ckeditor5/translations/ar.umd.js') ?>"></script>
+<script src="<?= asset('js/admin-richtext.js') ?>"></script>
+<?php endblock(); ?>
+<?php endif; ?>

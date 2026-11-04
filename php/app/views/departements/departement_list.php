@@ -116,7 +116,7 @@
                 <!-- المحتوى -->
                 <div class="dept-body">
                     <h3 class="dept-title"><?= e($dept['name']) ?></h3>
-                    <p class="dept-description"><?= e(truncatewords($dept['description'], 25)) ?></p>
+                    <p class="dept-description"><?= e(truncatewords(plain_text($dept['description']), 25)) ?></p>
                     
                     <?php if (!empty($dept['head_of_department']) || !empty($dept['email']) || !empty($dept['phone'])): ?>
                     <div class="dept-info">

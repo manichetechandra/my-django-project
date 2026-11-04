@@ -83,6 +83,11 @@
 
     // ================================================================ الترجمة التلقائية
     // كل حقل ترجمة يحمل data-tr-of="اسم الحقل العربي" و data-tr-lang="fr|en"
+    // الحقول المنسّقة (admin-richtext.js): محرر CKEditor يحلّ محلّ textarea — نكتب فيه ونلوّنه هو
+    function fieldBox(el) { return el.ckeditorInstance ? el.ckeditorInstance.ui.element : el; }
+    function setFieldValue(el, value) {
+        if (el.ckeditorInstance) { el.ckeditorInstance.setData(value); } else { el.value = value; }
+    }
     function trSource(input) {
         var name = input.getAttribute('data-tr-of');
         return document.querySelector('[name="' + name.replace(/(["\\])/g, '\\$1') + '"]');
@@ -120,9 +125,9 @@
                     targets.forEach(function (t) {
                         var value = (data[t.getAttribute('data-tr-lang')] || {})[t.getAttribute('data-tr-of')];
                         if (value && (replace || t.value.trim() === '')) {
-                            t.value = value;
-                            t.classList.add('admin-tr-new');
-                            t.classList.remove('admin-tr-stale');
+                            setFieldValue(t, value);
+                            fieldBox(t).classList.add('admin-tr-new');
+                            fieldBox(t).classList.remove('admin-tr-stale');
                             n++;
                         }
                     });
@@ -138,9 +143,9 @@
         var src = trSource(t);
         if (!src) { return; }
         src.addEventListener('input', function () {
-            if (t.value.trim() !== '') { t.classList.add('admin-tr-stale'); t.title = 'تغيّر النص العربي: اضغط «ترجمة تلقائية» أو عدّل الترجمة'; }
+            if (t.value.trim() !== '') { fieldBox(t).classList.add('admin-tr-stale'); fieldBox(t).title = 'تغيّر النص العربي: اضغط «ترجمة تلقائية» أو عدّل الترجمة'; }
         });
-        t.addEventListener('input', function () { t.classList.remove('admin-tr-stale', 'admin-tr-new'); });
+        t.addEventListener('input', function () { fieldBox(t).classList.remove('admin-tr-stale', 'admin-tr-new'); });
     });
 
     // إخفاء الرسائل بعد 6 ثوانٍ

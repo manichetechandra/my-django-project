@@ -91,7 +91,7 @@
         <div class="col-md-8">
             <div class="answer-box">
                 <h3><i class="fa fa-check-circle" style="color: #16a085;"></i> <?= t('الإجابة:') ?></h3>
-                <p><?= linebreaks($faq['answer']) ?></p>
+                <div class="rich-text"><?= rich_text($faq['answer']) ?></div>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
                     <span style="color: #999;">

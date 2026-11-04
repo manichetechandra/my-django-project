@@ -29,6 +29,7 @@ require APP_PATH . '/core/RateLimit.php';
 require APP_PATH . '/core/Form.php';
 require APP_PATH . '/core/Upload.php';
 require APP_PATH . '/core/Translator.php';
+require APP_PATH . '/core/RichText.php';
 require APP_PATH . '/core/XlsxWriter.php';
 require APP_PATH . '/core/Barcode.php';
 require APP_PATH . '/core/Crypto.php';

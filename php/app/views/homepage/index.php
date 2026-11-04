@@ -669,7 +669,7 @@
                         <h4 class="text-center"><?= e($dept['name']) ?></h4>
                     </div>
                     <div class="panel-body text-justify">
-                        <p><?= e(truncatewords($dept['description'], 20)) ?></p>
+                        <p><?= e(truncatewords(plain_text($dept['description']), 20)) ?></p>
                         <a class="btn btn-md btn-success" href="<?= e(url('departements:departement_detail', $dept['slug'])) ?>" style="float: right; float: inline-start;">
                             <?= t('المزيد') ?> <i class="fa fa-arrow-left"></i>
                         </a>

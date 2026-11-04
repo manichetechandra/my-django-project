@@ -817,6 +817,21 @@ function linebreaks($value): string
     return implode("\n\n", $out);
 }
 
+/**
+ * نص منسّق من محرر لوحة الإدارة (CKEditor): HTML منظَّف بقائمة سماح (app/core/RichText.php).
+ * النص القديم العادي (قبل المحرر) يُعرض كما كان: فقرات وأسطر مع التهريب (linebreaks).
+ */
+function rich_text($value): string
+{
+    return RichText::render($value);
+}
+
+/** نص منسّق كنص عادي بلا وسوم، للمقتطفات والبحث: e(truncatewords(plain_text($cite['description']), 20)) */
+function plain_text($value): string
+{
+    return RichText::toText($value);
+}
+
 /** فلتر slice: slice_($list, ':6') أو slice_($text, '1:') */
 function slice_($value, string $spec)
 {

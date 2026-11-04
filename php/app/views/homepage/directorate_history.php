@@ -87,9 +87,9 @@
                 <h3 style="color: #8e44ad; margin-top: 0;">
                     <i class="fa fa-book"></i> <?= t('نبذة تاريخية') ?>
                 </h3>
-                <p style="font-size: 18px; line-height: 2; color: #555;">
-                    <?= linebreaks($history['introduction']) ?>
-                </p>
+                <div class="rich-text" style="font-size: 18px; line-height: 2; color: #555;">
+                    <?= rich_text($history['introduction']) ?>
+                </div>
             </div>
         </div>
     </div>
@@ -110,8 +110,8 @@
                     <i class="fa fa-file-text"></i> <?= t('التاريخ التفصيلي') ?>
                 </h3>
                 
-                <div style="margin-top: 30px;">
-                    <?= linebreaks($history['content']) ?>
+                <div class="rich-text" style="margin-top: 30px;">
+                    <?= rich_text($history['content']) ?>
                 </div>
             </div>
             

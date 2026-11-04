@@ -61,7 +61,7 @@
                     <h3 class="panel-title"><?= t('عن النشاط') ?></h3>
                 </div>
                 <div class="panel-body">
-                    <p style="line-height: 1.8; font-size: 16px;"><?= linebreaks($activity['description']) ?></p>
+                    <div class="rich-text" style="line-height: 1.8; font-size: 16px;"><?= rich_text($activity['description']) ?></div>
                 </div>
             </div>
             

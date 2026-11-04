@@ -123,8 +123,8 @@
                     </h3>
                 </div>
                 <div class="panel-body">
-                    <div class="description-box">
-                        <?= linebreaks($departement['description']) ?>
+                    <div class="description-box rich-text">
+                        <?= rich_text($departement['description']) ?>
                     </div>
                 </div>
             </div>
@@ -198,7 +198,7 @@
                             <h4><?= e($other['name']) ?></h4>
                             <small>
                                 <i class="fa fa-arrow-circle-left"></i> 
-                                <?= e(truncatewords($other['description'], 10)) ?>
+                                <?= e(truncatewords(plain_text($other['description']), 10)) ?>
                             </small>
                         </div>
                     </a>

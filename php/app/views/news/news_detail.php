@@ -52,8 +52,8 @@
             <?php endif; ?>
             
             <!-- محتوى الخبر -->
-            <div style="font-size: 17px; line-height: 1.9; color: #333; text-align: justify;">
-                <?= linebreaks($news['content']) ?>
+            <div class="rich-text" style="font-size: 17px; line-height: 1.9; color: #333; text-align: justify;">
+                <?= rich_text($news['content']) ?>
             </div>
             
             <!-- الصور الإضافية -->

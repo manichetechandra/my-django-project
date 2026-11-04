@@ -22,7 +22,7 @@ cat > $T/bin/php <<'EOF'
 #!/usr/bin/env bash
 P=/tmp/tools/php80/package/native
 EXT=""
-for e in mbstring mysqlnd pdo pdo_mysql mysqli fileinfo zip ctype iconv; do
+for e in mbstring mysqlnd pdo pdo_mysql mysqli fileinfo zip ctype iconv dom; do
   [ -f $P/php/modules/$e.so ] && EXT="$EXT -d extension=$e"
 done
 exec env LD_LIBRARY_PATH=$P/lib $P/php/php -n -d extension_dir=$P/php/modules $EXT \

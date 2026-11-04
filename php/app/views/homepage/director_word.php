@@ -133,8 +133,8 @@
                         <!-- نص الكلمة -->
                         <div class="word-content">
                             <i class="fa fa-quote-right quote-icon"></i>
-                            <div style="margin-top: -30px;">
-                                <?= linebreaks($director_word['word_content']) ?>
+                            <div class="rich-text" style="margin-top: -30px;">
+                                <?= rich_text($director_word['word_content']) ?>
                             </div>
                         </div>
                         

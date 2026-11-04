@@ -9,6 +9,7 @@
 """
 import glob
 import http.client
+import json
 import os
 import re
 import subprocess
@@ -309,6 +310,53 @@ c = Client()
 c.login('/admin/login/', *STAFF)
 s, h, _b = c.req('GET', '/admin/recover/')
 check(s == 302 and location(h) == '/admin/password/', 'المتصل فعلاً يُحوَّل إلى «تغيير كلمة المرور» العادي')
+
+# ----------------------------------------------------------------------------------------------
+if not V1:
+    print('10) النصوص المنسّقة (محرر CKEditor): HTML يُنظَّف في الخادم عند الحفظ وعند العرض')
+    # هجوم يتجاوز المحرر تماماً (طلب POST مباشر)، والترجمة FR بنفس الهجوم
+    EVIL = ('<p>جواب <strong>آمن</strong> <a href="https://www.mesrs.dz" target="_blank">رابط</a></p>'
+            '<script>alert(1)</script><img src=x onerror=alert(2)><svg onload=alert(3)></svg>'
+            '<p onclick="alert(4)" style="position:fixed;top:0">نص</p><a href="javascript:alert(5)">خطير</a>'
+            '<a href="java&#x09;script:alert(6)">x</a><iframe src="https://evil.example"></iframe>'
+            '<form action="https://evil.example"><input name=p></form><p class="text-center ck-evil">وسط</p>')
+    BAD = re.compile(r'<(script|img|svg|iframe|form|input)\b|\son[a-z]+\s*=|javascript:|style=|ck-evil', re.I)
+    c = Client()
+    c.login('/admin/login/', *ADMIN)
+    _s, _h, b = c.req('GET', '/admin/faqs/add/')
+    t = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', b).group(1)
+    cat = re.search(r'<select name="category_id"[^>]*>.*?<option value="(\d+)"', b, re.S).group(1)
+    check('data-richtext="ar"' in b and 'vendor/ckeditor5/ckeditor5.umd.js' in b and 'cdn.ckeditor.com' not in b,
+          'نموذج السؤال: حقل «الإجابة» بمحرر CKEditor محلي (بلا CDN)')
+    s, h, _b = c.req('POST', '/admin/faqs/add/', {'csrfmiddlewaretoken': t, 'category_id': cat, 'question': 'سؤال اختبار الأمان',
+                                                   'answer': EVIL, 'answer_fr': EVIL, 'answer_en': '', 'question_fr': 'Q', 'question_en': 'Q',
+                                                   'order': '99', 'is_active': '1', '_continue': '1'})
+    m = re.search(r'/admin/faqs/(\d+)/$', location(h))
+    check(s == 302 and m, 'حفظ السؤال بطلب مباشر (بلا المحرر) ← ' + location(h))
+    fid = int(m.group(1)) if m else 0
+    row = json.loads(php(f"echo json_encode(DB::one('SELECT answer, answer_fr FROM faqs WHERE id = ?', [{fid}]));") or 'null') or {}
+    stored = (row.get('answer') or '') + '\n' + (row.get('answer_fr') or '')
+    check(row.get('answer') and row.get('answer_fr') and not BAD.search(stored), 'المحفوظ في قاعدة البيانات (العربي و FR) منظَّف: لا script ولا on...= ولا javascript: ولا style')
+    check('<strong>آمن</strong>' in stored and 'class="text-center"' in stored and 'rel="noopener noreferrer"' in stored,
+          'والتنسيق المسموح يبقى (غامق، محاذاة، رابط مع rel="noopener noreferrer")')
+    for path in (f'/faq/{fid}/', f'/fr/faq/{fid}/'):
+        _s, _h, b = Client().req('GET', path)
+        box = re.search(r'<div class="rich-text">(.*?)</div>', b, re.S)
+        check(box and '<strong>' in box.group(1) and not BAD.search(box.group(1)), f'{path}: الإجابة منسّقة وآمنة')
+    # HTML خطير وصل قاعدة البيانات مباشرة (استيراد، ترجمة آلية، تعديل في phpMyAdmin): يُنظَّف عند العرض أيضاً
+    php(f"DB::query('UPDATE faqs SET answer = ? WHERE id = ?', [{EVIL!r}, {fid}]);")
+    _s, _h, b = Client().req('GET', f'/faq/{fid}/')
+    box = re.search(r'<div class="rich-text">(.*?)</div>', b, re.S)
+    check(box and '<strong>آمن</strong>' in box.group(1) and not BAD.search(box.group(1)), 'HTML خطير في قاعدة البيانات مباشرة: يُنظَّف عند العرض')
+    _s, _h, b = Client().req('GET', '/search/?q=' + urllib.parse.quote('جواب'))
+    check('alert(' not in b and '&lt;p' not in b, 'نتائج البحث: مقتطف نص عادي بلا وسوم ولا سكربت')
+    _s, _h, b = c.req('GET', '/admin/faqs/')
+    check('alert(' not in re.sub(r'<textarea.*?</textarea>', '', b, flags=re.S) and '&lt;p' not in b, 'قائمة الأسئلة في لوحة الإدارة: نص عادي')
+    # النص القديم العادي (قبل المحرر) يبقى مهرَّباً كما كان
+    php(f"DB::query('UPDATE faqs SET answer = ? WHERE id = ?', ['سطر a < b <script>alert(7)</script>', {fid}]);")
+    _s, _h, b = Client().req('GET', f'/faq/{fid}/')
+    check('&lt;script&gt;alert(7)&lt;/script&gt;' in b and '<script>alert(7)' not in b, 'النص القديم العادي: يُعرض مهرَّباً كما كان')
+    php(f"DB::query('DELETE FROM faqs WHERE id = ?', [{fid}]);")
 
 clear_ratelimit()
 print('\n' + ('✓ كل اختبارات الأمان نجحت' if not failures else f'✗ {failures} اختبار فشل'))

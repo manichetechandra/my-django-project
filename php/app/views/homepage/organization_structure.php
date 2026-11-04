@@ -59,8 +59,8 @@
                 <i class="fa fa-info-circle"></i> <?= t('نبذة') ?>
             </h3>
         </div>
-        <div class="panel-body content-section">
-            <?= linebreaks($organization['description']) ?>
+        <div class="panel-body content-section rich-text">
+            <?= rich_text($organization['description']) ?>
         </div>
     </div>
     <?php endif; ?>
@@ -85,8 +85,8 @@
                 <i class="fa fa-list-alt"></i> <?= t('التفاصيل') ?>
             </h3>
         </div>
-        <div class="panel-body content-section">
-            <?= linebreaks($organization['content']) ?>
+        <div class="panel-body content-section rich-text">
+            <?= rich_text($organization['content']) ?>
         </div>
     </div>
     <?php endif; ?>

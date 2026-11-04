@@ -174,3 +174,21 @@ body.admin-login-body {
 .recruit-results-table tr.recruit-res-failed td:first-child { box-shadow: inset -4px 0 0 #d9534f; }
 .recruit-results-table tr.recruit-res-absent td:first-child { box-shadow: inset -4px 0 0 #999; }
 .recruit-results-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 14px; }
+
+/* ================================================================ محرر النصوص المنسّقة (CKEditor 5) */
+.admin-form .ck.ck-editor { width: 100%; }
+.admin-tr-row .ck.ck-editor { flex: 1; min-width: 0; }
+.admin-form .ck-editor__editable { font-size: 15px; line-height: 1.8; }
+.admin-form .ck-editor__editable[lang=fr], .admin-form .ck-editor__editable[lang=en] { font-size: 14px; }
+.admin-form .ck-editor__editable h2 { font-size: 22px; }
+.admin-form .ck-editor__editable h3 { font-size: 19px; }
+.admin-form .ck-editor__editable h4 { font-size: 16px; }
+.admin-form .ck.ck-editor.admin-tr-new .ck-editor__editable { background: #fffbe6; }
+.admin-form .ck.ck-editor.admin-tr-stale { box-shadow: 0 0 0 2px rgba(240,173,78,.45); border-radius: 4px; }
+.admin-form .ck.ck-editor.admin-richtext-error { box-shadow: 0 0 0 2px rgba(169,68,66,.45); border-radius: 4px; }
+/* قبل تحميل المحرر (أو بدونه): textarea يعرض HTML */
+textarea.admin-richtext { font-family: monospace; font-size: 13px; direction: ltr; text-align: left; }
+.admin-richtext-view { border: 1px solid #e5e5e5; border-radius: 4px; padding: 8px 12px; background: #fafafa; }
+.admin-richtext-view > :last-child { margin-bottom: 0; }
+/* لوحات المحرر المنسدلة فوق الشريط العلوي الثابت */
+.admin-body { --ck-z-panel: 1060; }

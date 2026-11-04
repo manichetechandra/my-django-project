@@ -40,7 +40,7 @@
             <?php if (trim((string) $c['description']) !== ''): ?>
                 <section class="cmp-section">
                     <h3><i class="fa fa-bullhorn"></i> <?= t('نص الإعلان') ?></h3>
-                    <div class="cmp-text"><?= linebreaks($c['description']) ?></div>
+                    <div class="cmp-text rich-text"><?= rich_text($c['description']) ?></div>
                 </section>
             <?php endif; ?>
 
@@ -86,7 +86,7 @@
             <?php if (trim((string) $c['deposit_info']) !== ''): ?>
                 <section class="cmp-section">
                     <h3><i class="fa fa-map-marker"></i> <?= t('إيداع الملفات') ?></h3>
-                    <div class="cmp-text"><?= linebreaks($c['deposit_info']) ?></div>
+                    <div class="cmp-text rich-text"><?= rich_text($c['deposit_info']) ?></div>
                 </section>
             <?php endif; ?>
 

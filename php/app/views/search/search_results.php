@@ -375,7 +375,7 @@
                 <i class="fa <?= e($faq['category']['icon']) ?>"></i> <?= e($faq['category']['name']) ?>
             </span>
             <h4><a href="<?= e(url('faq:faq_detail', $faq['id'])) ?>"><?= e($faq['question']) ?></a></h4>
-            <p><?= e(truncatewords($faq['answer'], 30)) ?></p>
+            <p><?= e(truncatewords(plain_text($faq['answer']), 30)) ?></p>
             <div class="meta">
                 <i class="fa fa-eye"></i> <?= t('{count} مشاهدة', ['count' => $faq['views_count']]) ?>
             </div>
@@ -438,7 +438,7 @@
                 <i class="fa fa-quote-left"></i> <?= t('كلمة') ?>
             </span>
             <h4><a href="<?= e(url('homepage:director_word')) ?>"><?= e($word['word_title']) ?></a></h4>
-            <p><?= e(truncatewords($word['word_content'], 30)) ?></p>
+            <p><?= e(truncatewords(plain_text($word['word_content']), 30)) ?></p>
             <div class="meta">
                 <i class="fa fa-user"></i> <?= e($word['director_name']) ?>
             </div>
@@ -457,7 +457,7 @@
                 <i class="fa fa-history"></i> <?= t('تاريخ') ?>
             </span>
             <h4><a href="<?= e(url('homepage:history')) ?>"><?= e($hist['title']) ?></a></h4>
-            <p><?= e(truncatewords($hist['introduction'], 30)) ?></p>
+            <p><?= e(truncatewords(plain_text($hist['introduction']), 30)) ?></p>
             <div class="meta">
                 <?php if (!empty($hist['founding_year'])): ?>
                     <i class="fa fa-calendar"></i> <?= t('تأسست عام') ?> <?= e($hist['founding_year']) ?>
@@ -478,7 +478,7 @@
                 <i class="fa fa-sitemap"></i> <?= t('هيكل') ?>
             </span>
             <h4><a href="<?= e(url('homepage:organization')) ?>"><?= e($org['title']) ?></a></h4>
-            <p><?= e(truncatewords($org['description'], 30)) ?></p>
+            <p><?= e(truncatewords(plain_text($org['description']), 30)) ?></p>
         </div>
         <?php endforeach; ?>
     </div>
@@ -494,7 +494,7 @@
                 <i class="fa fa-university"></i> <?= t('إقامة') ?>
             </span>
             <h4><a href="<?= e(url('cities:cite_detail', $cite['slug'])) ?>"><?= e($cite['name']) ?></a></h4>
-            <p><?= e((truncatewords($cite['description'], 30) ?: __('إقامة جامعية'))) ?></p>
+            <p><?= e((truncatewords(plain_text($cite['description']), 30) ?: __('إقامة جامعية'))) ?></p>
             <div class="meta">
                 <?php if (!empty($cite['address'])): ?>
                     <i class="fa fa-map-marker"></i> <?= e($cite['address']) ?>
@@ -515,7 +515,7 @@
                 <i class="fa fa-building"></i> <?= t('قسم') ?>
             </span>
             <h4><a href="<?= e(url('departements:departement_detail', $dept['slug'])) ?>"><?= e($dept['name']) ?></a></h4>
-            <p><?= e(truncatewords($dept['description'], 30)) ?></p>
+            <p><?= e(truncatewords(plain_text($dept['description']), 30)) ?></p>
             <div class="meta">
                 <?php if (!empty($dept['phone'])): ?>
                     <i class="fa fa-phone"></i> <?= e($dept['phone']) ?>

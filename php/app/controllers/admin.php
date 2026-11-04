@@ -666,6 +666,10 @@ function admin_collect_form(array $r, ?Model $obj): array
 
         $raw = $_POST[$f] ?? '';
         $v = is_string($raw) ? trim($raw) : '';
+        if ($type === 'richtext') {
+            // محرر CKEditor: HTML منظَّف بقائمة سماح (لا script ولا on...= ولا style)، والمحرر الفارغ = ''
+            $v = RichText::normalize($v);
+        }
         if ($type === 'password') {
             $v = is_string($raw) ? $raw : '';
             if ($v === '') {
@@ -702,7 +706,7 @@ function admin_collect_form(array $r, ?Model $obj): array
             }
             continue;
         }
-        if (isset($spec['max']) && mb_strlen($v) > $spec['max']) {
+        if (isset($spec['max']) && mb_strlen($type === 'richtext' ? RichText::toText($v) : $v) > $spec['max']) {
             $errors[$f] = 'الحد الأقصى ' . $spec['max'] . ' حرفاً.';
             continue;
         }
@@ -796,6 +800,9 @@ function admin_collect_form(array $r, ?Model $obj): array
         foreach (admin_other_langs() as $lang) {
             $col = $f . '_' . $lang;
             $v = trim((string) ($_POST[$col] ?? ''));
+            if ($r['fields'][$f]['type'] === 'richtext') {
+                $v = RichText::normalize($v);
+            }
             $max = admin_translation_max($r['fields'][$f]);
             if ($max && mb_strlen($v) > $max) {
                 $errors[$col] = 'الحد الأقصى ' . $max . ' حرفاً.';
@@ -1093,7 +1100,8 @@ function admin_auto_translate(array $r, array $data): array
                 $col = $f . '_' . $lang;
                 if (!isset($data[$col]) && $tr[$lang][$f] !== '') {
                     $max = admin_translation_max($r['fields'][$f]);
-                    $data[$col] = $max ? mb_substr($tr[$lang][$f], 0, $max) : $tr[$lang][$f];
+                    $value = $r['fields'][$f]['type'] === 'richtext' ? RichText::normalize($tr[$lang][$f]) : $tr[$lang][$f];
+                    $data[$col] = $max ? mb_substr($value, 0, $max) : $value;
                     $n++;
                 }
             }
@@ -1335,6 +1343,8 @@ function admin_cell(array $r, Model $obj, string $col): string
             return '<i class="fa ' . e($v) . ' fa-lg"></i> <small class="text-muted">' . e($v) . '</small>';
         case 'textarea':
             return e(truncatewords((string) $v, 12));
+        case 'richtext':
+            return e(truncatewords(RichText::toText($v), 12));
         default:
             if ($col === 'file_size') {
                 return e(human_filesize($v));
@@ -1377,6 +1387,13 @@ function admin_input(array $r, string $f, array $spec, $value, bool $readonly, ?
     switch ($type) {
         case 'textarea':
             return '<textarea name="' . $name . '" id="' . $id . '" class="form-control" rows="' . (int) ($spec['rows'] ?? 4) . '"' . $reqAttr . $dis . '>' . e($val) . '</textarea>';
+        case 'richtext':
+            // نص منسّق: assets/js/admin-richtext.js يحوّل الحقل إلى محرر CKEditor (وبدونه يبقى textarea يقبل HTML)
+            if ($readonly) {
+                return '<div class="form-control-static admin-richtext-view">' . RichText::render($val) . '</div>';
+            }
+            return '<textarea name="' . $name . '" id="' . $id . '" class="form-control admin-richtext" rows="' . (int) ($spec['rows'] ?? 8) . '"'
+                . ' data-richtext="' . e(default_lang()) . '"' . $reqAttr . '>' . e(RichText::forEditor($val)) . '</textarea>';
         case 'bool':
             return '<div class="checkbox"><label><input type="checkbox" name="' . $name . '" id="' . $id . '" value="1"' . ($val !== '' && $val !== '0' ? ' checked' : '') . $dis . '> ' . e($spec['label']) . '</label></div>';
         case 'select':
