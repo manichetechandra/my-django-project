@@ -187,3 +187,4 @@ textarea.admin-richtext { font-family: monospace; font-size: 13px; direction: lt
 .admin-richtext-view > :last-child { margin-bottom: 0; }
 /* نوافذ المحرر (رابط، جدول) والقوائم المنسدلة فوق الشريط العلوي الثابت للوحة الإدارة */
 .tox.tox-silver-sink { z-index: 1300; }
+.admin-editor-source { margin: 10px 0 0; padding-top: 8px; border-top: 1px dashed #e3e3e3; }

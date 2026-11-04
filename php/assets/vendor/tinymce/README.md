@@ -6,23 +6,32 @@
 
 ## استعمال نسختك من TinyMCE بدل هذه
 
-انسخ **محتوى المجلد الذي فيه `tinymce.min.js`** إلى هنا (استبدل الموجود)، حتى يصير عندك:
+**لا تحذف شيئاً ولا تستبدل شيئاً:** ضع مجلد TinyMCE الخاص بك **كما هو** في أحد هذه الأماكن، والموقع يستعمله تلقائياً
+بدل هذه النسخة (نسختك لها الأولوية دائماً):
 
-```
-dou-setif/assets/vendor/tinymce/tinymce.min.js
-dou-setif/assets/vendor/tinymce/plugins/...
-dou-setif/assets/vendor/tinymce/skins/...
-dou-setif/assets/vendor/tinymce/themes/...
-dou-setif/assets/vendor/tinymce/icons/...
-dou-setif/assets/vendor/tinymce/models/...      (TinyMCE 6 وما بعده)
-dou-setif/assets/vendor/tinymce/langs/ar.js     (ملف العربية: إن لم يكن عندك تبقى الواجهة بالإنجليزية)
-```
+| المكان (في XAMPP: `C:\xampp\htdocs\dou-setif\...`) | مثال |
+|---|---|
+| **في مجلد الموقع مباشرة (الأسهل)** | `dou-setif/tinymce/js/tinymce/tinymce.min.js` (مجلد التحميل الرسمي كما فككته) |
+| داخل هذا المجلد | `dou-setif/assets/vendor/tinymce/tinymce_7.9.3/tinymce/js/tinymce/tinymce.min.js` |
+| `assets/` أو `assets/js/` أو `js/` أو `lib/` أو `libs/` | `dou-setif/assets/js/tinymce/tinymce.min.js` |
+| Composer أو npm | `dou-setif/vendor/tinymce/tinymce/` أو `dou-setif/node_modules/tinymce/` |
+| بجانب مجلد الموقع | `C:\xampp\htdocs\tinymce\js\tinymce\tinymce.min.js` |
+| أي مكان آخر داخل مجلد الموقع | اكتب مساره في `config.php`: `'editor' => ['tinymce' => 'editors/tinymce'],` |
+| مكان ملفات هذه النسخة | استبدل محتوى هذا المجلد بمحتوى المجلد الذي فيه `tinymce.min.js` |
 
-- في ملف التحميل الرسمي من tiny.cloud هذا المجلد هو `tinymce/js/tinymce/`. ولو نسخت المجلد كما هو
-  (`assets/vendor/tinymce/js/tinymce/tinymce.min.js`) يجده الموقع أيضاً.
-- تعمل الإصدارات **5 و 6 و 7 و 8**. الإضافات المستعملة (موجودة في كل نسخة): `lists` `link` `autolink` `table` `code` (و `hr` في الإصدار 5).
-- ملف العربية يُكتشف تلقائياً إن كان اسمه `langs/ar.js` أو `langs/ar_SA.js` أو `langs/ar-SA.js`.
-- إن لم يجد الموقع TinyMCE تظهر رسالة في نموذج لوحة الإدارة، وتبقى الحقول خانات نص (HTML) تعمل.
+- يكفي أن **يبدأ اسم المجلد بـ `tinymce`** (مثل `tinymce` أو `tinymce_7.9.3` أو `TinyMCE`)، وأن يكون `tinymce.min.js`
+  على عمق 4 مجلدات على الأكثر داخله. في ملف التحميل الرسمي من tiny.cloud هو `tinymce/js/tinymce/tinymce.min.js`.
+- **كيف تتأكد؟** أسفل كل نموذج فيه محرر في لوحة الإدارة (مثلاً «إضافة خبر») سطر مثل:
+  «محرر النصوص: TinyMCE 7.9.3 — نسختك: `tinymce/js/tinymce/tinymce.min.js`».
+  إن كتب «النسخة المرفقة بالمشروع» فالموقع لم يجد نسختك: تأكد أن الملف `tinymce.min.js` موجود فعلاً في أحد الأماكن أعلاه.
+  بعد تغيير النسخة حدّث الصفحة بـ **Ctrl+F5**.
+- تعمل الإصدارات **4 و 5 و 6 و 7 و 8**. الإضافات المستعملة (موجودة في كل نسخة): `lists` `link` `autolink` `table` `code`
+  (و `hr` في الإصدارين 4 و 5).
+- **ملف العربية:** إن كان في نسختك `langs/ar.js` (أو `ar_SA.js` أو `ar-SA.js`) يُستعمل، وإلا يستعير الموقع ملف العربية
+  من هذا المجلد فتبقى الواجهة بالعربية (يظهر ذلك في السطر نفسه).
+- نسخة مطابقة لهذه النسخة (نسخة احتياطية `tinymce.bak` مثلاً) لا تتقدّم أبداً على نسختك.
+- لا يُبحث في `uploads/` ولا `storage/` ولا `app/` ولا `database/`.
+- إن لم يجد الموقع أي TinyMCE تظهر رسالة في نموذج لوحة الإدارة، وتبقى الحقول خانات نص (HTML) تعمل.
 
 ## الترخيص
 

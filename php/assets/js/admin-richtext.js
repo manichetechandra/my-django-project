@@ -1,5 +1,6 @@
 /*
- * محرر النصوص المنسّقة في لوحة الإدارة: TinyMCE (assets/vendor/tinymce — نسخة المشروع أو نسختك، الإصدارات 5 إلى 8)
+ * محرر النصوص المنسّقة في لوحة الإدارة: TinyMCE — نسختك أينما وضعتها في مجلد الموقع، وإلا نسخة المشروع assets/vendor/tinymce
+ * (الإصدارات 4 إلى 8؛ البحث في admin_tinymce_locate في app/controllers/admin.php، والسطر أسفل النموذج يبيّن النسخة المستعملة)
  * لكل textarea[data-richtext]:  data-richtext="ar" نص عربي من اليمين لليسار، و fr / en من اليسار لليمين (حقول الترجمة).
  * الأدوات هي ما يقبله الخادم فقط (app/core/RichText.php): عناوين، غامق، مائل، تسطير، شطب، روابط، قوائم، اقتباس، جداول،
  * خط فاصل، ومحاذاة بأصناف Bootstrap (text-center ...) بدل style — فما تراه في المحرر هو ما سيُحفظ.
@@ -14,6 +15,7 @@
 
     var major = parseInt(T.majorVersion, 10) || 8;
     var lang = me.getAttribute('data-lang');
+    var langUrl = me.getAttribute('data-lang-url');
     var topbar = document.querySelector('.admin-topbar');
     var aligned = 'p,h2,h3,h4,li,td,th';
     // نفس قائمة السماح في الخادم: المحرر نفسه يحذف غيرها (اللصق من Word، أو زر «الكود»)
@@ -28,7 +30,7 @@
             target: ta,
             base_url: me.getAttribute('data-base'),
             suffix: me.getAttribute('data-suffix'),
-            license_key: 'gpl', // TinyMCE 7 و 8 مفتوح المصدر (GPL): بدونه يعطّل TinyMCE 8 المحرر
+            license_key: 'gpl', // TinyMCE 7 و 8 مفتوح المصدر (GPL): بدونه يعطّل TinyMCE 8 المحرر (والإصدارات الأقدم تتجاهله)
             directionality: content === 'ar' ? 'rtl' : 'ltr',
             menubar: false,
             branding: false,
@@ -98,7 +100,13 @@
                 });
             }
         };
-        if (lang) { conf.language = lang; } // ملف العربية assets/vendor/tinymce/langs/ar.js (وبدونه: الواجهة بالإنجليزية)
+        if (lang) { conf.language = lang; } // ملف العربية langs/ar.js في مجلد TinyMCE (وبدونه: الواجهة بالإنجليزية)
+        if (langUrl) { conf.language_url = langUrl; } // نسختك بلا ملف العربية: ملف العربية من نسخة المشروع
         T.init(conf);
+    });
+
+    // سطر «محرر النصوص: TinyMCE x.y — من المجلد ...» أسفل النموذج: الإصدار الفعلي المحمَّل
+    Array.prototype.forEach.call(document.querySelectorAll('[data-tinymce-version]'), function (el) {
+        el.textContent = T.majorVersion + '.' + T.minorVersion;
     });
 })();

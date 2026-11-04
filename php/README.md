@@ -300,9 +300,13 @@ C:\xampp\php\php.exe database\tools\translate_content.php --limit=50    (50 سج
   والروابط http(s) و mailto و tel والداخلية فقط. التفاصيل في `SECURITY.md` §7.
 - **ملفات المحرر محلية** في `assets/vendor/tinymce/` (TinyMCE 8.10.1 مع ملف العربية `langs/ar.js`، بلا CDN): يعمل بلا إنترنت،
   ولا سكربت خارجي في لوحة الإدارة. الترخيص GPL-2.0-or-later (مجاني لمشروع مفتوح المصدر كهذا: `license_key: 'gpl'`).
-- **نسختك من TinyMCE:** انسخ محتوى المجلد الذي فيه `tinymce.min.js` إلى `assets/vendor/tinymce/` (في XAMPP:
-  `C:\xampp\htdocs\dou-setif\assets\vendor\tinymce\`) — تعمل الإصدارات 5 إلى 8، وملف العربية `langs/ar.js` يُكتشف تلقائياً.
-  التفاصيل في `assets/vendor/tinymce/README.md`. إن لم يوجد TinyMCE تظهر رسالة في نموذج لوحة الإدارة وتبقى الحقول خانات نص.
+- **نسختك من TinyMCE لها الأولوية:** ضع مجلدها كما هو في مجلد الموقع، مثلاً `C:\xampp\htdocs\dou-setif\tinymce\`
+  (مجلد التحميل الرسمي كما فككته: `tinymce\js\tinymce\tinymce.min.js`)، أو داخل `assets\vendor\tinymce\`، أو `assets\js\`،
+  أو `vendor\tinymce\tinymce` (Composer)، أو بجانب مجلد الموقع (`htdocs\tinymce`) — أي مجلد يبدأ اسمه بـ `tinymce`،
+  أو اكتب مسارها في `config.php` (`'editor' => ['tinymce' => '...']` أو متغير البيئة `TINYMCE_PATH`؛ هذا المفتاح اختياري).
+  تعمل الإصدارات 4 إلى 8، وإن لم يكن فيها ملف العربية `langs/ar.js` يُستعمل ملف المشروع.
+  **أسفل كل نموذج فيه محرر سطر يبيّن النسخة المستعملة:** «محرر النصوص: TinyMCE 7.9.3 — نسختك: `tinymce/js/tinymce/tinymce.min.js`».
+  التفاصيل في `assets/vendor/tinymce/README.md`. إن لم يوجد TinyMCE تظهر رسالة في النموذج وتبقى الحقول خانات نص.
 - لا إدراج للصور داخل النص: صور الخبر/النشاط/الإقامة تُرفع من حقلي «الصورة الرئيسية» و«صور إضافية (المعرض)» كما كانت.
 
 ---

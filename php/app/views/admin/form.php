@@ -18,8 +18,9 @@
 <?php $tr_fields = admin_translatable($r); $has_rich = !$readonly && array_filter($r['fields'], fn($spec) => $spec['type'] === 'richtext'); ?>
 <?php if ($has_rich && !admin_tinymce()): ?>
     <div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i>
-        محرر النصوص <strong>TinyMCE</strong> غير موجود: انسخ محتوى المجلد الذي فيه <code>tinymce.min.js</code> إلى
-        <code dir="ltr">assets/vendor/tinymce/</code> في مجلد الموقع. إلى ذلك الحين تعمل الحقول المنسّقة كخانات نص (HTML).
+        محرر النصوص <strong>TinyMCE</strong> غير موجود: ضع مجلد TinyMCE (الذي فيه <code>tinymce.min.js</code> في أي مستوى) داخل مجلد الموقع،
+        مثلاً <code dir="ltr">tinymce/</code> أو <code dir="ltr">assets/vendor/tinymce/</code>، أو اكتب مساره في <code>config.php</code>
+        (<code dir="ltr">'editor' => ['tinymce' => '...']</code>). إلى ذلك الحين تعمل الحقول المنسّقة كخانات نص (HTML).
     </div>
 <?php endif; ?>
 <form method="post" enctype="multipart/form-data" class="admin-form" novalidate>
@@ -76,6 +77,13 @@
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
+            <?php if ($has_rich && ($tinymce = admin_tinymce())): ?>
+                <p class="admin-editor-source small text-muted" data-editor-source>
+                    <i class="fa fa-pencil-square-o"></i> محرر النصوص: <bdi dir="ltr">TinyMCE <span data-tinymce-version></span></bdi>
+                    — <?= $tinymce['bundled'] ? 'النسخة المرفقة بالمشروع' : 'نسختك' ?>: <code dir="ltr"><?= e($tinymce['path']) ?></code>
+                    <?php if ($tinymce['lang_url'] !== ''): ?>(ملف العربية من نسخة المشروع)<?php endif; ?>
+                </p>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -170,9 +178,9 @@
 <?php endblock(); ?>
 
 <?php if ($has_rich && ($tinymce = admin_tinymce())): ?>
-<?php /* محرر النصوص المنسّقة: TinyMCE من assets/vendor/tinymce (نسخة محلية — بلا CDN، يعمل بلا إنترنت) */ ?>
+<?php /* محرر النصوص المنسّقة: TinyMCE — نسخة المستخدم أينما وضعها في مجلد الموقع، وإلا assets/vendor/tinymce (admin_tinymce؛ محلي بلا CDN) */ ?>
 <?php block('extra_js'); ?>
 <script src="<?= e($tinymce['url']) ?>"></script>
-<script src="<?= asset('js/admin-richtext.js') ?>" data-base="<?= e($tinymce['base']) ?>" data-suffix="<?= e($tinymce['suffix']) ?>" data-lang="<?= e($tinymce['lang']) ?>"></script>
+<script src="<?= asset('js/admin-richtext.js') ?>" data-base="<?= e($tinymce['base']) ?>" data-suffix="<?= e($tinymce['suffix']) ?>" data-lang="<?= e($tinymce['lang']) ?>" data-lang-url="<?= e($tinymce['lang_url']) ?>"></script>
 <?php endblock(); ?>
 <?php endif; ?>

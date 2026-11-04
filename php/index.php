@@ -4,11 +4,14 @@
  * كل الطلبات تمر من هنا عبر .htaccess ثم تُوجَّه حسب app/routes.php
  */
 
-// خادم PHP المدمج (php -S): تقديم الملفات الثابتة مباشرة
+// خادم PHP المدمج (php -S): تقديم الملفات الثابتة مباشرة كما يفعل Apache: assets/ و uploads/،
+// وملفات المتصفح (js, css, خطوط, صور) في أي مجلد آخر — مثل مجلد TinyMCE الخاص بك — عدا app/ database/ storage/
 if (PHP_SAPI === 'cli-server') {
-    $file = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $rel = str_replace('\\', '/', substr(realpath($file) ?: '', strlen(__DIR__)));
-    if (is_file($file) && preg_match('#^/(assets|uploads)/#', $rel) && !preg_match('/\.php$/i', $file)) {
+    $file = realpath(__DIR__ . rawurldecode((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))) ?: '';
+    $rel = str_replace('\\', '/', substr($file, strlen(__DIR__)));
+    if ($file !== '' && is_file($file) && strpos($file, __DIR__ . DIRECTORY_SEPARATOR) === 0 && !preg_match('/\.(php\d?|phtml|phar)$/i', $file)
+        && (preg_match('#^/(assets|uploads)/#', $rel) || (!preg_match('#^/(app|database|storage)/|/\.#', $rel)
+            && preg_match('/\.(js|css|map|woff2?|ttf|eot|otf|svg|png|gif|jpe?g|webp|ico)$/i', $rel)))) {
         return false;
     }
 }

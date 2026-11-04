@@ -1353,34 +1353,138 @@ function admin_cell(array $r, Model $obj, string $col): string
     }
 }
 
-/**
- * محرر النصوص المنسّقة TinyMCE في assets/vendor/tinymce (نسخة المشروع، أو نسختك مكانها: الإصدارات 5 إلى 8).
- * يقبل tinymce.min.js مباشرة في المجلد، أو مجلد التحميل الرسمي كما هو (js/tinymce/tinymce.min.js).
- * @return array{url: string, base: string, suffix: string, lang: string}|null  null إن لم يوجد
- */
+/** بصمة tinymce.min.js المرفق بالمشروع (8.10.1): لنعرف إن كان المستعمل نسختك أم نسخة المشروع */
+const ADMIN_TINYMCE_BUNDLED_SHA256 = 'a76eae0c9747774f3a026488b18a0540bba25dfaafa8f614540050fa0aa50320';
+
+/** محرر TinyMCE المستعمل في نماذج الإدارة (انظر admin_tinymce_locate) — يُحسب مرة واحدة لكل طلب */
 function admin_tinymce(): ?array
 {
     static $found = false;
-    if ($found !== false) {
-        return $found;
+    if ($found === false) {
+        $found = admin_tinymce_locate(BASE_PATH, base_url(), (string) realpath((string) ($_SERVER['DOCUMENT_ROOT'] ?? '')),
+            (string) config('editor.tinymce', ''));
     }
-    foreach (['', '/js/tinymce', '/tinymce/js/tinymce', '/tinymce'] as $sub) {
-        $rel = 'vendor/tinymce' . $sub;
-        $dir = BASE_PATH . '/assets/' . $rel;
-        foreach (['tinymce.min.js' => '.min', 'tinymce.js' => ''] as $file => $suffix) {
-            if (is_file($dir . '/' . $file)) {
-                $lang = '';
-                foreach (['ar', 'ar_SA', 'ar-SA'] as $code) {
-                    if (is_file($dir . '/langs/' . $code . '.js')) {
-                        $lang = $code;
-                        break;
-                    }
-                }
-                return $found = ['url' => asset($rel . '/' . $file), 'base' => base_url() . '/assets/' . $rel, 'suffix' => $suffix, 'lang' => $lang];
-            }
+    return $found;
+}
+
+/**
+ * أين TinyMCE؟ (الإصدارات 4 إلى 8) نسختك أنت أولاً، ونسخة المشروع فقط إن لم نجد غيرها:
+ *   1) المسار في config.php ← 'editor' => ['tinymce' => '...'] (نسبةً إلى مجلد الموقع، أو متغير البيئة TINYMCE_PATH؛
+ *      لا يُقبل .. ولا uploads/ ولا storage/ ولا app/ ولا database/)
+ *   2) أي مجلد يبدأ اسمه بـ tinymce في: مجلد الموقع، assets/، assets/js/، assets/vendor/، js/، lib/، libs/،
+ *      vendor/tinymce/ (Composer)، node_modules/ (npm)
+ *   3) مجلد داخل assets/vendor/tinymce/ (نسختك منسوخة داخل مجلد نسخة المشروع)
+ *   4) مجلد يبدأ اسمه بـ tinymce بجانب مجلد الموقع (htdocs/tinymce في XAMPP) إن كان داخل جذر الخادم
+ *   5) نسخة المشروع: assets/vendor/tinymce/tinymce.min.js (أو نسختك إن وضعت ملفاتها مكان ملفاته)
+ * داخل كل مجلد نبحث عن tinymce.min.js (أو tinymce.js) حتى 4 مستويات: مجلد التحميل الرسمي هو tinymce/js/tinymce/.
+ * النسخة المطابقة لنسخة المشروع (بصمة sha256) لا تتقدّم على نسخة مختلفة، فلا تغلب نسخةٌ احتياطية ملفاتك.
+ *
+ * @param string $site    مجلد الموقع (BASE_PATH)
+ * @param string $baseUrl رابطه ('' أو '/dou-setif')
+ * @param string $docRoot جذر الخادم (DOCUMENT_ROOT) لمجلد بجانب الموقع
+ * @param string $custom  المسار المكتوب في config.php
+ * @return array{url: string, base: string, suffix: string, lang: string, lang_url: string, path: string, bundled: bool}|null
+ */
+function admin_tinymce_locate(string $site, string $baseUrl, string $docRoot = '', string $custom = ''): ?array
+{
+    $norm = fn(string $p): string => rtrim(str_replace('\\', '/', $p), '/');
+    $site = $norm($site);
+    $docRoot = $norm($docRoot);
+    $baseUrl = $norm($baseUrl);
+    $bundled = $site . '/assets/vendor/tinymce';
+    $own = ['plugins', 'skins', 'themes', 'icons', 'models', 'langs'];
+    $dirs = fn(string $parent): array => array_map($norm, glob($parent . '/*', GLOB_ONLYDIR) ?: []);
+    $named = fn(string $parent): array => array_values(array_filter($dirs($parent),
+        fn($d) => preg_match('/^tinymce/i', basename($d)) && $d !== $bundled));
+
+    $roots = [];
+    $custom = trim(str_replace('\\', '/', $custom), '/ ');
+    if ($custom !== '' && !in_array('..', explode('/', $custom), true) && !preg_match('#^(uploads|storage|app|database)(/|$)#i', $custom)) {
+        $roots[] = $site . '/' . $custom;
+    }
+    foreach (['', '/assets', '/assets/js', '/assets/vendor', '/js', '/lib', '/libs', '/vendor/tinymce', '/node_modules'] as $parent) {
+        array_push($roots, ...$named($site . $parent));
+    }
+    foreach ($dirs($bundled) as $dir) {
+        if (!in_array(basename($dir), $own, true)) {
+            $roots[] = $dir;
         }
     }
-    return $found = null;
+    $parent = dirname($site);
+    if ($docRoot !== '' && $parent !== $site && strpos($parent . '/', $docRoot . '/') === 0) {
+        array_push($roots, ...$named($parent));
+    }
+    $roots[] = $bundled;
+
+    // رابط ملف داخل مجلد الموقع، أو داخل جذر الخادم (htdocs) لمجلد بجانبه
+    $enc = fn(string $rel): string => implode('/', array_map('rawurlencode', explode('/', $rel)));
+    $urlOf = function (string $file) use ($site, $baseUrl, $docRoot, $enc): ?string {
+        if (strpos($file, $site . '/') === 0) {
+            return $baseUrl . '/' . $enc(substr($file, strlen($site) + 1));
+        }
+        return $docRoot !== '' && strpos($file, $docRoot . '/') === 0 ? '/' . $enc(substr($file, strlen($docRoot) + 1)) : null;
+    };
+    $find = function (string $dir, int $depth) use (&$find, $own, $dirs): ?string {
+        foreach (['tinymce.min.js', 'tinymce.js'] as $f) {
+            if (is_file($dir . '/' . $f)) {
+                return $dir . '/' . $f;
+            }
+        }
+        foreach ($depth > 0 ? $dirs($dir) : [] as $sub) {
+            if (basename($sub) === 'node_modules') {
+                $sub .= '/tinymce'; // مشروع npm: نبحث في حزمة tinymce وحدها لا في كل الحزم
+            }
+            if (!in_array(basename($sub), $own, true) && $sub[strrpos($sub, '/') + 1] !== '.' && is_dir($sub) && ($hit = $find($sub, $depth - 1))) {
+                return $hit;
+            }
+        }
+        return null;
+    };
+
+    // أول نسخة تختلف عن نسخة المشروع هي نسختك. والنسخ المطابقة لها (نسخة احتياطية tinymce.bak مثلاً) لا تتقدّم أبداً:
+    // تُستعمل فقط إن لم توجد غيرها، والمسار الأصلي assets/vendor/tinymce أولاً
+    $pick = null;
+    $same = null;
+    foreach (array_unique($roots) as $root) {
+        $file = is_dir($root) ? $find($root, $root === $bundled ? 0 : 4) : null;
+        if ($file === null || $urlOf($file) === null) {
+            continue;
+        }
+        if (hash_file('sha256', $file) !== ADMIN_TINYMCE_BUNDLED_SHA256) {
+            $pick = $file;
+            break;
+        }
+        if ($same === null || $file === $bundled . '/tinymce.min.js') {
+            $same = $file;
+        }
+    }
+    if (($file = $pick ?? $same) !== null) {
+        $url = $urlOf($file);
+        $dir = dirname($file);
+        $lang = '';
+        $langUrl = '';
+        foreach (['ar', 'ar_SA', 'ar-SA'] as $code) {
+            if (is_file($dir . '/langs/' . $code . '.js')) {
+                $lang = $code;
+                break;
+            }
+        }
+        if ($lang === '' && is_file($bundled . '/langs/ar.js')) {
+            // نسختك بلا ملف العربية: نستعير ملف العربية من نسخة المشروع حتى تبقى الواجهة بالعربية
+            $lang = 'ar';
+            $langUrl = $urlOf($bundled . '/langs/ar.js') . '?v=' . filemtime($bundled . '/langs/ar.js');
+        }
+        return [
+            'url'      => $url . '?v=' . filemtime($file),
+            'base'     => substr($url, 0, strrpos($url, '/')),
+            'suffix'   => substr($file, -7) === '.min.js' ? '.min' : '',
+            'lang'     => $lang,
+            'lang_url' => $langUrl,
+            'path'     => strpos($file, $site . '/') === 0 ? substr($file, strlen($site) + 1) : '../' . substr($file, strlen($parent) + 1),
+            'bundled'  => $pick === null,
+        ];
+    }
+    return null;
 }
 
 /** حقل الإدخال في نموذج الإضافة/التعديل */
