@@ -667,7 +667,7 @@ function admin_collect_form(array $r, ?Model $obj): array
         $raw = $_POST[$f] ?? '';
         $v = is_string($raw) ? trim($raw) : '';
         if ($type === 'richtext') {
-            // محرر CKEditor: HTML منظَّف بقائمة سماح (لا script ولا on...= ولا style)، والمحرر الفارغ = ''
+            // محرر TinyMCE: HTML منظَّف بقائمة سماح (لا script ولا on...= ولا style)، والمحرر الفارغ = ''
             $v = RichText::normalize($v);
         }
         if ($type === 'password') {
@@ -1353,6 +1353,36 @@ function admin_cell(array $r, Model $obj, string $col): string
     }
 }
 
+/**
+ * محرر النصوص المنسّقة TinyMCE في assets/vendor/tinymce (نسخة المشروع، أو نسختك مكانها: الإصدارات 5 إلى 8).
+ * يقبل tinymce.min.js مباشرة في المجلد، أو مجلد التحميل الرسمي كما هو (js/tinymce/tinymce.min.js).
+ * @return array{url: string, base: string, suffix: string, lang: string}|null  null إن لم يوجد
+ */
+function admin_tinymce(): ?array
+{
+    static $found = false;
+    if ($found !== false) {
+        return $found;
+    }
+    foreach (['', '/js/tinymce', '/tinymce/js/tinymce', '/tinymce'] as $sub) {
+        $rel = 'vendor/tinymce' . $sub;
+        $dir = BASE_PATH . '/assets/' . $rel;
+        foreach (['tinymce.min.js' => '.min', 'tinymce.js' => ''] as $file => $suffix) {
+            if (is_file($dir . '/' . $file)) {
+                $lang = '';
+                foreach (['ar', 'ar_SA', 'ar-SA'] as $code) {
+                    if (is_file($dir . '/langs/' . $code . '.js')) {
+                        $lang = $code;
+                        break;
+                    }
+                }
+                return $found = ['url' => asset($rel . '/' . $file), 'base' => base_url() . '/assets/' . $rel, 'suffix' => $suffix, 'lang' => $lang];
+            }
+        }
+    }
+    return $found = null;
+}
+
 /** حقل الإدخال في نموذج الإضافة/التعديل */
 function admin_input(array $r, string $f, array $spec, $value, bool $readonly, ?Model $obj): string
 {
@@ -1388,7 +1418,7 @@ function admin_input(array $r, string $f, array $spec, $value, bool $readonly, ?
         case 'textarea':
             return '<textarea name="' . $name . '" id="' . $id . '" class="form-control" rows="' . (int) ($spec['rows'] ?? 4) . '"' . $reqAttr . $dis . '>' . e($val) . '</textarea>';
         case 'richtext':
-            // نص منسّق: assets/js/admin-richtext.js يحوّل الحقل إلى محرر CKEditor (وبدونه يبقى textarea يقبل HTML)
+            // نص منسّق: assets/js/admin-richtext.js يحوّل الحقل إلى محرر TinyMCE (وبدونه يبقى textarea يقبل HTML)
             if ($readonly) {
                 return '<div class="form-control-static admin-richtext-view">' . RichText::render($val) . '</div>';
             }

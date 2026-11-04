@@ -14,7 +14,7 @@
  *   permission : صلاحية إضافية للقسم (recruitment = المدير العام أو من منحه «صلاحية مسابقات التوظيف»)
  *   before_delete : دالة ترجع سبب منع الحذف (أو null)
  *
- * أنواع الحقول: text, textarea, richtext (محرر CKEditor: نص منسّق يُنظَّف بـ RichText)، email, url, int, decimal, bool, select, fk, date, datetime,
+ * أنواع الحقول: text, textarea, richtext (محرر TinyMCE: نص منسّق يُنظَّف بـ RichText)، email, url, int, decimal, bool, select, fk, date, datetime,
  *               image, file, slug, color, icon, password, readonly
  */
 

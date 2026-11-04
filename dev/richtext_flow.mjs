@@ -1,6 +1,6 @@
-// محرر النصوص المنسّقة في لوحة الإدارة (CKEditor 5) في متصفح حقيقي:
-//   خبر جديد ← كتابة وتنسيق (عنوان، غامق، قائمة، رابط) بلوحة المفاتيح وشريط الأدوات ← «ترجمة تلقائية» تملأ محرري FR و EN
-//   ← حفظ ← الصفحة العامة بالعربية والفرنسية تعرض التنسيق ← حذف الخبر (تبقى البيانات التجريبية كما هي)
+// محرر النصوص المنسّقة في لوحة الإدارة (TinyMCE) في متصفح حقيقي:
+//   خبر جديد ← كتابة وتنسيق (عنوان، غامق، تسطير، قائمة، محاذاة، رابط) بلوحة المفاتيح وشريط الأدوات ونافذة الرابط
+//   ← «ترجمة تلقائية» تملأ محرري FR و EN ← حفظ ← الصفحة العامة بالعربية والفرنسية ← حذف الخبر (البيانات التجريبية كما هي)
 //   node dev/richtext_flow.mjs [--base=http://127.0.0.1:8002] [--out=/tmp/shots/rich] [--admin=miloudsellam:AdminDemo2026]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -40,8 +40,8 @@ await page.setRequestInterception(true);
 const external = [];
 page.on('request', (req) => {
   const u = req.url();
-  if (u.startsWith(BASE) || u.startsWith('data:') || u.startsWith('blob:')) return req.continue();
-  if (u.includes('ckeditor')) external.push(u); // المحرر يجب أن يُحمَّل من الموقع نفسه، لا من CDN
+  if (u.startsWith(BASE) || /^(data|blob|about):/.test(u)) return req.continue();
+  if (/tinymce|tiny\.cloud/.test(u)) external.push(u); // المحرر يجب أن يُحمَّل من الموقع نفسه، لا من CDN
   const f = cdnFile(u);
   if (f && fs.existsSync(f)) return req.respond({ status: 200, contentType: MIME[path.extname(f)] || 'application/octet-stream', headers: { 'Access-Control-Allow-Origin': '*' }, body: fs.readFileSync(f) });
   return req.respond({ status: 404, body: '' });
@@ -54,25 +54,22 @@ let failures = 0;
 const check = (cond, label) => { console.log((cond ? '  ✓ ' : '  ✗ ') + label); if (!cond) failures++; return cond; };
 const go = (url) => page.goto(url.startsWith('http') ? url : BASE + url, { waitUntil: 'networkidle0' });
 const submit = (selector) => Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click(selector)]);
-async function shot(name, full = true) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function shot(name) {
   await page.addStyleTag({ content: '*{animation:none!important;transition:none!important;caret-color:transparent!important}' });
-  if (full) {
-    const h = await page.evaluate(() => document.documentElement.scrollHeight);
-    await page.setViewport({ width: 1366, height: Math.min(h, 5000) });
-  }
   await page.screenshot({ path: path.join(OUT, name + '.png') });
-  await page.setViewport({ width: 1366, height: 900 });
 }
-// رابط https://www.mesrs.dz بخصائص target="_blank" و rel="noopener noreferrer" (بأي ترتيب) ونصه
+// محرر TinyMCE بحسب textarea (id): محتواه، وزر في شريط أدواته، والكتابة داخله
+const content = (id) => page.evaluate((i) => tinymce.get(i).getContent(), id);
+const tool = (id, name) => page.click(`#${id} ~ .tox-tinymce button[data-mce-name="${name}"]`);
+async function focusEnd(id) {
+  await page.evaluate((i) => { const ed = tinymce.get(i); ed.focus(); ed.selection.select(ed.getBody(), true); ed.selection.collapse(false); }, id);
+}
+// رابط https://www.mesrs.dz ونصه؛ وإن كان فيه target="_blank" فمعه rel="noopener noreferrer"
 function linkOk(html, text) {
   const m = html.match(/<a ([^>]*href="https:\/\/www\.mesrs\.dz"[^>]*)>([^<]*)<\/a>/);
-  return !!m && /target="_blank"/.test(m[1]) && /rel="noopener noreferrer"/.test(m[1]) && (!text || m[2] === text);
+  return !!m && (!/target=/.test(m[1]) || /rel="noopener noreferrer"/.test(m[1])) && (!text || m[2] === text);
 }
-// بيانات محرر بحسب اسم الحقل (textarea name)
-const editorData = (name) => page.evaluate((n) => {
-  const ta = document.querySelector(`textarea[name="${n}"]`);
-  return ta && ta.ckeditorInstance ? ta.ckeditorInstance.getData() : null;
-}, name);
 
 // 1) الدخول ونموذج خبر جديد
 await go('/admin/login/');
@@ -80,122 +77,137 @@ await page.type('input[name=username]', ADMIN);
 await page.type('input[name=password]', PASS);
 await submit('form [type=submit]');
 await go('/admin/news/add/');
-await page.waitForSelector('.ck-editor__editable', { timeout: 15000 });
-const editors = await page.$$eval('.ck-editor__editable', (els) => els.map((e) => ({ lang: e.getAttribute('lang'), dir: e.getAttribute('dir') })));
-check(editors.length === 3, `3 محررات في نموذج الخبر (المحتوى + FR + EN): ${editors.length}`);
-check(editors[0] && editors[0].lang === 'ar' && editors[0].dir === 'rtl', 'محرر المحتوى العربي من اليمين لليسار: ' + JSON.stringify(editors[0]));
-check(editors.slice(1).every((e) => e.dir === 'ltr') && editors.map((e) => e.lang).join() === 'ar,fr,en', 'محررا FR و EN من اليسار لليمين: ' + JSON.stringify(editors.slice(1)));
-const ui = await page.$eval('.ck-editor', (el) => ({ dir: el.getAttribute('dir'), heading: (el.querySelector('.ck-heading-dropdown .ck-button__label') || {}).textContent }));
-check(ui.dir === 'rtl' && /فقرة/.test(ui.heading || ''), 'واجهة المحرر بالعربية: ' + JSON.stringify(ui));
-check(await page.$$eval('textarea.admin-richtext', (t) => t.every((x) => getComputedStyle(x).display === 'none')), 'حقول textarea الأصلية مخفية خلف المحرر');
-const toolbar = await page.$$eval('.ck-editor:first-of-type .ck-toolbar__items > .ck-button, .ck-editor:first-of-type .ck-toolbar__items > .ck-dropdown', (b) => b.length);
-check(toolbar >= 14, `أزرار شريط الأدوات: ${toolbar}`);
+await page.waitForFunction(() => window.tinymce && tinymce.get().length === 3 && tinymce.get().every((e) => e.initialized), { timeout: 20000 });
+const info = await page.evaluate(() => ({
+  version: tinymce.majorVersion + '.' + tinymce.minorVersion,
+  ids: tinymce.get().map((e) => e.id),
+  dirs: tinymce.get().map((e) => e.getBody().getAttribute('dir')),
+  ui: document.querySelector('.tox-tinymce').getAttribute('dir'),
+  bold: (document.querySelector('.tox-tinymce button[data-mce-name="bold"]') || {}).ariaLabel,
+  hidden: [...document.querySelectorAll('textarea.admin-richtext')].every((t) => getComputedStyle(t).display === 'none'),
+  disabled: tinymce.get().some((e) => e.mode && e.mode.isReadOnly && e.mode.isReadOnly()),
+}));
+check(info.ids.join() === 'f_content,f_content_fr,f_content_en', `3 محررات TinyMCE ${info.version} (المحتوى + FR + EN): ${info.ids.join()}`);
+check(info.dirs.join() === 'rtl,ltr,ltr', 'المحتوى العربي من اليمين لليسار، و FR و EN من اليسار لليمين: ' + info.dirs.join());
+check(info.ui === 'rtl' && info.bold === 'غامق', `واجهة المحرر بالعربية (langs/ar.js): زر «${info.bold}»`);
+check(info.hidden, 'حقول textarea الأصلية مخفية خلف المحرر');
+check(!info.disabled, 'المحرر مفعّل (license_key: gpl)');
 
 // 2) الكتابة والتنسيق كما يفعل الموظف
 const title = 'خبر تجريبي للمحرر ' + Date.now().toString().slice(-6);
 await page.type('#f_title', title);
-await page.click('.ck-editor__editable[lang=ar]');
+await focusEnd('f_content');
 await page.keyboard.type('صرف المنحة');
-// العنوان: قائمة «فقرة» ← «عنوان 1»
-await page.click('.ck-editor:first-of-type .ck-heading-dropdown > button');
-await page.click('.ck-editor:first-of-type .ck-heading-dropdown .ck-list__item:nth-child(2) button');
-await page.keyboard.press('End');
+// «فقرة» ← «عنوان 1»
+await tool('f_content', 'blocks');
+await page.waitForSelector('.tox-selected-menu .tox-collection__item', { timeout: 5000 });
+await page.evaluate(() => [...document.querySelectorAll('.tox-selected-menu .tox-collection__item')].find((i) => i.textContent.trim() === 'عنوان 1').click());
+await sleep(200);
+await focusEnd('f_content');
 await page.keyboard.press('Enter');
 await page.keyboard.type('يعلن مدير الخدمات الجامعية عن ');
 await page.keyboard.down('Control'); await page.keyboard.press('KeyB'); await page.keyboard.up('Control');
 await page.keyboard.type('صرف المنحة');
 await page.keyboard.down('Control'); await page.keyboard.press('KeyB'); await page.keyboard.up('Control');
-await page.keyboard.type(' للطلبة.');
+await page.keyboard.type(' للطلبة، ');
+await page.keyboard.down('Control'); await page.keyboard.press('KeyU'); await page.keyboard.up('Control');
+await page.keyboard.type('ابتداءً من الأحد');
+await page.keyboard.down('Control'); await page.keyboard.press('KeyU'); await page.keyboard.up('Control');
+await page.keyboard.type('.');
+await tool('f_content', 'aligncenter');
 await page.keyboard.press('Enter');
-await page.keyboard.type('* '); // Autoformat: «* » = قائمة نقطية
+await tool('f_content', 'aligncenter'); // الفقرة الجديدة ترث المحاذاة: نلغيها
+await tool('f_content', 'bullist');
 await page.keyboard.type('الإقامة دباغين');
 await page.keyboard.press('Enter');
 await page.keyboard.type('الإقامة الباز');
 await page.keyboard.press('Enter');
 await page.keyboard.press('Enter'); // سطر فارغ في القائمة = الخروج منها
-await page.keyboard.type('التفاصيل في ');
-// رابط: Ctrl+K ثم العنوان
-await page.keyboard.type('موقع الوزارة');
-// تحديد «موقع الوزارة» (عبر واجهة CKEditor البرمجية: تحديد النص العربي بالأسهم غير ثابت التوقيت) ثم Ctrl+K كما يفعل الموظف
-await new Promise((r) => setTimeout(r, 300));
+await page.keyboard.type('التفاصيل في موقع الوزارة');
+// تحديد «موقع الوزارة» ثم Ctrl+K: نافذة الرابط
 await page.evaluate((text) => {
-  const ed = document.querySelector('textarea[name=content]').ckeditorInstance;
-  ed.model.change((writer) => {
-    const root = ed.model.document.getRoot();
-    const para = root.getChild(root.childCount - 1);
-    const full = [...para.getChildren()].map((n) => n.data || '').join('');
-    const start = full.lastIndexOf(text);
-    writer.setSelection(writer.createRange(writer.createPositionAt(para, start), writer.createPositionAt(para, start + text.length)));
-  });
-  ed.editing.view.focus();
+  const ed = tinymce.get('f_content');
+  const p = ed.getBody().lastElementChild;
+  const node = [...p.childNodes].reverse().find((n) => n.nodeType === 3 && n.data.includes(text));
+  const r = ed.dom.createRng();
+  const start = node.data.lastIndexOf(text);
+  r.setStart(node, start);
+  r.setEnd(node, start + text.length);
+  ed.selection.setRng(r);
 }, 'موقع الوزارة');
 await page.keyboard.down('Control'); await page.keyboard.press('KeyK'); await page.keyboard.up('Control');
-await page.waitForSelector('.ck-link-form input, .ck-balloon-panel input', { timeout: 5000 });
-await page.keyboard.type('www.mesrs.dz');
-await page.keyboard.press('Enter');
-await new Promise((r) => setTimeout(r, 400));
-let ar = await editorData('content');
-check(/<h2>صرف المنحة<\/h2>/.test(ar), 'عنوان h2: ' + ar.slice(0, 60));
-check(/<strong>صرف المنحة<\/strong>/.test(ar), 'نص غامق (Ctrl+B)');
-check(/<ul><li[^>]*>الإقامة دباغين<\/li><li[^>]*>الإقامة الباز<\/li><\/ul>/.test(ar), 'قائمة نقطية («* »): ' + (ar.match(/<ul>.*?<\/ul>/) || [ar])[0]);
-check(linkOk(ar, 'موقع الوزارة'), 'رابط خارجي https:// مع target و rel: ' + (ar.match(/<a [^>]+>.*?<\/a>/) || [ar.slice(-160)])[0]);
-check(await page.$eval('textarea[name=content]', (t) => t.value) === ar, 'textarea الأصلي محدَّث مع المحرر');
+await page.waitForSelector('.tox-dialog input.tox-textfield', { timeout: 5000 });
+await page.type('.tox-dialog input.tox-textfield', 'www.mesrs.dz');
+await page.click('.tox-dialog__footer .tox-button:not(.tox-button--secondary)');
+await page.waitForFunction(() => !document.querySelector('.tox-dialog'), { timeout: 5000 });
+await sleep(300);
+let ar = await content('f_content');
+check(/<h2>صرف المنحة<\/h2>/.test(ar), 'عنوان h2 من قائمة «فقرة»: ' + ar.slice(0, 40));
+check(/<strong>صرف المنحة<\/strong>/.test(ar), 'غامق (Ctrl+B) ← <strong>');
+check(/<u>ابتداءً من الأحد<\/u>/.test(ar), 'تسطير (Ctrl+U) ← <u> (لا span style)');
+check(/<p class="text-center">يعلن/.test(ar), 'محاذاة للمنتصف ← class="text-center" (لا style)');
+check(/<ul>\s*<li>الإقامة دباغين<\/li>\s*<li>الإقامة الباز<\/li>\s*<\/ul>/.test(ar), 'قائمة نقطية: ' + ((ar.match(/<ul>[\s\S]*?<\/ul>/) || [''])[0]).replace(/\s+/g, ' '));
+check(linkOk(ar, 'موقع الوزارة'), 'رابط من نافذة الرابط (www. ← https://): ' + ((ar.match(/<a [^>]+>[^<]*<\/a>/) || [''])[0]));
+check(!/style=|data-mce|<span/.test(ar), 'لا style ولا span في ناتج المحرر');
+check(await page.$eval('textarea[name=content]', (t) => t.value.replace(/\s+/g, ' ')) === ar.replace(/\s+/g, ' '), 'textarea الأصلي محدَّث مع المحرر');
 
 // 3) الترجمة التلقائية تملأ محرري FR و EN مع بقاء التنسيق
+// نمرّر إلى الزر أولاً (بعد الكتابة في المحرر يكون شريط أدواته اللاصق فوق أعلى الصفحة)
+await page.$eval('[data-auto-translate]', (b) => b.scrollIntoView({ block: 'center' }));
 await page.click('[data-auto-translate]');
-await page.waitForFunction(() => /✓|✗/.test(document.querySelector('[data-tr-status]').textContent), { timeout: 20000 });
-const status = await page.$eval('[data-tr-status]', (e) => e.textContent);
-check(status.includes('✓'), 'زر «ترجمة تلقائية»: ' + status);
-const fr = await editorData('content_fr');
-const en = await editorData('content_en');
-check(/<h2>Versement de la bourse<\/h2>/.test(fr) && /<ul><li/.test(fr) && /<strong>/.test(fr) && linkOk(fr), 'محرر FR: نفس الهيكل مترجماً: ' + fr);
-check(/<h2>Scholarship payment<\/h2>/.test(en) && /<ul><li/.test(en) && linkOk(en), 'محرر EN: ' + en.slice(0, 70));
-check(await page.$eval('textarea[name=content_fr]', (t) => t.ckeditorInstance.ui.element.classList.contains('admin-tr-new')), 'محرر الترجمة الجديدة ملوّن (admin-tr-new)');
+await page.waitForFunction(() => /✓|✗/.test(document.querySelector('[data-tr-status]').textContent), { timeout: 20000 }).catch(async () => {
+  console.log('  ! الحالة: ' + await page.$eval('[data-tr-status]', (e) => e.innerHTML) + ' | أخطاء: ' + errors.join(' | '));
+});
+check((await page.$eval('[data-tr-status]', (e) => e.textContent)).includes('✓'), 'زر «ترجمة تلقائية»: ' + await page.$eval('[data-tr-status]', (e) => e.textContent));
+const fr = await content('f_content_fr');
+const en = await content('f_content_en');
+check(/<h2>Versement de la bourse<\/h2>/.test(fr) && /<ul>/.test(fr) && /<strong>/.test(fr) && /<u>/.test(fr) && /class="text-center"/.test(fr) && linkOk(fr),
+  'محرر FR: نفس الهيكل والتنسيق مترجماً: ' + fr.replace(/\s+/g, ' ').slice(0, 110));
+check(/<h2>Scholarship payment<\/h2>/.test(en) && /<ul>/.test(en) && linkOk(en), 'محرر EN: ' + en.replace(/\s+/g, ' ').slice(0, 70));
+check(await page.$eval('textarea[name=content_fr]', (t) => t.richEditor.element.classList.contains('admin-tr-new')), 'محرر الترجمة الجديدة ملوّن (admin-tr-new)');
 check(await page.$eval('#f_title_fr', (i) => i.value) !== '', 'وعنوان الخبر بالفرنسية أيضاً');
-// تعديل النص العربي بعد الترجمة ← تنبيه «تغيّر النص العربي» على محرري الترجمة
-await page.click('.ck-editor__editable[lang=ar]');
-await page.keyboard.press('End');
+await focusEnd('f_content');
 await page.keyboard.type(' .');
-await new Promise((r) => setTimeout(r, 300));
-check(await page.$eval('textarea[name=content_fr]', (t) => t.ckeditorInstance.ui.element.classList.contains('admin-tr-stale')), 'تعديل العربي بعد الترجمة يلوّن محرر FR (admin-tr-stale)');
-await page.evaluate(() => window.scrollTo(0, 0));
-await shot('admin-news-editor', false);
-await page.evaluate(() => document.querySelector('.admin-translations').scrollIntoView());
-await shot('admin-news-editor-translations', false);
+await sleep(300);
+check(await page.$eval('textarea[name=content_fr]', (t) => t.richEditor.element.classList.contains('admin-tr-stale')), 'تعديل العربي بعد الترجمة يلوّن محرر FR (admin-tr-stale)');
+await page.evaluate(() => document.querySelector('label[for=f_content]').scrollIntoView());
+await page.evaluate(() => window.scrollBy(0, -70));
+await shot('admin-news-tinymce');
 
 // 4) الحفظ
 await submit('button[name=_continue]');
 const editUrl = page.url();
 check(/\/admin\/news\/\d+\/$/.test(editUrl), 'حُفظ الخبر ← صفحة تعديله: ' + editUrl.replace(BASE, ''));
-await page.waitForSelector('.ck-editor__editable', { timeout: 15000 });
-ar = await editorData('content');
-check(/<h2>صرف المنحة<\/h2>/.test(ar) && /<ul>/.test(ar), 'المحتوى المحفوظ يعود إلى المحرر كما هو');
+await page.waitForFunction(() => window.tinymce && tinymce.get('f_content') && tinymce.get('f_content').initialized, { timeout: 20000 });
+ar = await content('f_content');
+check(/<h2>صرف المنحة<\/h2>/.test(ar) && /<ul>/.test(ar) && /<u>/.test(ar), 'المحتوى المحفوظ يعود إلى المحرر كما هو');
 const slug = await page.$eval('#f_slug', (i) => i.value);
 await go('/admin/news/');
 const cell = await page.evaluate((t) => { const row = [...document.querySelectorAll('tr')].find((r) => r.textContent.includes(t)); return row ? row.textContent : ''; }, title);
-check(cell !== '' && !/<p>|<h2>|&lt;/.test(cell), 'قائمة الأخبار في لوحة الإدارة: نص بلا وسوم');
+check(cell !== '' && !/<p|<h2|&lt;/.test(cell), 'قائمة الأخبار في لوحة الإدارة: نص بلا وسوم');
 
 // 5) الصفحة العامة بالعربية والفرنسية
 for (const [lang, prefix, heading] of [['ar', '', 'صرف المنحة'], ['fr', '/fr', 'Versement de la bourse']]) {
   await go(`${prefix}/news/${encodeURIComponent(slug)}/`);
   const html = await page.$eval('.rich-text', (e) => e.innerHTML).catch(() => '');
-  check(html.includes(`<h2>${heading}</h2>`) && /<strong>/.test(html) && /<ul><li>/.test(html), `الصفحة العامة (${lang}): عنوان وغامق وقائمة`);
-  check(linkOk(html), `الصفحة العامة (${lang}): الرابط مع target="_blank" و rel="noopener noreferrer"`);
-  check(!/data-list-item-id|data-|style=|class="(?!text-)/.test(html), `الصفحة العامة (${lang}): لا خصائص زائدة من المحرر (data-list-item-id ...) — نُظّفت عند الحفظ`);
-  const style = await page.$eval('.rich-text ul', (u) => getComputedStyle(u).listStyleType).catch(() => '');
-  check(style === 'disc', `القائمة تظهر بنقاط (${lang}): ${style}`);
+  check(html.includes(`<h2>${heading}</h2>`) && /<strong>/.test(html) && /<u>/.test(html) && /<ul>/.test(html), `الصفحة العامة (${lang}): عنوان وغامق وتسطير وقائمة`);
+  check(linkOk(html), `الصفحة العامة (${lang}): الرابط`);
+  check(!/data-|style=|<span/.test(html), `الصفحة العامة (${lang}): لا خصائص زائدة`);
+  const align = await page.$eval('.rich-text p.text-center', (p) => getComputedStyle(p).textAlign).catch(() => '');
+  check(align === 'center', `المحاذاة للمنتصف تظهر في الصفحة (${lang}): ${align}`);
+  check(await page.$eval('.rich-text ul', (u) => getComputedStyle(u).listStyleType).catch(() => '') === 'disc', `القائمة بنقاط (${lang})`);
   await page.evaluate(() => document.querySelector('.rich-text').scrollIntoView({ block: 'center' }));
-  await shot('public-news-' + lang, false);
+  await shot('public-news-' + lang);
 }
 
 // 6) حذف الخبر التجريبي
 await go(editUrl.replace(/\/$/, '/delete/'));
-await submit('form [type=submit].btn-danger, form button[type=submit]');
+await submit('form button[type=submit]');
 const gone = await page.goto(`${BASE}/news/${encodeURIComponent(slug)}/`, { waitUntil: 'networkidle0' });
 check(gone.status() === 404, 'حُذف الخبر التجريبي (404)');
 
 check(external.length === 0, 'المحرر يُحمَّل من الموقع نفسه (لا CDN): ' + (external[0] || ''));
 check(errors.length === 0, 'لا أخطاء JavaScript' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
 await browser.close();
-console.log(failures ? `✗ ${failures} فحص فاشل` : '✓ محرر النصوص المنسّقة يعمل');
+console.log(failures ? `✗ ${failures} فحص فاشل` : '✓ محرر TinyMCE يعمل');
 process.exit(failures ? 1 : 0);

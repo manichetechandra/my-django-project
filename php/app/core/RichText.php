@@ -1,6 +1,6 @@
 <?php
 /**
- * النصوص المنسّقة (محرر CKEditor في لوحة الإدارة): تنظيف HTML بقائمة سماح صارمة، وعرضه، وتحويله لنص عادي.
+ * النصوص المنسّقة (محرر TinyMCE في لوحة الإدارة): تنظيف HTML بقائمة سماح صارمة، وعرضه، وتحويله لنص عادي.
  *
  *   RichText::normalize($_POST['content'])  عند الحفظ: HTML منظَّف ('' إن كان فارغاً)، والنص العادي يصير فقرات <p>
  *   RichText::render($news['content'])      في الصفحات: HTML منظَّف — والنص القديم العادي يُعرض كما كان (linebreaks)
@@ -46,7 +46,7 @@ final class RichText
         'thead' => ['table'], 'tbody' => ['table'], 'tfoot' => ['table'],
     ];
 
-    /** المحاذاة في CKEditor (alignment.options بأصناف Bootstrap بدل style) */
+    /** المحاذاة في المحرر (formats في admin-richtext.js: أصناف Bootstrap بدل style) */
     private const ALIGN = ['text-left', 'text-center', 'text-right', 'text-justify'];
 
     /** أقصى حجم نقبله (MEDIUMTEXT يتسع لأكثر، لكن لا يوجد نص إداري بهذا الطول) */

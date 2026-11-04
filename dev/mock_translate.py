@@ -33,7 +33,7 @@ LOG = []
 
 def fake(text, lang):
     if re.match(r'^\s*<(p|h[1-6]|ul|ol|blockquote|figure|table|hr)\b', text):
-        # نص منسّق (CKEditor): مثل Gemini الحقيقي، الوسوم تبقى ويُترجم النص الذي بينها فقط
+        # نص منسّق (محرر TinyMCE): مثل Gemini الحقيقي، الوسوم تبقى ويُترجم النص الذي بينها فقط
         return re.sub(r'>([^<]*[^\s<][^<]*)<', lambda m: '>' + fake(m.group(1), lang) + '<', text)
     out = text
     for ar, tr in sorted(WORDS[lang].items(), key=lambda kv: -len(kv[0])):

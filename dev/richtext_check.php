@@ -2,7 +2,7 @@
 /**
  * فحص منظِّف النصوص المنسّقة (php/app/core/RichText.php) بلا قاعدة بيانات ولا خادم:
  *   /tmp/tools/bin/php dev/richtext_check.php
- * 1) التنسيق الذي ينتجه CKEditor يبقى كما هو  2) هجمات XSS المعروفة لا يبقى منها شيء خطير
+ * 1) التنسيق الذي ينتجه المحرر (TinyMCE) يبقى كما هو  2) هجمات XSS المعروفة لا يبقى منها شيء خطير
  * 3) النص القديم العادي يُعرض كما كان  4) التحويل لنص عادي  5) الترجمة كتلة بكتلة (MyMemory)
  */
 define('BASE_PATH', dirname(__DIR__) . '/php');
@@ -29,7 +29,7 @@ function check(bool $ok, string $label, string $detail = ''): void
     echo "  ✗ $label" . ($detail !== '' ? "\n      " . $detail : '') . "\n";
 }
 
-// 1) مخرجات CKEditor العادية تبقى كما هي (بعد التنظيف مرتين: idempotent)
+// 1) مخرجات المحرر العادية تبقى كما هي (بعد التنظيف مرتين: idempotent)
 $keep = [
     '<p>نص <strong>غامق</strong> و<i>مائل</i> و<u>تسطير</u> و<s>شطب</s></p>',
     '<h2>عنوان</h2><h3>عنوان فرعي</h3><h4>صغير</h4>',

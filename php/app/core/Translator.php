@@ -71,7 +71,7 @@ class Translator
                 foreach ($targets as $lang) {
                     foreach ($todo as $key => $source) {
                         $value = trim((string) ($out[$lang][$key] ?? ''));
-                        // نص منسّق (محرر CKEditor): الترجمة HTML أيضاً، ولا نثق بها قبل التنظيف بقائمة السماح
+                        // نص منسّق (محرر TinyMCE): الترجمة HTML أيضاً، ولا نثق بها قبل التنظيف بقائمة السماح
                         $result[$lang][$key] = RichText::isHtml($source) ? RichText::normalize($value) : $value;
                     }
                 }

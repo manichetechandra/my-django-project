@@ -818,7 +818,7 @@ function linebreaks($value): string
 }
 
 /**
- * نص منسّق من محرر لوحة الإدارة (CKEditor): HTML منظَّف بقائمة سماح (app/core/RichText.php).
+ * نص منسّق من محرر لوحة الإدارة (TinyMCE): HTML منظَّف بقائمة سماح (app/core/RichText.php).
  * النص القديم العادي (قبل المحرر) يُعرض كما كان: فقرات وأسطر مع التهريب (linebreaks).
  */
 function rich_text($value): string

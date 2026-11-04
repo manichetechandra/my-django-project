@@ -15,7 +15,13 @@
     </div>
 </div>
 
-<?php $tr_fields = admin_translatable($r); ?>
+<?php $tr_fields = admin_translatable($r); $has_rich = !$readonly && array_filter($r['fields'], fn($spec) => $spec['type'] === 'richtext'); ?>
+<?php if ($has_rich && !admin_tinymce()): ?>
+    <div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i>
+        محرر النصوص <strong>TinyMCE</strong> غير موجود: انسخ محتوى المجلد الذي فيه <code>tinymce.min.js</code> إلى
+        <code dir="ltr">assets/vendor/tinymce/</code> في مجلد الموقع. إلى ذلك الحين تعمل الحقول المنسّقة كخانات نص (HTML).
+    </div>
+<?php endif; ?>
 <form method="post" enctype="multipart/form-data" class="admin-form" novalidate>
     <?= csrf_field() ?>
     <div class="panel panel-default admin-panel">
@@ -163,14 +169,10 @@
 </form>
 <?php endblock(); ?>
 
-<?php if (!$readonly && array_filter($r['fields'], fn($spec) => $spec['type'] === 'richtext')): ?>
-<?php /* محرر النصوص المنسّقة: CKEditor 5 (نسخة محلية في assets/vendor/ckeditor5 — بلا CDN، يعمل بلا إنترنت) */ ?>
-<?php block('extra_css'); ?>
-    <link rel="stylesheet" href="<?= asset('vendor/ckeditor5/ckeditor5.css') ?>">
-<?php endblock(); ?>
+<?php if ($has_rich && ($tinymce = admin_tinymce())): ?>
+<?php /* محرر النصوص المنسّقة: TinyMCE من assets/vendor/tinymce (نسخة محلية — بلا CDN، يعمل بلا إنترنت) */ ?>
 <?php block('extra_js'); ?>
-<script src="<?= asset('vendor/ckeditor5/ckeditor5.umd.js') ?>"></script>
-<script src="<?= asset('vendor/ckeditor5/translations/ar.umd.js') ?>"></script>
-<script src="<?= asset('js/admin-richtext.js') ?>"></script>
+<script src="<?= e($tinymce['url']) ?>"></script>
+<script src="<?= asset('js/admin-richtext.js') ?>" data-base="<?= e($tinymce['base']) ?>" data-suffix="<?= e($tinymce['suffix']) ?>" data-lang="<?= e($tinymce['lang']) ?>"></script>
 <?php endblock(); ?>
 <?php endif; ?>

@@ -83,10 +83,10 @@
 
     // ================================================================ الترجمة التلقائية
     // كل حقل ترجمة يحمل data-tr-of="اسم الحقل العربي" و data-tr-lang="fr|en"
-    // الحقول المنسّقة (admin-richtext.js): محرر CKEditor يحلّ محلّ textarea — نكتب فيه ونلوّنه هو
-    function fieldBox(el) { return el.ckeditorInstance ? el.ckeditorInstance.ui.element : el; }
+    // الحقول المنسّقة (admin-richtext.js): محرر TinyMCE يحلّ محلّ textarea — نكتب فيه ونلوّنه هو (el.richEditor)
+    function fieldBox(el) { return el.richEditor ? el.richEditor.element : el; }
     function setFieldValue(el, value) {
-        if (el.ckeditorInstance) { el.ckeditorInstance.setData(value); } else { el.value = value; }
+        if (el.richEditor) { el.richEditor.setData(value); } else { el.value = value; }
     }
     function trSource(input) {
         var name = input.getAttribute('data-tr-of');

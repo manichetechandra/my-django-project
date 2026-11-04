@@ -74,27 +74,33 @@ await page.type('input[name=username]', 'miloudsellam');
 await page.type('input[name=password]', 'AdminDemo2026');
 await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('form:has(input[name=password]) [type=submit]')]);
 
+// زر «ترجمة تلقائية»: نمرّر إليه أولاً (بعد الكتابة في المحرر يلتصق شريط أدواته أعلى الصفحة)
+async function clickTranslate() {
+  await page.$eval('[data-auto-translate]', (b) => b.scrollIntoView({ block: 'center' }));
+  await page.click('[data-auto-translate]');
+}
+
 // ---------------------------------------------------------------- 1) زر «ترجمة تلقائية» في إضافة خبر
 await go('/admin/news/add/');
 check(await page.$('[data-auto-translate]') !== null, 'زر «ترجمة تلقائية» موجود في إضافة خبر');
 check((await page.$$('[data-tr-of]')).length === 6, 'ستة حقول ترجمة (العنوان والملخص والمحتوى × FR/EN)');
-await page.click('[data-auto-translate]');
+await clickTranslate();
 check((await page.$eval('[data-tr-status]', (e) => e.textContent)).includes('اكتب النص العربي'), 'بلا نص عربي: رسالة «اكتب النص العربي أولاً»');
 await page.type('#f_title', 'صرف المنحة للطلبة');
 await page.type('#f_summary', 'خبر تجريبي من سطيف');
-// «المحتوى» نص منسّق: محرر CKEditor (admin-richtext.js) — نكتب فيه كما يفعل الموظف، وEnter = فقرة جديدة
-await page.waitForSelector('.ck-editor__editable[lang=ar]', { timeout: 15000 });
-await page.click('.ck-editor__editable[lang=ar]');
+// «المحتوى» نص منسّق: محرر TinyMCE (admin-richtext.js) — نكتب فيه كما يفعل الموظف، وEnter = فقرة جديدة
+await page.waitForFunction(() => window.tinymce && tinymce.get('f_content') && tinymce.get('f_content').initialized, { timeout: 20000 });
+await page.evaluate(() => tinymce.get('f_content').focus());
 await page.keyboard.type('خبر تجريبي');
 await page.keyboard.press('Enter');
 await page.keyboard.type('الإقامة الجامعية في سطيف');
-await page.click('[data-auto-translate]');
+await clickTranslate();
 await page.waitForFunction(() => /✓|✗/.test(document.querySelector('[data-tr-status]').textContent), { timeout: 15000 });
 const status1 = await page.$eval('[data-tr-status]', (e) => e.textContent);
 check(status1.includes('✓') && status1.includes('gemini'), 'الزر ترجم عبر gemini: ' + status1.trim());
 check(await val('[name=title_fr]') === 'Versement de la bourse للطلبة', 'title_fr = ' + await val('[name=title_fr]'));
 check(await val('[name=title_en]') === 'Scholarship payment للطلبة', 'title_en = ' + await val('[name=title_en]'));
-check(/^<p>[^<]+<\/p><p>[^<]+<\/p>$/.test(await val('[name=content_en]')), 'فقرتا المحتوى محفوظتان في الترجمة (محرر EN): ' + await val('[name=content_en]'));
+check(/^<p>[^<]+<\/p>\s*<p>[^<]+<\/p>$/.test(await val('[name=content_en]')), 'فقرتا المحتوى محفوظتان في الترجمة (محرر EN): ' + await val('[name=content_en]'));
 await shot('1-add-translated');
 
 // تعديل الترجمة يدوياً ثم الضغط مرة أخرى مع «إلغاء» = لا نستبدل الموجود
@@ -102,14 +108,14 @@ await page.$eval('[name=title_fr]', (e) => { e.value = 'Titre corrigé à la mai
 await page.$eval('[name=summary_en]', (e) => { e.value = ''; });
 confirmAnswer = false;
 await page.$eval('[data-tr-status]', (e) => { e.textContent = ''; });
-await page.click('[data-auto-translate]');
+await clickTranslate();
 await page.waitForFunction(() => /✓|✗/.test(document.querySelector('[data-tr-status]').textContent), { timeout: 15000 });
 check(await val('[name=title_fr]') === 'Titre corrigé à la main', '«إلغاء» في التأكيد يحافظ على الترجمة اليدوية');
 check(await val('[name=summary_en]') === 'news test من Sétif', '… ويملأ الحقل الفارغ فقط');
 confirmAnswer = true;
 
 // ---------------------------------------------------------------- 2) الحفظ: ترجمة الحقول الفارغة تلقائياً
-await page.$eval('[name=content_fr]', (e) => { if (e.ckeditorInstance) { e.ckeditorInstance.setData(''); } else { e.value = ''; } });
+await page.$eval('[name=content_fr]', (e) => { if (e.richEditor) { e.richEditor.setData(''); } else { e.value = ''; } });
 await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('button[name=_continue]')]);
 const f2 = await flash();
 check(f2.includes('الفارغة (1)'), 'الحفظ ترجم الحقل الفارغ الوحيد: ' + f2);

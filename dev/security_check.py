@@ -313,7 +313,7 @@ check(s == 302 and location(h) == '/admin/password/', 'المتصل فعلاً �
 
 # ----------------------------------------------------------------------------------------------
 if not V1:
-    print('10) النصوص المنسّقة (محرر CKEditor): HTML يُنظَّف في الخادم عند الحفظ وعند العرض')
+    print('10) النصوص المنسّقة (محرر TinyMCE): HTML يُنظَّف في الخادم عند الحفظ وعند العرض')
     # هجوم يتجاوز المحرر تماماً (طلب POST مباشر)، والترجمة FR بنفس الهجوم
     EVIL = ('<p>جواب <strong>آمن</strong> <a href="https://www.mesrs.dz" target="_blank">رابط</a></p>'
             '<script>alert(1)</script><img src=x onerror=alert(2)><svg onload=alert(3)></svg>'
@@ -326,8 +326,8 @@ if not V1:
     _s, _h, b = c.req('GET', '/admin/faqs/add/')
     t = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', b).group(1)
     cat = re.search(r'<select name="category_id"[^>]*>.*?<option value="(\d+)"', b, re.S).group(1)
-    check('data-richtext="ar"' in b and 'vendor/ckeditor5/ckeditor5.umd.js' in b and 'cdn.ckeditor.com' not in b,
-          'نموذج السؤال: حقل «الإجابة» بمحرر CKEditor محلي (بلا CDN)')
+    check('data-richtext="ar"' in b and 'vendor/tinymce/tinymce.min.js' in b and 'tiny.cloud' not in b and 'cdn.jsdelivr.net/npm/tinymce' not in b,
+          'نموذج السؤال: حقل «الإجابة» بمحرر TinyMCE محلي (بلا CDN)')
     s, h, _b = c.req('POST', '/admin/faqs/add/', {'csrfmiddlewaretoken': t, 'category_id': cat, 'question': 'سؤال اختبار الأمان',
                                                    'answer': EVIL, 'answer_fr': EVIL, 'answer_en': '', 'question_fr': 'Q', 'question_en': 'Q',
                                                    'order': '99', 'is_active': '1', '_continue': '1'})
