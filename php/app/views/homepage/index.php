@@ -55,6 +55,12 @@
         border-bottom: 1px solid #eee;
         transition: background-color 0.3s;
     }
+
+    /* صندوق «أخر الأخبار» يعرض خبراً واحداً في كل مرة (السكربت أسفل الصفحة): الأخبار الأخرى مخفية من البداية،
+       وإلا قصُرت الصفحة نحو 280 بكسل بعد التحميل فانزاح ما تحتها، ومنه قسم الإقامات (رابط /#cite في الشريط) */
+    #latest-news-ticker .news-item + .news-item {
+        display: none;
+    }
     
     .news-item:hover {
         background-color: #f8f9fa;

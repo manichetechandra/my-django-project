@@ -59,6 +59,12 @@
             right: auto;
             margin-bottom: 0;
         }
+
+        /* الروابط الداخلية مثل «الإقامات الجامعية» (/#cite) تتوقف تحت الشريط الثابت لا خلفه:
+           --navbar-h = ارتفاعه الحقيقي، يحسبه السكربت الذي بعد الشريط مباشرة */
+        html {
+            scroll-padding-top: calc(var(--navbar-h, 0px) + 10px);
+        }
         
         /* Navbar RTL */
         .navbar-inverse {
@@ -363,6 +369,33 @@ setTimeout(function() {
 <?php endif; ?>
     <!-- Navbar -->
     <?php include view_path('base/navbar'); ?>
+    <script>
+    // ارتفاع الشريط الثابت يتغير (50 إلى 200 بكسل حسب عرض الشاشة واللغة): نحفظه في --navbar-h (انظر scroll-padding-top).
+    // قائمة الهاتف المفتوحة لا تُحسب، وتُغلق عند اختيار رابط داخل الصفحة نفسها ثم نمرّر إلى القسم (وإلا بقيت فوقه)
+    (function () {
+        var nav = document.querySelector('.navbar-fixed-top'), menu = document.getElementById('myNavbar');
+        if (!nav || !menu) return;
+        var toggle = nav.querySelector('.navbar-toggle');
+        function mobileOpen() {
+            return !!toggle && toggle.offsetWidth > 0 && (menu.classList.contains('in') || menu.classList.contains('collapsing'));
+        }
+        function update() {
+            document.documentElement.style.setProperty('--navbar-h', (nav.offsetHeight - (mobileOpen() ? menu.offsetHeight : 0)) + 'px');
+        }
+        update();
+        if (window.ResizeObserver) new ResizeObserver(update).observe(nav); else window.addEventListener('resize', update);
+        menu.addEventListener('click', function (e) {
+            var a = e.target.closest('a[href*="#"]:not([data-toggle])'), target;
+            if (!a || !mobileOpen() || !window.jQuery || a.pathname !== location.pathname || a.search !== location.search
+                || !(target = document.getElementById(decodeURIComponent(a.hash.slice(1))))) return;
+            e.preventDefault();
+            jQuery(menu).one('hidden.bs.collapse', function () {
+                if (location.hash !== a.hash) history.pushState(null, '', a.hash);
+                target.scrollIntoView();
+            }).collapse('hide');
+        });
+    })();
+    </script>
 
     <!-- الإشعارات -->
     

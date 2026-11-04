@@ -1,3 +1,29 @@
+<?php
+// قسم الصفحة الحالية: عنصره في الشريط يُميَّز بـ active (كانت «الرئيسية» مميَّزة في كل الصفحات)
+$__navPath = request_path();
+$__navSection = $__navPath === '/' ? 'home' : '';
+foreach ([
+    'directorate'  => ['/director-word/', '/organization/', '/history/'],
+    'cities'       => ['/cities/'],
+    'news'         => ['/news/'],
+    'competitions' => ['/competitions/'],
+    'services'     => ['/services/'],
+    'downloads'    => ['/downloads/'],
+    'faq'          => ['/faq/'],
+    'students'     => ['/students/'],
+    'contact'      => ['/contact/'],
+] as $__section => $__prefixes) {
+    foreach ($__prefixes as $__prefix) {
+        if (str_starts_with($__navPath, $__prefix)) {
+            $__navSection = $__section;
+            break 2;
+        }
+    }
+}
+// class="..." لعنصر الشريط مع active إن كان قسم الصفحة الحالية
+$__navClass = fn(string $section, string $class = ''): string
+    => ($__c = trim($class . ($section === $__navSection ? ' active' : ''))) === '' ? '' : ' class="' . $__c . '"';
+?>
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -12,13 +38,13 @@
         
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav navbar-right">
-                <li class="active">
+                <li<?= $__navClass('home') ?>>
                     <a href="<?= e(url('homepage:index')) ?>">
                         <i class="fa fa-home"></i> <?= t('الرئيسية') ?>
                     </a>
                 </li>
                 
-                <li class="dropdown">
+                <li<?= $__navClass('directorate', 'dropdown') ?>>
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
                         <i class="fa fa-building"></i> <?= t('المديرية') ?> <span class="caret"></span>
                     </a>
@@ -35,8 +61,9 @@
                     </ul>
                 </li>
                 
-                <li>
-                    <a href="#cite">
+                <!-- قسم الإقامات في الصفحة الرئيسية: الرابط كامل (لا "#cite" وحده) حتى يعمل من أي صفحة وبأي لغة -->
+                <li<?= $__navClass('cities') ?>>
+                    <a href="<?= e(url('homepage:index')) ?>#cite">
                         <i class="fa fa-university"></i> <?= tx('nav', 'الإقامات الجامعية') ?>
                     </a>
                 </li>
@@ -47,16 +74,16 @@
                     </a>
                 </li>
                 
-                <li><a href="<?= e(url('news:news_list')) ?>"><i class="fa fa-newspaper-o"></i> <?= t('الأخبار') ?></a></li>
+                <li<?= $__navClass('news') ?>><a href="<?= e(url('news:news_list')) ?>"><i class="fa fa-newspaper-o"></i> <?= t('الأخبار') ?></a></li>
                 
-                <li>
+                <li<?= $__navClass('competitions') ?>>
                     <a href="<?= e(url('competitions:list')) ?>">
                         <i class="fa fa-trophy"></i> <?= t('المسابقات') ?>
                         <?php if ($__openCompetitions = Competition::openCount()): ?><span class="nav-count" title="<?= t('مسابقات مفتوحة للترشح') ?>"><?= $__openCompetitions ?></span><?php endif; ?>
                     </a>
                 </li>
                 
-                <li class="dropdown">
+                <li<?= $__navClass('services', 'dropdown') ?>>
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-cogs"></i> <?= tx('nav', 'الخدمات الجامعية') ?> <span class="caret"></span>
                     </a>
@@ -68,13 +95,13 @@
                     </ul>
                 </li>
                 
-                <li>
+                <li<?= $__navClass('downloads') ?>>
                     <a href="<?= e(url('downloads:download_center')) ?>">
                         <i class="fa fa-download"></i> <?= t('التحميلات') ?>
                     </a>
                 </li>
                 
-                <li>
+                <li<?= $__navClass('faq') ?>>
                     <a href="<?= e(url('faq:faq_list')) ?>">
                         <i class="fa fa-question-circle"></i> <?= tx('nav', 'الأسئلة الشائعة') ?>
                     </a>
@@ -82,7 +109,7 @@
 
                 <?php if (is_authenticated()): ?>
                     <?php if (is_staff()): ?>
-                        <li class="dropdown">
+                        <li<?= $__navClass('students', 'dropdown') ?>>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
                                 <i class="fa fa-shield"></i> <?= tx('nav', 'لوحة المشرف') ?> <span class="caret"></span>
                             </a>
@@ -116,7 +143,7 @@
                     <?php elseif (!empty($student_profile)): ?>
                    
                         
-                        <li class="dropdown">
+                        <li<?= $__navClass('students', 'dropdown') ?>>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
                                 <i class="fa fa-user-circle"></i> <?= e(truncatewords($student_profile['full_name_arabic'], 2)) ?> <span class="caret"></span>
                             </a>
@@ -199,14 +226,14 @@
                         </li>
                     <?php endif; ?>
                 <?php else: ?>
-                    <li>
+                    <li<?= $__navClass('students') ?>>
                         <a href="<?= e(url('students:login')) ?>">
                             <i class="fa fa-sign-in"></i> <?= t('فضاء الطالب') ?>
                         </a>
                     </li>
                 <?php endif; ?>
 
-                <li>
+                <li<?= $__navClass('contact') ?>>
                     <a href="<?= e(url('contact:contact')) ?>">
                         <i class="fa fa-envelope"></i> <?= t('إتصل بنا') ?>
                     </a>
