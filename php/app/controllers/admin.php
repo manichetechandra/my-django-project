@@ -1182,6 +1182,22 @@ function admin_translate(): void
     }
 }
 
+/**
+ * رفع صورة من محرر النصوص (زر «صورة» ← رفع، أو لصق/سحب صورة داخل المحرر): POST /admin/editor/upload/ (AJAX)
+ * للموظفين فقط، مع رمز CSRF (في index.php لكل POST). Upload يتحقق من الامتداد ونوع الملف الحقيقي (finfo) وأنها صورة
+ * (getimagesize): jpg و png و gif و webp فقط — لا svg. تُحفظ في uploads/editor/السنة/الشهر/ باسم عشوائي.
+ */
+function admin_editor_upload(): void
+{
+    admin_guard();
+    try {
+        $path = Upload::store($_FILES['file'] ?? [], 'editor/' . date('Y/m'), Upload::IMAGES, (float) config('uploads.max_image_mb', 5));
+    } catch (Throwable $e) {
+        json_response(['error' => $e->getMessage()], 400);
+    }
+    json_response(['location' => media_url($path)]);
+}
+
 /** صفحة «ترجمة المحتوى القديم»: تترجم السجلات التي تنقصها ترجمة على دفعات صغيرة */
 function admin_translate_all(): void
 {
@@ -1353,8 +1369,11 @@ function admin_cell(array $r, Model $obj, string $col): string
     }
 }
 
-/** بصمة tinymce.min.js المرفق بالمشروع (8.10.1): لنعرف إن كان المستعمل نسختك أم نسخة المشروع */
-const ADMIN_TINYMCE_BUNDLED_SHA256 = 'a76eae0c9747774f3a026488b18a0540bba25dfaafa8f614540050fa0aa50320';
+/** نسخة TinyMCE المرفقة بالمشروع (كل الإضافات المفتوحة المصدر) — مجلد باسم إصدارها حتى لا يمس تحديثُ المشروع مجلدَك */
+const ADMIN_TINYMCE_BUNDLED_DIR = 'assets/vendor/tinymce-8.10.1';
+
+/** بصمات tinymce.min.js التي أرفقها المشروع (8.10.1): لنعرف إن كان المستعمل نسختك أم نسخة المشروع */
+const ADMIN_TINYMCE_BUNDLED_SHA256 = ['a76eae0c9747774f3a026488b18a0540bba25dfaafa8f614540050fa0aa50320'];
 
 /** محرر TinyMCE المستعمل في نماذج الإدارة (انظر admin_tinymce_locate) — يُحسب مرة واحدة لكل طلب */
 function admin_tinymce(): ?array
@@ -1371,11 +1390,11 @@ function admin_tinymce(): ?array
  * أين TinyMCE؟ (الإصدارات 4 إلى 8) نسختك أنت أولاً، ونسخة المشروع فقط إن لم نجد غيرها:
  *   1) المسار في config.php ← 'editor' => ['tinymce' => '...'] (نسبةً إلى مجلد الموقع، أو متغير البيئة TINYMCE_PATH؛
  *      لا يُقبل .. ولا uploads/ ولا storage/ ولا app/ ولا database/)
- *   2) أي مجلد يبدأ اسمه بـ tinymce في: مجلد الموقع، assets/، assets/js/، assets/vendor/، js/، lib/، libs/،
- *      vendor/tinymce/ (Composer)، node_modules/ (npm)
- *   3) مجلد داخل assets/vendor/tinymce/ (نسختك منسوخة داخل مجلد نسخة المشروع)
+ *   2) أي مجلد داخل assets/vendor/ (مثل assets/vendor/tinymce)، وأي مجلد يبدأ اسمه بـ tinymce في: مجلد الموقع،
+ *      assets/، assets/js/، js/، lib/، libs/، vendor/tinymce/ (Composer)، node_modules/ (npm)
+ *   3) مجلد داخل مجلد نسخة المشروع (نسختك منسوخة بداخله)
  *   4) مجلد يبدأ اسمه بـ tinymce بجانب مجلد الموقع (htdocs/tinymce في XAMPP) إن كان داخل جذر الخادم
- *   5) نسخة المشروع: assets/vendor/tinymce/tinymce.min.js (أو نسختك إن وضعت ملفاتها مكان ملفاته)
+ *   5) نسخة المشروع: assets/vendor/tinymce-8.10.1/tinymce.min.js (ADMIN_TINYMCE_BUNDLED_DIR)
  * داخل كل مجلد نبحث عن tinymce.min.js (أو tinymce.js) حتى 4 مستويات: مجلد التحميل الرسمي هو tinymce/js/tinymce/.
  * النسخة المطابقة لنسخة المشروع (بصمة sha256) لا تتقدّم على نسخة مختلفة، فلا تغلب نسخةٌ احتياطية ملفاتك.
  *
@@ -1383,7 +1402,9 @@ function admin_tinymce(): ?array
  * @param string $baseUrl رابطه ('' أو '/dou-setif')
  * @param string $docRoot جذر الخادم (DOCUMENT_ROOT) لمجلد بجانب الموقع
  * @param string $custom  المسار المكتوب في config.php
- * @return array{url: string, base: string, suffix: string, lang: string, lang_url: string, path: string, bundled: bool}|null
+ * plugins: الإضافات الموجودة في مجلد النسخة (المحرر يفعّل كل ما يعرفه منها). lang: ملف العربية في مجلدها ('' = ملف المشروع
+ * assets/js/tinymce-lang/ar-<الإصدار>.js، يختاره admin-richtext.js حسب إصدار TinyMCE المحمَّل).
+ * @return array{url: string, base: string, suffix: string, lang: string, plugins: string[], path: string, bundled: bool}|null
  */
 function admin_tinymce_locate(string $site, string $baseUrl, string $docRoot = '', string $custom = ''): ?array
 {
@@ -1391,7 +1412,7 @@ function admin_tinymce_locate(string $site, string $baseUrl, string $docRoot = '
     $site = $norm($site);
     $docRoot = $norm($docRoot);
     $baseUrl = $norm($baseUrl);
-    $bundled = $site . '/assets/vendor/tinymce';
+    $bundled = $site . '/' . ADMIN_TINYMCE_BUNDLED_DIR;
     $own = ['plugins', 'skins', 'themes', 'icons', 'models', 'langs'];
     $dirs = fn(string $parent): array => array_map($norm, glob($parent . '/*', GLOB_ONLYDIR) ?: []);
     $named = fn(string $parent): array => array_values(array_filter($dirs($parent),
@@ -1402,8 +1423,13 @@ function admin_tinymce_locate(string $site, string $baseUrl, string $docRoot = '
     if ($custom !== '' && !in_array('..', explode('/', $custom), true) && !preg_match('#^(uploads|storage|app|database)(/|$)#i', $custom)) {
         $roots[] = $site . '/' . $custom;
     }
-    foreach (['', '/assets', '/assets/js', '/assets/vendor', '/js', '/lib', '/libs', '/vendor/tinymce', '/node_modules'] as $parent) {
+    foreach (['', '/assets', '/assets/js', '/js', '/lib', '/libs', '/vendor/tinymce', '/node_modules'] as $parent) {
         array_push($roots, ...$named($site . $parent));
+    }
+    foreach ($dirs($site . '/assets/vendor') as $dir) { // مجلد المكتبات: كل مجلداته، أياً كان اسمها
+        if ($dir !== $bundled) {
+            $roots[] = $dir;
+        }
     }
     foreach ($dirs($bundled) as $dir) {
         if (!in_array(basename($dir), $own, true)) {
@@ -1442,7 +1468,7 @@ function admin_tinymce_locate(string $site, string $baseUrl, string $docRoot = '
     };
 
     // أول نسخة تختلف عن نسخة المشروع هي نسختك. والنسخ المطابقة لها (نسخة احتياطية tinymce.bak مثلاً) لا تتقدّم أبداً:
-    // تُستعمل فقط إن لم توجد غيرها، والمسار الأصلي assets/vendor/tinymce أولاً
+    // تُستعمل فقط إن لم توجد غيرها، ومجلد نسخة المشروع (ADMIN_TINYMCE_BUNDLED_DIR) أولاً
     $pick = null;
     $same = null;
     foreach (array_unique($roots) as $root) {
@@ -1450,7 +1476,7 @@ function admin_tinymce_locate(string $site, string $baseUrl, string $docRoot = '
         if ($file === null || $urlOf($file) === null) {
             continue;
         }
-        if (hash_file('sha256', $file) !== ADMIN_TINYMCE_BUNDLED_SHA256) {
+        if (!in_array(hash_file('sha256', $file), ADMIN_TINYMCE_BUNDLED_SHA256, true)) {
             $pick = $file;
             break;
         }
@@ -1462,26 +1488,26 @@ function admin_tinymce_locate(string $site, string $baseUrl, string $docRoot = '
         $url = $urlOf($file);
         $dir = dirname($file);
         $lang = '';
-        $langUrl = '';
         foreach (['ar', 'ar_SA', 'ar-SA'] as $code) {
             if (is_file($dir . '/langs/' . $code . '.js')) {
                 $lang = $code;
                 break;
             }
         }
-        if ($lang === '' && is_file($bundled . '/langs/ar.js')) {
-            // نسختك بلا ملف العربية: نستعير ملف العربية من نسخة المشروع حتى تبقى الواجهة بالعربية
-            $lang = 'ar';
-            $langUrl = $urlOf($bundled . '/langs/ar.js') . '?v=' . filemtime($bundled . '/langs/ar.js');
+        $plugins = [];
+        foreach ($dirs($dir . '/plugins') as $p) {
+            if (is_file($p . '/plugin.min.js') || is_file($p . '/plugin.js')) {
+                $plugins[] = basename($p);
+            }
         }
         return [
-            'url'      => $url . '?v=' . filemtime($file),
-            'base'     => substr($url, 0, strrpos($url, '/')),
-            'suffix'   => substr($file, -7) === '.min.js' ? '.min' : '',
-            'lang'     => $lang,
-            'lang_url' => $langUrl,
-            'path'     => strpos($file, $site . '/') === 0 ? substr($file, strlen($site) + 1) : '../' . substr($file, strlen($parent) + 1),
-            'bundled'  => $pick === null,
+            'url'     => $url . '?v=' . filemtime($file),
+            'base'    => substr($url, 0, strrpos($url, '/')),
+            'suffix'  => substr($file, -7) === '.min.js' ? '.min' : '',
+            'lang'    => $lang,
+            'plugins' => $plugins,
+            'path'    => strpos($file, $site . '/') === 0 ? substr($file, strlen($site) + 1) : '../' . substr($file, strlen($parent) + 1),
+            'bundled' => $pick === null,
         ];
     }
     return null;

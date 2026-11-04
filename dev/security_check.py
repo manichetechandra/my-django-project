@@ -319,14 +319,20 @@ if not V1:
             '<script>alert(1)</script><img src=x onerror=alert(2)><svg onload=alert(3)></svg>'
             '<p onclick="alert(4)" style="position:fixed;top:0">نص</p><a href="javascript:alert(5)">خطير</a>'
             '<a href="java&#x09;script:alert(6)">x</a><iframe src="https://evil.example"></iframe>'
-            '<form action="https://evil.example"><input name=p></form><p class="text-center ck-evil">وسط</p>')
-    BAD = re.compile(r'<(script|img|svg|iframe|form|input)\b|\son[a-z]+\s*=|javascript:|style=|ck-evil', re.I)
+            '<form action="https://evil.example"><input name=p></form><p class="text-center ck-evil">وسط</p>'
+            # «كل الأدوات»: ألوان وصور وفيديو مقبولة، لكن بلا ما يحمّل شيئاً أو يغطي الصفحة أو يغيّرها
+            '<p style="color: #e03e2d; position: fixed; z-index: 99999; top: 0">ملوّن</p>'
+            '<p style="color: red; background: url(javascript:alert(8))">بصمة هجوم: يُحذف style كله</p>'
+            '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" srcdoc="<script>alert(9)</script>" sandbox="allow-top-navigation"></iframe>'
+            '<img src="javascript:alert(10)"><img src="/uploads/editor/x.png" onerror="alert(11)" style="position:fixed;z-index:9">')
+    BAD = re.compile(r'<(script|svg|form|input|object|embed)\b|\son[a-z]+\s*=|javascript:|position|z-index|url\(|srcdoc|allow-top-navigation|ck-evil'
+                     r'|<iframe(?![^>]*src="https://www\.youtube\.com/embed/[^"]*"[^>]*sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox")', re.I)
     c = Client()
     c.login('/admin/login/', *ADMIN)
     _s, _h, b = c.req('GET', '/admin/faqs/add/')
     t = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', b).group(1)
     cat = re.search(r'<select name="category_id"[^>]*>.*?<option value="(\d+)"', b, re.S).group(1)
-    check('data-richtext="ar"' in b and 'vendor/tinymce/tinymce.min.js' in b and 'tiny.cloud' not in b and 'cdn.jsdelivr.net/npm/tinymce' not in b,
+    check('data-richtext="ar"' in b and re.search(r'vendor/tinymce[^"]*/tinymce\.min\.js', b) and 'tiny.cloud' not in b and 'cdn.jsdelivr.net/npm/tinymce' not in b,
           'نموذج السؤال: حقل «الإجابة» بمحرر TinyMCE محلي (بلا CDN)')
     s, h, _b = c.req('POST', '/admin/faqs/add/', {'csrfmiddlewaretoken': t, 'category_id': cat, 'question': 'سؤال اختبار الأمان',
                                                    'answer': EVIL, 'answer_fr': EVIL, 'answer_en': '', 'question_fr': 'Q', 'question_en': 'Q',
@@ -336,9 +342,16 @@ if not V1:
     fid = int(m.group(1)) if m else 0
     row = json.loads(php(f"echo json_encode(DB::one('SELECT answer, answer_fr FROM faqs WHERE id = ?', [{fid}]));") or 'null') or {}
     stored = (row.get('answer') or '') + '\n' + (row.get('answer_fr') or '')
-    check(row.get('answer') and row.get('answer_fr') and not BAD.search(stored), 'المحفوظ في قاعدة البيانات (العربي و FR) منظَّف: لا script ولا on...= ولا javascript: ولا style')
+    bad = BAD.search(stored)
+    check(row.get('answer') and row.get('answer_fr') and not bad,
+          'المحفوظ في قاعدة البيانات (العربي و FR) منظَّف: لا script ولا on...= ولا javascript: ولا position ولا url() ولا iframe خارجي' + (f' ← {bad.group(0)}' if bad else ''))
     check('<strong>آمن</strong>' in stored and 'class="text-center"' in stored and 'rel="noopener noreferrer"' in stored,
           'والتنسيق المسموح يبقى (غامق، محاذاة، رابط مع rel="noopener noreferrer")')
+    check('<p style="color: #e03e2d;">ملوّن</p>' in stored and '<p>بصمة هجوم: يُحذف style كله</p>' in stored
+          and '<img src="/uploads/editor/x.png" loading="lazy">' in stored
+          and 'sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox"' in stored
+          and 'iframe src="https://evil.example' not in stored,
+          'كل الأدوات: اللون والصورة وفيديو YouTube (مع sandbox) تبقى، وحدها خصائصها الخطيرة تُحذف')
     for path in (f'/faq/{fid}/', f'/fr/faq/{fid}/'):
         _s, _h, b = Client().req('GET', path)
         box = re.search(r'<div class="rich-text">(.*?)</div>', b, re.S)
@@ -357,6 +370,85 @@ if not V1:
     _s, _h, b = Client().req('GET', f'/faq/{fid}/')
     check('&lt;script&gt;alert(7)&lt;/script&gt;' in b and '<script>alert(7)' not in b, 'النص القديم العادي: يُعرض مهرَّباً كما كان')
     php(f"DB::query('DELETE FROM faqs WHERE id = ?', [{fid}]);")
+
+# ----------------------------------------------------------------------------------------------
+def upload(client, path, files, token=None):
+    """POST متعدد الأجزاء (multipart) كما يرسله المتصفح: files = {'file': (الاسم، المحتوى، النوع)}"""
+    boundary = '----dou' + os.urandom(8).hex()
+    body = b''
+    for field, (name, data, ctype) in files.items():
+        body += (f'--{boundary}\r\nContent-Disposition: form-data; name="{field}"; filename="{name}"\r\n'
+                 f'Content-Type: {ctype}\r\n\r\n').encode() + data + b'\r\n'
+    body += f'--{boundary}--\r\n'.encode()
+    conn = http.client.HTTPConnection(U.hostname, U.port or 80, timeout=60)
+    h = {'Host': U.netloc, 'Content-Type': 'multipart/form-data; boundary=' + boundary, 'X-Requested-With': 'XMLHttpRequest'}
+    if client.cookies:
+        h['Cookie'] = '; '.join(f'{k}={v}' for k, v in client.cookies.items())
+    if token:
+        h['X-CSRFToken'] = token
+    conn.request('POST', path, body, h)
+    r = conn.getresponse()
+    return r.status, {k.lower(): v for k, v in r.getheaders()}, r.read().decode('utf-8', 'replace')
+
+
+if not V1:
+    import base64
+    print('11) رفع الصور من محرر النصوص: /admin/editor/upload/ (للموظفين فقط، صور حقيقية فقط)')
+    PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
+    GIF_PHP = (b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00'
+               b'\x01\x00\x01\x00\x00\x02\x02D\x01\x00;<?php echo "PWN" . "ED"; ?>')
+    URL = '/admin/editor/upload/'
+    stored_files = []
+    anon = Client()
+    anon_t = anon.token('/admin/login/')
+    s, h, b = upload(anon, URL, {'file': ('a.png', PNG, 'image/png')}, anon_t)
+    check(s == 302 and '/admin/login/' in location(h), f'زائر بلا دخول ← صفحة دخول الإدارة ({s})')
+    stu = Client()
+    stu.login('/students/login/', *STUDENT)
+    stu_t = stu.token('/students/applications/create/')  # الدخول يجدّد رمز CSRF: نأخذ الجديد من صفحة فيها نموذج
+    s, h, b = upload(stu, URL, {'file': ('a.png', PNG, 'image/png')}, stu_t)
+    check(s == 403 and 'للموظفين' in b and 'location' not in b, f'الطالب (برمز CSRF صحيح) لا يرفع ملفات للمحرر ← 403 «للموظفين فقط» ({s})')
+    c = Client()
+    c.login('/admin/login/', *STAFF)
+    t = c.token('/admin/faqs/add/')
+    s, h, b = upload(c, URL, {'file': ('a.png', PNG, 'image/png')})
+    check(s == 403 and 'انتهت صلاحية الجلسة' in b, f'موظف بلا رمز CSRF ← 403 ({s})')
+    for label, name, data, ctype in [
+        ('ملف PHP باسم صورة', 'shell.png', b'<?php system($_GET["c"]); ?>', 'image/png'),
+        ('SVG فيه سكربت', 'x.svg', b'<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"/>', 'image/svg+xml'),
+        ('امتداد php', 'x.php', PNG, 'image/png'),
+        ('HTML باسم صورة', 'x.jpg', b'<html><script>alert(1)</script></html>', 'image/jpeg'),
+        ('ملف فارغ', 'x.png', b'', 'image/png'),
+    ]:
+        s, h, b = upload(c, URL, {'file': (name, data, ctype)}, t)
+        try:
+            j = json.loads(b)
+        except ValueError:
+            j = {}
+        check(s == 400 and 'error' in j and 'location' not in j, f'{label} ← 400: {j.get("error", b[:80])}')
+    s, h, b = upload(c, URL, {'file': ('big.png', PNG + b'\0' * (6 * 1024 * 1024), 'image/png')}, t)
+    check(s == 400 or s == 413, f'صورة أكبر من الحد (6 MB) ← مرفوضة ({s})')
+    s, h, b = upload(c, URL, {'file': ('../../index.php.png', PNG, 'image/png')}, t)
+    j = json.loads(b) if s == 200 else {}
+    loc = j.get('location', '')
+    check(s == 200 and re.fullmatch(r'/uploads/editor/\d{4}/\d{2}/[A-Za-z0-9_-]+_[0-9a-f]{8}\.png', loc or '') is not None,
+          f'صورة PNG حقيقية ← 200 ورابطها باسم عشوائي داخل uploads/editor/ (لا ../ ولا .php.): {loc}')
+    stored_files.append(loc)
+    _s, gh, gb = Client().req('GET', loc) if loc else (0, {}, '')
+    check(_s == 200 and gh.get('content-type', '').startswith('image/png'), f'الصورة المرفوعة تُعرض صورةً ({gh.get("content-type")})')
+    s, h, b = upload(c, URL, {'file': ('poly.gif', GIF_PHP, 'image/gif')}, t)
+    j = json.loads(b) if s == 200 else {}
+    stored_files.append(j.get('location', ''))
+    if s == 200:
+        _s, gh, gb = Client().req('GET', j['location'])
+        check('PWNED' not in gb and gh.get('content-type', '').startswith('image/gif'),
+              'صورة GIF فيها كود PHP: تُحفظ صورةً .gif ولا يُنفَّذ الكود أبداً (uploads/.htaccess + الامتداد)')
+    else:
+        check(s == 400, f'صورة GIF فيها كود PHP ← مرفوضة ({s})')
+    for loc in filter(None, stored_files):
+        path = os.path.join(SITE, loc.lstrip('/'))
+        if os.path.isfile(path):
+            os.remove(path)
 
 clear_ratelimit()
 print('\n' + ('✓ كل اختبارات الأمان نجحت' if not failures else f'✗ {failures} اختبار فشل'))

@@ -32,3 +32,30 @@
 .rich-text .text-right { text-align: right !important; }
 .rich-text .text-center { text-align: center !important; }
 .rich-text .text-justify { text-align: justify !important; }
+/* «كل الأدوات»: التنسيق من style (ألوان، خطوط، محاذاة، إزاحة) يعمل مباشرة. القالب العام يضع text-align: start على كل
+   عنصر (* {...})، فنجعل عناصر النص المنسّق ترث محاذاة الكتلة التي هي فيها، ولا يخرج شيء عن عرض الصفحة */
+.rich-text * { text-align: inherit; max-width: 100%; }
+.rich-text::after { content: ""; display: table; clear: both; } /* الصور العائمة لا تخرج من أسفل النص */
+.rich-text h1, .rich-text h5, .rich-text h6 { color: #2c3e50; font-weight: bold; line-height: 1.45; margin: 1.3em 0 .6em; }
+.rich-text h1 { font-size: 1.6em; }
+.rich-text h5 { font-size: 1em; }
+.rich-text h6 { font-size: .92em; }
+.rich-text img { height: auto; vertical-align: middle; }
+.rich-text figure.image { display: table; margin: 0 auto 1em; }
+.rich-text figure.image img { display: block; margin: 0 auto; }
+.rich-text figure.image figcaption { display: table-caption; caption-side: bottom; padding: .45em .2em 0; font-size: .9em; color: #666; text-align: center; }
+.rich-text figure.align-left { float: left; margin: .2em 1.2em 1em 0; }
+.rich-text figure.align-right { float: right; margin: .2em 0 1em 1.2em; }
+.rich-text figure.image.align-center { float: none; margin-left: auto; margin-right: auto; }
+.rich-text iframe { border: 0; }
+.rich-text video, .rich-text audio { display: inline-block; }
+.rich-text details { margin: 0 0 1em; padding: .55em .95em; border: 1px solid #dde3e8; border-radius: 4px; background: #fbfcfd; }
+.rich-text summary { cursor: pointer; font-weight: bold; color: #2c3e50; }
+.rich-text details[open] > summary { margin-bottom: .55em; }
+.rich-text pre { background: #f6f8fa; padding: .8em 1em; border-radius: 4px; overflow-x: auto; }
+.rich-text pre code { background: none; padding: 0; color: inherit; font-size: .92em; white-space: inherit; }
+.rich-text mark { background: #fff1a8; padding: 0 .15em; }
+.rich-text caption { caption-side: top; padding: .35em 0; color: #555; text-align: center; }
+/* اتجاه فقرة من المحرر (زرّا «يمين ليسار / يسار ليمين»): القالب العام يورّث اتجاه الصفحة لكل عنصر، فنُرجع لـ dir أولويته */
+.rich-text [dir="ltr"] { direction: ltr; }
+.rich-text [dir="rtl"] { direction: rtl; }

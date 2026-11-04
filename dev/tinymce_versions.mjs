@@ -22,7 +22,7 @@ const [ADMIN, PASS] = (args.admin || 'miloudsellam:AdminDemo2026').split(':');
 const CDN = path.join(ROOT, 'book', '.build', 'cdn');
 const ORIGIN = new URL(BASE).origin;
 const BASE_PATH = new URL(BASE).pathname.replace(/\/$/, ''); // '' أو '/dou-setif'
-const BUNDLED = path.join(SITE, 'assets', 'vendor', 'tinymce');
+const BUNDLED = path.join(SITE, 'assets', 'vendor', 'tinymce-8.10.1');
 const AWAY = SITE.replace(/\/$/, '') + '.vendor-away'; // خارج مجلد الموقع حتى لا يُعدّ نسخة أخرى
 
 /** حزمة tinymce@ver من npm (مجلد package/ فيه tinymce.min.js) */
@@ -37,9 +37,10 @@ function tinymce(ver) {
 
 // الحالات: [وصف، الإصدار (null = نسخة المشروع)، مكان النسخة داخل الموقع، المسار المتوقع في سطر «محرر النصوص»]
 const CASES = [
-  ['نسخة المشروع وحدها', null, null, 'assets/vendor/tinymce/tinymce.min.js'],
+  ['نسخة المشروع وحدها (كل الإضافات)', null, null, 'assets/vendor/tinymce-8.10.1/tinymce.min.js'],
+  ['7.9.3 — حالة المستخدم: مجلده مكان مجلد المشروع القديم assets/vendor/tinymce', '7.9.3', 'assets/vendor/tinymce', 'assets/vendor/tinymce/tinymce.min.js'],
   ['7.9.3 — مجلد التحميل الرسمي في مجلد الموقع', '7.9.3', 'tinymce/js/tinymce', 'tinymce/js/tinymce/tinymce.min.js'],
-  ['6.8.6 — منسوخ كما هو داخل assets/vendor/tinymce', '6.8.6', 'assets/vendor/tinymce/tinymce_6.8.6/tinymce/js/tinymce', 'assets/vendor/tinymce/tinymce_6.8.6/tinymce/js/tinymce/tinymce.min.js'],
+  ['6.8.6 — منسوخ كما هو داخل مجلد نسخة المشروع', '6.8.6', 'assets/vendor/tinymce-8.10.1/tinymce_6.8.6/tinymce/js/tinymce', 'assets/vendor/tinymce-8.10.1/tinymce_6.8.6/tinymce/js/tinymce/tinymce.min.js'],
   ['5.10.9 — Composer: vendor/tinymce/tinymce', '5.10.9', 'vendor/tinymce/tinymce', 'vendor/tinymce/tinymce/tinymce.min.js'],
   ['7.9.3 — اسم مجلد فيه مسافة', '7.9.3', 'tinymce 7/js/tinymce', 'tinymce 7/js/tinymce/tinymce.min.js'],
   ['4.9.11 — assets/js/tinymce', '4.9.11', 'assets/js/tinymce', 'assets/js/tinymce/tinymce.min.js'],
@@ -120,6 +121,10 @@ try {
     const info = await page.evaluate(() => ({
       version: window.tinymce ? `${tinymce.majorVersion}.${tinymce.minorVersion}` : null,
       editors: window.tinymce ? (tinymce.editors?.length ?? tinymce.get().length) : 0,
+      plugins: window.tinymce && (tinymce.get ? tinymce.get()[0] : tinymce.editors[0]) ? Object.keys((tinymce.get ? tinymce.get()[0] : tinymce.editors[0]).plugins).sort() : [],
+      buttons: document.querySelectorAll('.tox-tinymce .tox-toolbar__group button, .mce-tinymce .mce-toolbar .mce-btn').length,
+      menus: document.querySelectorAll('.tox-tinymce .tox-mbtn, .mce-tinymce .mce-menubar .mce-menubtn').length,
+      failed: [...document.querySelectorAll('.tox-notification--error, .mce-notification-error')].map((n) => n.textContent).join(' | '),
       line: document.querySelector('[data-editor-source]')?.textContent.replace(/\s+/g, ' ').trim() || '',
       bold: document.querySelector('.tox-tbtn[aria-label], .mce-btn[aria-label]') ? [...document.querySelectorAll('.tox-tbtn[aria-label], .mce-btn[aria-label]')].map((b) => b.getAttribute('aria-label')).slice(0, 12).join('|') : '',
       // الترجمة نفسها (TinyMCE 4 يضع في aria-label النص الإنجليزي ويترجم التلميح الظاهر فقط)
@@ -129,15 +134,22 @@ try {
     check(ready && n === 3, `${n} محررات جاهزة (عربي + FR + EN)`, JSON.stringify(info));
     check(info.version !== null && info.version.startsWith(want), `الإصدار المحمَّل في الصفحة ${info.version} = ${want}`);
     check(info.line.includes(`TinyMCE ${info.version}`) && info.line.includes(shown)
-      && info.line.includes(ver ? 'نسختك' : 'النسخة المرفقة بالمشروع'), `سطر «محرر النصوص»: ${info.line}`);
+      && info.line.includes(ver ? 'نسختك' : 'النسخة المرفقة بالمشروع') && /الأدوات: \d+ إضافة من \d+ في مجلدها/.test(info.line), `سطر «محرر النصوص»: ${info.line}`);
+    // كل الأدوات: كل إضافة معروفة في مجلد هذه النسخة مفعّلة، والشريط والقوائم كاملة، ولا «فشل تحميل إضافة»
+    const must = ['charmap', 'code', 'emoticons', 'fullscreen', 'image', 'link', 'lists', 'media', 'preview', 'searchreplace', 'table', 'visualblocks']
+      .concat(want.startsWith('4.') ? ['hr', 'textcolor', 'paste'] : want.startsWith('5.') ? ['hr', 'print', 'paste', 'codesample', 'directionality'] : ['codesample', 'directionality', 'accordion'].filter((p) => p !== 'accordion' || !want.startsWith('6.') || parseFloat(want.slice(2)) >= 8));
+    const missing = must.filter((p) => !info.plugins.includes(p));
+    check(!missing.length && info.buttons >= 35 && info.menus >= 7, `كل الأدوات: ${info.plugins.length} إضافة مفعّلة، ${info.buttons} زراً، ${info.menus} قوائم`, 'ناقص: ' + missing.join(' ') + ' | ' + info.plugins.join(' '));
+    check(!info.failed, 'لا «فشل تحميل إضافة»', info.failed);
     const core = requests.filter((u) => /\/tinymce(\.min)?\.js(\?|$)/.test(decodeURIComponent(u)));
     const dirUrl = path.posix.normalize(BASE_PATH + '/' + path.posix.dirname(shown)); // ../tinymce ← /tinymce من جذر الخادم
     const fromShown = (u) => decodeURIComponent(new URL(u).pathname).startsWith(dirUrl + '/');
     check(core.length === 1 && fromShown(core[0]), `tinymce.min.js من ${path.dirname(shown)}/ وحده`, core.join(' , '));
     const parts = requests.filter((u) => /\/(plugins|themes|models|icons|skins)\//.test(u));
     check(parts.length > 3 && parts.every(fromShown), `الإضافات والواجهة (${parts.length} ملفاً) من المجلد نفسه`, parts.filter((u) => !fromShown(u)).join(' , '));
-    const lang = requests.filter((u) => /\/langs\/ar[^/]*\.js/.test(u));
-    check(lang.length === 1, `ملف العربية: ${lang.map((u) => new URL(u).pathname).join(' ')}`);
+    const lang = requests.filter((u) => /\/(langs\/ar[^/]*|tinymce-lang\/ar-\d)\.js/.test(u));
+    const wantLang = ver ? `/tinymce-lang/ar-${Math.min(8, Math.max(4, parseInt(ver, 10)))}.js` : '/langs/ar.js';
+    check(lang.length === 1 && new URL(lang[0]).pathname.endsWith(wantLang), `ملف العربية مرة واحدة: ${lang.map((u) => new URL(u).pathname).join(' ')}`);
     check(/[\u0600-\u06FF]/.test(info.tr) && !/Bold|link/.test(info.tr), `ترجمة واجهة المحرر بالعربية (${info.tr})`, info.tr);
     if (!want.startsWith('4.')) check(/غامق|عريض/.test(info.bold), 'أزرار المحرر بالعربية', info.bold);
     // الكتابة في المحرر العربي تصل إلى textarea (زر الترجمة وحفظ النموذج يقرآنه)

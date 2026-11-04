@@ -12,3 +12,6 @@ config.local.php
 
 # قاعدة "downloads/" في .gitignore الرئيسي (قالب Python) كانت تستثني قوالب مركز التحميلات
 !app/views/downloads/
+
+# قاعدة "media/" في .gitignore الرئيسي (قالب Django) كانت تستثني إضافة الفيديو في محرر TinyMCE
+!assets/vendor/**/plugins/media/

@@ -100,6 +100,7 @@ $router->get('/admin/logout/', 'admin_logout', 'admin:logout');
 $router->any('/admin/password/', 'admin_password', 'admin:password');
 $router->any('/admin/recover/', 'admin_recover', 'admin:recover');            // نسيت كلمة مرور المدير؟
 $router->post('/admin/translate/', 'admin_translate', 'admin:translate');          // زر «ترجمة تلقائية» (AJAX)
+$router->post('/admin/editor/upload/', 'admin_editor_upload', 'admin:editor_upload'); // رفع صورة من محرر النصوص (AJAX)
 $router->any('/admin/translate-all/', 'admin_translate_all', 'admin:translate_all'); // ترجمة المحتوى القديم
 // طلبات الترشح للمسابقات (معطيات شخصية: للمدير العام وأصحاب صلاحية «مسابقات التوظيف» فقط)
 $router->any('/admin/recruitment/applications/', 'recruit_admin_applications', 'admin:recruit_applications');

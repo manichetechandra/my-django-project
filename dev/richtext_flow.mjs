@@ -145,10 +145,10 @@ let ar = await content('f_content');
 check(/<h2>صرف المنحة<\/h2>/.test(ar), 'عنوان h2 من قائمة «فقرة»: ' + ar.slice(0, 40));
 check(/<strong>صرف المنحة<\/strong>/.test(ar), 'غامق (Ctrl+B) ← <strong>');
 check(/<u>ابتداءً من الأحد<\/u>/.test(ar), 'تسطير (Ctrl+U) ← <u> (لا span style)');
-check(/<p class="text-center">يعلن/.test(ar), 'محاذاة للمنتصف ← class="text-center" (لا style)');
+check(/<p style="text-align: center;">يعلن/.test(ar), 'محاذاة للمنتصف ← style="text-align: center;" (كل الأدوات: المحاذاة الافتراضية في TinyMCE)');
 check(/<ul>\s*<li>الإقامة دباغين<\/li>\s*<li>الإقامة الباز<\/li>\s*<\/ul>/.test(ar), 'قائمة نقطية: ' + ((ar.match(/<ul>[\s\S]*?<\/ul>/) || [''])[0]).replace(/\s+/g, ' '));
 check(linkOk(ar, 'موقع الوزارة'), 'رابط من نافذة الرابط (www. ← https://): ' + ((ar.match(/<a [^>]+>[^<]*<\/a>/) || [''])[0]));
-check(!/style=|data-mce|<span/.test(ar), 'لا style ولا span في ناتج المحرر');
+check(!/data-mce|<span/.test(ar) && (ar.match(/style="/g) || []).length === 1, 'لا data-mce ولا span في ناتج المحرر، و style المحاذاة وحدها');
 check(await page.$eval('textarea[name=content]', (t) => t.value.replace(/\s+/g, ' ')) === ar.replace(/\s+/g, ' '), 'textarea الأصلي محدَّث مع المحرر');
 
 // 3) الترجمة التلقائية تملأ محرري FR و EN مع بقاء التنسيق
@@ -161,7 +161,7 @@ await page.waitForFunction(() => /✓|✗/.test(document.querySelector('[data-tr
 check((await page.$eval('[data-tr-status]', (e) => e.textContent)).includes('✓'), 'زر «ترجمة تلقائية»: ' + await page.$eval('[data-tr-status]', (e) => e.textContent));
 const fr = await content('f_content_fr');
 const en = await content('f_content_en');
-check(/<h2>Versement de la bourse<\/h2>/.test(fr) && /<ul>/.test(fr) && /<strong>/.test(fr) && /<u>/.test(fr) && /class="text-center"/.test(fr) && linkOk(fr),
+check(/<h2>Versement de la bourse<\/h2>/.test(fr) && /<ul>/.test(fr) && /<strong>/.test(fr) && /<u>/.test(fr) && /style="text-align: center;"/.test(fr) && linkOk(fr),
   'محرر FR: نفس الهيكل والتنسيق مترجماً: ' + fr.replace(/\s+/g, ' ').slice(0, 110));
 check(/<h2>Scholarship payment<\/h2>/.test(en) && /<ul>/.test(en) && linkOk(en), 'محرر EN: ' + en.replace(/\s+/g, ' ').slice(0, 70));
 check(await page.$eval('textarea[name=content_fr]', (t) => t.richEditor.element.classList.contains('admin-tr-new')), 'محرر الترجمة الجديدة ملوّن (admin-tr-new)');
@@ -192,8 +192,8 @@ for (const [lang, prefix, heading] of [['ar', '', 'صرف المنحة'], ['fr',
   const html = await page.$eval('.rich-text', (e) => e.innerHTML).catch(() => '');
   check(html.includes(`<h2>${heading}</h2>`) && /<strong>/.test(html) && /<u>/.test(html) && /<ul>/.test(html), `الصفحة العامة (${lang}): عنوان وغامق وتسطير وقائمة`);
   check(linkOk(html), `الصفحة العامة (${lang}): الرابط`);
-  check(!/data-|style=|<span/.test(html), `الصفحة العامة (${lang}): لا خصائص زائدة`);
-  const align = await page.$eval('.rich-text p.text-center', (p) => getComputedStyle(p).textAlign).catch(() => '');
+  check(!/data-|<span/.test(html) && (html.match(/style="/g) || []).length === 1, `الصفحة العامة (${lang}): لا خصائص زائدة`);
+  const align = await page.$eval('.rich-text p[style*="text-align: center"]', (p) => getComputedStyle(p).textAlign).catch(() => '');
   check(align === 'center', `المحاذاة للمنتصف تظهر في الصفحة (${lang}): ${align}`);
   check(await page.$eval('.rich-text ul', (u) => getComputedStyle(u).listStyleType).catch(() => '') === 'disc', `القائمة بنقاط (${lang})`);
   await page.evaluate(() => document.querySelector('.rich-text').scrollIntoView({ block: 'center' }));

@@ -81,7 +81,8 @@
                 <p class="admin-editor-source small text-muted" data-editor-source>
                     <i class="fa fa-pencil-square-o"></i> محرر النصوص: <bdi dir="ltr">TinyMCE <span data-tinymce-version></span></bdi>
                     — <?= $tinymce['bundled'] ? 'النسخة المرفقة بالمشروع' : 'نسختك' ?>: <code dir="ltr"><?= e($tinymce['path']) ?></code>
-                    <?php if ($tinymce['lang_url'] !== ''): ?>(ملف العربية من نسخة المشروع)<?php endif; ?>
+                    — الأدوات: <span data-tinymce-plugins><?= count($tinymce['plugins']) ?></span> إضافة من <?= count($tinymce['plugins']) ?> في مجلدها
+                    <?php if ($tinymce['lang'] === ''): ?>(الواجهة العربية من ملفات المشروع)<?php endif; ?>
                 </p>
             <?php endif; ?>
         </div>
@@ -178,9 +179,14 @@
 <?php endblock(); ?>
 
 <?php if ($has_rich && ($tinymce = admin_tinymce())): ?>
-<?php /* محرر النصوص المنسّقة: TinyMCE — نسخة المستخدم أينما وضعها في مجلد الموقع، وإلا assets/vendor/tinymce (admin_tinymce؛ محلي بلا CDN) */ ?>
+<?php /* محرر النصوص المنسّقة: TinyMCE — نسخة المستخدم أينما وضعها في مجلد الموقع، وإلا نسخة المشروع (admin_tinymce؛ محلي بلا CDN).
+         كل إضافات مجلدها تُفعَّل (admin-richtext.js)، وقائمة الوسوم والخصائص من RichText::editorSchema() — نفس ما يحفظه الخادم */ ?>
+<?php $rich_schema = RichText::editorSchema(); ?>
 <?php block('extra_js'); ?>
 <script src="<?= e($tinymce['url']) ?>"></script>
-<script src="<?= asset('js/admin-richtext.js') ?>" data-base="<?= e($tinymce['base']) ?>" data-suffix="<?= e($tinymce['suffix']) ?>" data-lang="<?= e($tinymce['lang']) ?>" data-lang-url="<?= e($tinymce['lang_url']) ?>"></script>
+<script src="<?= asset('js/admin-richtext.js') ?>" data-base="<?= e($tinymce['base']) ?>" data-suffix="<?= e($tinymce['suffix']) ?>"
+        data-lang="<?= e($tinymce['lang']) ?>" data-lang-base="<?= e(base_url() . '/assets/js/tinymce-lang/') ?>"
+        data-plugins="<?= e(implode(' ', $tinymce['plugins'])) ?>" data-upload-url="<?= e(url('admin:editor_upload')) ?>"
+        data-valid-elements="<?= e($rich_schema['elements']) ?>" data-valid-styles="<?= e($rich_schema['styles']) ?>"></script>
 <?php endblock(); ?>
 <?php endif; ?>
