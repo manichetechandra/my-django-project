@@ -119,6 +119,20 @@
   و textarea المحتوى data-richtext مع RichText::forEditor()، كما وعد الفصل 39. لقطات 39-news-list/form/errors (بعرض 1280)
   بدل 36-news-* (حُذفت). reader-sim 39-41 يُبقي delete.php. اختبار /tmp/t39.py (القائمة، الأخطاء، الصورة، التعديل، الحذف، 403).
   الفصل 37: الأسطر 50-51 من admin.css (المعاينة) صارت «للفصل 39».
+- **الفصل 40 (مكتوب، العنوان «الترجمة الآلية إلى الفرنسية والإنجليزية»):** config.php 79-97 (insert)، Translator.php كاملاً بترتيبه
+  (1-50، 51-86، 87-194 الجماعية، 195-269 Gemini، 270-349 MyMemory، 350-410 test+http)، ملف مؤقت tr_test.php، translate_content.php،
+  ثم في admin.php (مرحلة adminnews): resources-temp 40.2 (admin_resources() مؤقتة: قسم news بحقوله المترجمة فقط، content من النوع
+  textarea — **الفصل 41 يغيّره إلى richtext** مع المحرر)، translation 40.2 (النهائي 1037-1117 = أسطر المرحلة 418-498)، translate-ajax 40.2
+  (1162-1184 = 499-521)، translate-all 40.3 (1201-1231 = 522-552)، news-form-tr (يستبدل news-form: جمع الترجمات null للفارغ + سطر
+  admin_auto_translate)، القوالب: news-form-view-tr (شريط الترجمة + include لكل حقل)، القالب الجزئي المؤقت _news_tr.php،
+  news-list-view-tr (الشارات)، index-view-tr (زر «ترجمة المحتوى» للمدير العام)، ثم admin.css 84-100 و admin.js 83-150 (insert)
+  و translate_all.php النهائي. **الفصل 42 يجب أن**: يستبدل resources-temp بـ admin_resources النهائية (8-15) ويحذف news_list.php
+  و news_form.php و _news_tr.php، ويعرض admin_auto_translate_inline (1118-1160)؛ و admin_editor_upload (1185-1200) في الفصل 41.
+  اللقطات 40-news-translate / 40-news-badges / 40-translate-all: خادم dev/mock_translate.py مع MOCK_WORDS من
+  book/tools/mock-words.php (ترجمات الموقع التجريبي الحقيقية)، ومتغيرات TRANSLATE_PROVIDER=gemini GEMINI_API_KEY=dev-key
+  GEMINI_ENDPOINT=http://127.0.0.1:8999/v1beta MYMEMORY_ENDPOINT=http://127.0.0.1:8999/get لأمر shots، وخبر مؤقت بلا ترجمة
+  (slug = book-untranslated) يُضاف إلى dou_setif2 قبل اللقطتين الأخيرتين ويُحذف بعدهما. reader-sim يُبقي translate_all.php من 40.
+  اختبار /tmp/t40.py (يحتاج الخادم الوهمي وخادم المحاكاة بمتغيرات الترجمة). build.mjs لم يتغير.
 
 ## قائمة العمل
 - [x] الأدوات على النسخة 2 + نقل الإشارات (remap_v2.py)

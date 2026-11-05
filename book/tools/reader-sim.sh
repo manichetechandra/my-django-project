@@ -56,10 +56,11 @@ if [ "$N" -ge 36 ] && [ "$N" -lt 38 ]; then
   find app/views/admin -mindepth 1 -maxdepth 1 ! -name login.php -exec rm -rf {} +
 fi
 # الفصول 38-41: admin.php والقوالب المؤقتة من stages/adminnews.src (الحارس، القائمة والرئيسية المؤقتتان، كلمة المرور،
-# الاستعادة، ثم الأخبار في الفصل 39). القوالب النهائية: الدخول (36)، والقالب وكلمة المرور والاستعادة (38)، وتأكيد الحذف (39)
+# الاستعادة، ثم الأخبار في الفصل 39). القوالب النهائية: الدخول (36)، والقالب وكلمة المرور والاستعادة (38)، وتأكيد الحذف (39)، وترجمة المحتوى (40)
 if [ "$N" -ge 38 ] && [ "$N" -lt 42 ]; then
   keep="! -name login.php ! -name layout.php ! -name password.php ! -name recover.php"
   [ "$N" -ge 39 ] && keep="$keep ! -name delete.php"
+  [ "$N" -ge 40 ] && keep="$keep ! -name translate_all.php"
   find app/views/admin -mindepth 1 -maxdepth 1 $keep -exec rm -rf {} +
   node "$BOOK/tools/stages.mjs" adminnews "$N.99" "$SIM" > /dev/null
 fi

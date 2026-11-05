@@ -123,6 +123,19 @@ const stageShots = [
       await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('.admin-submit-row [type=submit]')]);
     },
   },
+  // الفصل 40: خادم الترجمة الوهمي يعمل (MOCK_WORDS=... python3 dev/mock_translate.py 8999) ومتغيرات الترجمة في البيئة:
+  //   TRANSLATE_PROVIDER=gemini GEMINI_API_KEY=dev-key GEMINI_ENDPOINT=http://127.0.0.1:8999/v1beta MYMEMORY_ENDPOINT=http://127.0.0.1:8999/get
+  // و40-news-badges / 40-translate-all تحتاجان خبراً بلا ترجمة (slug = book-untranslated، يُحذف بعد اللقطات)
+  {
+    name: '40-news-translate', overlay: ['adminnews', 40.3], url: '/admin/news/1/', login: STAFF, w: 1280, h: 1020,
+    act: async (page) => {
+      await page.$$eval('[data-tr-of]', (els) => els.forEach((el) => { el.value = ''; }));
+      await page.click('[data-auto-translate]');
+      await page.waitForFunction(() => /✓|✗/.test(document.querySelector('[data-tr-status]').textContent), { timeout: 20000 });
+    },
+  },
+  { name: '40-news-badges', overlay: ['adminnews', 40.3], url: '/admin/news/', login: STAFF, w: 1280, h: 330 },
+  { name: '40-translate-all', overlay: ['adminnews', 40.3], url: '/admin/translate-all/', login: STAFF, w: 1280, h: 520 },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];

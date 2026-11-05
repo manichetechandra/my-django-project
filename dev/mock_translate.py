@@ -17,6 +17,7 @@
 الترجمة نفسها وهمية: قاموس صغير، وإلا يوضع [FR] أو [EN] قبل النص العربي.
 """
 import json
+import os
 import re
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -29,6 +30,13 @@ WORDS = {
            'الإقامة': 'the residence', 'سطيف': 'Sétif', 'خبر': 'news', 'تجريبي': 'test'},
 }
 LOG = []
+
+# قاموس إضافي اختياري (للقطات الكتاب): MOCK_WORDS=ملف.json بالشكل {"fr": {"النص العربي": "Texte"}, "en": {...}}
+# النصوص الكاملة تُستبدل أولاً (الأطول قبل الأقصر)، فتظهر في اللقطة ترجمة حقيقية بدل [FR]
+if os.environ.get('MOCK_WORDS'):
+    with open(os.environ['MOCK_WORDS'], encoding='utf-8') as fh:
+        for _lang, _words in json.load(fh).items():
+            WORDS.setdefault(_lang, {}).update(_words)
 
 
 def fake(text, lang):
