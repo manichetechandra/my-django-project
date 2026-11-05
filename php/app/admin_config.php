@@ -514,7 +514,7 @@ return [
             'opens_at' => ['type' => 'date', 'label' => 'بداية إيداع الملفات', 'default' => 'now'],
             'closes_at' => ['type' => 'date', 'label' => 'آخر أجل لإيداع الملفات', 'help' => 'يبقى الترشح مفتوحاً حتى الساعة 23:59 من هذا اليوم (توقيت الجزائر)'],
             'exam_date' => ['type' => 'date', 'label' => 'تاريخ الاختبار أو المقابلة (اختياري)', 'required' => false, 'nullable' => true],
-            'online_apply' => $bool('قبول الترشح الإلكتروني (استمارة + رفع الوثائق PDF)'),
+            'online_apply' => $bool('الترشح الإلكتروني') + ['help' => 'استمارة على الموقع ورفع الوثائق PDF. ألغِ التحديد إن كان الترشح بإيداع الملف الورقي وحده'],
             'status' => ['type' => 'select', 'label' => 'الحالة', 'default' => 'published'],
             'views_count' => ['type' => 'readonly', 'label' => 'عدد المشاهدات'],
             'results_published_at' => ['type' => 'readonly', 'label' => 'نشر النتائج الفردية', 'help' => 'يُنشر ويُلغى من صفحة «نتائج المسابقة» في لوحة الإدارة'],

@@ -179,6 +179,28 @@ const stageShots = [
   { name: '42-edit', overlay: ['admin42', 42], url: '/admin/sliders/1/', login: STAFF, w: 1280, h: 860 },
   { name: '42-app-edit', overlay: ['admin42', 42], url: '/admin/student_applications/{id:202600007}/', login: STAFF, w: 1280, h: 1400 },
   { name: '42-applications', overlay: ['admin42', 42], url: '/admin/student_applications/', login: STAFF, w: 1280, h: 720 },
+  // الفصل 44: قسم المسابقات (admin_config.php 477-566) في المحرك العام، قبل صفحات دراسة الملفات (الفصل 48)
+  {
+    name: '44-list', overlay: ['admin42', 44], url: '/admin/competitions/', login: STAFF, w: 1600, h: 900,
+    clip: () => {
+      const r = document.querySelector('#admin-list-form').getBoundingClientRect();
+      return { x: r.left + scrollX - 8, y: r.top + scrollY - 8, width: r.width + 16, height: r.height + 16 };
+    },
+  },
+  {
+    name: '44-posts', overlay: ['admin42', 44], url: '/admin/competitions/1/', login: STAFF, w: 1280, h: 1200, act: richReady,
+    clip: () => {
+      const r = document.querySelector('#inline-0').getBoundingClientRect();
+      return { x: r.left + scrollX - 10, y: r.top + scrollY - 10, width: r.width + 20, height: r.height + 20 };
+    },
+  },
+  {
+    name: '44-exams', overlay: ['admin42', 44], url: '/admin/competitions/1/', login: STAFF, w: 1280, h: 1200, act: richReady,
+    clip: () => {
+      const a = document.querySelector('#inline-exams').getBoundingClientRect(), b = document.querySelector('#inline-3').getBoundingClientRect();
+      return { x: a.left + scrollX - 10, y: a.top + scrollY - 10, width: a.width + 20, height: b.bottom - a.top + 20 };
+    },
+  },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
