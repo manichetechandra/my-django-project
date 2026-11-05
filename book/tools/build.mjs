@@ -476,10 +476,10 @@ function coverHtml() {
   <div class="logo"><img src="${logo}"></div>
   <div class="kicker">دليل عملي خطوة بخطوة للمبتدئين</div>
   <div class="title">بناء موقع مديرية الخدمات الجامعية لولاية سطيف من الصفر</div>
-  <div class="subtitle">الواجهة العامة، فضاء الطالب، لوحة الموظفين ولوحة الإدارة<br>مع قاعدة البيانات، سطراً بسطر</div>
+  <div class="subtitle">الواجهة العامة بثلاث لغات، فضاء الطالب، لوحة الموظفين، لوحة الإدارة<br>ومسابقات التوظيف، مع قاعدة البيانات، سطراً بسطر</div>
   <div class="tags"><span>PHP 8</span><span>MySQL</span><span>HTML &amp; CSS</span><span>Bootstrap 3</span><span>JavaScript</span></div>
   <div class="for">لا يحتاج أي خبرة سابقة: <b>كل ما تحتاجه موجود في هذا الكتاب</b></div>
-  <div class="edition">الطبعة الأولى — 2026</div>
+  <div class="edition">الطبعة الثالثة — 2026</div>
   <div class="band bottom"></div>
 </div>`;
 }
