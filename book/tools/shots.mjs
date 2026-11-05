@@ -304,6 +304,54 @@ const shots = SET === 'stages' ? stageShots : [
       return { x: r.left + scrollX - 12, y: r.top + scrollY - 12, width: r.width + 24, height: r.height + 24 };
     },
   },
+  // الفصل 47: فضاء المترشح بالمترشحين التجريبيين (أمينة: ملف ناقص، كريم: مستدعى، نجاح: نتيجة منشورة)
+  {
+    name: '47-track', url: '/competitions/track/', w: 1280, h: 900,
+    act: (page) => trackLogout(page),
+    css: '.cmp-page > .alert { display: none; }',
+    clip: () => {
+      const a = document.querySelector('.cmp-title').getBoundingClientRect(), b = document.querySelector('.cmp-track-form').getBoundingClientRect();
+      return { x: a.left + scrollX - 12, y: a.top + scrollY - 12, width: a.width + 24, height: b.bottom - a.top + 30 };
+    },
+  },
+  {
+    name: '47-incomplete', url: '/competitions/track/', w: 1280, h: 1400,
+    act: (page) => trackLogin(page, 'C26-AHM8D3R5', 'DEMO2-AMINA'),
+    clip: () => {
+      const a = document.querySelector('.cmp-status').getBoundingClientRect(), b = document.querySelector('#complete').getBoundingClientRect();
+      const row = document.querySelector('.cmp-page .row').getBoundingClientRect();
+      return { x: row.left + scrollX - 4, y: a.top + scrollY - 12, width: row.width + 8, height: b.bottom - a.top + 24 };
+    },
+  },
+  {
+    name: '47-convocation', url: '/competitions/track/', w: 1280, h: 1400,
+    act: (page) => trackLogin(page, 'C26-KMZ4N7Q2', 'DEMO2-KARIM'),
+    clip: () => {
+      const a = document.querySelector('.cmp-status').getBoundingClientRect(), b = document.querySelector('#convocation').getBoundingClientRect();
+      const row = document.querySelector('.cmp-page .row').getBoundingClientRect();
+      return { x: row.left + scrollX - 4, y: a.top + scrollY - 12, width: row.width + 8, height: b.bottom - a.top + 24 };
+    },
+  },
+  {
+    name: '47-result', url: '/competitions/track/', w: 1280, h: 1400,
+    act: (page) => trackLogin(page, 'C26-RSN7T9P3', 'DEMO2-NAJAH'),
+    clip: () => {
+      const a = document.querySelector('.cmp-status').getBoundingClientRect(), b = document.querySelector('#result').getBoundingClientRect();
+      const col = a; // العمود الرئيسي فقط: الصندوق الجانبي ظهر في اللقطة السابقة
+      return { x: col.left + scrollX - 12, y: a.top + scrollY - 12, width: col.width + 24, height: b.bottom - a.top + 24 };
+    },
+  },
+  {
+    name: '47-print-convocation', url: '/competitions/track/', w: 1000, h: 1300,
+    act: async (page) => {
+      await trackLogin(page, 'C26-KMZ4N7Q2', 'DEMO2-KARIM');
+      await page.goto(BASE + '/competitions/track/convocation/', { waitUntil: 'networkidle0' });
+    },
+    clip: () => {
+      const r = document.querySelector('.doc-sheet').getBoundingClientRect();
+      return { x: r.left + scrollX - 10, y: r.top + scrollY - 10, width: r.width + 20, height: r.height + 20 };
+    },
+  },
   {
     name: '45-home', url: '/', w: 1280, h: 900,
     clip: () => {
@@ -324,6 +372,20 @@ function shotFiles() {
   fs.writeFileSync(files.big, pdf('x'.repeat(3600000)));
   fs.writeFileSync(files.txt, 'notes');
   return files;
+}
+
+// فضاء المترشح (الفصل 47): رقم المتابعة والرمز السري، ثم صفحة الطلب
+async function trackLogout(page) {
+  // طلب مفتوح من لقطة سابقة في السياق نفسه: «إغلاق صفحة طلبي» أولاً
+  if (await page.$('button[name=logout]')) {
+    await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('button[name=logout]')]);
+  }
+}
+async function trackLogin(page, code, secret) {
+  await trackLogout(page);
+  await page.type('#tracking_code', code);
+  await page.type('#secret', secret);
+  await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('.cmp-track-form [type=submit]')]);
 }
 
 async function login(page, cred) {
