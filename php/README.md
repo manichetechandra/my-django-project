@@ -188,7 +188,8 @@ C:\xampp\php\php.exe database\tools\translate_content.php --limit=50    (50 سج
    ثم بنفس الطريقة `database/migrations/2026_11_recruitment.sql` (جداول قسم المسابقات)
    ثم `database/migrations/2026_11_recruitment_2_convocations.sql` (الاستدعاءات والنتائج وإكمال الملفات).
 3. ارفع ملفات النسخة الجديدة فوق القديمة **ما عدا** `config.php` و `uploads/` و `storage/`.
-   ثم انسخ من `config.php` الجديد الأقسام `'i18n'` و `'translation'` و `'security'` و `'recruitment'` والسطر `'trusted_proxies'` إلى ملفك.
+   ثم انسخ من `config.php` الجديد الأقسام `'i18n'` و `'translation'` و `'security'` و `'editor'` و `'recruitment'` والسطر `'trusted_proxies'` إلى ملفك
+   (قسم `'editor'` اختياري: بدونه يبحث الموقع عن نسخة TinyMCE في أماكنها المعتادة).
 4. ضع مفتاح Gemini، ثم ترجم المحتوى الموجود (القسم السابق).
 
 ---
