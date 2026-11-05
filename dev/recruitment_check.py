@@ -783,6 +783,8 @@ check(int(q("SELECT COUNT(*) n FROM recruitment_audit WHERE action = 'purge' AND
 
 # ----------------------------------------------------------------------------------------------
 php(f"DB::delete('competitions', 'id IN (' . DB::in([{CID}, {T['draft_id']}, {T['other_id']}]) . ')', [{CID}, {T['draft_id']}, {T['other_id']}]);")
+# سطور سجل الاطلاع للمسابقات المؤقتة (السجل بلا مفاتيح أجنبية: لا يُحذف مع المسابقة) — حتى لا تظهر في لقطات الفصل 48
+x(f"DELETE FROM recruitment_audit WHERE competition_id IN ({CID}, {T['draft_id']}, {T['other_id']})")
 x(f"UPDATE users SET can_recruit = {int(old_perm)} WHERE username = 'hicham41'")
 clear_ratelimit()
 print(f'\n{"✓ كل اختبارات المسابقات نجحت" if failures == 0 else f"✗ {failures} اختبار فشل"}')

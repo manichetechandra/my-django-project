@@ -391,11 +391,11 @@ const shots = SET === 'stages' ? stageShots : [
     },
   },
   {
-    // ملف كريم (مستدعى): صندوقا «الاستدعاء والنتيجة» و«سجل الطلب» في العمود الجانبي
+    // ملف كريم (مستدعى): صندوق «الاستدعاء والنتيجة» في العمود الجانبي
     name: '48-outcome', url: '/admin/recruitment/applications/2/', login: STAFF, w: 1280, h: 1900,
     clip: () => {
-      const o = document.querySelector('.recruit-outcome').getBoundingClientRect(), h = document.querySelector('.recruit-history').closest('.panel').getBoundingClientRect();
-      return { x: o.left + scrollX - 12, y: o.top + scrollY - 12, width: o.width + 24, height: h.bottom - o.top + 24 };
+      const o = document.querySelector('.recruit-outcome').getBoundingClientRect();
+      return { x: o.left + scrollX - 12, y: o.top + scrollY - 12, width: o.width + 24, height: o.height + 24 };
     },
   },
   {
