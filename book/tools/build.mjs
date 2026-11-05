@@ -212,6 +212,13 @@ function contextLines(code, lang) {
   return hlCache.get(key);
 }
 
+// عنوان الكتلة «المسار (وصف)»: الوصف العربي يُعزل باتجاه عربي، فيُقرأ بالترتيب الصحيح حتى لو فيه كلمة لاتينية
+function headLabel(head) {
+  const m = /^(\S+) (\(.*\))$/.exec(head);
+  if (!m || !/[\u0600-\u06FF]/.test(m[2])) return esc(head);
+  return `${esc(m[1])} <span dir="rtl">${wrapLatinRuns(esc(m[2]))}</span>`;
+}
+
 function codeBlock({ code, lang, start = 1, head = '', badge = '', badgeClass = 'ex', range = '', foot = '', kind = '', nums = null, gaps = null, htmlLines = null }) {
   const plain = !lang || lang === 'plaintext' || !hljs.getLanguage(lang);
   const lines = (htmlLines || splitLines(highlight(code, lang))).map((l) => fixBidi(l, plain));
@@ -219,7 +226,7 @@ function codeBlock({ code, lang, start = 1, head = '', badge = '', badgeClass = 
   const rows = lines.map((l, i) => (gaps && gaps[i] ? `<div class="l gap"><span class="n">⋮</span><span class="c">${esc(gaps[i])}</span></div>` : '')
     + `<div class="l"><span class="n">${nums ? nums[i] : start + i}</span><span class="c">${l === '' ? ' ' : l}</span></div>`).join('');
   const headHtml = (head || badge || range)
-    ? `<div class="code-head">${badge ? `<span class="badge ${badgeClass}">${badge}</span>` : ''}<span class="path">${esc(head)}</span>${range ? `<span class="range">${range}</span>` : ''}</div>`
+    ? `<div class="code-head">${badge ? `<span class="badge ${badgeClass}">${badge}</span>` : ''}<span class="path">${headLabel(head)}</span>${range ? `<span class="range">${range}</span>` : ''}</div>`
     : '';
   return `<div class="code ${kind}">${headHtml}<div class="code-body">${rows}</div>${foot ? `<div class="code-foot">${foot}</div>` : ''}</div>`;
 }
