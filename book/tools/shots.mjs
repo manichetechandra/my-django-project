@@ -249,6 +249,21 @@ const shots = SET === 'stages' ? stageShots : [
     },
   },
   { name: '34-detail', url: '/students/admin/applications/{id:202600009}/', login: STAFF, h: 1250 },
+  // الفصل 45: صفحات الإعلانات (الموقع التجريبي: 5 مسابقات، المسابقة 1 مفتوحة حتى 17/11/2026)
+  { name: '45-list', url: '/competitions/', w: 1280, h: 860 },
+  { name: '45-list-fr', url: '/fr/competitions/', w: 1280, h: 650 },
+  {
+    // صفحة المسابقة على صورتين: الرأس والنص والرتب مع الشريط الجانبي، ثم الشروط والوثائق والملفات
+    name: '45-detail', url: '/competitions/msbk-aal-ass-lshhd-ltothyf-mtsrfyn-dryyn-omlhkyn-dryyn/', w: 1280, untilFooter: true, wait: 1500,
+    regions: [['45-detail', '.breadcrumb', 'h3:has(.fa-check-square-o)'], ['45-detail-docs', 'h3:has(.fa-check-square-o)', 'footer']],
+  },
+  {
+    name: '45-home', url: '/', w: 1280, h: 900,
+    clip: () => {
+      const r = document.querySelector('.cmp-home').getBoundingClientRect();
+      return { x: r.left + scrollX - 12, y: r.top + scrollY - 12, width: r.width + 24, height: r.height + 24 };
+    },
+  },
 ];
 
 async function login(page, cred) {
@@ -409,7 +424,7 @@ for (const s of shots) {
   if (s.untilFooter) {
     // الصفحة كاملة حتى بداية التذييل
     const bottom = await page.$eval('footer', (el) => Math.ceil(el.getBoundingClientRect().top + window.scrollY));
-    await page.setViewport({ width: W, height: bottom, deviceScaleFactor: 1 });
+    await page.setViewport({ width: s.w || W, height: bottom, deviceScaleFactor: 1 });
     await new Promise((r) => setTimeout(r, s.wait || 400));
     await page.evaluate(() => window.scrollTo(0, 0));
     const full = s.regions ? path.join(BOOK, '.build', `${s.name}-full.png`) : file;
