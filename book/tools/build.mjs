@@ -7,6 +7,7 @@
 //  node tools/build.mjs --only=03,04   بناء فصول محددة فقط (للمراجعة)
 //  node tools/build.mjs --png=1,5-7    حفظ صفحات كصور في .build/png للمراجعة
 //  node tools/build.mjs --coverage     تقرير تغطية ملفات المشروع فقط (.build/coverage.txt)
+//  node tools/build.mjs --html         HTML فقط (.build/final.html) بلا PDF، ثم node tools/htmlcheck.mjs
 //  node tools/build.mjs --tagged       إبقاء وسوم إمكانية الوصول (Tagged PDF) في الملف النهائي (حجم أكبر بكثير)
 //
 //  تعليمات خاصة داخل ملفات الفصول:
@@ -624,6 +625,11 @@ const cov = coverageReport();
 console.log(`الفصول: ${chapters.length} | العناوين: ${headings.length} | كتل كود من المشروع: ${[...coverage.values()].reduce((a, b) => a + b.length, 0)}`);
 console.log(`تغطية ملفات المشروع: ${cov.full}/${cov.total} ملف مكتمل (التفاصيل في .build/coverage.txt)`);
 if (argv.includes('--coverage')) process.exit(0); // تقرير التغطية فقط، بلا PDF
+if (argv.includes('--html')) { // HTML فقط، بلا PDF (للفحص السريع: node tools/htmlcheck.mjs)
+  fs.writeFileSync(path.join(OUT, 'final.html'), pageHtml(null));
+  console.log(`HTML: ${path.join(OUT, 'final.html')}`);
+  process.exit(0);
+}
 
 const browser = await launch();
 try {

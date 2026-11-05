@@ -249,7 +249,7 @@ WHERE is_active = 1 AND activity_type = ? AND (title LIKE ? OR description LIKE 
 1. افتح `http://localhost/dou-setif/news/`: بطاقات الأخبار. اضغط خبراً: صفحة تفاصيله، وعدد مشاهداته يزيد مع كل تحديث.
 2. افتح `http://localhost/dou-setif/news/xyz/`: صفحة 404 لأن هذا الـ slug غير موجود.
 3. افتح `http://localhost/dou-setif/activities/` وجرّب أزرار الأنواع، ثم ابحث عن كلمة، ولاحظ الرابط في شريط العنوان: `?type=...` و`?q=...`.
-4. بدّل اللغة إلى الفرنسية وأنت في صفحة النشاطات مع تصفية: يبقى `?type=...` في الرابط، والأزرار («Tout»، «Sportive»...) وأرقام الصفحات («Suivant») بالفرنسية.
+4. بدّل اللغة إلى الفرنسية وأنت في صفحة النشاطات مع تصفية: يبقى `?type=...` في الرابط، والأزرار («<bdi>Tout</bdi>»، «<bdi>Sportive</bdi>»...) وأرقام الصفحات («Suivant») بالفرنسية.
 
 @shot images/27-activities.png | قائمة النشاطات مع البحث وأزرار التصفية
 
