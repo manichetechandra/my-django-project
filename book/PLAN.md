@@ -43,6 +43,22 @@
 ملفَّي اللغة في php/ حسب الفصل الذي يظهر فيه كل نص أول مرة (أداة آلية: موضع النص في الكود ← الفصل من خريطة التغطية)،
 ثم يُعاد بناء dou-setif-php-v2.zip واختبار i18n_keys (الترتيب وحده يتغيّر، لا المفاتيح).
 
+## قرارات أثناء الكتابة (الإصدار الثالث)
+- **دخول الموظفين في الفصل 36** (لا 38): require_staff ترسل إلى admin:login، والموظف لا يدخل من فضاء الطالب،
+  فلا تُختبر لوحة الموظفين بدونه. الفصل 36 يبدأ بـ admin_login و admin_logout (admin.php 130-187)
+  و views/admin/login.php وقسم تصميم الدخول من admin.css. الفصل 38 يبقى للحماية (admin_guard)
+  وتغيير كلمة المرور والاستعادة (recover) والأدوات. جدول الروابط كاملاً في الفصل 20 (admin:index معرّف مبكراً).
+- **helpers.php**: الفصل 17 يعرض كل شيء ما عدا: محاولات الدخول 583-632 ← الفصل 31 مع RateLimit (too_many_attempts_message يستعملها نموذج الاتصال؛ login_throttle_* تُستعمل في 33 و36)،
+  و rich_text/plain_text 824-835 ← الفصل 25 (تحتاج RichText). time_left و can_recruit بقيتا في 17 مع إشارة.
+- **config.php**: 43-46 (trusted_proxies) و 55-72 (security) ← الفصل 17.
+- **schema.sql السطر 64 (can_recruit) في الفصل 14** مع جدول users (لا 43): admin_config قسم المستخدمين (الفصل 42) يحفظ العمود.
+- **ملفات اللغة**: أقسامها مرتبة حسب الفصول (tools/lang_regroup.py)، وكل فصل يعرض قسمه بالتوجيه `@lang fr` و `@lang en`
+  (المدى من tools/lang-sections.json). المسابقات (navbar 79-84، homepage index.php 5 و 315-...، PdfGuard، recruitment.php،
+  competitions.php و views/competitions) ← 44/45/46 بقواعد تجاوز في الأداة حتى تُكتب تلك الفصول.
+- **اختبار hello.php في 17 بلا تواريخ** (format_date/timesince تحتاج lang()) ← تُجرَّب في 18.
+- build.mjs: سطر الفجوة يقول «نضيفها في فصل لاحق»؛ إن كانت الأسطر كُتبت في فصل **سابق** (مثل admin.css 84-190
+  في 36 ثم الباقي في 37) يجب أن يقول «كتبناها في الفصل N» ← يُعدَّل build.mjs عند الحاجة.
+
 ## قائمة العمل
 - [x] الأدوات على النسخة 2 + نقل الإشارات (remap_v2.py)
 - [ ] 135 إشارة نصية (checkrefs) — الأرقام في النص

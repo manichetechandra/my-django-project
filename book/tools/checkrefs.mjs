@@ -46,6 +46,11 @@ for (const file of files) {
       ctx = { label: `${m[1]} ${s}-${e}`, lines: all, s, e };
       return;
     }
+    if ((m = line.match(/^@lang\s+(\S+)/))) {
+      const all = finalLines(`app/lang/${m[1]}.php`);
+      ctx = { label: `app/lang/${m[1]}.php`, lines: all, s: 1, e: all.length };
+      return;
+    }
     if ((m = line.match(/^@stage\s+(\S+)\s+(\S+)(?:\s+(\S+))?(?:\s+(\S+))?/))) {
       try {
         const b = m[2] === '*' ? stageFile(m[1], m[3], m[4]) : stageBlock(m[1], m[2], m[3] === '-' ? '' : m[3]);

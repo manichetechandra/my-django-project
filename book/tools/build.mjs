@@ -19,6 +19,7 @@
 //    @stage home stats-php - 16-20   جزء من كتلة (أسطرها 16–20 داخلها)؛ «-» = خطوة الكتلة نفسها
 //    @moved app/views/base/base.php 22-218 | نص   أسطر نهائية سبق كتابتها في ملف مؤقت: «انقلها كما هي»
 //    @shot images/home.png [40%] | تعليق   صورة مع تعليق (وعرض اختياري بالنسبة المئوية)
+//    @lang fr                        قسم هذا الفصل من app/lang/fr.php (tools/lang-sections.json)
 //    @pagebreak                      صفحة جديدة
 //    ::: tip|warning|note|info|try|why|summary [عنوان] ... :::   صناديق ملوّنة
 // =====================================================================
@@ -356,10 +357,23 @@ for (const [name, label] of Object.entries(BOXES)) {
   });
 }
 
+// @lang fr — قسم هذا الفصل من ملف اللغة app/lang/fr.php (المدى من tools/lang-sections.json الذي تكتبه
+// tools/lang_regroup.py). أول فصل يكتب رأس الملف وسطر الإغلاق، والبقية تُدرج أقسامها قبل «];»
+let LANG_SECTIONS = null;
+function langSpec(code, chapter) {
+  LANG_SECTIONS ??= JSON.parse(fs.readFileSync(path.join(BOOK, 'tools', 'lang-sections.json'), 'utf8'));
+  const n = String(parseInt(chapter, 10));
+  const range = LANG_SECTIONS[n]?.[code];
+  if (!range) throw new Error(`@lang ${code}: لا قسم للفصل ${n} في tools/lang-sections.json (${chapter})`);
+  const first = Math.min(...Object.keys(LANG_SECTIONS).map(Number));
+  return `app/lang/${code}.php ${range}${Number(n) === first ? '' : ' insert'}`;
+}
+
 function renderChapter(file) {
   const raw = fs.readFileSync(path.join(BOOK, 'chapters', file), 'utf8').replace(/\r\n/g, '\n');
   const blocks = [];
-  let text = raw.replace(/^@(file|stage|moved)\s+(.+)$/gm, (_, kind, spec) => {
+  let text = raw.replace(/^@(file|stage|moved|lang)\s+(.+)$/gm, (_, kind, spec) => {
+    if (kind === 'lang') spec = langSpec(spec.trim(), file), kind = 'file';
     blocks.push(kind === 'file' ? includeFile(spec, file) : kind === 'stage' ? includeStage(spec, file) : movedBlock(spec, file));
     return `\n<div data-ph="${blocks.length - 1}"></div>\n`;
   });
@@ -500,6 +514,8 @@ function coverageReport() {
     byFile[f] = { lines: n, chapters: [...new Set((coverage.get(f) || []).map(([, , chap]) => chap))] };
   }
   fs.writeFileSync(path.join(OUT, 'files-chapters.json'), JSON.stringify(byFile, null, 1));
+  // القطع الخام لكل ملف [بداية، نهاية، الفصل، النوع] (لأداة ترتيب ملفات اللغة حسب الفصول)
+  fs.writeFileSync(path.join(OUT, 'line-chapters.json'), JSON.stringify(Object.fromEntries(coverage)));
   return { full, total: files.length, report };
 }
 

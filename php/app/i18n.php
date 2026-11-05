@@ -168,13 +168,3 @@ function intl_locale(string $arabic = 'ar-DZ'): string
 {
     return ['fr' => 'fr-FR', 'en' => 'en-GB'][lang()] ?? $arabic;
 }
-
-/** الحقل المترجم من صف مصفوفة (للاستعلامات التي لا ترجع كائنات Model) */
-function tr_field(array $row, string $field): string
-{
-    $l = lang();
-    if ($l !== default_lang() && !empty($row[$field . '_' . $l])) {
-        return (string) $row[$field . '_' . $l];
-    }
-    return (string) ($row[$field] ?? '');
-}

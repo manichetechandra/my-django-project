@@ -61,6 +61,11 @@ if (in_array('--tsv', $argv, true)) {
     }
     exit;
 }
+if (in_array('--where', $argv, true)) {
+    // كل أماكن كل نص: {"النص": ["app/views/x.php:12", ...]} (لأداة ترتيب ملفات اللغة حسب فصول الكتاب)
+    echo json_encode($keys, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), "\n";
+    exit;
+}
 if (in_array('--json', $argv, true)) {
     echo json_encode(array_keys($keys), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), "\n";
     exit;
