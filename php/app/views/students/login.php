@@ -48,7 +48,7 @@
         display: block;
     }
     
-    .form-control {
+    .login-container .form-control {
         height: 45px;
         font-size: 16px;
     }

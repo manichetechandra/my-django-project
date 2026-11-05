@@ -65,14 +65,14 @@
         margin-bottom: 8px;
     }
     
-    .form-control {
+    .contact-form-container .form-control {
         border: 2px solid #ddd;
         border-radius: 5px;
         padding: 12px; height: auto;
         transition: all 0.3s;
     }
     
-    .form-control:focus {
+    .contact-form-container .form-control:focus {
         border-color: #8cc040;
         box-shadow: 0 0 0 0.2rem rgba(140, 192, 64, 0.25);
     }
