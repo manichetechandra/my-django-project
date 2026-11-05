@@ -7,7 +7,7 @@
  */
 
 @@end
-@@block guard 36.1 from=app/controllers/admin.php:35-48
+@@block guard 36.1 from=app/controllers/admin.php:41-55
 @@end
 @@block render-temp 36.1
 function admin_render(string $view, array $data = []): void
@@ -31,7 +31,7 @@ function admin_index(): void
 }
 
 @@end
-@@block auth 36.1 from=app/controllers/admin.php:92-134
+@@block auth 36.1 from=app/controllers/admin.php:130-328
 @@end
 @@block news-list 36.1
 // ====================================================================== الأخبار (مؤقت)

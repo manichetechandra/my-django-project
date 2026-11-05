@@ -427,7 +427,9 @@ ${body}
 
 // ------------------------------------------------------------------ تقرير التغطية
 function coverageReport() {
-  const EXCLUDE = [/^database\/data\.sql$/, /^README\.md$/, /\.gitkeep$/, /\.jpe?g$/i, /\.png$/i];
+  // لا تُكتب في الكتاب: البيانات التجريبية، الوثائق، الصور، ومكتبات من خارج المشروع يحمّلها القارئ (TinyMCE وملفات لغته)
+  const EXCLUDE = [/^database\/data\.sql$/, /^README\.md$/, /^SECURITY\.md$/, /\.gitkeep$/, /\.jpe?g$/i, /\.png$/i,
+    /^assets\/vendor\//, /^assets\/js\/tinymce-lang\//];
   const files = projectFiles()
     .filter((f) => !EXCLUDE.some((re) => re.test(f)));
   const lines = [];

@@ -17,7 +17,7 @@
 
 كلمة المدير جدولها موجود (الفصل 25). نضيف جدولي الصفحتين الأخريين: أدرج هذه القطعة في `schema.sql` **بعد** جدول `director_words` مباشرة، ونفّذها في تبويب SQL في phpMyAdmin:
 
-@file database/schema.sql 103-124 insert
+@file database/schema.sql 128-161 insert
 
 - **`organization_structures`**: صفحة الهيكل التنظيمي: عنوان (بقيمة افتراضية)، ووصف، وصورة المخطط (`organization_chart`)، ومحتوى.
 - **`directorate_histories`**: صفحة تاريخ المديرية: عنوان، ومقدمة، ومحتوى، وصورة، وسنة التأسيس.
@@ -79,7 +79,7 @@ function homepage_director_word(): void
 
 استبدل الدالة المؤقتة في `homepage.php` بالنسخة النهائية:
 
-@file app/controllers/homepage.php 22-28 replace
+@file app/controllers/homepage.php 23-29 replace
 
 - `DirectorWord::firstWhere(...)`: أول سجل مفعّل، **الأحدث** (`created_at DESC`): إن تغيّر المدير يضيف المسؤول كلمة جديدة فتظهر هي، وتبقى القديمة في الأرشيف. وإن لم يوجد أي سجل تُرجع `null`، فيعرض القالب رسالة بديلة.
 - **`page_title`**: عنوان الصفحة، يمرّ إلى القالب.
@@ -133,7 +133,7 @@ echo linebreaks("الفقرة الأولى\nسطرها الثاني\n\nالفق�
 
 الصفحتان الأخريان على النمط نفسه، فنكتبهما مباشرة بشكلهما النهائي. أكمل `homepage.php`:
 
-@file app/controllers/homepage.php 29-44
+@file app/controllers/homepage.php 30-45
 
 نفس الفكرة، مع فرق: للهيكل والتاريخ نأخذ الأقدم بالرقم (`id`) لأنه يوجد عادة سجل واحد فقط.
 

@@ -273,25 +273,25 @@ $current_year = date('Y');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 @@end
-@@block base-css-1 3 from=app/views/base/base.php:21-34
+@@block base-css-1 3 from=app/views/base/base.php:25-71
 @@end
-@@block base-css-nav 4 from=app/views/base/base.php:35-96
+@@block base-css-nav 4 from=app/views/base/base.php:72-164
 @@end
-@@block base-css-2 3 from=app/views/base/base.php:97-182
+@@block base-css-2 3 from=app/views/base/base.php:165-292
 @@end
-@@block base-css-carousel 5 from=app/views/base/base.php:183-199
+@@block base-css-carousel 5 from=app/views/base/base.php:293-309
 @@end
-@@block base-css-3 3 from=app/views/base/base.php:200-218
+@@block base-css-3 3 from=app/views/base/base.php:310-326
 @@end
-@@block home-css-open 5 from=app/views/homepage/index.php:5-12
+@@block home-css-open 5 from=app/views/homepage/index.php:6-13
 @@end
-@@block home-css-news 6 from=app/views/homepage/index.php:13-65
+@@block home-css-news 6 from=app/views/homepage/index.php:14-72
 @@end
-@@block home-css-act 7 from=app/views/homepage/index.php:66-135
+@@block home-css-act 7 from=app/views/homepage/index.php:73-140
 @@end
-@@block home-css-depcite 8 from=app/views/homepage/index.php:136-215
+@@block home-css-depcite 8 from=app/views/homepage/index.php:141-226
 @@end
-@@block home-css-close 5 from=app/views/homepage/index.php:216-216
+@@block home-css-close 5 from=app/views/homepage/index.php:227-227
 @@end
 </head>
 <body>
@@ -432,9 +432,9 @@ $current_year = date('Y');
     </div>
 </nav>
 @@end
-@@block nav-css-1 4 from=app/views/base/navbar.php:226-266 file=app/views/base/navbar.php@12
+@@block nav-css-1 4 from=app/views/base/navbar.php:267-335 file=app/views/base/navbar.php@12
 @@end
-@@block nav-css-2 4 from=app/views/base/navbar.php:466-575 file=app/views/base/navbar.php@12
+@@block nav-css-2 4 from=app/views/base/navbar.php:535-644 file=app/views/base/navbar.php@12
 @@end
 @@block slider 5
 
@@ -1002,9 +1002,9 @@ $current_year = date('Y');
     </div>
 </section>
 @@end
-@@block stats-css-js 7 from=app/views/homepage/index.php:511-575
+@@block stats-css-js 7 from=app/views/homepage/index.php:545-609
 @@end
-@@block sites-dephead 8 from=app/views/homepage/index.php:576-627
+@@block sites-dephead 8 from=app/views/homepage/index.php:610-661
 @@end
 @@block dept-list 8
 
@@ -1340,7 +1340,7 @@ $current_year = date('Y');
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
 
 @@end
-@@block home-js 5 from=app/views/homepage/index.php:763-792
+@@block home-js 5 from=app/views/homepage/index.php:797-826
 @@end
 </body>
 </html>

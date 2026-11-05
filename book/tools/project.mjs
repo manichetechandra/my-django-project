@@ -1,11 +1,10 @@
-// مصدر كود الكتاب: النسخة 1.0 المجمّدة في dou-setif-php.zip
-// (مجلد php/ في المستودع صار النسخة 2.0 متعددة اللغات، والكتاب يشرح النسخة 1.0 كما هي)
+// مصدر كود الكتاب (الإصدار الثالث للكتاب): النسخة 2 في مجلد php/ — متعددة اللغات، المسابقات، المحرر...
 //
 //   import { SRC, projectFiles } from './project.mjs';
 //   node tools/project.mjs          ← يطبع مسار المجلد (للسكربتات: SRC=$(node tools/project.mjs))
 //
-// يُفك الملف المضغوط مرة واحدة في .build/project-v1، ويُعاد فكه إن تغيّر.
-// للتجربة على مجلد آخر: BOOK_SRC=/path/to/project node tools/build.mjs
+// BOOK_V1=1  ← الكتاب السابق: النسخة 1.0 المجمّدة في dou-setif-php.zip (تُفك في .build/project-v1)
+// BOOK_SRC=/path/to/project  ← مجلد آخر للتجربة
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -27,11 +26,13 @@ function extract() {
   fs.writeFileSync(stamp, hash);
 }
 
-export const SRC = process.env.BOOK_SRC ? path.resolve(process.env.BOOK_SRC) : (extract(), path.join(OUT, ROOT));
+const V1 = !!process.env.BOOK_V1;
+const PHP = path.resolve(BOOK, '..', 'php');
+export const SRC = process.env.BOOK_SRC ? path.resolve(process.env.BOOK_SRC) : (V1 ? (extract(), path.join(OUT, ROOT)) : PHP + path.sep);
 
 /** ملفات المشروع (مثل git ls-files): أسماء الملفات داخل الملف المضغوط */
 export function projectFiles() {
-  if (process.env.BOOK_SRC) {
+  if (process.env.BOOK_SRC || !V1) {
     return execFileSync('git', ['ls-files'], { cwd: SRC, encoding: 'utf8' }).trim().split('\n');
   }
   const out = execFileSync('python3', ['-c',

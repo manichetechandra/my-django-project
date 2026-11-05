@@ -1,23 +1,23 @@
 @@file database/schema.sql 14
-@@block s-head 14 from=database/schema.sql:1-43
+@@block s-head 14 from=database/schema.sql:1-51
 @@end
-@@block s-users-home 14 from=database/schema.sql:44-88
+@@block s-users-home 14 from=database/schema.sql:52-105
 @@end
-@@block s-director 25 from=database/schema.sql:89-102
+@@block s-director 25 from=database/schema.sql:106-127
 @@end
-@@block s-news 14 from=database/schema.sql:126-150
+@@block s-news 14 from=database/schema.sql:163-193
 @@end
-@@block s-activities 14 from=database/schema.sql:174-199
+@@block s-activities 14 from=database/schema.sql:221-256
 @@end
-@@block s-cites 14 from=database/schema.sql:212-232
+@@block s-cites 14 from=database/schema.sql:271-297
 @@end
-@@block s-departements 14 from=database/schema.sql:245-266
+@@block s-departements 14 from=database/schema.sql:312-339
 @@end
-@@block s-services 25 from=database/schema.sql:267-291
+@@block s-services 25 from=database/schema.sql:340-376
 @@end
-@@block s-downloads-faq 25 from=database/schema.sql:312-360
+@@block s-downloads-faq 25 from=database/schema.sql:397-455
 @@end
-@@block s-notifications 24 from=database/schema.sql:361-381
+@@block s-notifications 24 from=database/schema.sql:456-482
 @@end
-@@block s-sitestats 23 from=database/schema.sql:382-403
+@@block s-sitestats 23 from=database/schema.sql:483-504
 @@end
