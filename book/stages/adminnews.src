@@ -1,24 +1,15 @@
-@@file app/controllers/admin.php 39.1
-@@block header-temp 39.1
-<?php
-/**
- * لوحة الإدارة /admin/ — مؤقت: قسم الأخبار وحده، بدوال مكتوبة باليد.
- * في الفصل 37 تصبح عامة: تقرأ إعدادات كل جدول من app/admin_config.php
- */
-
+@@file app/controllers/admin.php 38
+@@block open 38 from=app/controllers/admin.php:1-1
 @@end
-@@block guard 39.1 from=app/controllers/admin.php:41-55
+@@block header 38 from=app/controllers/admin.php:2-6
 @@end
-@@block render-temp 39.1
-function admin_render(string $view, array $data = []): void
+@@block guard 38 from=app/controllers/admin.php:41-61
+@@end
+@@block menu-temp 38
+/** القائمة الجانبية — مؤقت: لا أقسام بعد */
+function admin_menu(): array
 {
-    // القائمة الجانبية: قسم واحد في الوقت الحالي
-    $data['admin_menu'] = [
-        'المحتوى' => [
-            ['key' => 'news', 'label' => 'الأخبار', 'icon' => 'fa-newspaper-o', 'badge' => 0],
-        ],
-    ];
-    render('admin/' . $view, $data);
+    return [];
 }
 
 // ====================================================================== الصفحات
@@ -26,12 +17,50 @@ function admin_render(string $view, array $data = []): void
 function admin_index(): void
 {
     admin_guard();
-    // لا صفحة رئيسية بعد: نذهب إلى الأخبار مباشرة
-    redirect_to('admin:list', 'news');
+    admin_render('index', ['page_title' => 'لوحة الإدارة']);
 }
 
 @@end
-@@block auth 39.1 from=app/controllers/admin.php:130-328
+@@block menu-news 39.1 replaces=menu-temp
+/** القائمة الجانبية — مؤقت: قسم الأخبار وحده */
+function admin_menu(): array
+{
+    return [
+        'المحتوى' => [
+            ['key' => 'news', 'label' => 'الأخبار', 'icon' => 'fa-newspaper-o', 'badge' => 0,
+                'url' => url('admin:list', 'news'), 'active' => '/admin/news/'],
+        ],
+    ];
+}
+
+// ====================================================================== الصفحات
+
+function admin_index(): void
+{
+    admin_guard();
+    admin_render('index', ['page_title' => 'لوحة الإدارة']);
+}
+
+@@end
+@@block auth 38 from=app/controllers/admin.php:126-187
+@@end
+@@block password 38 from=app/controllers/admin.php:188-215
+@@end
+@@block recover 38 from=app/controllers/admin.php:216-328
+@@end
+@@block index-view 38 file=app/views/admin/index.php@38
+<?php extend('admin/layout'); ?>
+<?php block('title'); ?><?= e($page_title) ?><?php endblock(); ?>
+<?php block('content'); ?>
+<h1 class="admin-title"><i class="fa fa-home"></i> مرحباً، <?= e($user->display_name()) ?></h1>
+<div class="panel panel-default admin-panel">
+    <div class="panel-body">
+        <p>لوحة الإدارة قيد الإنشاء: أقسامها تظهر هنا وفي القائمة الجانبية حين نكتبها.</p>
+        <a href="<?= e(url('students:admin_dashboard')) ?>" class="btn btn-default"><i class="fa fa-dashboard"></i> متابعة الطلبات</a>
+        <a href="<?= e(url('admin:password')) ?>" class="btn btn-default"><i class="fa fa-key"></i> تغيير كلمة المرور</a>
+    </div>
+</div>
+<?php endblock(); ?>
 @@end
 @@block news-list 39.1
 // ====================================================================== الأخبار (مؤقت)

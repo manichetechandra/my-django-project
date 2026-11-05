@@ -297,6 +297,8 @@ check(s == 302 and 'name="password1"' in b and f'value="{ADMIN[0]}"' in b, 'مع
 t = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', b).group(1)
 s, h, b = c.req('POST', '/admin/recover/', {'csrfmiddlewaretoken': t, 'username': ADMIN[0], 'password1': '12345678', 'password2': '12345678'})
 check(s == 200 and 'أرقام' in b, 'كلمة مرور ضعيفة تُرفض')
+s, h, b = c.req('POST', '/admin/recover/', {'csrfmiddlewaretoken': t, 'username': 'bad name!', 'password1': 'Recovered#2026', 'password2': 'Recovered#2027'})
+check(s == 200 and '@/./+/-/_' in b and 'كلمتا المرور غير متطابقتين' in b, 'اسم مرفوض + كلمتان مختلفتان: رسالتا خطأ (لا خطأ 500)')
 s, h, b = c.req('POST', '/admin/recover/', {'csrfmiddlewaretoken': t, 'username': ADMIN[0], 'password1': 'Recovered#2026', 'password2': 'Recovered#2026'})
 check(s == 302 and location(h) == '/admin/login/' and not glob.glob(os.path.join(STORAGE, 'recover-*')), 'الحفظ ← صفحة الدخول، والملف حُذف')
 s, h, _b = Client().login('/admin/login/', ADMIN[0], 'Recovered#2026')

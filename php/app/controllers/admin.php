@@ -275,7 +275,7 @@ function admin_recover(): void
             if ($f->cleaned['password1'] !== $f->cleaned['password2']) {
                 $f->add_error('password2', 'كلمتا المرور غير متطابقتين');
             }
-            foreach (password_errors($f->cleaned['password1'], $f->cleaned['username']) as $err) {
+            foreach (password_errors($f->cleaned['password1'], $f->cleaned['username'] ?? '') as $err) {
                 $f->add_error('password1', $err);
             }
         };

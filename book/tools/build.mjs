@@ -292,19 +292,22 @@ function includeStage(spec, chapter) {
   // «*» = الملف كاملاً كما هو عند تلك الخطوة (extra = اسم الملف)، وإلا extra = جزء من الكتلة «a-b» بأرقام نسبية
   let b = blockName === '*' ? stageFile(name, step, extra) : stageBlock(name, blockName, step === '-' ? '' : step);
   let htmlLines = null;
+  let fromRange = b.block && b.block.fromFile ? [b.block.fromStart, b.block.fromEnd] : null;
   if (blockName !== '*' && extra && /^\d+-\d+$/.test(extra)) {
     const [x, y] = extra.split('-').map(Number);
     htmlLines = contextLines(b.lines.join('\n'), langFor(b.file)).slice(x - 1, y);
     b = { ...b, lines: b.lines.slice(x - 1, y), start: b.start + x - 1, end: b.start + y - 1 };
+    // جزء من كتلة منسوخة من الملف النهائي: نحسب في التغطية أسطر هذا الجزء وحده
+    if (fromRange) fromRange = [fromRange[0] + x - 1, fromRange[0] + y - 1];
   }
   const fin = b.block && b.block.fromFile;
   if (fin) {
     if (!coverage.has(fin)) coverage.set(fin, []);
-    coverage.get(fin).push([b.block.fromStart, b.block.fromEnd, chapter, 'stage']);
+    coverage.get(fin).push([fromRange[0], fromRange[1], chapter, 'stage']);
   }
   const range = blockName === '*' ? `الملف كاملاً — ${b.total} سطر` : (b.start === b.end ? `السطر ${b.start}` : `الأسطر ${b.start}–${b.end}`);
   const foot = fin && fin !== b.file
-    ? `نص نهائي: سيُنقل لاحقاً كما هو إلى ${fin} (الأسطر ${b.block.fromStart}–${b.block.fromEnd})`
+    ? `نص نهائي: سيُنقل لاحقاً كما هو إلى ${fin} (الأسطر ${fromRange[0]}–${fromRange[1]})`
     : '';
   return codeBlock({
     code: b.lines.join('\n'), lang: langFor(b.file), start: b.start, head: b.file, htmlLines,
@@ -364,7 +367,7 @@ for (const [name, label] of Object.entries(BOXES)) {
       const t = tokens[idx];
       if (t.nesting === 1) {
         const title = t.info.trim().slice(name.length).trim();
-        return `<div class="box box-${name}"><div class="box-title">${md.utils.escapeHtml(title || label)}</div>\n`;
+        return `<div class="box box-${name}"><div class="box-title">${isoHtml(md.utils.escapeHtml(title || label))}</div>\n`; // عزل الكلمات اللاتينية مثل require_staff() كما في العناوين
       }
       return '</div>\n';
     },

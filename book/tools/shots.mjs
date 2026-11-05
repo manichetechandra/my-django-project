@@ -104,6 +104,17 @@ const stageShots = [
     name: '35-static-form', overlay: ['admindemo', 37], plain: true, url: '/admin-demo/form.html', h: 900,
     act: async (page) => { await page.type('#f_title', 'تمديد التسجيل في الإقامات'); },
   },
+  { name: '38-index-temp', overlay: ['adminnews', 38], url: '/admin/', login: STAFF, w: 1100, h: 300 },
+  {
+    // تغيير كلمة المرور بأخطاء الحقول الثلاثة: القديمة خاطئة، والجديدة أرقام شائعة، والتأكيد مختلف
+    name: '38-password', overlay: ['adminnews', 38], url: '/admin/password/', login: STAFF, w: 1100, h: 560,
+    act: async (page) => {
+      await page.type('#id_old_password', 'KalimaKhatia#1');
+      await page.type('#id_new_password1', '12345678');
+      await page.type('#id_new_password2', '12345679');
+      await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('.admin-main [type=submit]')]);
+    },
+  },
   { name: '36-news-list', overlay: ['adminnews', 39.3], url: '/admin/news/', login: STAFF, h: 700 },
   { name: '36-news-form', overlay: ['adminnews', 39.3], url: '/admin/news/1/', login: STAFF, h: 1250 },
   {
@@ -139,6 +150,8 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '30-downloads', url: '/downloads/', h: 900 },
   { name: '30-search', url: '/search/?q=' + encodeURIComponent('المنحة الجامعية'), h: 900 },
   { name: '31-login', url: '/students/login/', h: 860 },
+  // استعادة دخول المدير: الخطوة الأولى (اسم الملف عشوائي في كل جلسة)
+  { name: '38-recover', url: '/admin/recover/', w: 900, h: 980 },
   // واجهة دخول الموظفين، كما تظهر لمن فتح صفحة محمية (رسالة «سجّل الدخول بحساب موظف»)
   { name: '34-admin-login', url: '/admin/login/?next=%2Fstudents%2Fadmin%2Fdashboard%2F', w: 900, h: 720 },
   { name: '32-dashboard', url: '/students/dashboard/', login: STUDENT, h: 950, scrollTo: '.application-list', scrollPad: 190 },

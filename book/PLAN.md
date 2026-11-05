@@ -30,7 +30,7 @@
 | 33–35 | فضاء الطالب | |
 | 36 | الموظفون | |
 | 37 | الإدارة: التصميم الثابت | |
-| **38** | **دخول الإدارة** (جديد) | قالب اللوحة، الحارس، admin_login/logout/password، الاستعادة recover، set_password.php، login.php، recover.php، password.php، تنسيق admin.css للدخول |
+| **38** | **حماية اللوحة وقالبها وكلمة المرور** (جديد) | الحارس admin_guard و admin_render، قائمة ورئيسية مؤقتتان، layout.php، admin_password + password.php، الاستعادة admin_recover + recover.php + admin.css 122-129، set_password.php (الدخول/الخروج انتقلا إلى 36) |
 | 39 | إدارة الأخبار يدوياً (مؤقت) | |
 | **40** | **الترجمة الآلية** (جديد) | Translator.php، translate_content.php، صفحة «ترجمة المحتوى» (admin_translate_all + translate_all.php) |
 | **41** | **محرر النصوص TinyMCE** (جديد) | admin_tinymce/locate، admin_editor_upload، admin-richtext.js — يُجرَّب على نموذج الأخبار المؤقت |
@@ -100,6 +100,18 @@
   الكتاب: الفصل 36 يبدأ بدخول الموظفين (admin.php 1 + 126-187، views/admin/login.php، admin.css 102-121 بالعلامة new)،
   ثم staff_dashboard مؤقتة فيها require_staff (لتجربة الدخول بـ ?next=). shots.mjs: دخول الموظفين من /admin/login/،
   ولقطة جديدة 34-admin-login، ومتغير DEMO_DB لخادم overlay.
+  وفي الفصل 38: admin_recover — في دالة clean السطر 278 صار `$f->cleaned['username'] ?? ''` (اسم مرفوض في الخطوة 2
+  كان يعطي خطأ 500: add_error تحذف cleaned['username'] ثم تقرأها password_errors). أُضيف فحص رجوع في dev/security_check.py.
+- **الفصل 38 (مكتوب):** admin.php يُعرض من stages/adminnews.src **بأرقام ملف القارئ** بعد كل إضافة (لا أرقام الملف النهائي)،
+  مع ملاحظة في الفصل: open(1، لا يُعرض؛ عرضه الفصل 36)، header 2-6، guard 7-27 (الحارس + admin_render)، menu-temp 28-41
+  (admin_menu فارغة + admin_index مؤقتة)، auth 42-103 (الدخول/الخروج من 36، لا يُعرض)، password 104-131، recover 132-244
+  (يُعرض على 4 قطع بالمدى النسبي 1-33/34-46/47-86/87-113)، و index-view (app/views/admin/index.php مؤقت). الفصل 39 يُلحق
+  الأخبار بعد recover بالترقيم نفسه؛ والفصل 42 يعرض الملف النهائي بأرقامه (لا يعيد 1-6 و41-61 و126-328).
+  build.mjs: عرض جزء من كتلة منسوخة (`@stage name block step a-b`) يُحسب في التغطية لأسطر ذلك الجزء فقط (كان يُحسب المدى كله
+  في كل مرة)، وعناوين الصناديق (::: why ...) تمر بـ isoHtml مثل العناوين (كان «require_staff()» يظهر «()require_staff»).
+  reader-sim 38-41: admin.php والقوالب المؤقتة من `node tools/stages.mjs adminnews N.99`، وviews/admin = login, layout,
+  password, recover + المؤقتة. اللقطات: 38-index-temp و38-password (overlay adminnews 38، بعرض 1100، كلمة المرور بأخطائها)،
+  و38-recover (الموقع الكامل). اختبار المحاكاة /tmp/t38.py (الحارس، 403، كلمة المرور والجلسات، الاستعادة بكل حالاتها، set_password).
 
 ## قائمة العمل
 - [x] الأدوات على النسخة 2 + نقل الإشارات (remap_v2.py)

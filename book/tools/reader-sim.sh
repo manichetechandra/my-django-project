@@ -55,6 +55,12 @@ if [ "$N" -ge 36 ] && [ "$N" -lt 38 ]; then
   { sed -n '1p' "$P/app/controllers/admin.php"; sed -n '126,187p' "$P/app/controllers/admin.php"; } > app/controllers/admin.php
   find app/views/admin -mindepth 1 -maxdepth 1 ! -name login.php -exec rm -rf {} +
 fi
+# الفصول 38-41: admin.php والقوالب المؤقتة من stages/adminnews.src (الحارس، القائمة والرئيسية المؤقتتان، كلمة المرور،
+# الاستعادة، ثم الأخبار في الفصل 39). القوالب النهائية: الدخول (36)، والقالب وكلمة المرور والاستعادة (38)
+if [ "$N" -ge 38 ] && [ "$N" -lt 42 ]; then
+  find app/views/admin -mindepth 1 -maxdepth 1 ! -name login.php ! -name layout.php ! -name password.php ! -name recover.php -exec rm -rf {} +
+  node "$BOOK/tools/stages.mjs" adminnews "$N.99" "$SIM" > /dev/null
+fi
 # admin.css بأقسامه حسب الفصول: 1-83 (37)، 84-101 (40)، 102-121 (36)، 122-131 (38)، 132-137 (42)، 138-177 (47)، 178-190 (41)
 if [ -f assets/css/admin.css ] && [ "$N" -lt 47 ]; then
   awk -v n="$N" '
