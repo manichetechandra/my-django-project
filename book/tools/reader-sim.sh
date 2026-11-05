@@ -54,7 +54,17 @@ fi
 if [ "$N" -ge 36 ] && [ "$N" -lt 38 ]; then
   { sed -n '1p' "$P/app/controllers/admin.php"; sed -n '126,187p' "$P/app/controllers/admin.php"; } > app/controllers/admin.php
   find app/views/admin -mindepth 1 -maxdepth 1 ! -name login.php -exec rm -rf {} +
-  [ "$N" -ge 37 ] || keep_lines assets/css/admin.css 102-121
+fi
+# admin.css بأقسامه حسب الفصول: 1-83 (37)، 84-101 (40)، 102-121 (36)، 122-131 (38)، 132-137 (42)، 138-177 (47)، 178-190 (41)
+if [ -f assets/css/admin.css ] && [ "$N" -lt 47 ]; then
+  awk -v n="$N" '
+    NR<=83 {c=37} NR>=84&&NR<=101 {c=40} NR>=102&&NR<=121 {c=36} NR>=122&&NR<=131 {c=38}
+    NR>=132&&NR<=137 {c=42} NR>=138&&NR<=177 {c=47} NR>=178 {c=41}
+    c<=n' "$P/assets/css/admin.css" > assets/css/admin.css
+fi
+# admin.js: الفصل 37 يكتب كل شيء إلا زر الترجمة (الأسطر 83-149، الفصل 40)
+if [ "$N" -lt 37 ]; then rm -f assets/js/admin.js
+elif [ "$N" -lt 40 ]; then sed -i '83,149d' assets/js/admin.js
 fi
 
 # --- القوالب
