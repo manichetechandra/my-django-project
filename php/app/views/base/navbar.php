@@ -141,8 +141,8 @@ $__navClass = fn(string $section, string $class = ''): string
                         </li>
                         
                     <?php elseif (!empty($student_profile)): ?>
-                   
-                        
+
+
                         <li<?= $__navClass('students', 'dropdown') ?>>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
                                 <i class="fa fa-user-circle"></i> <?= e(truncatewords($student_profile['full_name_arabic'], 2)) ?> <span class="caret"></span>
@@ -158,12 +158,12 @@ $__navClass = fn(string $section, string $class = ''): string
                                     <i class="fa fa-plus"></i> <?= t('طلب جديد') ?>
                                 </a></li>
                                 <li><a href="<?= e(url('students:profile_view')) ?>">
-                                <i class="fa fa-user"></i> <?= t('معلوماتي الشخصية') ?>
+                                    <i class="fa fa-user"></i> <?= t('معلوماتي الشخصية') ?>
                                 </a></li>
-                                 <!-- ← جديد! البطاقة الرقمية -->
-                                <li><a href="<?= e(url('students:student_card')) ?>"target="_blank">
-                                 <i class="fa fa-id-card"></i> <?= t('بطاقتي الرقمية') ?>
-                                 </a></li>
+                                <!-- البطاقة الرقمية: صفحة طباعة مستقلة تُفتح في تبويب جديد -->
+                                <li><a href="<?= e(url('students:student_card')) ?>" target="_blank">
+                                    <i class="fa fa-id-card"></i> <?= t('بطاقتي الرقمية') ?>
+                                </a></li>
                                 <li class="divider"></li>
                                 <li><a href="<?= e(logout_url('students:logout')) ?>">
                                     <i class="fa fa-sign-out"></i> <?= t('تسجيل الخروج') ?>

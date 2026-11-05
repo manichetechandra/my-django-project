@@ -33,7 +33,7 @@
         if (!menu) { return; }
         menu.querySelectorAll('.notif-item').forEach(function (li) { li.remove(); });
         var empty = menu.querySelector('.notif-empty');
-        var anchor = menu.querySelector('.notif-empty') || menu.querySelector('.notif-footer-divider');
+        var anchor = empty || menu.querySelector('.notif-footer-divider');
         items.forEach(function (n) {
             var li = document.createElement('li');
             li.className = 'notif-item';

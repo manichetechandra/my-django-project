@@ -245,6 +245,8 @@
             
             .student-card {
                 box-shadow: none;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             
             .no-print {

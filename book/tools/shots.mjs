@@ -141,8 +141,8 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '31-login', url: '/students/login/', h: 860 },
   { name: '32-dashboard', url: '/students/dashboard/', login: STUDENT, h: 950, scrollTo: '.application-list', scrollPad: 190 },
   { name: '32-create', url: '/students/applications/create/1/', login: STUDENT, h: 1100 },
-  // البطاقة مقاسة بخط Arial (غير موجود هنا، والخط البديل أعلى سطراً فيقص آخر الصفوف): نحاكي ارتفاع سطره 1.15
-  { name: '33-card', url: '/students/student-card/', login: STUDENT, w: 900, h: 470, scale: 2, css: '.student-card *{line-height:1.15}' },
+  // البطاقة ثم أزرار الطباعة ونصائحها تحتها (ارتفاع السطر 1.15 صار في القالب نفسه)
+  { name: '33-card', url: '/students/student-card/', login: STUDENT, w: 640, h: 580, scale: 2 },
   {
     name: '34-dashboard', url: '/students/admin/dashboard/', login: STAFF, untilFooter: true, wait: 1800,
     // صورتان من الصفحة الطويلة: الجزء العلوي (حتى جدول آخر الطلبات) والرسوم البيانية

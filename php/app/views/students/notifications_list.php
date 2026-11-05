@@ -177,7 +177,7 @@
         color: #7f8c8d;
     }
     
-    .empty-state i {
+    .empty-state > i {
         font-size: 80px;
         margin-bottom: 20px;
         display: block;
@@ -324,9 +324,9 @@
 // JavaScript للإشعارات
 // ========================================
 
-// رمز CSRF وروابط الإجراءات (تعمل حتى لو كان الموقع داخل مجلد فرعي)
+// رمز CSRF وبداية روابط الإجراءات. url() تضيف مجلد الموقع وبادئة اللغة، فتصل ردود الخادم بلغة الصفحة
 const csrftoken = <?= json_js(csrf_token()) ?>;
-const NOTIF_BASE = <?= json_js(base_url() . route_prefix() . '/students/notifications/') ?>;
+const NOTIF_BASE = <?= json_js(url('students:notifications_list')) ?>;
 
 // ========================================
 // تمييز إشعار كمقروء
