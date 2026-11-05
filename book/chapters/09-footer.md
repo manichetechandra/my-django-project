@@ -6,7 +6,7 @@
 
 ## التذييل
 
-أضف بعد سلايدر الإقامات (بعد `<br><br>` في السطر 1496)، وقبل أسطر jQuery وBootstrap JS:
+أضف بعد سلايدر الإقامات (بعد `<br><br>` في السطر 1475)، وقبل أسطر jQuery وBootstrap JS:
 
 @stage home footer-a
 
