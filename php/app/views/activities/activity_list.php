@@ -34,7 +34,7 @@
                 
                 <!-- التصفية حسب النوع -->
                 <div class="col-md-6">
-                    <div class="btn-group pull-left">
+                    <div class="pull-left">
                         <a href="<?= e(url('activities:activity_list')) ?>" class="btn btn-default <?php if (empty($selected_type)): ?>active<?php endif; ?>">
                             <?= t('الكل') ?>
                         </a>
