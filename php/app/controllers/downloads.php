@@ -14,9 +14,13 @@ function download_center(): void
         $params[] = $category;
     }
     if ($searchQuery !== '') {
-        $where .= ' AND (title LIKE ? OR description LIKE ?)';
-        $like = DB::like($searchQuery);
-        array_push($params, $like, $like);
+        $fields = ['title', 'description'];
+        if (lang() !== default_lang()) {
+            // زائر الموقع الفرنسي يكتب بالفرنسية: نبحث أيضاً في title_fr و description_fr
+            array_push($fields, 'title_' . lang(), 'description_' . lang());
+        }
+        $where .= ' AND (' . implode(' OR ', array_map(fn($f) => "`$f` LIKE ?", $fields)) . ')';
+        $params = array_merge($params, array_fill(0, count($fields), DB::like($searchQuery)));
     }
     $files = DownloadFile::where($where, $params, 'display_order, created_at DESC');
 

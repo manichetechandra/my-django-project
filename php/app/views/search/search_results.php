@@ -291,31 +291,31 @@
     
     <!-- الفلاتر -->
     <div class="filter-tabs">
-        <a href="<?= e(url('search:search')) ?>?q=<?= e($query) ?>" 
+        <a href="<?= e(url('search:search')) ?>?q=<?= e(rawurlencode($query)) ?>" 
            class="filter-btn <?php if ($search_type == 'all'): ?>active<?php endif; ?>">
             <i class="fa fa-th"></i> <?= t('الكل') ?>
             <span class="count"><?= e($counts['total']) ?></span>
         </a>
         
-        <a href="<?= e(url('search:search')) ?>?q=<?= e($query) ?>&type=news" 
+        <a href="<?= e(url('search:search')) ?>?q=<?= e(rawurlencode($query)) ?>&type=news" 
            class="filter-btn <?php if ($search_type == 'news'): ?>active<?php endif; ?>">
             <i class="fa fa-newspaper-o"></i> <?= t('أخبار') ?>
             <span class="count"><?= e($counts['news']) ?></span>
         </a>
         
-        <a href="<?= e(url('search:search')) ?>?q=<?= e($query) ?>&type=services" 
+        <a href="<?= e(url('search:search')) ?>?q=<?= e(rawurlencode($query)) ?>&type=services" 
            class="filter-btn <?php if ($search_type == 'services'): ?>active<?php endif; ?>">
             <i class="fa fa-cogs"></i> <?= t('خدمات') ?>
             <span class="count"><?= e($counts['services']) ?></span>
         </a>
         
-        <a href="<?= e(url('search:search')) ?>?q=<?= e($query) ?>&type=faqs" 
+        <a href="<?= e(url('search:search')) ?>?q=<?= e(rawurlencode($query)) ?>&type=faqs" 
            class="filter-btn <?php if ($search_type == 'faqs'): ?>active<?php endif; ?>">
             <i class="fa fa-question-circle"></i> <?= t('أسئلة') ?>
             <span class="count"><?= e($counts['faqs']) ?></span>
         </a>
         
-        <a href="<?= e(url('search:search')) ?>?q=<?= e($query) ?>&type=downloads" 
+        <a href="<?= e(url('search:search')) ?>?q=<?= e(rawurlencode($query)) ?>&type=downloads" 
            class="filter-btn <?php if ($search_type == 'downloads'): ?>active<?php endif; ?>">
             <i class="fa fa-download"></i> <?= t('ملفات') ?>
             <span class="count"><?= e($counts['downloads']) ?></span>

@@ -57,7 +57,6 @@ function search_view(): void
         'faqs'           => [Faq::class, ['question', 'answer'], 'is_active = 1', 'views_count DESC', 30],
         'departements'   => [Departement::class, ['name', 'description', 'head_of_department'], 'is_active = 1', '`order`, name', 30],
         'cites'          => [Cite::class, ['name', 'address', 'description'], 'is_active = 1', '`order`, name', 30],
-        'sliders'        => [Slider::class, ['title', 'subtitle'], 'is_active = 1', '`order`', 20],
         'director_words' => [DirectorWord::class, ['word_title', 'word_content', 'director_name', 'director_title'], 'is_active = 1', 'created_at DESC', 20],
         'history'        => [DirectorateHistory::class, ['title', 'introduction', 'content'], 'is_active = 1', 'id', 20],
         'organization'   => [OrganizationStructure::class, ['title', 'description'], 'is_active = 1', 'id', 20],

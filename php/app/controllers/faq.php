@@ -10,9 +10,13 @@ function faq_list(): void
     $where = 'f.is_active = 1';
     $params = [];
     if ($searchQuery !== '') {
-        $where .= ' AND (f.question LIKE ? OR f.answer LIKE ?)';
-        $like = DB::like($searchQuery);
-        $params = [$like, $like];
+        $fields = ['question', 'answer'];
+        if (lang() !== default_lang()) {
+            // نبحث أيضاً في ترجمة لغة الصفحة (question_fr و answer_fr ...)
+            array_push($fields, 'question_' . lang(), 'answer_' . lang());
+        }
+        $where .= ' AND (' . implode(' OR ', array_map(fn($f) => "f.`$f` LIKE ?", $fields)) . ')';
+        $params = array_fill(0, count($fields), DB::like($searchQuery));
     }
     $faqs = Faq::query("SELECT f.* FROM faqs f JOIN faq_categories c ON c.id = f.category_id WHERE $where ORDER BY c.`order`, f.`order`, f.created_at DESC", $params);
 
