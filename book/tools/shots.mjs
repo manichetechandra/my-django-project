@@ -352,6 +352,70 @@ const shots = SET === 'stages' ? stageShots : [
       return { x: r.left + scrollX - 10, y: r.top + scrollY - 10, width: r.width + 20, height: r.height + 20 };
     },
   },
+  // الفصل 48: دراسة الملفات في لوحة الإدارة (المدير العام). شغّلها بـ --locale=fr_FR.UTF-8 (خانة التاريخ في 48-application).
+  // فتح ملف مترشح يضيف سطراً إلى سجل الاطلاع، فقبل اللقطات:
+  //   DB_NAME=dou_setif2 php tools/shots-recruit.php mark /tmp/site2   وبعدها:   ... shots-recruit.php reset /tmp/site2
+  {
+    // مجموعة «مسابقات التوظيف» في القائمة الجانبية (الشريط الجانبي ثابت: نافذة طويلة ليظهر كله)
+    name: '48-menu', url: '/admin/recruitment/applications/', login: STAFF, w: 1280, h: 1800,
+    clip: () => {
+      const g = [...document.querySelectorAll('.admin-nav-group')].find((el) => el.textContent.trim() === 'مسابقات التوظيف');
+      let last = g;
+      while (last.nextElementSibling && last.nextElementSibling.classList.contains('admin-nav-link')) last = last.nextElementSibling;
+      const a = g.getBoundingClientRect(), b = last.getBoundingClientRect(), s = document.querySelector('.admin-sidebar').getBoundingClientRect();
+      return { x: s.left + scrollX, y: a.top + scrollY - 2, width: s.width, height: b.bottom - a.top + 12 };
+    },
+  },
+  {
+    // قائمة طلبات المسابقة 1: طلبان محددان وحالة جديدة مختارة (بلا إرسال)
+    name: '48-applications', url: '/admin/recruitment/applications/?competition=1', login: STAFF, w: 1280, h: 1200,
+    act: async (page) => {
+      const boxes = await page.$$('[data-row-check]');
+      for (const i of [0, 2]) await boxes[i].click();
+      await page.select('select[name=new_status]', 'under_review');
+    },
+    clip: () => {
+      const m = document.querySelector('.admin-main').getBoundingClientRect(), a = document.querySelector('.admin-header').getBoundingClientRect();
+      const b = document.querySelector('.recruit-table').getBoundingClientRect();
+      return { x: m.left + scrollX + 12, y: a.top + scrollY - 12, width: m.width - 24, height: b.bottom - a.top + 24 };
+    },
+  },
+  {
+    // ملف أمينة (ملف ناقص): أعلى الصفحة حتى نهاية المعطيات الشخصية ونموذج الدراسة
+    name: '48-application', url: '/admin/recruitment/applications/3/', login: STAFF, w: 1280, h: 1900,
+    css: '.recruit-outcome { visibility: hidden; }', // رأس الصندوق التالي يدخل أسفل الصورة
+    clip: () => {
+      const m = document.querySelector('.admin-main').getBoundingClientRect(), a = document.querySelector('.breadcrumb').getBoundingClientRect();
+      const b = Math.max(document.querySelector('.recruit-private').getBoundingClientRect().bottom, document.querySelector('.recruit-decision').getBoundingClientRect().bottom);
+      return { x: m.left + scrollX + 12, y: a.top + scrollY - 12, width: m.width - 24, height: b - a.top + 24 };
+    },
+  },
+  {
+    // ملف كريم (مستدعى): صندوقا «الاستدعاء والنتيجة» و«سجل الطلب» في العمود الجانبي
+    name: '48-outcome', url: '/admin/recruitment/applications/2/', login: STAFF, w: 1280, h: 1900,
+    clip: () => {
+      const o = document.querySelector('.recruit-outcome').getBoundingClientRect(), h = document.querySelector('.recruit-history').closest('.panel').getBoundingClientRect();
+      return { x: o.left + scrollX - 12, y: o.top + scrollY - 12, width: o.width + 24, height: h.bottom - o.top + 24 };
+    },
+  },
+  {
+    // نتائج الامتحان المهني (المسابقة 4): منشورة، وخمس نتائج بألوانها
+    name: '48-results', url: '/admin/recruitment/results/?competition=4', login: STAFF, w: 1280, h: 1000,
+    clip: () => {
+      const m = document.querySelector('.admin-main').getBoundingClientRect(), a = document.querySelector('.breadcrumb').getBoundingClientRect();
+      const b = document.querySelector('.recruit-results-actions').getBoundingClientRect();
+      return { x: m.left + scrollX + 12, y: a.top + scrollY - 12, width: m.width - 24, height: b.bottom - a.top + 20 };
+    },
+  },
+  {
+    // سجل الاطلاع: أول 16 سطراً (أحدثها اطلاع هذه اللقطات نفسها على ملفي أمينة وكريم)
+    name: '48-audit', url: '/admin/recruitment/audit/', login: STAFF, w: 1280, h: 1400,
+    clip: () => {
+      const m = document.querySelector('.admin-main').getBoundingClientRect(), a = document.querySelector('.admin-header').getBoundingClientRect();
+      const b = document.querySelector('.admin-table tbody tr:nth-child(16)').getBoundingClientRect();
+      return { x: m.left + scrollX + 12, y: a.top + scrollY - 12, width: m.width - 24, height: b.bottom - a.top + 12 };
+    },
+  },
   {
     name: '45-home', url: '/', w: 1280, h: 900,
     clip: () => {
@@ -431,7 +495,8 @@ const browser = await puppeteer.launch({
   executablePath: path.join(BT, 'rt', 'chromium'),
   headless: 'shell',
   args: ['--no-sandbox', '--disable-setuid-sandbox', '--no-zygote', '--disable-gpu', '--disable-dev-shm-usage', '--font-render-hinting=none', '--lang=ar'],
-  env: { ...process.env, HOME: BT, LD_LIBRARY_PATH: `${BT}/rt/al2023/lib:${BT}/rt`, FONTCONFIG_FILE: fontsConf },
+  // --locale=fr_FR.UTF-8: خانات التاريخ <input type="date"> بالشكل 10/11/2026 بدل الشكل الأمريكي 11/10/2026 (لقطات الفصل 48)
+  env: { ...process.env, HOME: BT, LD_LIBRARY_PATH: `${BT}/rt/al2023/lib:${BT}/rt`, FONTCONFIG_FILE: fontsConf, ...(args.locale ? { LANG: args.locale, LC_ALL: args.locale } : {}) },
 });
 fs.mkdirSync(IMAGES, { recursive: true });
 

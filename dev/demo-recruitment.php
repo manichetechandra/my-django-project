@@ -299,6 +299,12 @@ demo_fixed_codes(CompetitionApplication::find((int) $proApps[0]['id']), 'C26-RSN
 // أحداث الموظفين المسجّلة من سطر الأوامر (بلا مستخدم) تُنسب للمدير التجريبي
 DB::query("UPDATE recruitment_audit SET user_id = ?, username = ? WHERE user_id IS NULL AND action IN ('convoke', 'unconvoke', 'result', 'publish', 'unpublish', 'status', 'update')",
     [$adminId, (string) $admin['username']]);
+// وبعنوان المدير وأوقات واقعية بدل 0.0.0.0 ووقت تشغيل هذا الملف (سجل الاطلاع في لقطات الفصل 48)
+DB::query("UPDATE recruitment_audit SET ip_address = '41.111.20.5' WHERE user_id = ? AND ip_address IN ('', '0.0.0.0')", [$adminId]);
+foreach ([['convoke', (int) $pro['id'], $at(36, '11:30')], ['result', (int) $pro['id'], $at(11, '10:05')], ['publish', (int) $pro['id'], $at(10, '14:00')]] as [$action, $cid, $when]) {
+    DB::query('UPDATE recruitment_audit SET created_at = ? WHERE action = ? AND competition_id = ?', [$when, $action, $cid]);
+}
+DB::query("UPDATE recruitment_audit SET created_at = ? WHERE action = 'convoke' AND application_id = ?", [$at(1, '10:20'), (int) $karim['id']]);
 
 @array_map('unlink', glob("$tmp/*.pdf"));
 // الموظف التجريبي hicham41 بلا «صلاحية مسابقات التوظيف» عمداً: لا يرى المسابقات ولا ملفات المترشحين (لاختبار الصلاحيات)
