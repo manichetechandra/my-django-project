@@ -336,7 +336,7 @@ md.renderer.rules.fence = (tokens, idx) => {
   return codeBlock({
     code: t.content.replace(/\n$/, ''),
     lang: terminal ? 'bash' : lang,
-    head: title || '',
+    head: title === 'مثال' ? '' : title, // «مثال» هو نص الشارة نفسها، فلا نكرره عنواناً
     badge: terminal ? 'سطر الأوامر' : 'مثال',
     badgeClass: 'ex',
     kind: terminal ? 'terminal' : 'example',
