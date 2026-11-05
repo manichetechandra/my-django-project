@@ -754,7 +754,6 @@ function timesince($value, $now = null): string
     return lang() === 'en' ? '0 minutes' : (is_rtl() ? '0 دقيقة' : '0 minute');
 }
 
-/** عدد + وحدة بصيغة اللغة: العربية (مفرد، مثنى، جمع) أو الفرنسية والإنجليزية (مفرد، جمع) */
 /** مدة متبقية بلغة الصفحة: «5 أيام و3 ساعات» / «5 jours et 3 heures» (العد التنازلي لآجال المسابقات) */
 function time_left(int $seconds): string
 {
@@ -777,6 +776,7 @@ function time_left(int $seconds): string
     return plural_unit(max(1, $m), $forms[2]);
 }
 
+/** عدد + وحدة بصيغة اللغة: العربية (مفرد، مثنى، جمع) أو الفرنسية والإنجليزية (مفرد، جمع) */
 function plural_unit(int $n, array $forms): string
 {
     if (count($forms) === 3) {
