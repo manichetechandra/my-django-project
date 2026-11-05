@@ -230,11 +230,12 @@ function includeFile(spec, chapter) {
   const [file, rangeSpec, ...flags] = spec.trim().split(/\s+/);
   const insert = flags.includes('insert');
   const replace = flags.includes('replace'); // قطعة تحل محل كود مؤقت موجود في الملف
+  const fresh = flags.includes('new'); // أول قطعة في ملف جديد لا تبدأ من السطر 1 (ما قبلها يُكتب في فصل لاحق)
   const abs = path.join(SRC, file);
   if (!fs.existsSync(abs)) throw new Error(`@file: الملف غير موجود: ${file} (${chapter})`);
   const all = fs.readFileSync(abs, 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
   let s = 1, e = all.length;
-  if (rangeSpec && rangeSpec.includes(',')) return includeFileParts(file, all, rangeSpec, insert || replace, chapter);
+  if (rangeSpec && rangeSpec.includes(',')) return includeFileParts(file, all, rangeSpec, insert || replace, chapter, fresh);
   if (rangeSpec && rangeSpec !== '-') {
     const m = rangeSpec.match(/^(\d+)-(\d+|\$)$/);
     if (!m) throw new Error(`@file: مدى غير صالح "${rangeSpec}" في ${chapter}`);
@@ -245,18 +246,18 @@ function includeFile(spec, chapter) {
   if (!coverage.has(file)) coverage.set(file, []);
   coverage.get(file).push([s, e, chapter, insert || replace ? 'insert' : 'file']);
   const whole = s === 1 && e === all.length;
-  const badge = replace ? 'استبدال' : (s === 1 ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف'));
+  const badge = replace ? 'استبدال' : (s === 1 || fresh ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف'));
   const range = whole ? `الملف كاملاً — ${all.length} سطر` : `الأسطر ${s}–${e} من ${all.length}`;
   const foot = e === all.length && !whole ? 'نهاية الملف' : (whole ? '' : `يتبع الملف من السطر ${e + 1}`);
   return codeBlock({
     code: all.slice(s - 1, e).join('\n'), lang: langFor(file), start: s,
     htmlLines: contextLines(all.join('\n'), langFor(file)).slice(s - 1, e),
-    head: file, badge, badgeClass: replace ? 'ins' : (s === 1 ? 'new' : (insert ? 'ins' : 'cont')), range, foot,
+    head: file, badge, badgeClass: replace ? 'ins' : (s === 1 || fresh ? 'new' : (insert ? 'ins' : 'cont')), range, foot,
   });
 }
 
 // مدى متعدد «1-42,47-53»: صندوق واحد بأجزاء الملف، وبين الأجزاء سطر فاصل للأسطر التي تُضاف في فصل لاحق
-function includeFileParts(file, all, rangeSpec, insert, chapter) {
+function includeFileParts(file, all, rangeSpec, insert, chapter, fresh = false) {
   const parts = rangeSpec.split(',').map((p) => {
     const m = p.match(/^(\d+)-(\d+|\$)$/);
     if (!m) throw new Error(`@file: مدى غير صالح "${p}" في ${chapter}`);
@@ -275,7 +276,7 @@ function includeFileParts(file, all, rangeSpec, insert, chapter) {
     }
     for (let n = s; n <= e; n++) { code.push(all[n - 1]); nums.push(n); }
   });
-  const first = parts[0][0], last = parts[parts.length - 1][1];
+  const first = fresh ? 1 : parts[0][0], last = parts[parts.length - 1][1];
   const range = `الأسطر ${parts.map(([s, e]) => (s === e ? `${s}` : `${s}–${e}`)).join('، ')} من ${all.length}`;
   const foot = last === all.length ? 'نهاية الملف' : `يتبع الملف من السطر ${last + 1}`;
   const ctx = contextLines(all.join('\n'), langFor(file));

@@ -1,21 +1,9 @@
 <?php
 /**
- * لوحة الموظفين لمتابعة طلبات الطلاب (admin_dashboard, admin_applications_list, ... في students/views.py)
+ * لوحة الموظفين لمتابعة طلبات الطلاب: تقابل دوال admin_ في الملف students/views.py
  */
 
 /** بناء شرط الفلترة المشترك بين القائمة والتصدير */
-/**
- * خلية CSV آمنة: Excel ينفّذ الخلايا التي تبدأ بـ = + - @ كمعادلات (CSV/Formula Injection)،
- * والطالب يكتب اسمه وتفاصيل طلبه بنفسه، فنضيف ' قبلها لتُعرض كنص.
- */
-function csv_safe($value)
-{
-    if (is_string($value) && $value !== '' && strpbrk($value[0], "=+-@\t\r") !== false) {
-        return "'" . $value;
-    }
-    return $value;
-}
-
 function staff_applications_filter(): array
 {
     $where = '1';
@@ -255,6 +243,18 @@ function staff_application_detail($pk): void
     ]);
 }
 
+/**
+ * خلية CSV آمنة: Excel ينفّذ الخلايا التي تبدأ بـ = + - @ كمعادلات (CSV/Formula Injection)،
+ * والطالب يكتب اسمه وتفاصيل طلبه بنفسه، فنضيف ' قبلها لتُعرض كنص.
+ */
+function csv_safe($value)
+{
+    if (is_string($value) && $value !== '' && strpbrk($value[0], "=+-@\t\r") !== false) {
+        return "'" . $value;
+    }
+    return $value;
+}
+
 function staff_export_applications_excel(): void
 {
     never_cache();
@@ -276,7 +276,7 @@ function staff_export_applications_excel(): void
             $app->get_status_display(),
             format_date($app['submitted_at'], 'Y-m-d H:i'),
             format_date($app['reviewed_at'], 'Y-m-d H:i'),
-            $r ? $r->get_full_name() : '',
+            $r ? $r->display_name() : '',
             (string) $s['phone'],
             $s['user']['email'],
             $s['faculty'],

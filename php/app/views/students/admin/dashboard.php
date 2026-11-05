@@ -18,7 +18,7 @@
     /* بطاقات الإحصائيات الكبيرة */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
         gap: 20px;
         margin-bottom: 40px;
     }
@@ -141,7 +141,7 @@
             <i class="fa fa-dashboard"></i> <?= t('لوحة تحكم المشرف') ?>
         </h1>
         <p style="margin-top: 10px; opacity: 0.9;">
-            <?= t('مرحباً') ?> <?= e((($user ? $user->get_full_name() : '') ?: ($user['username'] ?? ''))) ?>
+            <?= t('مرحباً') ?> <?= e($user ? $user->display_name() : '') ?>
         </p>
     </div>
 </div>
@@ -313,10 +313,9 @@
         </div>
     </div>
     
-
-<br><br>
+    <br><br>
     <!-- ========================================
-         قسم الرسوم البيانية ← جديد! 📊
+         قسم الرسوم البيانية
          ======================================== -->
     <div class="row" style="margin-top: 40px;">
         <div class="col-md-12">
@@ -380,6 +379,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
 
 <script>
+// اتجاه الصفحة: من اليمين لليسار بالعربية، ومن اليسار لليمين بالفرنسية والإنجليزية
+const RTL = <?= json_js(is_rtl()) ?>;
+
 // ========================================
 // 1. Pie Chart - توزيع حسب الحالة
 // ========================================
@@ -388,7 +390,7 @@ const statusCtx = document.getElementById('statusChart').getContext('2d');
 const statusChart = new Chart(statusCtx, {
     type: 'pie',  // نوع الرسم: دائري
     data: {
-        labels: <?= json_js($chart_status_labels) ?>,  // [<?= js_t('قيد الانتظار') ?>, <?= js_t('قيد المراجعة') ?>, ...]
+        labels: <?= json_js($chart_status_labels) ?>,  // أسماء الحالات بلغة الصفحة
         datasets: [{
             label: <?= js_t('عدد الطلبات') ?>,
             data: <?= json_js($chart_status_data) ?>,  // [5, 3, 10, 2]
@@ -403,7 +405,7 @@ const statusChart = new Chart(statusCtx, {
         plugins: {
             legend: {
                 position: 'bottom',  // الأسطورة في الأسفل
-                rtl: true,  // من اليمين لليسار (عربي)
+                rtl: RTL,  // من اليمين لليسار بالعربية
                 labels: {
                     font: {
                         size: 14,
@@ -413,7 +415,7 @@ const statusChart = new Chart(statusCtx, {
                 }
             },
             tooltip: {
-                rtl: true,
+                rtl: RTL,
                 callbacks: {
                     label: function(context) {
                         let label = context.label || '';
@@ -471,7 +473,7 @@ const typeChart = new Chart(typeCtx, {
                 display: false  // إخفاء الأسطورة (غير ضرورية)
             },
             tooltip: {
-                rtl: true,
+                rtl: RTL,
                 callbacks: {
                     label: function(context) {
                         return <?= js_t('العدد: {count} طلب') ?>.replace('{count}', context.parsed.y);
@@ -498,7 +500,7 @@ const daysChart = new Chart(daysCtx, {
             backgroundColor: 'rgba(52, 152, 219, 0.2)',  // لون شفاف
             borderColor: '#3498db',  // لون الخط
             borderWidth: 3,
-            tension: 0.4,  // انحناء الخط (0 = مستقيم، 1 = منحني جداً)
+            tension: 0.4,  // انحناء الخط: صفر مستقيم، وواحد منحني جداً
             pointRadius: 5,  // حجم النقاط
             pointBackgroundColor: '#3498db',
             pointBorderColor: '#fff',
@@ -532,7 +534,7 @@ const daysChart = new Chart(daysCtx, {
                 display: false
             },
             tooltip: {
-                rtl: true,
+                rtl: RTL,
                 callbacks: {
                     title: function(context) {
                         return context[0].label;

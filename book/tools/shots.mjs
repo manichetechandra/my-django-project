@@ -139,6 +139,8 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '30-downloads', url: '/downloads/', h: 900 },
   { name: '30-search', url: '/search/?q=' + encodeURIComponent('المنحة الجامعية'), h: 900 },
   { name: '31-login', url: '/students/login/', h: 860 },
+  // واجهة دخول الموظفين، كما تظهر لمن فتح صفحة محمية (رسالة «سجّل الدخول بحساب موظف»)
+  { name: '34-admin-login', url: '/admin/login/?next=%2Fstudents%2Fadmin%2Fdashboard%2F', w: 900, h: 720 },
   { name: '32-dashboard', url: '/students/dashboard/', login: STUDENT, h: 950, scrollTo: '.application-list', scrollPad: 190 },
   { name: '32-create', url: '/students/applications/create/1/', login: STUDENT, h: 1100 },
   // البطاقة ثم أزرار الطباعة ونصائحها تحتها (ارتفاع السطر 1.15 صار في القالب نفسه)
@@ -163,8 +165,10 @@ const shots = SET === 'stages' ? stageShots : [
   { name: '37-applications', url: '/admin/student_applications/', login: STAFF, h: 820 },
 ];
 
-async function login(page, [user, pass]) {
-  await page.goto(BASE + '/students/login/', { waitUntil: 'networkidle0' });
+async function login(page, cred) {
+  const [user, pass] = cred;
+  // الموظفون يدخلون من واجهة الإدارة فقط (صفحة دخول الطلبة ترفض حساباتهم)
+  await page.goto(BASE + (cred === STAFF ? '/admin/login/' : '/students/login/'), { waitUntil: 'networkidle0' });
   await page.type('input[name=username]', user);
   await page.type('input[name=password]', pass);
   await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('form:has(input[name=password]) [type=submit]')]);
@@ -275,7 +279,7 @@ async function prepareOverlay(s) {
   writeSnapshot(s.overlay[0], s.overlay[1], dir);
   // plain: بلا موجّه index.php، فتُقدَّم ملفات HTML الثابتة (مثل admin-demo/) كما يفعل Apache
   const routerArgs = s.plain ? [] : [path.join(dir, 'index.php')];
-  server = spawn(PHP, ['-S', '127.0.0.1:8100', '-t', dir, ...routerArgs], { env: { ...process.env, DB_NAME: 'dou_setif' }, stdio: ['ignore', 'ignore', 'pipe'] });
+  server = spawn(PHP, ['-S', '127.0.0.1:8100', '-t', dir, ...routerArgs], { env: { ...process.env, DB_NAME: process.env.DEMO_DB || 'dou_setif' }, stdio: ['ignore', 'ignore', 'pipe'] });
   server.stderr.on('data', (d) => { const t = String(d); if (/error|warning|fatal/i.test(t) && !/Accepted|Closing|\[200\]|\[30\d\]/.test(t)) process.stderr.write('  php: ' + t); });
   for (let i = 0; i < 50 && !(await portOpen(8100)); i++) await new Promise((r) => setTimeout(r, 100));
   serverKey = key;

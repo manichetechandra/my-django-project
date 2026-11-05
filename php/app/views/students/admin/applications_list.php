@@ -3,7 +3,7 @@
 
 <?php block('extra_css'); ?>
 <style>
-    /* نفس الـ CSS السابق + إضافات */
+    /* تصميم صفحة إدارة الطلبات */
     
     .list-header {
         background: linear-gradient(135deg, #16a085 0%, #27ae60 100%);
@@ -30,7 +30,7 @@
     }
     
     /* ========================================
-       جديد: تصميم الإجراءات الجماعية
+       تصميم الإجراءات الجماعية
        ======================================== */
     
     .bulk-actions-bar {
@@ -95,7 +95,7 @@
         background: #fff3cd !important;
     }
     
-    /* باقي الـ CSS السابق */
+    /* جدول الطلبات */
     .applications-table {
         background: white;
         border-radius: 10px;
@@ -143,7 +143,7 @@
         color: #7f8c8d;
     }
     
-    .empty-state i {
+    .empty-state > i {
         font-size: 80px;
         margin-bottom: 20px;
         display: block;
@@ -239,8 +239,8 @@
         </form>
     </div>
     
-        <!-- ========================================
-         نموذج واحد يحتوي كل شيء ← الحل!
+    <!-- ========================================
+         نموذج واحد يضم شريط الإجراءات والجدول
          ======================================== -->
     <form method="post" id="bulkActionsForm">
         <?= csrf_field() ?>
@@ -284,32 +284,32 @@
              جدول الطلبات - داخل نفس الـ form!
              ======================================== -->
         <div class="applications-table">
-                    <h3>
-            <span>
-                <i class="fa fa-list"></i> <?= t('قائمة الطلبات') ?>
-                <small style="opacity: 0.7; font-size: 14px; margin-inline-start: 15px;">
-                    <?= t('({count} طلب)', ['count' => $total_count]) ?>
-                </small>
-            </span>
-            <span>
-                <!-- ========================================
-                     زر تصدير Excel ← جديد!
-                     
-                     الشرح:
-                     - نفس URL parameters (status, type, search)
-                     - يصدّر الطلبات المفلترة فقط!
-                     ======================================== -->
-                <a href="<?= e(url('students:export_applications_excel')) ?>?<?= e(http_build_query($_GET)) ?>" 
-                   class="btn btn-success btn-sm"
-                   title="<?= t('تصدير إلى Excel') ?>">
-                    <i class="fa fa-file-excel-o"></i> <?= t('تصدير Excel') ?>
-                </a>
-                
-                <a href="<?= e(url('students:admin_dashboard')) ?>" class="btn btn-default btn-sm">
-                    <i class="fa fa-arrow-right"></i> <?= t('العودة') ?>
-                </a>
-            </span>
-        </h3>
+            <h3>
+                <span>
+                    <i class="fa fa-list"></i> <?= t('قائمة الطلبات') ?>
+                    <small style="opacity: 0.7; font-size: 14px; margin-inline-start: 15px;">
+                        <?= t('({count} طلب)', ['count' => $total_count]) ?>
+                    </small>
+                </span>
+                <span>
+                    <!-- ========================================
+                         زر تصدير Excel
+
+                         الشرح:
+                         - يحمل فلاتر الرابط نفسها (status, type, search)
+                         - فيصدّر الطلبات المفلترة فقط
+                         ======================================== -->
+                    <a href="<?= e(url('students:export_applications_excel')) ?>?<?= e(http_build_query($_GET)) ?>" 
+                       class="btn btn-success btn-sm"
+                       title="<?= t('تصدير إلى Excel') ?>">
+                        <i class="fa fa-file-excel-o"></i> <?= t('تصدير Excel') ?>
+                    </a>
+                    
+                    <a href="<?= e(url('students:admin_dashboard')) ?>" class="btn btn-default btn-sm">
+                        <i class="fa fa-arrow-right"></i> <?= t('العودة') ?>
+                    </a>
+                </span>
+            </h3>
             
             <?php if (!empty($applications)): ?>
             <table class="table table-striped table-hover" style="margin: 0;">
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.classList.remove('selected');
             }
             
-            // تحديث <?= js_t('تحديد الكل') ?>
+            // تحديث مربع «تحديد الكل»
             const allChecked = Array.from(appCheckboxes).every(cb => cb.checked);
             const someChecked = Array.from(appCheckboxes).some(cb => cb.checked);
             
@@ -539,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
             
-            // إذا كان الإجراء <?= js_t('رفض') ?>، نطلب سبب الرفض
+            // إذا كان الإجراء «رفض»، نطلب سبب الرفض
             if (action === 'reject') {
                 const notes = prompt(<?= js_t('أدخل سبب الرفض (اختياري):') ?>);
                 if (notes !== null && notes.trim() !== '') {
@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ========================================
-// دالة إلغاء التحديد (من زر <?= js_t('إلغاء التحديد') ?>)
+// دالة إلغاء التحديد (من زر «إلغاء التحديد»)
 // ========================================
 function clearSelection() {
     document.querySelectorAll('.app-checkbox').forEach(checkbox => {

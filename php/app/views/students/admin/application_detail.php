@@ -163,6 +163,12 @@
         border-radius: 5px;
         padding: 20px;
     }
+    
+    /* زر إغلاق النافذة المنبثقة: Bootstrap 3 يضعه يميناً دائماً، فننقله إلى نهاية السطر */
+    .modal-header .close {
+        float: left;
+        float: inline-end;
+    }
 </style>
 <?php endblock(); ?>
 
@@ -201,7 +207,7 @@
                  الشرح:
                  - فقط إذا كان الطلب "معلق"
                  - نموذج POST لتغيير الحالة
-                 - action="<?= e(request_path()) ?>" = نفس الصفحة
+                 - بلا action: يُرسَل إلى الصفحة نفسها
                  ======================================== -->
             <?php if ($application['status'] == 'pending'): ?>
             <div class="action-section">
@@ -223,7 +229,7 @@
                     <!-- 
                         input hidden
                         لماذا؟
-                        - لنخبر الـ View أي إجراء نريد
+                        - لنخبر المتحكم أي إجراء نريد
                         - action=approve يعني "اعتماد"
                     -->
                     <button type="submit" class="action-btn btn-approve" 
@@ -305,7 +311,7 @@
                             <label><?= t('راجعه') ?></label>
                             <div class="value">
                                 <i class="fa fa-user"></i>
-                                <?= e(($application['reviewed_by']->get_full_name() ?: $application['reviewed_by']['username'])) ?>
+                                <?= e($application['reviewed_by']->display_name()) ?>
                             </div>
                         </div>
                         <?php endif; ?>
@@ -379,13 +385,13 @@
                 <?php if (!empty($application['details'])): ?>
                 <div class="detail-section">
                     <h3><i class="fa fa-comment"></i> <?= t('تفاصيل الطلب') ?></h3>
-                    <div style="padding: 15px; background: #f8f9fa; border-radius: 5px; line-height: 1.8; border-inline-start: 3px solid #3498db;">
+                    <div dir="auto" style="padding: 15px; background: #f8f9fa; border-radius: 5px; line-height: 1.8; border-inline-start: 3px solid #3498db;">
                         <?= linebreaks($application['details']) ?>
                         <!-- 
-                            |linebreaks
+                            linebreaks()
                             
                             الشرح:
-                            - filter يحول النص إلى <p> و <br>
+                            - تهرّب النص وتحوّل أسطره إلى فقرات
                             - يحترم الأسطر الجديدة
                         -->
                     </div>
@@ -443,7 +449,7 @@
                 <div class="detail-section">
                     <h3><i class="fa fa-comment-o"></i> <?= t('ملاحظات الإدارة') ?></h3>
                     <div class="admin-notes-box">
-                        <p style="margin: 0; white-space: pre-line;"><?= e($application['admin_notes']) ?></p>
+                        <p dir="auto" style="margin: 0; white-space: pre-line;"><?= e($application['admin_notes']) ?></p>
                         <!-- 
                             white-space: pre-line
                             

@@ -38,7 +38,7 @@ keep_lines() { # keep_lines FILE A-B
 [ "$N" -ge 42 ] || empty app/admin_config.php
 
 # --- المتحكمات
-[ "$N" -ge 36 ] || rm -f app/controllers/admin.php app/controllers/staff.php
+[ "$N" -ge 36 ] || rm -f app/controllers/admin.php app/controllers/staff.php assets/css/admin.css
 [ "$N" -ge 45 ] || rm -f app/controllers/competitions.php
 [ "$N" -ge 47 ] || rm -f app/controllers/recruitment_admin.php
 if   [ "$N" -lt 33 ]; then rm -f app/controllers/students.php
@@ -48,6 +48,13 @@ fi
 if   [ "$N" -lt 33 ]; then keep_lines app/forms.php 1-57
 elif [ "$N" -lt 34 ]; then keep_lines app/forms.php 1-115
 elif [ "$N" -lt 35 ]; then keep_lines app/forms.php 1-128
+fi
+
+# --- لوحة الإدارة: الفصل 36 يكتب الدخول والخروج فقط (الأسطر 126-187)، وقسم صفحة الدخول من admin.css
+if [ "$N" -ge 36 ] && [ "$N" -lt 38 ]; then
+  { sed -n '1p' "$P/app/controllers/admin.php"; sed -n '126,187p' "$P/app/controllers/admin.php"; } > app/controllers/admin.php
+  find app/views/admin -mindepth 1 -maxdepth 1 ! -name login.php -exec rm -rf {} +
+  [ "$N" -ge 37 ] || keep_lines assets/css/admin.css 102-121
 fi
 
 # --- القوالب
