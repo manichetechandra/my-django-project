@@ -583,7 +583,7 @@ $current_year = date('Y');
         <div class="col-lg-12">
             <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
                 <i class="fa fa-newspaper-o"></i> آخر الأخبـــار
-                <a href="#" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                <a href="#" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
                     <i class="fa fa-arrow-left"></i> عرض الكل
                 </a>
             </h3>
@@ -718,7 +718,7 @@ $current_year = date('Y');
         <div class="col-lg-12">
             <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
                 <i class="fa fa-calendar-check-o"></i> آخر النشاطـــات
-                <a href="#" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                <a href="#" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
                     <i class="fa fa-arrow-left"></i> عرض الكل
                 </a>
             </h3>
@@ -1011,9 +1011,86 @@ $current_year = date('Y');
     </div>
 </section>
 @@end
-@@block stats-css-js 7 from=app/views/homepage/index.php:545-609
+@@block stats-css-js 7 from=app/views/homepage/index.php:545-586
 @@end
-@@block sites-dephead 8 from=app/views/homepage/index.php:610-661
+@@block stats-js 7
+<script>
+    // رسم متحرك للأرقام
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.stat-number');
+        
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-count'));
+            const duration = 2000;
+            const step = target / (duration / 16);
+            
+            let current = 0;
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    counter.textContent = target.toLocaleString('ar-EG');
+                    clearInterval(timer);
+                } else {
+                    counter.textContent = Math.floor(current).toLocaleString('ar-EG');
+                }
+            }, 16);
+        });
+    });
+</script>
+@@end
+@@block sites-dephead 8
+
+<!-- مواقع مهمة -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="panel panel-default outer">
+                    <div class="panel-heading" style="background-color: #2c3e50; color: white;">
+                        <h4 class="text-center" style="font-size:24px; margin: 10px 0;">
+                            <i class="fa fa-link"></i> مــواقــع مهمـــــة
+                        </h4>
+                    </div>
+                    <div class="panel-body">
+                        <a class="btn btn-md btn-success" target="_blank" rel="noopener noreferrer" 
+                           href="https://arabe.univ-setif.dz/" 
+                           style="font-size:18px; font-weight:bold; margin: 5px;">
+                            <i class="fa fa-university"></i> جامعة فرحات عباس
+                        </a>
+                    </div>
+                    <div class="panel-body">
+                        <a class="btn btn-md btn-success" target="_blank" rel="noopener noreferrer" 
+                           href="https://www.mesrs.dz/" 
+                           style="font-size:18px; font-weight:bold; margin: 5px;">
+                            <i class="fa fa-graduation-cap"></i> وزارة التعليم العالي والبحث العلمي
+                        </a>
+                    </div>
+                    <div class="panel-body">
+                        <a class="btn btn-md btn-success" target="_blank" rel="noopener noreferrer" 
+                           href="https://progres.mesrs.dz/webonou/" 
+                           style="font-size:18px; font-weight:bold; margin: 5px;">
+                            <i class="fa fa-external-link"></i> منصة PROGRES
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- عنوان أقسام المديرية -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
+                <i class="fa fa-sitemap"></i> أقسام المديرية
+            </h3>
+        </div>
+    </div>
+</div>
+<br>
+
 @@end
 @@block dept-list 8
 
@@ -1027,7 +1104,7 @@ $current_year = date('Y');
                 </div>
                 <div class="panel-body text-justify">
                     <p>تتكفل بدراسة ملفات المنحة الجامعية وصرفها للطلبة المستحقين، ومتابعة الطعون والتحويلات بين الولايات.</p>
-                    <a class="btn btn-md btn-success" href="#" style="float: right;">
+                    <a class="btn btn-md btn-success" href="#" style="float: right; float: inline-start;">
                         المزيد <i class="fa fa-arrow-left"></i>
                     </a>
                 </div>
@@ -1040,7 +1117,7 @@ $current_year = date('Y');
                 </div>
                 <div class="panel-body text-justify">
                     <p>تنظم عملية الإيواء في الإقامات الجامعية: التسجيل، توزيع الغرف، ومتابعة ظروف الإقامة.</p>
-                    <a class="btn btn-md btn-success" href="#" style="float: right;">
+                    <a class="btn btn-md btn-success" href="#" style="float: right; float: inline-start;">
                         المزيد <i class="fa fa-arrow-left"></i>
                     </a>
                 </div>
@@ -1053,7 +1130,7 @@ $current_year = date('Y');
                 </div>
                 <div class="panel-body text-justify">
                     <p>تشرف على المطاعم الجامعية وتسهر على جودة الوجبات المقدمة وتوازنها الغذائي.</p>
-                    <a class="btn btn-md btn-success" href="#" style="float: right;">
+                    <a class="btn btn-md btn-success" href="#" style="float: right; float: inline-start;">
                         المزيد <i class="fa fa-arrow-left"></i>
                     </a>
                 </div>
@@ -1066,7 +1143,7 @@ $current_year = date('Y');
                 </div>
                 <div class="panel-body text-justify">
                     <p>تسيّر خطوط النقل الجامعي التي تربط الأحياء والإقامات بالأقطاب الجامعية.</p>
-                    <a class="btn btn-md btn-success" href="#" style="float: right;">
+                    <a class="btn btn-md btn-success" href="#" style="float: right; float: inline-start;">
                         المزيد <i class="fa fa-arrow-left"></i>
                     </a>
                 </div>
@@ -1088,7 +1165,7 @@ $current_year = date('Y');
                     </div>
                     <div class="panel-body text-justify">
                         <p><?= e($dept['description']) ?></p>
-                        <a class="btn btn-md btn-success" href="#" style="float: right;">
+                        <a class="btn btn-md btn-success" href="#" style="float: right; float: inline-start;">
                             المزيد <i class="fa fa-arrow-left"></i>
                         </a>
                     </div>
@@ -1106,7 +1183,7 @@ $current_year = date('Y');
             <div class="col-lg-12">
                 <h3 style="color: #2c3e50; border-bottom: 3px solid #8cc040; padding-bottom: 10px;">
                     <i class="fa fa-building"></i> الإقامات الجامعية
-                    <a href="#" class="btn btn-sm btn-success" style="float: left; margin-top: 5px;">
+                    <a href="#" class="btn btn-sm btn-success" style="float: left; float: inline-end; margin-top: 5px;">
                         <i class="fa fa-arrow-left"></i> عرض الكل
                     </a>
                 </h3>
@@ -1328,7 +1405,60 @@ $current_year = date('Y');
 @@block inc-footer 12
     <?php include __DIR__ . '/app/views/base/footer.php'; ?>
 @@end
-@@block footer-a 9 from=app/views/base/footer.php:1-53 file=app/views/base/footer.php@12
+@@block footer-a 9 file=app/views/base/footer.php@12
+<footer class="container-fluid text-center" style="background-color: #2c3e50; color: #fff; padding: 40px 0; margin-top: 80px;">
+    <div class="footer-above">
+        <div class="container">
+            <div class="row">
+                <div class="footer-col col-md-4">
+                    <h4><i class="fa fa-map-marker"></i> العنوان</h4>
+                    <p>
+                        مديرية الخدمات الجامعية لولاية سطيف<br>
+                        سطيف، الجزائر
+                    </p>
+                </div>
+                
+                <div class="footer-col col-md-4">
+                    <h4><i class="fa fa-share-alt"></i> تواصل معنا</h4>
+                    <ul class="social-network social-circle" style="list-style: none; padding: 0;">
+                        <li style="display: inline-block; margin: 0 10px;">
+                            <a href="#" style="color: #fff; font-size: 24px;">
+                                <i class="fa fa-facebook"></i>
+                            </a>
+                        </li>
+                        <li style="display: inline-block; margin: 0 10px;">
+                            <a href="#" style="color: #fff; font-size: 24px;">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        </li>
+                        <li style="display: inline-block; margin: 0 10px;">
+                            <a href="#" style="color: #fff; font-size: 24px;">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        </li>
+                        <li style="display: inline-block; margin: 0 10px;">
+                            <a href="#" style="color: #fff; font-size: 24px;">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col col-md-4">
+                    <h4><i class="fa fa-info-circle"></i> حول الموقع</h4>
+                    <p>الموقع الرسمي لمديرية الخدمات الجامعية</p>
+                    <p style="font-size: 12px; color: #bdc3c7;">
+                        Created by Sellam Miloud<br>
+                        sellammiloud06@gmail.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="container-fluid" style="background-color: #1a252f; color: #bdc3c7; padding: 15px 0; text-align: center;">
+    <p style="margin: 0;">
 @@end
 @@block footer-year 9
         <i class="fa fa-copyright"></i> جميع الحقوق محفوظة © 2026 - مديرية الخدمات الجامعية لولاية سطيف
@@ -1336,7 +1466,8 @@ $current_year = date('Y');
 @@block footer-year-php 10 replaces=footer-year
         <i class="fa fa-copyright"></i> جميع الحقوق محفوظة © <?= date('Y') ?> - مديرية الخدمات الجامعية لولاية سطيف
 @@end
-@@block footer-year-final 12 replaces=footer-year-php from=app/views/base/footer.php:54-54 file=app/views/base/footer.php@12
+@@block footer-year-final 12 replaces=footer-year-php file=app/views/base/footer.php@12
+        <i class="fa fa-copyright"></i> جميع الحقوق محفوظة © <?= e(($current_year ?: '2024')) ?> - مديرية الخدمات الجامعية لولاية سطيف
 @@end
 @@block footer-b 9 from=app/views/base/footer.php:55-56 file=app/views/base/footer.php@12
 @@end
