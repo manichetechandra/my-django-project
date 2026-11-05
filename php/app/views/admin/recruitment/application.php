@@ -10,7 +10,7 @@
     <h1 class="admin-title"><i class="fa fa-id-card-o"></i> <?= e($app->full_name()) ?>
         <span class="label label-<?= e($app->status_color()) ?> recruit-status-big"><?= e($app->get_status_display()) ?></span>
     </h1>
-    <div class="btn-group">
+    <div>
         <?php // القائمة مرتبة من الأحدث إلى الأقدم: «السابق» = الأحدث، «التالي» = الأقدم ?>
         <?php if ($neighbours['next']): ?><a class="btn btn-default" href="<?= e(url('admin:recruit_application', $neighbours['next'])) ?>"><i class="fa fa-arrow-right"></i> الطلب السابق</a><?php endif; ?>
         <?php if ($neighbours['prev']): ?><a class="btn btn-default" href="<?= e(url('admin:recruit_application', $neighbours['prev'])) ?>">الطلب التالي <i class="fa fa-arrow-left"></i></a><?php endif; ?>
