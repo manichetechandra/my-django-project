@@ -26,7 +26,7 @@ C:\xampp\php\php.exe database\tools\create_admin.php admin "MyPass#2025"
 إن كان الموقع القديم ما زال يعمل وفيه أخبار أو طلبات أحدث من `data.sql`، اصنع بالأداة ملفاً جديداً واستورده بدل الملف الجاهز:
 
 <div class="flow">
-  <div class="st"><b>Django</b>تصدير البيانات<small>dumpdata ← data.json</small></div><span class="ar">←</span>
+  <div class="st"><b>Django</b>تصدير البيانات<small>dumpdata إلى data.json</small></div><span class="ar">←</span>
   <div class="st hl"><b>الأداة</b>تحويل JSON إلى SQL<small>django_json_to_sql.php</small></div><span class="ar">←</span>
   <div class="st"><b>phpMyAdmin</b>استيراد<small>schema.sql ثم data.sql</small></div>
 </div>

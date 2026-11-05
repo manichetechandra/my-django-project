@@ -91,7 +91,7 @@ class Translator
     {
         $out = [];
         foreach (get_declared_classes() as $class) {
-            if (is_subclass_of($class, 'Model') && $class::translatable()) {
+            if (is_subclass_of($class, 'Model') && $class::translatable() && DB::value('SHOW TABLES LIKE ?', [$class::table()])) {
                 $out[] = $class;
             }
         }

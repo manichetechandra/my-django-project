@@ -123,7 +123,7 @@ for %f in (app\core\DB.php app\core\Model.php app\core\Page.php app\core\Router.
 | `/dou-setif/app/views/base/footer.php` | ممنوع ← 403 |
 
 ::: note
-في XAMPP تكون إضافة `mod_rewrite` مفعّلة، ويُسمح لملفات `.htaccess` بالعمل داخل `htdocs` افتراضياً (`AllowOverride All`). إن ظهر لك يوماً «خطأ 500» بمجرد إضافة `.htaccess` فغالباً السبب سطر مكتوب خطأ فيه، وتجد التفاصيل في سجل أخطاء Apache (**Logs ← Apache (error.log)** في لوحة XAMPP).
+في XAMPP تكون إضافة `mod_rewrite` مفعّلة، ويُسمح لملفات `.htaccess` بالعمل داخل `htdocs` افتراضياً (`AllowOverride All`). إن ظهر لك يوماً «خطأ 500» بمجرد إضافة `.htaccess` فغالباً السبب سطر مكتوب خطأ فيه، وتجد التفاصيل في سجل أخطاء Apache: في لوحة XAMPP اضغط **Logs** في سطر Apache، واختر **Apache (error.log)**.
 :::
 
 ## نقطة الدخول الجديدة: index.php
