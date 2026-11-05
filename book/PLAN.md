@@ -150,6 +150,16 @@
   تبدأ بـ `http://localhost/dou-setif/`): قبل استيراد ملف SQL في الاستضافة (الموقع في جذر النطاق) استبدال `/dou-setif/` بـ `/`
   في الملف المصدَّر (بحث واستبدال في محرر نصوص)، كما وعد الفصل 41. **الملحق أ يجب أن**: يضيف المجلدين tinymce-8.10.1 و
   tinymce-lang إلى «ما لا تكتبه بيدك». **المقدمة والملحقان أ و ب**: اسم النسخة المرجعية dou-setif-php-v2.zip لا dou-setif-php.zip.
+- **الفصل 42 (أُعيدت كتابته على النسخة 2):** admin_config.php كاملاً إلا 477-566 (صندوق بمدى متعدد 459-476,567-613 فيه شريط
+  «نضيفها في فصل لاحق»)، و admin.php: 7-39 replace (مكان resources-rt)، 62-73,85-102,112-124 replace (مكان menu-news: بلا قائمة
+  المسابقات 74-84 ولا تنبيه الترقية 103-111 — الفصل 47)، ثم 329-1036 (مكان دوال الأخبار المؤقتة)، و 1118-1161 بعد الترجمة،
+  و 1232-1371 بعد translate_all، و 1516-1638 في آخر الملف؛ بلا @moved (الأجزاء المكتوبة في 36-41 تُذكر نصاً). القوالب: index.php
+  (`- replace`)، list.php، form.php (4 قطع)، admin.css 132-136 insert، وحذف news_list.php و news_form.php و _news_tr.php و admin-demo/.
+  **stages/admin42.src** يبني admin.php و admin_config.php بلا المسابقات: reader-sim 42-46 يستعمله (ويحذف views/admin/recruitment)،
+  ولقطات 42-index/list/edit/app-edit/applications (overlay admin42، عرض 1280) بدل 37-*.png (حُذفت). admin_smoke على المحاكاة 42:
+  76 صفحة تعمل. **التغطية الكاملة `--coverage` تعمل الآن بلا حيلة نقل الفصل 42**: 107/144 (الباقي: المسابقات 43-47 والملحق ج،
+  ومكرر base.php 16-22/418-424 و footer.php 55-56 — يُراجع).
+  **الفصل 47 يجب أن**: يدرج admin.php 74-84 و 103-111، و admin_config.php 477-566، وقوالب views/admin/recruitment، و admin.css 138-176.
 
 ## قائمة العمل
 - [x] الأدوات على النسخة 2 + نقل الإشارات (remap_v2.py)

@@ -64,6 +64,11 @@ if [ "$N" -ge 38 ] && [ "$N" -lt 42 ]; then
   find app/views/admin -mindepth 1 -maxdepth 1 $keep -exec rm -rf {} +
   node "$BOOK/tools/stages.mjs" adminnews "$N.99" "$SIM" > /dev/null
 fi
+# الفصول 42-46: المحرك العام بلا المسابقات (admin.php 74-84 و 103-111، admin_config.php 477-566 وقوالبها: الفصل 47)
+if [ "$N" -ge 42 ] && [ "$N" -lt 47 ]; then
+  node "$BOOK/tools/stages.mjs" admin42 42 "$SIM" > /dev/null
+  rm -rf app/views/admin/recruitment
+fi
 # admin.css بأقسامه حسب الفصول: 1-83 (37)، 84-101 (40)، 102-121 (36)، 122-131 (38)، 132-137 (42)، 138-177 (47)، 178-190 (41)
 if [ -f assets/css/admin.css ] && [ "$N" -lt 47 ]; then
   awk -v n="$N" '

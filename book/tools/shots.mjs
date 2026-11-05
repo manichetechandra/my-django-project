@@ -173,6 +173,12 @@ const stageShots = [
       return { x: c.left + scrollX - 14, y: c.top + scrollY - 14, width: c.width + 28, height: rt.bottom - c.top + 28 };
     },
   },
+  // الفصل 42: المحرك العام بلا أقسام المسابقات (stages/admin42.src: admin.php بلا 74-84 و 103-111، admin_config.php بلا 477-566)
+  { name: '42-index', overlay: ['admin42', 42], url: '/admin/', login: STAFF, w: 1280, h: 860 },
+  { name: '42-list', overlay: ['admin42', 42], url: '/admin/news/', login: STAFF, w: 1280, h: 720 },
+  { name: '42-edit', overlay: ['admin42', 42], url: '/admin/sliders/1/', login: STAFF, w: 1280, h: 860 },
+  { name: '42-app-edit', overlay: ['admin42', 42], url: '/admin/student_applications/{id:202600007}/', login: STAFF, w: 1280, h: 1400 },
+  { name: '42-applications', overlay: ['admin42', 42], url: '/admin/student_applications/', login: STAFF, w: 1280, h: 720 },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
@@ -221,11 +227,6 @@ const shots = SET === 'stages' ? stageShots : [
     },
   },
   { name: '34-detail', url: '/students/admin/applications/{id:202600009}/', login: STAFF, h: 1250 },
-  { name: '37-index', url: '/admin/', login: STAFF, h: 900 },
-  { name: '37-list', url: '/admin/news/', login: STAFF, h: 760 },
-  { name: '37-edit', url: '/admin/sliders/1/', login: STAFF, h: 940 },
-  { name: '37-app-edit', url: '/admin/student_applications/{id:202600007}/', login: STAFF, h: 1420 },
-  { name: '37-applications', url: '/admin/student_applications/', login: STAFF, h: 820 },
 ];
 
 async function login(page, cred) {

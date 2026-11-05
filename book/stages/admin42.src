@@ -1,0 +1,11 @@
+@@file app/controllers/admin.php 42
+@@block menu-head 42 from=app/controllers/admin.php:1-73
+@@end
+@@block menu-tail 42 from=app/controllers/admin.php:85-102
+@@end
+@@block index-tail 42 from=app/controllers/admin.php:112-1638
+@@end
+@@block config-head 42 file=app/admin_config.php@42 from=app/admin_config.php:1-476
+@@end
+@@block config-tail 42 file=app/admin_config.php@42 from=app/admin_config.php:567-613
+@@end
