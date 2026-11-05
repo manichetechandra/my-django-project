@@ -16,8 +16,6 @@
     
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-    <?php if (is_rtl()): ?>
-    <?php endif; ?>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
@@ -50,10 +48,10 @@
             text-align: start;
         }
 
-        /* شريط التنقل ثابت أعلى الشاشة عند التمرير، لكنه يأخذ مكانه الحقيقي في الصفحة (sticky بدل fixed):
-           ارتفاعه يتغير (100 إلى 200 بكسل حسب عرض الشاشة واللغة)، والهامش الثابت القديم (70px) كان يترك
-           أول الصفحة — عنوان الخبر مثلاً — مختفياً تحته. لذلك صار margin-top لرؤوس الصفحات الملونة 0 بدل 70px
-           (كان يعوّض الشريط الثابت)، و30px بدل 80px لصفحات النشاطات والإقامات والمصالح */
+        /* شريط التنقل يبقى أعلى الشاشة عند التمرير لكنه يأخذ مكانه الحقيقي في الصفحة (sticky لا fixed):
+           ارتفاعه يتغير (100 إلى 200 بكسل حسب عرض الشاشة واللغة)، والشريط الثابت (fixed) يطفو فوق الصفحة
+           فيغطي أولها — عنوان الخبر مثلاً — إلا بهامش بارتفاعه بالضبط. لهذا رؤوس الصفحات الملونة بلا هامش علوي،
+           وصفحات النشاطات والإقامات والمصالح بهامش 30px فقط */
         .navbar-fixed-top {
             position: -webkit-sticky;
             position: sticky;
@@ -163,11 +161,8 @@
         }
         
         /* Bootstrap Grid RTL */
-        .row {
-        }
-        
-        /* كل مقاس يطفو في العرض الذي يعمل فيه فقط، كما في Bootstrap: تطبيق الطفو على كل الشاشات
-           كان يجعل أعمدة col-sm/md/lg في الهاتف تنكمش على محتواها بدل أن تأخذ عرض الشاشة */
+        /* كل مقاس يطفو في العرض الذي يعمل فيه فقط، كما في Bootstrap نفسه: في الهاتف تأخذ أعمدة
+           col-sm وcol-md وcol-lg عرض الشاشة كاملاً بدل أن تنكمش على محتواها */
         .col-xs-1, .col-xs-2, .col-xs-3,
         .col-xs-4, .col-xs-5, .col-xs-6,
         .col-xs-7, .col-xs-8, .col-xs-9,
@@ -308,9 +303,6 @@
         }
         
         /* Pagination RTL */
-        .pagination {
-        }
-        
         .pagination > li {
             float: right; float: inline-start;
         }

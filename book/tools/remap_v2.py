@@ -25,11 +25,20 @@ EXCLUDE = [r'^database/data\.sql$', r'^README\.md$', r'^SECURITY\.md$', r'\.gitk
            r'^assets/vendor/', r'^assets/js/tinymce-lang/', r'^uploads/', r'^storage/', r'(^|/)\.gitignore$']
 
 # ------------------------------------------------------------------ النسختان
-z = zipfile.ZipFile(os.path.join(REPO, 'dou-setif-php.zip'))
+# --from-rev=REV : المصدر php/ في مراجعة git (بعد تعديل كود البرنامج نفسه، مثل تنظيف أسطر) بدل dou-setif-php.zip
+FROM_REV = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--from-rev=')), None)
 V1 = {}
-for n in z.namelist():
-    if not n.endswith('/') and n.startswith('dou-setif/'):
-        V1[n[len('dou-setif/'):]] = z.read(n).decode('utf-8', 'replace').replace('\r\n', '\n')
+if FROM_REV:
+    for n in subprocess.run(['git', 'ls-tree', '-r', '--name-only', FROM_REV, 'php/'], cwd=REPO, capture_output=True, text=True).stdout.split():
+        try:
+            V1[n[len('php/'):]] = subprocess.run(['git', 'show', f'{FROM_REV}:{n}'], cwd=REPO, capture_output=True, check=True).stdout.decode('utf-8').replace('\r\n', '\n')
+        except UnicodeDecodeError:
+            pass
+else:
+    z = zipfile.ZipFile(os.path.join(REPO, 'dou-setif-php.zip'))
+    for n in z.namelist():
+        if not n.endswith('/') and n.startswith('dou-setif/'):
+            V1[n[len('dou-setif/'):]] = z.read(n).decode('utf-8', 'replace').replace('\r\n', '\n')
 FILES2 = subprocess.run(['git', 'ls-files'], cwd=os.path.join(REPO, 'php'), capture_output=True, text=True).stdout.split()
 V2 = {}
 for f in FILES2:

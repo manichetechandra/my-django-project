@@ -263,25 +263,17 @@ $current_year = date('Y');
 
     <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
 @@end
-@@block css-links 3
-
-    <!-- Bootstrap RTL CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rtl@3.4.0/dist/css/bootstrap-rtl.min.css">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+@@block css-links 3 from=app/views/base/base.php:16-22
 @@end
-@@block base-css-1 3 from=app/views/base/base.php:25-71
+@@block base-css-1 3 from=app/views/base/base.php:26-69
 @@end
-@@block base-css-nav 4 from=app/views/base/base.php:72-164
+@@block base-css-nav 4 from=app/views/base/base.php:70-162
 @@end
-@@block base-css-2 3 from=app/views/base/base.php:165-292
+@@block base-css-2 3 from=app/views/base/base.php:163-287
 @@end
-@@block base-css-carousel 5 from=app/views/base/base.php:293-309
+@@block base-css-carousel 5 from=app/views/base/base.php:288-304
 @@end
-@@block base-css-3 3 from=app/views/base/base.php:310-326
+@@block base-css-3 3 from=app/views/base/base.php:305-318
 @@end
 @@block home-css-open 5 from=app/views/homepage/index.php:6-13
 @@end
@@ -346,7 +338,7 @@ $current_year = date('Y');
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
                         <i class="fa fa-building"></i> المديرية <span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-right" style="width: 300px; max-height: 450px; overflow-y: auto; left: auto; right: 0;">
+                    <ul class="dropdown-menu dropdown-menu-right" style="width: 300px; max-height: 450px; overflow-y: auto; inset-inline-end: auto; inset-inline-start: 0;">
                         <li><a href="#">
                             <i class="fa fa-quote-left"></i> كلمة المدير
                         </a></li>
@@ -421,6 +413,23 @@ $current_year = date('Y');
 @@block nav-4 4 file=app/views/base/navbar.php@12
             
             <form class="navbar-form navbar-left" role="search" method="get" action="#">
+                <!-- اختيار اللغة: نفس الصفحة بلغة أخرى -->
+                <div class="btn-group lang-switch">
+                    <button type="button" class="btn btn-lang dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="اللغة">
+                        <i class="fa fa-globe"></i> AR <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="active">
+                            <a href="#" hreflang="ar" lang="ar">العربية</a>
+                        </li>
+                        <li>
+                            <a href="#" hreflang="fr" lang="fr">Français</a>
+                        </li>
+                        <li>
+                            <a href="#" hreflang="en" lang="en">English</a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="form-group">
                     <input type="text" class="form-control" name="q" value="" placeholder="ابحث في الموقع..." style="width: 250px;">
                 </div>
@@ -1331,14 +1340,7 @@ $current_year = date('Y');
 @@end
 @@block footer-b 9 from=app/views/base/footer.php:55-56 file=app/views/base/footer.php@12
 @@end
-@@block js-libs 3
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
-
+@@block js-libs 3 from=app/views/base/base.php:418-424
 @@end
 @@block home-js 5 from=app/views/homepage/index.php:797-826
 @@end
