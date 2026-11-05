@@ -3,7 +3,7 @@
 #   bash tools/reader-sim.sh 34 [/tmp/ch24sim]
 # يبني المجلد من php/ (النسخة النهائية) مع حذف ما لم يُكتب بعد حتى ذلك الفصل:
 #   ملفات core الفارغة، المتحكمات والقوالب اللاحقة، أجزاء students.php و forms.php وملفَي اللغة،
-#   وقطع المسابقات في الرئيسية وشريط التنقل (الفصل 45).
+#   وقطع المسابقات في الرئيسية وشريط التنقل (الفصل 45)، وأجزاء المسابقات حسب فصولها (43-48).
 # ثم الخادم (يحاكي .htaccess تحت /dou-setif):
 #   DB_NAME=dou_setif2 /tmp/tools/bin/php -S 0.0.0.0:8077 -t /tmp/simroot /tmp/simroot/router.php
 set -euo pipefail
@@ -34,13 +34,18 @@ keep_lines() { # keep_lines FILE A-B
 [ "$N" -ge 36 ] || empty app/core/XlsxWriter.php
 [ "$N" -ge 40 ] || empty app/core/Translator.php
 [ "$N" -ge 43 ] || empty app/core/Crypto.php
-[ "$N" -ge 44 ] || { empty app/core/PdfGuard.php app/models/recruitment.php; }
+[ "$N" -ge 44 ] || empty app/models/recruitment.php
+[ "$N" -ge 46 ] || empty app/core/PdfGuard.php
 [ "$N" -ge 42 ] || empty app/admin_config.php
 
 # --- المتحكمات
 [ "$N" -ge 36 ] || rm -f app/controllers/admin.php app/controllers/staff.php assets/css/admin.css
-[ "$N" -ge 45 ] || rm -f app/controllers/competitions.php
-[ "$N" -ge 47 ] || rm -f app/controllers/recruitment_admin.php
+# المسابقات: الإعلانات 1-97 (45)، الترشح والوصل حتى 474 (46)، فضاء المترشح (47)، ولوحة الإدارة (48)
+if   [ "$N" -lt 45 ]; then rm -f app/controllers/competitions.php
+elif [ "$N" -lt 46 ]; then keep_lines app/controllers/competitions.php 1-97
+elif [ "$N" -lt 47 ]; then keep_lines app/controllers/competitions.php 1-474
+fi
+[ "$N" -ge 48 ] || rm -f app/controllers/recruitment_admin.php
 if   [ "$N" -lt 33 ]; then rm -f app/controllers/students.php
 elif [ "$N" -lt 34 ]; then keep_lines app/controllers/students.php 1-156
 elif [ "$N" -lt 35 ]; then keep_lines app/controllers/students.php 1-394
@@ -64,16 +69,17 @@ if [ "$N" -ge 38 ] && [ "$N" -lt 42 ]; then
   find app/views/admin -mindepth 1 -maxdepth 1 $keep -exec rm -rf {} +
   node "$BOOK/tools/stages.mjs" adminnews "$N.99" "$SIM" > /dev/null
 fi
-# الفصول 42-46: المحرك العام بلا المسابقات (admin.php 74-84 و 103-111، admin_config.php 477-566 وقوالبها: الفصل 47)
-if [ "$N" -ge 42 ] && [ "$N" -lt 47 ]; then
-  node "$BOOK/tools/stages.mjs" admin42 42 "$SIM" > /dev/null
+# الفصول 42-47: المحرك العام؛ أقسام المسابقات في admin_config.php (477-566) من الفصل 44،
+# وقائمة صفحات الترشح وتنبيه الترقية في admin.php (74-84 و 103-111) وقوالبها: الفصل 48
+if [ "$N" -ge 42 ] && [ "$N" -lt 48 ]; then
+  node "$BOOK/tools/stages.mjs" admin42 "$N" "$SIM" > /dev/null
   rm -rf app/views/admin/recruitment
 fi
-# admin.css بأقسامه حسب الفصول: 1-83 (37)، 84-101 (40)، 102-121 (36)، 122-131 (38)، 132-137 (42)، 138-177 (47)، 178-190 (41)
-if [ -f assets/css/admin.css ] && [ "$N" -lt 47 ]; then
+# admin.css بأقسامه حسب الفصول: 1-83 (37)، 84-101 (40)، 102-121 (36)، 122-131 (38)، 132-137 (42)، 138-177 (48)، 178-190 (41)
+if [ -f assets/css/admin.css ] && [ "$N" -lt 48 ]; then
   awk -v n="$N" '
     NR<=83 {c=37} NR>=84&&NR<=101 {c=40} NR>=102&&NR<=121 {c=36} NR>=122&&NR<=131 {c=38}
-    NR>=132&&NR<=137 {c=42} NR>=138&&NR<=177 {c=47} NR>=178 {c=41}
+    NR>=132&&NR<=137 {c=42} NR>=138&&NR<=177 {c=48} NR>=178 {c=41}
     c<=n' "$P/assets/css/admin.css" > assets/css/admin.css
 fi
 # admin.js: الفصل 37 يكتب كل شيء إلا زر الترجمة (الأسطر 83-149، الفصل 40)
@@ -84,9 +90,22 @@ fi
 # --- القوالب
 [ "$N" -ge 36 ] || rm -rf app/views/admin app/views/students/admin
 [ "$N" -ge 45 ] || rm -rf app/views/competitions
+[ "$N" -ge 46 ] || rm -f app/views/competitions/{apply,receipt}.php
+[ "$N" -ge 47 ] || rm -f app/views/competitions/{track,_print_open,_print_close,print_convocation,print_result}.php
 [ "$N" -ge 35 ] || { rm -rf app/views/students/profile app/views/students/notifications_list.php; : > app/views/base/notifications_js.php; }
 [ "$N" -ge 34 ] || rm -f app/views/students/{dashboard,create_application,my_applications,application_detail,application_print,print_all}.php
 [ "$N" -ge 33 ] || rm -rf app/views/students
+
+# --- ملفات المسابقات في assets: competitions.css بأقسامه (45 ثم 46 ثم 47)، و competitions.js (46)، وملف الطباعة (47)
+[ "$N" -ge 46 ] || rm -f assets/js/competitions.js
+[ "$N" -ge 47 ] || rm -f assets/css/competitions-print.css
+if [ "$N" -lt 45 ]; then rm -f assets/css/competitions.css
+elif [ "$N" -lt 47 ]; then
+  awk -v n="$N" '
+    NR<=88 {c=45} NR>=89&&NR<=132 {c=46} NR>=133&&NR<=154 {c=47} NR>=155&&NR<=161 {c=45}
+    NR>=162&&NR<=206 {c=47} NR>=207 {c=45}
+    c<=n' "$P/assets/css/competitions.css" > assets/css/competitions.css
+fi
 
 # --- المسابقات في الرئيسية وشريط التنقل (الفصل 45)
 if [ "$N" -lt 45 ]; then

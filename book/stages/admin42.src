@@ -7,5 +7,7 @@
 @@end
 @@block config-head 42 file=app/admin_config.php@42 from=app/admin_config.php:1-476
 @@end
+@@block config-recruit 44 file=app/admin_config.php@42 from=app/admin_config.php:477-566
+@@end
 @@block config-tail 42 file=app/admin_config.php@42 from=app/admin_config.php:567-613
 @@end

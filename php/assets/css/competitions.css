@@ -164,7 +164,7 @@
 .cmp-steps li.current { color: #2c3e50; font-weight: bold; }
 .cmp-steps li.current::before { background: #fff; color: #5b8f22; box-shadow: inset 0 0 0 3px #8cc040; }
 .cmp-h4 { margin-top: 26px; color: #2c3e50; }
-.cmp-card { background: #fff; border: 1px solid #dfe5ea; border-radius: 12px; margin: 22px 0; overflow: hidden; box-shadow: 0 3px 12px rgba(44, 62, 80, .06); }
+.cmp-result, .cmp-convocation, .cmp-complete { padding: 0; border: 1px solid #dfe5ea; border-radius: 12px; margin: 22px 0; overflow: hidden; box-shadow: 0 3px 12px rgba(44, 62, 80, .06); }
 .cmp-card-head { display: flex; align-items: center; gap: 10px; padding: 12px 18px; background: #f4f7f9; border-bottom: 1px solid #e3e8ec; }
 .cmp-card-head i { font-size: 22px; color: #2e86c1; }
 .cmp-card-head h3 { margin: 0; font-size: 18px; font-weight: bold; color: #2c3e50; line-height: 1.5; }

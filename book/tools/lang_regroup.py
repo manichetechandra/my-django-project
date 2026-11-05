@@ -31,12 +31,14 @@ OVERRIDES = [
     ('app/views/base/navbar.php', 79, 84, 45),         # رابط المسابقات في القائمة
     ('app/views/homepage/index.php', 5, 5, 45),        # competitions.css
     ('app/views/homepage/index.php', 315, 337, 45),    # صندوق «مسابقات توظيف مفتوحة»
-    ('app/core/PdfGuard.php', 1, BIG, 45),
+    ('app/core/PdfGuard.php', 1, BIG, 46),
     ('app/models/recruitment.php', 1, BIG, 44),
-    ('app/controllers/competitions.php', 1, 476, 45),  # الصفحات العامة والترشح والوصل
-    ('app/controllers/competitions.php', 477, BIG, 46),  # فضاء المترشح: المتابعة والاستكمال والطباعة
-] + [('app/views/competitions/%s.php' % v, 1, BIG, 45) for v in ('list', 'detail', 'apply', 'receipt', '_print_open', '_print_close')] \
-  + [('app/views/competitions/%s.php' % v, 1, BIG, 46) for v in ('track', 'print_convocation', 'print_result')]
+    ('app/controllers/competitions.php', 1, 97, 45),     # الإعلانات: القائمة والتفاصيل والملفات المنشورة
+    ('app/controllers/competitions.php', 98, 475, 46),   # الترشح الإلكتروني والوصل
+    ('app/controllers/competitions.php', 476, BIG, 47),  # فضاء المترشح: المتابعة والاستكمال والطباعة
+] + [('app/views/competitions/%s.php' % v, 1, BIG, 45) for v in ('list', 'detail')] \
+  + [('app/views/competitions/%s.php' % v, 1, BIG, 46) for v in ('apply', 'receipt')] \
+  + [('app/views/competitions/%s.php' % v, 1, BIG, 47) for v in ('track', 'print_convocation', 'print_result', '_print_open', '_print_close')]
 
 # عنوان قسم كل فصل في ملف اللغة (موضوعه، بلا رقم الفصل: البرنامج مستقل عن الكتاب)
 TITLES = {
@@ -47,7 +49,8 @@ TITLES = {
     28: 'صفحات المديرية', 29: 'الأخبار والنشاطات', 30: 'الأقسام والإقامات والخدمات',
     31: 'النماذج واتصل بنا', 32: 'التحميلات والأسئلة الشائعة والبحث', 33: 'حسابات الطلبة: التسجيل والدخول',
     34: 'لوحة الطالب والطلبات', 35: 'الإشعارات والملف الشخصي والبطاقة الرقمية', 36: 'لوحة الموظفين (فضاء المشرف)',
-    44: 'مسابقات التوظيف: الحالات والتسميات', 45: 'مسابقات التوظيف: الإعلانات والترشح', 46: 'مسابقات التوظيف: فضاء المترشح',
+    44: 'مسابقات التوظيف: الحالات والتسميات', 45: 'مسابقات التوظيف: الإعلانات',
+    46: 'مسابقات التوظيف: الترشح الإلكتروني والوصل', 47: 'مسابقات التوظيف: فضاء المترشح',
 }
 
 
