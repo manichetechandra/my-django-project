@@ -590,7 +590,7 @@ return [
     'حذف الصورة' => 'Supprimer la photo',
     'لا توجد صورة شخصية' => 'Aucune photo personnelle',
     'رفع صورة جديدة:' => 'Envoyer une nouvelle photo :',
-    'الصيغ المدعومة: JPG, PNG (الحد الأقصى: 2MB)' => 'Formats acceptés : JPG, PNG (max. 2 Mo)',
+    'الصيغ المدعومة: JPG وPNG وGIF وWEBP، والحد الأقصى {mb} ميغابايت' => 'Formats acceptés : JPG, PNG, GIF ou WEBP ({mb} Mo maximum)',
     'الاسم الكامل بالعربية:' => 'Nom complet en arabe :',
     'تاريخ الميلاد:' => 'Date de naissance :',
     'مكان الميلاد:' => 'Lieu de naissance :',

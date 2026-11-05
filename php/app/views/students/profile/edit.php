@@ -115,7 +115,7 @@
                     <div class="form-group">
                         <label><?= t('رفع صورة جديدة:') ?></label>
                         <?= $profile_form->widget('photo') ?>
-                        <small class="help-block"><?= t('الصيغ المدعومة: JPG, PNG (الحد الأقصى: 2MB)') ?></small>
+                        <small class="help-block"><?= t('الصيغ المدعومة: JPG وPNG وGIF وWEBP، والحد الأقصى {mb} ميغابايت', ['mb' => config('uploads.max_image_mb', 5)]) ?></small>
                     </div>
                 </div>
                 
@@ -254,10 +254,10 @@ function deleteImage() {
         return;
     }
     
-    fetch('<?= e(url('students:delete_profile_image')) ?>', {
+    fetch(<?= json_js(url('students:delete_profile_image')) ?>, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': '<?= e(csrf_token()) ?>',
+            'X-CSRFToken': <?= json_js(csrf_token()) ?>,
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/json'
         }

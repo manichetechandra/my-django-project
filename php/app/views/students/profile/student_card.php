@@ -25,6 +25,7 @@
             background: #f0f0f0;
             padding: 20px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -34,6 +35,7 @@
         .student-card {
             width: 8.5cm;
             height: 5.3cm;
+            line-height: 1.15; /* ارتفاع سطر ثابت: يتسع المحتوى في البطاقة مهما كان الخط المتوفر في الجهاز */
             background: white;
             border-radius: 6px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -69,7 +71,7 @@
             gap: 0.25cm;
         }
         
-        /* قسم الصورة (يسار) */
+        /* قسم الصورة والباركود (أول البطاقة: يمينها بالعربية ويسارها بالفرنسية) */
         .photo-section {
             width: 2.5cm;
             display: flex;
@@ -117,7 +119,7 @@
             display: block;
         }
         
-        /* قسم المعلومات (يمين) */
+        /* قسم المعلومات (بجانب الصورة) */
         .info-section {
             flex: 1;
             display: flex;
@@ -155,6 +157,7 @@
         
         .detail-row {
             display: flex;
+            gap: 0.1cm;
             margin-bottom: 0.1cm;
             font-size: 7.5pt;
         }
@@ -207,6 +210,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-family: inherit;
             font-size: 14px;
             text-decoration: none;
             transition: all 0.3s;
@@ -281,9 +285,7 @@
             
             <!-- Barcode -->
             <div class="barcode-container">
-                <img src="<?= e(barcode_data_uri($student['registration_number'], 2, 56)) ?>" 
-                     alt="Barcode" 
-                     onerror="this.style.display='none';">
+                <img src="<?= e(barcode_data_uri($student['registration_number'], 2, 56)) ?>" alt="Barcode">
             </div>
         </div>
         
@@ -320,7 +322,7 @@
                 
                 <div class="detail-row">
                     <span class="detail-label"><?= t('صالحة حتى:') ?></span>
-                    <span class="detail-value">30/09/<?= e(format_date($student['created_at'], 'Y')) ?></span>
+                    <span class="detail-value"><?= e($valid_until) ?></span>
                 </div>
             </div>
             

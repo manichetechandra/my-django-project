@@ -443,7 +443,7 @@ $current_year = date('Y');
 @@end
 @@block nav-css-1 4 from=app/views/base/navbar.php:267-335 file=app/views/base/navbar.php@12
 @@end
-@@block nav-css-2 4 from=app/views/base/navbar.php:535-644 file=app/views/base/navbar.php@12
+@@block nav-css-2 4 from=app/views/base/navbar.php:363-451 file=app/views/base/navbar.php@12
 @@end
 @@block slider 5
 

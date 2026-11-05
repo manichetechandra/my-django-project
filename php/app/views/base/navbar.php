@@ -182,7 +182,7 @@ $__navClass = fn(string $section, string $class = ''): string
                             <ul class="dropdown-menu notifications-menu" style="width: 280px; max-height: 360px; overflow-y: auto;">
                                 <li class="dropdown-header" style="background: #34495e; color: white; font-weight: bold;">
                                     <i class="fa fa-bell"></i> <?= t('الإشعارات') ?>
-                                    <span class="badge badge-danger pull-left notifications-count" style="<?= $unread_count_nav ? '' : 'display: none;' ?>"><?= e($unread_count_nav) ?></span>
+                                    <span class="badge badge-danger notifications-count" style="float: left; float: inline-end;<?= $unread_count_nav ? '' : ' display: none;' ?>"><?= e($unread_count_nav) ?></span>
                                 </li>
                                 <li class="divider"></li>
                                 <?php $recent_notifications = $student_profile->get_recent_notifications(); ?>
@@ -333,7 +333,7 @@ $__navClass = fn(string $section, string $class = ''): string
         background: #7ab030;
     }
     
-    /* الإشعارات */
+    /* جرس الإشعارات: الزر وشارة العدد (حركة النبض في notifications_js.php) */
     .notifications-dropdown .dropdown-toggle {
         position: relative;
         padding: 15px 20px;
@@ -354,182 +354,10 @@ $__navClass = fn(string $section, string $class = ''): string
         line-height: 1;
     }
     
-    .dropdown-menu-notifications {
-        width: 360px;
-        max-height: 500px;
-        padding: 0;
-        border-radius: 8px;
-        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-        border: none;
-        overflow: hidden;
-        inset-inline-start: 0;
-        inset-inline-end: auto;
-    }
-    
-    .notifications-header {
-        padding: 12px 15px;
-        background: #34495e;
-        color: white;
-        font-weight: bold;
-        border-bottom: 2px solid #2c3e50;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .notifications-header .unread-count {
-        background: #e74c3c;
-        padding: 2px 8px;
-        border-radius: 10px;
-        font-size: 11px;
-    }
-    
-    .notifications-list-wrapper {
-        padding: 0;
-    }
-    
-    .notifications-list {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    
-    .notification-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 12px 15px;
-        border-bottom: 1px solid #ecf0f1;
-        transition: all 0.2s;
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .notification-item:hover {
-        background: #f8f9fa;
-        text-decoration: none;
-    }
-    
-    .notification-item.unread {
-        background: #f0f8ff;
-        border-inline-start: 3px solid #3498db;
-    }
-    
-    .notification-item.unread:hover {
-        background: #e8f4fd;
-    }
-    
-    .notif-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    
-    .notif-icon i {
-        font-size: 20px;
-    }
-    
-    .notif-content {
-        flex: 1;
-        min-width: 0;
-    }
-    
-    .notif-title {
-        font-size: 13px;
-        font-weight: bold;
-        color: #2c3e50;
-        margin-bottom: 4px;
-        line-height: 1.3;
-    }
-    
-    .notif-message {
-        font-size: 12px;
-        color: #7f8c8d;
-        line-height: 1.4;
-        margin-bottom: 4px;
-    }
-    
-    .notif-time {
-        font-size: 11px;
-        color: #95a5a6;
-    }
-    
-    .new-label {
-        display: inline-block;
-        background: #e74c3c;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 8px;
-        font-size: 9px;
-        font-weight: bold;
-        margin-inline-start: 4px;
-    }
-    
-    .notifications-footer a {
-        display: block;
-        padding: 12px;
-        text-align: center;
-        background: #f8f9fa;
-        color: #3498db;
-        font-weight: bold;
-        border-top: 1px solid #ecf0f1;
-        text-decoration: none;
-    }
-    
-    .notifications-footer a:hover {
-        background: #ecf0f1;
-        text-decoration: none;
-    }
-    
-    .notifications-empty {
-        padding: 40px 20px;
-        text-align: center;
-        color: #95a5a6;
-    }
-    
-    .notifications-empty i {
-        font-size: 48px;
-        display: block;
-        margin-bottom: 10px;
-        opacity: 0.3;
-    }
-    
-    .notifications-empty p {
-        margin: 0;
-        font-size: 14px;
-    }
-    
-    .notifications-list::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .notifications-list::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    
-    .notifications-list::-webkit-scrollbar-thumb {
-        background: #bdc3c7;
-        border-radius: 3px;
-    }
-    
-    .notifications-list::-webkit-scrollbar-thumb:hover {
-        background: #95a5a6;
-    }
-    
-    @keyframes pulse {
-        0%, 100% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.2);
-        }
-    }
-    
-    .notifications-badge.new-notification {
-        animation: pulse 0.5s ease 3;
+    /* الجرس قرب آخر الشريط: قائمته تنفتح نحو داخل الصفحة، فلا يخرج نصفها من الشاشة */
+    .navbar-nav > .notifications-dropdown > .notifications-menu {
+        inset-inline-start: auto;
+        inset-inline-end: 0;
     }
     
     @media (max-width: 767px) {
@@ -555,27 +383,6 @@ $__navClass = fn(string $section, string $class = ''): string
         
         .navbar-form .form-control {
             width: 100% !important;
-        }
-        
-        .dropdown-menu-notifications {
-            width: 100%;
-            max-width: 100vw;
-            inset-inline-end: 0;
-            inset-inline-start: 0;
-            border-radius: 0;
-        }
-        
-        .notification-item {
-            padding: 10px;
-        }
-        
-        .notif-icon {
-            width: 35px;
-            height: 35px;
-        }
-        
-        .notif-icon i {
-            font-size: 18px;
         }
     }
 

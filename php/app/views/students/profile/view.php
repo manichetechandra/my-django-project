@@ -116,30 +116,29 @@
         <!-- الصورة والإحصائيات -->
         <div class="col-md-4">
             <!-- الصورة الشخصية -->
-            <!-- الصورة الشخصية -->
-<div class="profile-card">
-    <div class="profile-image-section">
-        <?php if (!empty($student['photo'])): ?>
-        <img src="<?= e(media_url($student['photo'])) ?>" alt="<?= e($student['full_name_arabic']) ?>" class="profile-image">
-        <?php else: ?>
-        <div class="profile-image" style="background: #bdc3c7; display: flex; align-items: center; justify-content: center; font-size: 60px; color: white;">
-            <i class="fa fa-user"></i>
-        </div>
-        <?php endif; ?>
-        
-        <h4 style="margin: 10px 0; color: #2c3e50;"><?= e($student['full_name_arabic']) ?></h4>
-        <p style="color: #7f8c8d; margin: 5px 0;"><?= e($student['registration_number']) ?></p>
-        
-        <div style="margin-top: 20px;">
-            <a href="<?= e(url('students:profile_edit')) ?>" class="btn btn-primary btn-block">
-                <i class="fa fa-edit"></i> <?= t('تعديل المعلومات') ?>
-            </a>
-            <a href="<?= e(url('students:change_password')) ?>" class="btn btn-default btn-block">
-                <i class="fa fa-lock"></i> <?= t('تغيير كلمة المرور') ?>
-            </a>
-        </div>
-    </div>
-</div>
+            <div class="profile-card">
+                <div class="profile-image-section">
+                    <?php if (!empty($student['photo'])): ?>
+                    <img src="<?= e(media_url($student['photo'])) ?>" alt="<?= e($student['full_name_arabic']) ?>" class="profile-image">
+                    <?php else: ?>
+                    <div class="profile-image" style="background: #bdc3c7; display: flex; align-items: center; justify-content: center; font-size: 60px; color: white;">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <h4 style="margin: 10px 0; color: #2c3e50;"><?= e($student['full_name_arabic']) ?></h4>
+                    <p style="color: #7f8c8d; margin: 5px 0;"><?= e($student['registration_number']) ?></p>
+                    
+                    <div style="margin-top: 20px;">
+                        <a href="<?= e(url('students:profile_edit')) ?>" class="btn btn-primary btn-block">
+                            <i class="fa fa-edit"></i> <?= t('تعديل المعلومات') ?>
+                        </a>
+                        <a href="<?= e(url('students:change_password')) ?>" class="btn btn-default btn-block">
+                            <i class="fa fa-lock"></i> <?= t('تغيير كلمة المرور') ?>
+                        </a>
+                    </div>
+                </div>
+            </div>
             
             <!-- إحصائيات سريعة -->
             <div class="stats-box total" style="margin-bottom: 15px;">
@@ -204,7 +203,7 @@
                         <div class="info-label"><?= t('البريد الإلكتروني:') ?></div>
                         <div class="info-value">
                             <i class="fa fa-envelope" style="color: #3498db;"></i> 
-                            <?= e(($student['user']['email'] ?: __('غير محدد'))) ?>
+                            <?= e($student['user']['email'] ?: __('غير محدد')) ?>
                         </div>
                     </div>
                     <div class="info-row">

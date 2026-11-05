@@ -96,7 +96,7 @@
                         <label><?= e($form->label('old_password')) ?>: <span class="text-danger">*</span></label>
                         <?= $form->widget('old_password') ?>
                         <?php if (!empty($form->help_text('old_password'))): ?>
-                        <small class="help-block"><?= $form->help_text('old_password') ?></small>
+                        <small class="help-block"><?= e($form->help_text('old_password')) ?></small>
                         <?php endif; ?>
                     </div>
                     
@@ -106,7 +106,7 @@
                         <label><?= e($form->label('new_password1')) ?>: <span class="text-danger">*</span></label>
                         <?= $form->widget('new_password1') ?>
                         <?php if (!empty($form->help_text('new_password1'))): ?>
-                        <small class="help-block"><?= $form->help_text('new_password1') ?></small>
+                        <small class="help-block"><?= e($form->help_text('new_password1')) ?></small>
                         <?php endif; ?>
                     </div>
                     
@@ -114,7 +114,7 @@
                         <label><?= e($form->label('new_password2')) ?>: <span class="text-danger">*</span></label>
                         <?= $form->widget('new_password2') ?>
                         <?php if (!empty($form->help_text('new_password2'))): ?>
-                        <small class="help-block"><?= $form->help_text('new_password2') ?></small>
+                        <small class="help-block"><?= e($form->help_text('new_password2')) ?></small>
                         <?php endif; ?>
                     </div>
                     

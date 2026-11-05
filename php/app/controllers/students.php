@@ -597,9 +597,11 @@ function student_card(): void
 {
     never_cache();
     $student = require_student();
+    // صالحة حتى نهاية السنة الجامعية، أي 30 سبتمبر. ومن سبتمبر تبدأ سنة جامعية جديدة تنتهي في السنة الميلادية التالية
+    $validYear = (int) date('Y') + ((int) date('n') >= 9 ? 1 : 0);
     render('students/profile/student_card', [
-        'student'    => $student,
-        'qr_data'    => 'Student:' . $student['registration_number'] . '|Name:' . $student['full_name_arabic'] . '|Faculty:' . $student['faculty'],
-        'page_title' => __('بطاقة الطالب الرقمية'),
+        'student'     => $student,
+        'valid_until' => '30/09/' . $validYear,
+        'page_title'  => __('بطاقة الطالب الرقمية'),
     ]);
 }

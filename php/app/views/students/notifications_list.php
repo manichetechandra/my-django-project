@@ -19,12 +19,49 @@
         margin-bottom: 30px;
     }
     
+    /* أزرار التصفية بعرض الشريط كله، وترتيبها يتبع اتجاه الصفحة: بالعربية يبدأ «الكل» من اليمين.
+       قواعد Bootstrap 3 تدوّر الزاويتين اليسريين للزر الأول دائماً، فنكتب الزوايا بخصائص منطقية */
     .filter-tabs .btn-group {
+        display: flex;
         width: 100%;
     }
     
-    .filter-tabs .btn {
+    .filter-tabs .btn-group > .btn {
         flex: 1;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .filter-tabs .btn-group > .btn + .btn {
+        margin-inline-start: -1px;
+    }
+    
+    .filter-tabs .btn-group > .btn:first-child:not(:last-child) {
+        border-start-start-radius: 4px;
+        border-end-start-radius: 4px;
+    }
+    
+    .filter-tabs .btn-group > .btn:last-child:not(:first-child) {
+        border-start-end-radius: 4px;
+        border-end-end-radius: 4px;
+    }
+    
+    /* زرا «تمييز الكل» و«حذف المقروءة»: ينزل الثاني تحت الأول إن ضاق العمود (نصوص الفرنسية أطول) */
+    .filter-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .filter-actions .btn {
+        margin: 0;
+    }
+    
+    /* تحت 992 بكسل ينزل عمودهما تحت أزرار التصفية */
+    @media (max-width: 991px) {
+        .filter-actions {
+            margin-top: 10px;
+        }
     }
     
     .notification-item {
@@ -94,6 +131,11 @@
     .notification-actions {
         display: flex;
         gap: 5px;
+    }
+
+    /* شارة «جديد» في زاوية الإشعار: أزرار غير المقروء تنزل تحتها فلا تغطيها */
+    .notification-item.unread .notification-actions {
+        margin-top: 20px;
     }
 
     /* الشاشات الضيقة جداً: الأزرار تنزل تحت النص بدل أن تدفعه خارج البطاقة، وشارة «جديد» لا تغطي العنوان */
@@ -186,10 +228,10 @@
                     </a>
                 </div>
             </div>
-            <div class="col-md-4 text-left">
+            <div class="col-md-4 filter-actions">
                 <?php if ($unread_count > 0): ?>
                 <button type="button" class="btn btn-info" id="markAllReadBtn">
-                    <i class="fa fa-check-double"></i> <?= t('تمييز الكل كمقروء') ?>
+                    <i class="fa fa-check"></i> <?= t('تمييز الكل كمقروء') ?>
                 </button>
                 <?php endif; ?>
                 
