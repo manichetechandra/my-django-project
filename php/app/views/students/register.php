@@ -132,7 +132,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required"><?= t('البريد الإلكتروني') ?></label>
+                                    <label><?= t('البريد الإلكتروني') ?></label>
                                     <?= $form->widget('email') ?>
                                     <?= $form->errors_html('email') ?>
                                 </div>

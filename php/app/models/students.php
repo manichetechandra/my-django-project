@@ -73,12 +73,11 @@ class StudentProfile extends Model
         return StudentNotification::where('student_id = ?', [(int) $this->attributes['id']], 'created_at DESC, id DESC', $limit);
     }
 
-    /** إنشاء إشعار للطالب */
     /**
-     * إشعار للطالب يُحفظ بالعربية والفرنسية والإنجليزية معاً، فيقرؤه بلغة تصفحه:
-     *   $student->notify('مرحباً {name}', '...', '/students/dashboard/', 'info', ['name' => $name]);
-     * النصوص عربية (مفاتيح ملفات app/lang)، وقيمة المتغير يمكن أن تكون مصفوفة لكل لغة:
-     *   ['type' => ['ar' => 'منحة', 'fr' => 'Bourse', 'en' => 'Grant']]
+     * إشعار للطالب يُحفظ بالعربية والفرنسية والإنجليزية معاً، فيقرؤه بلغة تصفحه. العنوان والنص عربيان (مفاتيح app/lang):
+     *   $student->notify($title, $message, '/students/dashboard/', 'info', ['name' => $name]);
+     * قيمة المكان الفارغ مثل {name} نص واحد، أو مصفوفة لكل لغة:
+     *   ['type' => ['ar' => $ar, 'fr' => 'Bourse', 'en' => 'Grant']]
      */
     public function notify(string $title, string $message, ?string $link = null, string $type = 'info', array $params = []): StudentNotification
     {

@@ -66,6 +66,7 @@
   base.php، تعليق navbar، ترتيب config، docblock plural_unit، حذف tr_field من i18n.php، ترتيب ملفات اللغة، رابط 500.php؛
   وفي الفصل 32: search.php بلا قسم sliders (كان يُعدّ في المجموع ولا يُعرض)، روابط التصفية في search_results.php
   بـ rawurlencode (بحث «A&B» كان ينقطع)، والبحث داخل صفحتي التحميلات والأسئلة يشمل ترجمة لغة الصفحة (title_fr...).
+  وفي الفصل 33: تسمية البريد في register.php بلا الصنف required (البريد اختياري)، وتنظيف docblock الدالة notify() في students.php.
 
 ## قائمة العمل
 - [x] الأدوات على النسخة 2 + نقل الإشارات (remap_v2.py)
