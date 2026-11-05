@@ -87,6 +87,16 @@ function langFor(file) {
   return { '.sql': 'sql', '.css': 'css', '.js': 'javascript', '.svg': 'xml', '.html': 'xml', '.json': 'json', '.md': 'markdown', '.sh': 'bash', '.ini': 'ini' }[ext] || 'plaintext';
 }
 
+// «N سطر» بقواعد العدد العربية: سطر واحد، سطران، 3–10 أسطر، 11–99 سطراً، 100 سطر...
+function linesCount(n) {
+  const r = n % 100;
+  if (n === 1) return 'سطر واحد';
+  if (n === 2) return 'سطران';
+  if (r >= 3 && r <= 10) return `${n} أسطر`;
+  if (r >= 11) return `${n} سطراً`;
+  return `${n} سطر`;
+}
+
 // تقسيم HTML الملوَّن إلى أسطر مع إغلاق وفتح الوسوم المفتوحة عند كل سطر
 function splitLines(html) {
   const lines = [];
@@ -254,7 +264,7 @@ function includeFile(spec, chapter) {
   coverage.get(file).push([s, e, chapter, insert || replace ? 'insert' : 'file']);
   const whole = s === 1 && e === all.length;
   const badge = replace ? 'استبدال' : (s === 1 || fresh ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف'));
-  const range = whole ? `الملف كاملاً — ${all.length} سطر` : `الأسطر ${s}–${e} من ${all.length}`;
+  const range = whole ? `الملف كاملاً — ${linesCount(all.length)}` : `الأسطر ${s}–${e} من ${all.length}`;
   const foot = e === all.length && !whole ? 'نهاية الملف' : (whole ? '' : `يتبع الملف من السطر ${e + 1}`);
   return codeBlock({
     code: all.slice(s - 1, e).join('\n'), lang: langFor(file), start: s,
@@ -312,7 +322,7 @@ function includeStage(spec, chapter) {
     if (!coverage.has(fin)) coverage.set(fin, []);
     coverage.get(fin).push([fromRange[0], fromRange[1], chapter, 'stage']);
   }
-  const range = blockName === '*' ? `الملف كاملاً — ${b.total} سطر` : (b.start === b.end ? `السطر ${b.start}` : `الأسطر ${b.start}–${b.end}`);
+  const range = blockName === '*' ? `الملف كاملاً — ${linesCount(b.total)}` : (b.start === b.end ? `السطر ${b.start}` : `الأسطر ${b.start}–${b.end}`);
   const foot = fin && fin !== b.file
     ? `نص نهائي: سيُنقل لاحقاً كما هو إلى ${fin} (الأسطر ${fromRange[0]}–${fromRange[1]})`
     : '';
