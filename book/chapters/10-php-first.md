@@ -40,8 +40,10 @@ display_errors = On
 error_reporting = E_ALL
 date.timezone = Africa/Algiers
 
+extension=curl
 extension=fileinfo
 extension=mbstring
+extension=openssl
 extension=pdo_mysql
 extension=zip
 
@@ -50,13 +52,13 @@ post_max_size = 40M
 ```
 
 - `date.timezone` المنطقة الزمنية: الجزائر، حتى تكون الساعة والتاريخ صحيحين.
-- أسطر `extension` تفعّل **امتدادات** PHP سنحتاجها في الكتاب: `pdo_mysql` للاتصال بقاعدة البيانات (الفصل 15)، و`mbstring` لمعالجة النصوص العربية، و`fileinfo` لفحص نوع الملفات المرفوعة (الفصل 32)، و`zip` لتصدير ملفات Excel (الفصل 36). في هذا الملف، السطر الذي يبدأ بفاصلة منقوطة `;` **معطّل**: إن وجدت `;extension=zip` فاحذف الفاصلة المنقوطة.
+- أسطر `extension` تفعّل **امتدادات** PHP سنحتاجها في الكتاب: `pdo_mysql` للاتصال بقاعدة البيانات (الفصل 15)، و`mbstring` لمعالجة النصوص العربية، و`fileinfo` لفحص نوع الملفات المرفوعة (الفصل 32)، و`zip` لتصدير ملفات Excel (الفصل 36)، و`curl` و`openssl` للاتصال بخدمة الترجمة عبر HTTPS (الفصل 40) ولتشفير ملفات المترشحين (الفصل 43). في هذا الملف، السطر الذي يبدأ بفاصلة منقوطة `;` **معطّل**: إن وجدت `;extension=zip` فاحذف الفاصلة المنقوطة.
 - `upload_max_filesize` أقصى حجم لملف واحد يرفعه الزائر، و`post_max_size` أقصى حجم للطلب كله (كل الملفات والحقول معاً).
 
 بعد أي تعديل على `php.ini` **أوقف Apache وشغّله من جديد** (Stop ثم Start).
 
 ::: tip
-لمعرفة إصدار PHP وكل إعداداته، أنشئ ملفاً مؤقتاً `info.php` فيه سطر واحد `<?php phpinfo();` وافتح `http://localhost/dou-setif/info.php`. تأكّد أن **PHP Version** يبدأ بـ 8، وأن في الصفحة أقساماً باسم **pdo_mysql** و**mbstring** و**fileinfo** و**zip**. ثم **احذف الملف**: لا يجب أن يبقى على موقع حقيقي لأنه يكشف معلومات عن الخادم.
+لمعرفة إصدار PHP وكل إعداداته، أنشئ ملفاً مؤقتاً `info.php` فيه سطر واحد `<?php phpinfo();` وافتح `http://localhost/dou-setif/info.php`. تأكّد أن **PHP Version** يبدأ بـ 8، وأن في الصفحة أقساماً باسم **pdo_mysql** و**mbstring** و**fileinfo** و**zip** و**curl** و**openssl**، وقسماً باسم **dom** (مدمج في PHP بلا سطر في `php.ini`، يحتاجه تنظيف النصوص المنسّقة في الفصل 25). ثم **احذف الملف**: لا يجب أن يبقى على موقع حقيقي لأنه يكشف معلومات عن الخادم.
 :::
 
 ## أول سطور PHP
@@ -145,7 +147,7 @@ Warning: Undefined variable $page_titel in C:\xampp\htdocs\dou-setif\index.php o
 | `Fatal error: Call to undefined function` | دالة غير موجودة | خطأ في الاسم، أو ملف لم يُضمَّن |
 
 ::: try
-1. أضف إلى `php-top` متغيّراً ثالثاً `$city = 'سطيف';` واطبعه في مكان ما من الصفحة بـ `<?= $city ?>`، ثم احذفه.
+1. أضف إلى كتلة PHP في أول الملف متغيّراً ثالثاً `$city = 'سطيف';` واطبعه في مكان ما من الصفحة بـ `<?= $city ?>`، ثم احذفه.
 2. غيّر `date('Y')` إلى `date('d/m/Y H:i')` لترى التاريخ والساعة، ثم أرجعها.
 3. اكتب في `test.php`: `echo 7 * 6;` وجرّب العمليات `+ - * /` و`%` (باقي القسمة).
 :::
