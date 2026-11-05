@@ -115,10 +115,10 @@ const stageShots = [
       await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('.admin-main [type=submit]')]);
     },
   },
-  { name: '36-news-list', overlay: ['adminnews', 39.3], url: '/admin/news/', login: STAFF, h: 700 },
-  { name: '36-news-form', overlay: ['adminnews', 39.3], url: '/admin/news/1/', login: STAFF, h: 1250 },
+  { name: '39-news-list', overlay: ['adminnews', 39.3], url: '/admin/news/', login: STAFF, w: 1280, h: 560 },
+  { name: '39-news-form', overlay: ['adminnews', 39.3], url: '/admin/news/1/', login: STAFF, w: 1280, h: 1180 },
   {
-    name: '36-news-errors', overlay: ['adminnews', 39.3], url: '/admin/news/add/', login: STAFF, h: 760,
+    name: '39-news-errors', overlay: ['adminnews', 39.3], url: '/admin/news/add/', login: STAFF, w: 1280, h: 750,
     act: async (page) => {
       await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('.admin-submit-row [type=submit]')]);
     },

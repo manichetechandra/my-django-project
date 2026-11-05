@@ -106,7 +106,7 @@ function admin_news_form(?News $news): void
     if (is_post()) {
         $data = [
             'title'          => trim($_POST['title'] ?? ''),
-            'slug'           => trim($_POST['slug'] ?? ''),
+            'slug'           => strtolower(trim($_POST['slug'] ?? '')),
             'summary'        => trim($_POST['summary'] ?? ''),
             'content'        => trim($_POST['content'] ?? ''),
             'status'         => $_POST['status'] ?? '',
@@ -116,6 +116,8 @@ function admin_news_form(?News $news): void
         ];
         if ($data['title'] === '') {
             $errors['title'] = 'هذا الحقل مطلوب.';
+        } elseif (mb_strlen($data['title']) > 300) {
+            $errors['title'] = 'العنوان أطول من 300 حرف.';
         }
         if ($data['content'] === '') {
             $errors['content'] = 'هذا الحقل مطلوب.';
@@ -123,7 +125,9 @@ function admin_news_form(?News $news): void
         if (!array_key_exists($data['status'], News::choiceMap('status'))) {
             $errors['status'] = 'اختر قيمة صحيحة.';
         }
-        if ($data['slug'] !== '' && News::exists('slug = ? AND id <> ?', [$data['slug'], $news ? (int) $news['id'] : 0])) {
+        if ($data['slug'] !== '' && !preg_match('/^[\p{L}\p{N}_-]{1,300}$/u', $data['slug'])) {
+            $errors['slug'] = 'الرابط يجب أن يحتوي على حروف وأرقام وشرطات فقط (بدون مسافات).';
+        } elseif ($data['slug'] !== '' && News::exists('slug = ? AND id <> ?', [$data['slug'], $news ? (int) $news['id'] : 0])) {
             $errors['slug'] = 'هذا الرابط مستعمل في خبر آخر.';
         }
         // حقل datetime-local يرسل «2026-10-29T10:00»، وMySQL يريد «2026-10-29 10:00:00»

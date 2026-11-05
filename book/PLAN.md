@@ -112,6 +112,13 @@
   reader-sim 38-41: admin.php والقوالب المؤقتة من `node tools/stages.mjs adminnews N.99`، وviews/admin = login, layout,
   password, recover + المؤقتة. اللقطات: 38-index-temp و38-password (overlay adminnews 38، بعرض 1100، كلمة المرور بأخطائها)،
   و38-recover (الموقع الكامل). اختبار المحاكاة /tmp/t38.py (الحارس، 403، كلمة المرور والجلسات، الاستعادة بكل حالاتها، set_password).
+- **الفصل 39 (مكتوب):** menu-news (39.1) يستبدل menu-temp (admin.php 28-46)، ثم الأخبار المؤقتة بعد recover: news-list 250-268،
+  news-form 269-364 (أُضيف: طول العنوان ≤ 300، وشكل الرابط `^[\p{L}\p{N}_-]{1,300}$` مع strtolower كما في المحرك العام)،
+  news-delete 365-383، والقالبان المؤقتان news_list.php و news_form.php، و delete.php النهائي (@file). المحتوى يُحفظ كما كُتب
+  (نص عادي؛ rich_text تنظّف عند العرض) — **الفصل 41 يجب أن**: يجعل محتوى نموذج الأخبار المؤقت RichText::normalize() عند الحفظ،
+  و textarea المحتوى data-richtext مع RichText::forEditor()، كما وعد الفصل 39. لقطات 39-news-list/form/errors (بعرض 1280)
+  بدل 36-news-* (حُذفت). reader-sim 39-41 يُبقي delete.php. اختبار /tmp/t39.py (القائمة، الأخطاء، الصورة، التعديل، الحذف، 403).
+  الفصل 37: الأسطر 50-51 من admin.css (المعاينة) صارت «للفصل 39».
 
 ## قائمة العمل
 - [x] الأدوات على النسخة 2 + نقل الإشارات (remap_v2.py)
