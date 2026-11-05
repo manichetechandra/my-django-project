@@ -257,6 +257,53 @@ const shots = SET === 'stages' ? stageShots : [
     name: '45-detail', url: '/competitions/msbk-aal-ass-lshhd-ltothyf-mtsrfyn-dryyn-omlhkyn-dryyn/', w: 1280, untilFooter: true, wait: 1500,
     regions: [['45-detail', '.breadcrumb', 'h3:has(.fa-check-square-o)'], ['45-detail-docs', 'h3:has(.fa-check-square-o)', 'footer']],
   },
+  // الفصل 46: الاستمارة والوصل. 46-receipt ترسل طلباً حقيقياً (رقم التعريف 199804120000123456): احذفه بعدها بـ
+  //   DB_NAME=dou_setif2 php tools/shots-recruit.php del /tmp/site2
+  {
+    name: '46-apply', url: '/competitions/msbk-aal-ass-lshhd-ltothyf-mtsrfyn-dryyn-omlhkyn-dryyn/apply/', w: 1280, h: 1200,
+    clip: () => {
+      const a = document.querySelector('.cmp-title').getBoundingClientRect(), b = document.querySelectorAll('.cmp-form fieldset')[1].getBoundingClientRect();
+      return { x: a.left + scrollX - 12, y: a.top + scrollY - 12, width: a.width + 24, height: b.bottom - a.top + 24 };
+    },
+  },
+  {
+    name: '46-apply-docs', url: '/competitions/msbk-aal-ass-lshhd-ltothyf-mtsrfyn-dryyn-omlhkyn-dryyn/apply/', w: 1280, h: 1200,
+    act: async (page) => {
+      const files = shotFiles();
+      const inputs = await page.$$('input.cmp-file');
+      await inputs[0].uploadFile(files.pdf);
+      await inputs[1].uploadFile(files.big);
+      await inputs[2].uploadFile(files.txt);
+    },
+    clip: () => {
+      const r = document.querySelector('.cmp-doc').closest('fieldset').getBoundingClientRect();
+      return { x: r.left + scrollX - 12, y: r.top + scrollY - 12, width: r.width + 24, height: r.height + 24 };
+    },
+  },
+  {
+    name: '46-receipt', url: '/competitions/msbk-aal-ass-lshhd-ltothyf-mtsrfyn-dryyn-omlhkyn-dryyn/apply/', w: 1280, h: 1200,
+    act: async (page) => {
+      const files = shotFiles();
+      await page.select('#id_post_id', await page.$eval('#id_post_id option:nth-child(2)', (o) => o.value));
+      const fill = { last_name: 'بن علي', first_name: 'أمينة', last_name_latin: 'BEN ALI', first_name_latin: 'Amina', birth_place: 'سطيف',
+        nin: '199804120000123456', phone: '0661234567', email: 'amina@example.com', address: 'حي 1000 مسكن، عمارة 5، سطيف', wilaya: 'سطيف',
+        diploma: 'ليسانس في العلوم القانونية', specialty: 'قانون عام', graduation_year: '2020' };
+      for (const [k, v] of Object.entries(fill)) await page.type('#id_' + k, v);
+      await page.select('#id_gender', 'F');
+      await page.select('#id_national_service', 'na');
+      await page.$eval('#id_birth_date', (el) => { el.value = '1998-04-12'; });
+      const inputs = await page.$$('input.cmp-file');
+      for (const input of inputs) await input.uploadFile(files.pdf);
+      await page.click('#id_declaration');
+      await page.click('#id_consent');
+      await new Promise((r) => setTimeout(r, 3500));
+      await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('#cmp-apply button[type=submit]')]);
+    },
+    clip: () => {
+      const r = document.querySelector('.cmp-receipt').getBoundingClientRect();
+      return { x: r.left + scrollX - 12, y: r.top + scrollY - 12, width: r.width + 24, height: r.height + 24 };
+    },
+  },
   {
     name: '45-home', url: '/', w: 1280, h: 900,
     clip: () => {
@@ -265,6 +312,19 @@ const shots = SET === 'stages' ? stageShots : [
     },
   },
 ];
+
+// ملفات للاستمارة (الفصل 46): PDF صغير سليم، و«PDF» أكبر من 3 ميغابايت، وملف نصي
+function shotFiles() {
+  const dir = path.join(BOOK, '.build', 'shot-files');
+  fs.mkdirSync(dir, { recursive: true });
+  const pdf = (body) => '%PDF-1.4\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Kids [] /Count 0 >> endobj\n'
+    + '3 0 obj << /Length ' + body.length + ' >>\nstream\n' + body + '\nendstream\nendobj\ntrailer << /Root 1 0 R >>\n%%EOF\n';
+  const files = { pdf: path.join(dir, 'diplome.pdf'), big: path.join(dir, 'releve-notes.pdf'), txt: path.join(dir, 'notes.txt') };
+  fs.writeFileSync(files.pdf, pdf('x'.repeat(30000)));
+  fs.writeFileSync(files.big, pdf('x'.repeat(3600000)));
+  fs.writeFileSync(files.txt, 'notes');
+  return files;
+}
 
 async function login(page, cred) {
   const [user, pass] = cred;
