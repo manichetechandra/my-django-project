@@ -18,7 +18,7 @@ find "$SIM" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 cp -a "$P/." "$SIM/"
 cd "$SIM"
 find storage -mindepth 2 -type f ! -name .gitkeep -delete
-[ "$N" -ge 41 ] || rm -rf assets/vendor
+[ "$N" -ge 41 ] || rm -rf assets/vendor assets/js/tinymce-lang assets/js/admin-richtext.js
 
 empty() { for f in "$@"; do printf '<?php\n' > "$f"; done; }
 cut_lines() { # cut_lines FILE "sed-delete-expr"

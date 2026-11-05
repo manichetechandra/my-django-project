@@ -133,6 +133,23 @@
   GEMINI_ENDPOINT=http://127.0.0.1:8999/v1beta MYMEMORY_ENDPOINT=http://127.0.0.1:8999/get لأمر shots، وخبر مؤقت بلا ترجمة
   (slug = book-untranslated) يُضاف إلى dou_setif2 قبل اللقطتين الأخيرتين ويُحذف بعدهما. reader-sim يُبقي translate_all.php من 40.
   اختبار /tmp/t40.py (يحتاج الخادم الوهمي وخادم المحاكاة بمتغيرات الترجمة). build.mjs لم يتغير.
+- **الفصل 41 (مكتوب، العنوان «محرر النصوص المنسّقة في لوحة الإدارة»):** نسخ assets/vendor/tinymce-8.10.1 و assets/js/tinymce-lang
+  من النسخة المرجعية (خارج التغطية في build.mjs)، config.php 98-104 (insert)، ثم مرحلة adminnews بثلاث خطوات حتى تتطابق أرقام
+  الأسطر في نهاية الفصل: **41.1** resources-rt (يستبدل resources-temp: content نوعه richtext و rows 14) و news-form-rt (يستبدل
+  news-form-tr: content بـ RichText::normalize، والترجمات المنسّقة normalize — مثل جمع النموذج النهائي 803-805)؛ **41.2**
+  editor-upload (النهائي 1185-1200 = أسطر المرحلة 525-540، بعد translate-ajax) و tinymce (1372-1515 = 572-715، آخر admin.php
+  المؤقت)؛ **41.3** news-form-view-rt (تنبيه «غير موجود» من form.php 20-24، textarea المحتوى admin-richtext + forEditor، سطر
+  «محرر النصوص» من form.php 81-86، كتلة extra_js من form.php 184-191) و news-tr-partial-rt (فرع richtext = form.php 67).
+  ثم admin-richtext.js كاملاً على 6 قطع، و admin.css 178-190 (insert، آخر الملف عند القارئ). reader-sim يحذف قبل 41:
+  assets/vendor و tinymce-lang و admin-richtext.js. لقطات 41-editor و 41-editor-image و 41-news-public مقصوصة (clip جديد في
+  shots.mjs) وتحتاج الخبر المؤقت 90: `DB_NAME=dou_setif2 php tools/shots-rich.php add` ثم `del`. book.css: أول 3 أسطر من صندوق
+  الكود مع رأسه وآخر 3 معاً (لا سطر يتيم). اختبارات: /tmp/t41.py (الخادم: المحرر في النموذج، التنظيف، الترجمة المنسّقة، المحرر
+  الفارغ = مطلوب، forEditor، الرفع وأخطاؤه و 403)، /tmp/ch41/richtext_flow41.mjs (متصفح حقيقي على المحاكاة: 36 فحصاً)،
+  /tmp/ch41/ui41.mjs (نافذة كود المصدر تحذف onclick، لسان «تحميل» يعود إلى «عام» بالرابط، فيديو YouTube)، و dev/tinymce_check.php.
+  **الفصل 48 يجب أن**: ينبّه إلى أن صور المحرر تُحفظ بروابط فيها مجلد الموقع (`/dou-setif/uploads/editor/...`، وروابط داخلية قد
+  تبدأ بـ `http://localhost/dou-setif/`): قبل استيراد ملف SQL في الاستضافة (الموقع في جذر النطاق) استبدال `/dou-setif/` بـ `/`
+  في الملف المصدَّر (بحث واستبدال في محرر نصوص)، كما وعد الفصل 41. **الملحق أ يجب أن**: يضيف المجلدين tinymce-8.10.1 و
+  tinymce-lang إلى «ما لا تكتبه بيدك». **المقدمة والملحقان أ و ب**: اسم النسخة المرجعية dou-setif-php-v2.zip لا dou-setif-php.zip.
 
 ## قائمة العمل
 - [x] الأدوات على النسخة 2 + نقل الإشارات (remap_v2.py)

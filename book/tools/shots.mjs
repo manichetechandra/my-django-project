@@ -69,6 +69,9 @@ const W = Number(args.width || 1920);
 const STUDENT = ['1234566', 'Talib2026x'];
 const STAFF = ['miloudsellam', 'AdminDemo2026'];
 // ------------------------------------------------------------------ لقطات المراحل (الملفات المؤقتة)
+// محررات TinyMCE في الصفحة جاهزة (الفصل 41)
+const richReady = (page) => page.waitForFunction(() => window.tinymce && tinymce.get().length > 0 && tinymce.get().every((e) => e.initialized)
+  && document.querySelector('[data-tinymce-version]').textContent !== '', { timeout: 20000 });
 const stageShots = [
   { name: '02-first', stage: ['home', 2.5], url: '/', w: 1100, h: 330 },
   { name: '03-bootstrap', stage: ['home', 3], url: '/', w: 1200, h: 330 },
@@ -136,6 +139,40 @@ const stageShots = [
   },
   { name: '40-news-badges', overlay: ['adminnews', 40.3], url: '/admin/news/', login: STAFF, w: 1280, h: 330 },
   { name: '40-translate-all', overlay: ['adminnews', 40.3], url: '/admin/translate-all/', login: STAFF, w: 1280, h: 520 },
+  // الفصل 41: خبر منسّق مؤقت (id 90، slug = book-richtext): DB_NAME=dou_setif2 php tools/shots-rich.php add، ثم del بعد اللقطات
+  // اللقطات مقصوصة (clip) على الجزء المهم، فتبقى نصوصها مقروءة في الكتاب
+  {
+    name: '41-editor', overlay: ['adminnews', 41.3], url: '/admin/news/90/', login: STAFF, w: 1280, h: 1500, act: richReady,
+    clip: () => {
+      const g = document.querySelector('#f_content').closest('.form-group');
+      const gr = g.getBoundingClientRect(), lr = g.querySelector('label').getBoundingClientRect(), er = g.querySelector('.tox-tinymce').getBoundingClientRect();
+      return { x: gr.left + scrollX - 10, y: lr.top + scrollY - 10, width: gr.width + 20, height: er.bottom - lr.top + 20 };
+    },
+  },
+  {
+    // نافذة «إدراج/تحرير صورة» على لسان «تحميل»
+    name: '41-editor-image', overlay: ['adminnews', 41.3], url: '/admin/news/90/', login: STAFF, w: 1280, h: 900,
+    css: '.tox-dialog-wrap__backdrop{background:#fff!important;opacity:1!important}',
+    act: async (page) => {
+      await richReady(page);
+      await page.evaluate(() => { const ed = tinymce.get('f_content'); ed.focus(); ed.execCommand('mceImage'); });
+      await page.waitForSelector('.tox-dialog .tox-tab', { timeout: 5000 });
+      const tabs = await page.$$('.tox-dialog .tox-tab');
+      await tabs[tabs.length - 1].click();
+    },
+    clip: () => {
+      const r = document.querySelector('.tox-dialog').getBoundingClientRect();
+      return { x: r.left + scrollX - 12, y: r.top + scrollY - 12, width: r.width + 24, height: r.height + 24 };
+    },
+  },
+  {
+    name: '41-news-public', overlay: ['adminnews', 41.3], url: '/news/book-richtext/', w: 1500, h: 1300,
+    clip: () => {
+      const c = document.querySelector('.container h1').closest('.col-md-8').getBoundingClientRect();
+      const rt = document.querySelector('.rich-text').getBoundingClientRect();
+      return { x: c.left + scrollX - 14, y: c.top + scrollY - 14, width: c.width + 28, height: rt.bottom - c.top + 28 };
+    },
+  },
   // 15-db يحتاج قاعدة dou_stage بالخبر الإضافي: bash tools/stage-db.sh 15.5
   { name: '15-db', stage: ['home', 15], url: '/', h: 600, scrollTo: '#list-news', scrollPad: 112, files: ['config.php'] },
 ];
@@ -368,6 +405,9 @@ for (const s of shots) {
         console.log(`  ← ${name} (${y0}–${y1})`);
       }
     }
+  } else if (s.clip) {
+    // clip: دالة تُنفَّذ في الصفحة وتُرجع المستطيل {x, y, width, height} بإحداثيات الصفحة
+    await page.screenshot({ path: file, clip: await page.evaluate(s.clip) });
   } else {
     await page.screenshot({ path: file, fullPage: !!s.full });
     if (s.scaleTo) {

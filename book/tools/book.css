@@ -166,6 +166,9 @@ th code { background: rgba(255,255,255,.15); color: #fff; }
 .code-head .range { background: rgba(255,255,255,.14); }
 .code-body { padding: 1.6mm 0; }
 .code .l { display: flex; break-inside: avoid; }
+/* لا يبقى سطر أو سطران من الصندوق وحدهما في أسفل الصفحة أو أعلاها: أول ثلاثة أسطر مع الرأس، وآخر ثلاثة معاً */
+.code-body > .l:nth-child(-n+2) { break-after: avoid; }
+.code-body > .l:nth-last-child(-n+2) { break-before: avoid; }
 .code .l.gap { background: repeating-linear-gradient(135deg, #f3f5f7 0 4px, #e9edf1 4px 8px); margin: .4mm 0; }
 .code .l.gap .c { font-family: 'Noto Kufi Arabic', sans-serif; direction: rtl; text-align: right; font-size: 7.2pt; color: #7b8794; padding-right: 2mm; }
 .code .n {

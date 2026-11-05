@@ -23,6 +23,26 @@ function admin_resources(): array
 }
 
 @@end
+@@block resources-rt 41.1 replaces=resources-temp
+/**
+ * أقسام اللوحة — مؤقت: وصف قسم الأخبار وحده، بالشكل الذي يقرؤه المحرك العام في الفصل 42
+ * (هناك تأتي أوصاف كل الأقسام من app/admin_config.php). نصف هنا الحقول المترجمة فقط.
+ */
+function admin_resources(): array
+{
+    return [
+        'news' => [
+            'model' => News::class, 'label' => 'خبر', 'plural' => 'الأخبار',
+            'fields' => [
+                'title'   => ['type' => 'text', 'label' => 'العنوان', 'max' => 300],
+                'summary' => ['type' => 'textarea', 'label' => 'الملخص', 'max' => 500],
+                'content' => ['type' => 'richtext', 'label' => 'المحتوى', 'rows' => 14],
+            ],
+        ],
+    ];
+}
+
+@@end
 @@block guard 38 from=app/controllers/admin.php:41-61
 @@end
 @@block menu-temp 38
@@ -332,6 +352,123 @@ function admin_news_form(?News $news): void
     ]);
 }
 @@end
+@@block news-form-rt 41.1 replaces=news-form-tr
+
+function admin_add(string $key): void
+{
+    admin_guard();
+    admin_news_only($key);
+    admin_news_form(null);
+}
+
+function admin_edit(string $key, $id): void
+{
+    admin_guard();
+    admin_news_only($key);
+    admin_news_form(News::findOrFail($id));
+}
+
+/** الإضافة والتعديل في دالة واحدة: $news فارغ عند الإضافة */
+function admin_news_form(?News $news): void
+{
+    $errors = [];
+    if (is_post()) {
+        $data = [
+            'title'          => trim($_POST['title'] ?? ''),
+            'slug'           => strtolower(trim($_POST['slug'] ?? '')),
+            'summary'        => trim($_POST['summary'] ?? ''),
+            'content'        => RichText::normalize($_POST['content'] ?? ''),
+            'status'         => $_POST['status'] ?? '',
+            'published_date' => trim($_POST['published_date'] ?? ''),
+            'is_featured'    => empty($_POST['is_featured']) ? 0 : 1,
+            'show_in_ticker' => empty($_POST['show_in_ticker']) ? 0 : 1,
+        ];
+        if ($data['title'] === '') {
+            $errors['title'] = 'هذا الحقل مطلوب.';
+        } elseif (mb_strlen($data['title']) > 300) {
+            $errors['title'] = 'العنوان أطول من 300 حرف.';
+        }
+        if ($data['content'] === '') {
+            $errors['content'] = 'هذا الحقل مطلوب.';
+        }
+        if (!array_key_exists($data['status'], News::choiceMap('status'))) {
+            $errors['status'] = 'اختر قيمة صحيحة.';
+        }
+        if ($data['slug'] !== '' && !preg_match('/^[\p{L}\p{N}_-]{1,300}$/u', $data['slug'])) {
+            $errors['slug'] = 'الرابط يجب أن يحتوي على حروف وأرقام وشرطات فقط (بدون مسافات).';
+        } elseif ($data['slug'] !== '' && News::exists('slug = ? AND id <> ?', [$data['slug'], $news ? (int) $news['id'] : 0])) {
+            $errors['slug'] = 'هذا الرابط مستعمل في خبر آخر.';
+        }
+        // حقل datetime-local يرسل «2026-10-29T10:00»، وMySQL يريد «2026-10-29 10:00:00»
+        if ($data['published_date'] === '') {
+            $data['published_date'] = null;
+        } else {
+            $d = DateTime::createFromFormat('Y-m-d\TH:i', $data['published_date']);
+            if ($d) {
+                $data['published_date'] = $d->format('Y-m-d H:i:s');
+            } else {
+                $errors['published_date'] = 'أدخل تاريخاً ووقتاً صالحين.';
+            }
+        }
+
+        // الترجمات (title_fr، title_en ...): اختيارية — الفارغة تُترجم تلقائياً عند الحفظ
+        $r = admin_resources()['news'];
+        foreach (admin_translatable($r) as $f) {
+            foreach (admin_other_langs() as $lang) {
+                $col = $f . '_' . $lang;
+                $v = trim((string) ($_POST[$col] ?? ''));
+                if ($r['fields'][$f]['type'] === 'richtext') {
+                    $v = RichText::normalize($v);
+                }
+                $max = admin_translation_max($r['fields'][$f]);
+                if ($max && mb_strlen($v) > $max) {
+                    $errors[$col] = 'الحد الأقصى ' . $max . ' حرفاً.';
+                    continue;
+                }
+                $data[$col] = $v === '' ? null : $v;
+            }
+        }
+
+        // الصورة: نرفعها فقط إن لم يكن في الحقول الأخرى خطأ
+        $file = $_FILES['main_image'] ?? null;
+        if (!$errors && $file && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+            $max = (float) config('uploads.max_image_mb', 10);
+            $err = Upload::validate($file, Upload::IMAGES, $max);
+            if ($err) {
+                $errors['main_image'] = $err;
+            } else {
+                $data['main_image'] = Upload::store($file, 'news/main', Upload::IMAGES, $max);
+            }
+        }
+
+        if (!$errors) {
+            $data = admin_auto_translate($r, $data); // الترجمات الفارغة قبل الحفظ
+            $oldImage = $news ? (string) $news['main_image'] : '';
+            if ($news === null) {
+                $news = new News(['author_id' => current_user()['id']]);
+            }
+            foreach ($data as $k => $v) {
+                $news[$k] = $v;
+            }
+            $news->save(); // تملأ الرابط الفارغ وتاريخ الإنشاء والتحديث
+            if (isset($data['main_image']) && $oldImage !== '') {
+                Upload::delete($oldImage); // الصورة القديمة استُبدلت
+            }
+            flash('success', 'تم حفظ "' . $news . '" بنجاح.');
+            redirect_to('admin:list', 'news');
+        }
+        $values = $_POST; // نعيد إلى النموذج ما كتبه المدير، مع الأخطاء
+    } else {
+        $values = $news ? $news->toArray() : ['status' => 'published', 'published_date' => now()];
+    }
+    admin_render('news_form', [
+        'page_title' => $news ? 'تعديل خبر' : 'إضافة خبر',
+        'news'       => $news,
+        'values'     => $values,
+        'errors'     => $errors,
+    ]);
+}
+@@end
 @@block news-delete 39.3
 
 function admin_delete(string $key, $id): void
@@ -357,7 +494,11 @@ function admin_delete(string $key, $id): void
 @@end
 @@block translate-ajax 40.2 from=app/controllers/admin.php:1162-1184
 @@end
+@@block editor-upload 41.2 from=app/controllers/admin.php:1185-1200
+@@end
 @@block translate-all 40.3 from=app/controllers/admin.php:1201-1231
+@@end
+@@block tinymce 41.2 from=app/controllers/admin.php:1372-1515
 @@end
 @@block news-list-view 39.1 file=app/views/admin/news_list.php@39.1
 <?php extend('admin/layout'); ?>
@@ -656,6 +797,129 @@ function admin_delete(string $key, $id): void
 </form>
 <?php endblock(); ?>
 @@end
+@@block news-form-view-rt 41.3 replaces=news-form-view-tr file=app/views/admin/news_form.php@41.3
+<?php extend('admin/layout'); ?>
+<?php block('title'); ?><?= e($page_title) ?><?php endblock(); ?>
+<?php block('content'); ?>
+<ol class="breadcrumb">
+    <li><a href="<?= e(url('admin:index')) ?>">لوحة الإدارة</a></li>
+    <li><a href="<?= e(url('admin:list', 'news')) ?>">الأخبار</a></li>
+    <li class="active"><?= $news ? e(truncatechars($news['title'], 60)) : 'إضافة' ?></li>
+</ol>
+<h1 class="admin-title"><i class="fa fa-newspaper-o"></i> <?= e($page_title) ?></h1>
+
+<?php $tinymce = admin_tinymce(); ?>
+<?php if (!$tinymce): ?>
+    <div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i>
+        محرر النصوص <strong>TinyMCE</strong> غير موجود: ضع مجلد TinyMCE (الذي فيه <code>tinymce.min.js</code> في أي مستوى) داخل مجلد الموقع،
+        مثلاً <code dir="ltr">tinymce/</code> أو <code dir="ltr">assets/vendor/tinymce/</code>، أو اكتب مساره في <code>config.php</code>
+        (<code dir="ltr">'editor' => ['tinymce' => '...']</code>). إلى ذلك الحين تعمل الحقول المنسّقة كخانات نص (HTML).
+    </div>
+<?php endif; ?>
+<form method="post" enctype="multipart/form-data" class="admin-form" novalidate>
+    <?= csrf_field() ?>
+    <div class="panel panel-default admin-panel">
+        <div class="panel-body">
+            <!-- الترجمة: كل نص عربي له حقلان FR و EN تحته -->
+            <div class="admin-tr-toolbar">
+                <button type="button" class="btn btn-info btn-sm" data-auto-translate data-url="<?= e(url('admin:translate')) ?>">
+                    <i class="fa fa-language"></i> ترجمة تلقائية
+                </button>
+                <span class="small text-muted">
+                    <?php if (Translator::enabled()): ?>
+                        تملأ حقول الفرنسية (FR) والإنجليزية (EN) من النص العربي. والحقول التي تبقى فارغة تُترجم تلقائياً عند الحفظ.
+                    <?php else: ?>
+                        <i class="fa fa-exclamation-triangle text-warning"></i> الترجمة التلقائية غير مفعّلة: أضف مفتاح Gemini المجاني في config.php، أو اكتب الترجمة بنفسك. الحقول الفارغة يظهر مكانها النص العربي.
+                    <?php endif; ?>
+                </span>
+                <span class="admin-tr-status small" data-tr-status></span>
+            </div>
+            <div class="form-group <?= isset($errors['title']) ? 'has-error' : '' ?>">
+                <label for="f_title" class="control-label">العنوان <span class="text-danger">*</span></label>
+                <input type="text" name="title" id="f_title" class="form-control" maxlength="300" value="<?= e($values['title'] ?? '') ?>">
+                <?php if (isset($errors['title'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['title']) ?></span><?php endif; ?>
+                <?php $f = 'title'; include view_path('admin/_news_tr'); ?>
+            </div>
+            <div class="form-group <?= isset($errors['slug']) ? 'has-error' : '' ?>">
+                <label for="f_slug" class="control-label">الرابط (slug)</label>
+                <input type="text" name="slug" id="f_slug" class="form-control" dir="ltr" value="<?= e($values['slug'] ?? '') ?>" data-slug-from="f_title"<?= $news ? ' data-slug-locked="1"' : '' ?>>
+                <?php if (isset($errors['slug'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['slug']) ?></span><?php endif; ?>
+                <span class="help-block small text-muted">يُولَّد تلقائياً من "العنوان" إذا تُرك فارغاً.</span>
+            </div>
+            <div class="form-group">
+                <label for="f_summary" class="control-label">الملخص</label>
+                <textarea name="summary" id="f_summary" class="form-control" rows="3"><?= e($values['summary'] ?? '') ?></textarea>
+                <?php $f = 'summary'; include view_path('admin/_news_tr'); ?>
+            </div>
+            <div class="form-group <?= isset($errors['content']) ? 'has-error' : '' ?>">
+                <label for="f_content" class="control-label">المحتوى <span class="text-danger">*</span></label>
+                <textarea name="content" id="f_content" class="form-control admin-richtext" rows="14" data-richtext="ar"><?= e(RichText::forEditor($values['content'] ?? '')) ?></textarea>
+                <?php if (isset($errors['content'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['content']) ?></span><?php endif; ?>
+                <?php $f = 'content'; include view_path('admin/_news_tr'); ?>
+            </div>
+            <div class="form-group <?= isset($errors['main_image']) ? 'has-error' : '' ?>">
+                <label for="f_main_image" class="control-label">الصورة الرئيسية</label>
+                <?php if ($news && $news['main_image']): ?>
+                    <div class="admin-current-file">
+                        <img src="<?= e(media_url($news['main_image'])) ?>" class="admin-preview" alt="">
+                    </div>
+                <?php endif; ?>
+                <input type="file" name="main_image" id="f_main_image" class="form-control" accept="image/*">
+                <?php if (isset($errors['main_image'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['main_image']) ?></span><?php endif; ?>
+            </div>
+            <?php $date = to_datetime($values['published_date'] ?? null); ?>
+            <div class="form-group <?= isset($errors['published_date']) ? 'has-error' : '' ?>">
+                <label for="f_published_date" class="control-label">تاريخ النشر</label>
+                <input type="datetime-local" name="published_date" id="f_published_date" class="form-control" value="<?= $date ? $date->format('Y-m-d\TH:i') : '' ?>">
+                <?php if (isset($errors['published_date'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['published_date']) ?></span><?php endif; ?>
+                <span class="help-block small text-muted">اتركه فارغاً ليُعتمد تاريخ الإنشاء</span>
+            </div>
+            <div class="form-group <?= isset($errors['status']) ? 'has-error' : '' ?>">
+                <label for="f_status" class="control-label">الحالة <span class="text-danger">*</span></label>
+                <select name="status" id="f_status" class="form-control">
+                    <?php foreach (News::choiceMap('status') as $value => $label): ?>
+                        <option value="<?= e($value) ?>"<?= ($values['status'] ?? '') === $value ? ' selected' : '' ?>><?= e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <?php if (isset($errors['status'])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= e($errors['status']) ?></span><?php endif; ?>
+            </div>
+            <div class="form-group">
+                <div class="checkbox"><label><input type="checkbox" name="is_featured" id="f_is_featured" value="1"<?= !empty($values['is_featured']) ? ' checked' : '' ?>> خبر مميز</label></div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox"><label><input type="checkbox" name="show_in_ticker" id="f_show_in_ticker" value="1"<?= !empty($values['show_in_ticker']) ? ' checked' : '' ?>> عرض في شريط الأخبار</label></div>
+            </div>
+            <?php if ($tinymce): ?>
+                <p class="admin-editor-source small text-muted" data-editor-source>
+                    <i class="fa fa-pencil-square-o"></i> محرر النصوص: <bdi dir="ltr">TinyMCE <span data-tinymce-version></span></bdi>
+                    — <?= $tinymce['bundled'] ? 'النسخة المرفقة بالمشروع' : 'نسختك' ?>: <code dir="ltr"><?= e($tinymce['path']) ?></code>
+                    — الأدوات: <span data-tinymce-plugins><?= count($tinymce['plugins']) ?></span> إضافة من <?= count($tinymce['plugins']) ?> في مجلدها
+                    <?php if ($tinymce['lang'] === ''): ?>(الواجهة العربية من ملفات المشروع)<?php endif; ?>
+                </p>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="admin-submit-row">
+        <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> حفظ</button>
+        <?php if ($news): ?>
+            <a href="<?= e(url('admin:delete', 'news', $news['id'])) ?>" class="btn btn-danger pull-left"><i class="fa fa-trash"></i> حذف</a>
+        <?php endif; ?>
+    </div>
+</form>
+<?php endblock(); ?>
+
+<?php if ($tinymce): ?>
+<?php $rich_schema = RichText::editorSchema(); ?>
+<?php block('extra_js'); ?>
+<script src="<?= e($tinymce['url']) ?>"></script>
+<script src="<?= asset('js/admin-richtext.js') ?>" data-base="<?= e($tinymce['base']) ?>" data-suffix="<?= e($tinymce['suffix']) ?>"
+        data-lang="<?= e($tinymce['lang']) ?>" data-lang-base="<?= e(base_url() . '/assets/js/tinymce-lang/') ?>"
+        data-plugins="<?= e(implode(' ', $tinymce['plugins'])) ?>" data-upload-url="<?= e(url('admin:editor_upload')) ?>"
+        data-valid-elements="<?= e($rich_schema['elements']) ?>" data-valid-styles="<?= e($rich_schema['styles']) ?>"></script>
+<?php endblock(); ?>
+<?php endif; ?>
+@@end
 @@block news-tr-partial 40.2 file=app/views/admin/_news_tr.php@40.2
 <?php /* حقلا الترجمة FR و EN تحت حقل عربي — مؤقت: يكتبهما النموذج العام لكل الأقسام في الفصل 42 */ ?>
 <?php $spec = admin_resources()['news']['fields'][$f]; $max = admin_translation_max($spec); ?>
@@ -665,6 +929,25 @@ function admin_delete(string $key, $id): void
             <label class="admin-tr-lang" for="f_<?= e($col) ?>" title="<?= $lang === 'fr' ? 'الفرنسية' : 'الإنجليزية' ?>"><?= e(strtoupper($lang)) ?></label>
             <?php if ($spec['type'] === 'text'): ?>
                 <input type="text" name="<?= e($col) ?>" id="f_<?= e($col) ?>" class="form-control input-sm" dir="ltr" lang="<?= e($lang) ?>" value="<?= e($values[$col] ?? '') ?>"<?= $max ? ' maxlength="' . $max . '"' : '' ?> data-tr-of="<?= e($f) ?>" data-tr-lang="<?= e($lang) ?>">
+            <?php else: ?>
+                <textarea name="<?= e($col) ?>" id="f_<?= e($col) ?>" class="form-control input-sm" rows="3" dir="ltr" lang="<?= e($lang) ?>" data-tr-of="<?= e($f) ?>" data-tr-lang="<?= e($lang) ?>"><?= e($values[$col] ?? '') ?></textarea>
+            <?php endif; ?>
+        </div>
+        <?php if (isset($errors[$col])): ?><span class="help-block"><i class="fa fa-exclamation-circle"></i> <?= strtoupper($lang) ?>: <?= e($errors[$col]) ?></span><?php endif; ?>
+    <?php endforeach; ?>
+</div>
+@@end
+@@block news-tr-partial-rt 41.3 replaces=news-tr-partial file=app/views/admin/_news_tr.php@41.3
+<?php /* حقلا الترجمة FR و EN تحت حقل عربي — مؤقت: يكتبهما النموذج العام لكل الأقسام في الفصل 42 */ ?>
+<?php $spec = admin_resources()['news']['fields'][$f]; $max = admin_translation_max($spec); ?>
+<div class="admin-translations">
+    <?php foreach (admin_other_langs() as $lang): $col = $f . '_' . $lang; ?>
+        <div class="admin-tr-row <?= isset($errors[$col]) ? 'has-error' : '' ?>" data-lang="<?= e($lang) ?>">
+            <label class="admin-tr-lang" for="f_<?= e($col) ?>" title="<?= $lang === 'fr' ? 'الفرنسية' : 'الإنجليزية' ?>"><?= e(strtoupper($lang)) ?></label>
+            <?php if ($spec['type'] === 'text'): ?>
+                <input type="text" name="<?= e($col) ?>" id="f_<?= e($col) ?>" class="form-control input-sm" dir="ltr" lang="<?= e($lang) ?>" value="<?= e($values[$col] ?? '') ?>"<?= $max ? ' maxlength="' . $max . '"' : '' ?> data-tr-of="<?= e($f) ?>" data-tr-lang="<?= e($lang) ?>">
+            <?php elseif ($spec['type'] === 'richtext'): ?>
+                <textarea name="<?= e($col) ?>" id="f_<?= e($col) ?>" class="form-control input-sm admin-richtext" rows="<?= max(3, (int) ceil(($spec['rows'] ?? 8) / 2)) ?>" dir="ltr" lang="<?= e($lang) ?>" data-richtext="<?= e($lang) ?>" data-tr-of="<?= e($f) ?>" data-tr-lang="<?= e($lang) ?>"><?= e(RichText::forEditor($values[$col] ?? '')) ?></textarea>
             <?php else: ?>
                 <textarea name="<?= e($col) ?>" id="f_<?= e($col) ?>" class="form-control input-sm" rows="3" dir="ltr" lang="<?= e($lang) ?>" data-tr-of="<?= e($f) ?>" data-tr-lang="<?= e($lang) ?>"><?= e($values[$col] ?? '') ?></textarea>
             <?php endif; ?>
