@@ -301,16 +301,16 @@
         <h4><?= t('طلباتي') ?></h4>
     </a>
     
-    <a href="#" class="action-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
+    <a href="<?= e(url('students:profile_view')) ?>" class="action-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
         <i class="fa fa-user"></i>
         <h4><?= t('معلوماتي الشخصية') ?></h4>
     </a>
     
      <!-- ← جديد! البطاقة الرقمية -->
-    <a href="<?= e(url('students:student_card')) ?>" target="_blank"class="action-card" style="background: linear-gradient(135deg, #f39c, #e67e22); color: white;">
+    <a href="<?= e(url('students:student_card')) ?>" target="_blank" class="action-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
         <i class="fa fa-id-card"></i><h4> <?= t('بطاقتي الرقمية') ?></h4>
     </a>
-    <a href="#" class="action-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white;">
+    <a href="<?= e(url('students:notifications_list')) ?>" class="action-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white;">
         <i class="fa fa-bell"></i>
         <h4><?= t('الإشعارات') ?></h4>
     </a>

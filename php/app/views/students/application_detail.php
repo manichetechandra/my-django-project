@@ -390,7 +390,7 @@ if (printBtn) {
                 <div class="detail-section">
                     <div class="admin-notes">
                         <h4><i class="fa fa-comment-o"></i> <?= t('ملاحظات الإدارة') ?></h4>
-                        <p style="color: #856404; margin: 0;"><?= linebreaks($application['admin_notes']) ?></p>
+                        <div style="color: #856404; margin: 0;"><?= linebreaks($application['admin_notes']) ?></div>
                     </div>
                 </div>
                 <?php endif; ?>

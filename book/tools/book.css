@@ -74,7 +74,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 1.2em 0; }
 .toc .lvl1 { margin-top: 3.2mm; font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; font-size: 11pt; color: var(--primary); break-after: avoid; }
 .toc .lvl1 .lab { color: var(--accent-dark); margin-left: 2mm; }
 .toc .lvl2 { padding-right: 7mm; font-size: 10pt; }
-.toc .lvl2 .num { display: inline-block; min-width: 9mm; color: var(--muted); font-family: 'Noto Sans', sans-serif; }
+.toc .lvl2 .num { display: inline-block; min-width: 9mm; margin-left: 1.5mm; color: var(--muted); font-family: 'Noto Sans', sans-serif; }
 
 /* ---------------- العناوين ---------------- */
 h1, h2, h3, h4 { font-family: 'Noto Kufi Arabic', 'Cairo', sans-serif; color: var(--primary); text-align: right; break-after: avoid; line-height: 1.6; }

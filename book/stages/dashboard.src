@@ -93,7 +93,7 @@
     </a>
     
      <!-- ← جديد! البطاقة الرقمية -->
-    <a href="#" target="_blank"class="action-card" style="background: linear-gradient(135deg, #f39c, #e67e22); color: white;">
+    <a href="#" target="_blank" class="action-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
         <i class="fa fa-id-card"></i><h4> بطاقتي الرقمية</h4>
     </a>
     <a href="#" class="action-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white;">

@@ -203,9 +203,18 @@ function fixBidi(line, plain) {
   });
 }
 
-function codeBlock({ code, lang, start = 1, head = '', badge = '', badgeClass = 'ex', range = '', foot = '', kind = '', nums = null, gaps = null }) {
+// تلوين النص كاملاً مرة واحدة ثم أخذ الأسطر المطلوبة منه: القطعة التي تبدأ داخل <style> أو <script>
+// أو داخل تعليق طويل تُلوَّن كما في المحرر، فتُعزل تعليقاتها العربية بالاتجاه الصحيح
+const hlCache = new Map();
+function contextLines(code, lang) {
+  const key = `${lang}\0${code}`;
+  if (!hlCache.has(key)) hlCache.set(key, splitLines(highlight(code, lang)));
+  return hlCache.get(key);
+}
+
+function codeBlock({ code, lang, start = 1, head = '', badge = '', badgeClass = 'ex', range = '', foot = '', kind = '', nums = null, gaps = null, htmlLines = null }) {
   const plain = !lang || lang === 'plaintext' || !hljs.getLanguage(lang);
-  const lines = splitLines(highlight(code, lang)).map((l) => fixBidi(l, plain));
+  const lines = (htmlLines || splitLines(highlight(code, lang))).map((l) => fixBidi(l, plain));
   // nums: رقم كل سطر (للمدى المتعدد)، gaps: نص سطر فاصل يظهر قبل السطر رقم i (أسطر تُضاف في فصل لاحق)
   const rows = lines.map((l, i) => (gaps && gaps[i] ? `<div class="l gap"><span class="n">⋮</span><span class="c">${esc(gaps[i])}</span></div>` : '')
     + `<div class="l"><span class="n">${nums ? nums[i] : start + i}</span><span class="c">${l === '' ? ' ' : l}</span></div>`).join('');
@@ -241,6 +250,7 @@ function includeFile(spec, chapter) {
   const foot = e === all.length && !whole ? 'نهاية الملف' : (whole ? '' : `يتبع الملف من السطر ${e + 1}`);
   return codeBlock({
     code: all.slice(s - 1, e).join('\n'), lang: langFor(file), start: s,
+    htmlLines: contextLines(all.join('\n'), langFor(file)).slice(s - 1, e),
     head: file, badge, badgeClass: replace ? 'ins' : (s === 1 ? 'new' : (insert ? 'ins' : 'cont')), range, foot,
   });
 }
@@ -268,8 +278,9 @@ function includeFileParts(file, all, rangeSpec, insert, chapter) {
   const first = parts[0][0], last = parts[parts.length - 1][1];
   const range = `الأسطر ${parts.map(([s, e]) => (s === e ? `${s}` : `${s}–${e}`)).join('، ')} من ${all.length}`;
   const foot = last === all.length ? 'نهاية الملف' : `يتبع الملف من السطر ${last + 1}`;
+  const ctx = contextLines(all.join('\n'), langFor(file));
   return codeBlock({
-    code: code.join('\n'), lang: langFor(file), nums, gaps, head: file,
+    code: code.join('\n'), lang: langFor(file), nums, gaps, head: file, htmlLines: nums.map((n) => ctx[n - 1]),
     badge: first === 1 ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف'), badgeClass: first === 1 ? 'new' : (insert ? 'ins' : 'cont'), range, foot,
   });
 }
@@ -279,8 +290,10 @@ function includeStage(spec, chapter) {
   const [name, blockName, step, extra] = spec.trim().split(/\s+/);
   // «*» = الملف كاملاً كما هو عند تلك الخطوة (extra = اسم الملف)، وإلا extra = جزء من الكتلة «a-b» بأرقام نسبية
   let b = blockName === '*' ? stageFile(name, step, extra) : stageBlock(name, blockName, step === '-' ? '' : step);
+  let htmlLines = null;
   if (blockName !== '*' && extra && /^\d+-\d+$/.test(extra)) {
     const [x, y] = extra.split('-').map(Number);
+    htmlLines = contextLines(b.lines.join('\n'), langFor(b.file)).slice(x - 1, y);
     b = { ...b, lines: b.lines.slice(x - 1, y), start: b.start + x - 1, end: b.start + y - 1 };
   }
   const fin = b.block && b.block.fromFile;
@@ -293,7 +306,7 @@ function includeStage(spec, chapter) {
     ? `نص نهائي: سيُنقل لاحقاً كما هو إلى ${fin} (الأسطر ${b.block.fromStart}–${b.block.fromEnd})`
     : '';
   return codeBlock({
-    code: b.lines.join('\n'), lang: langFor(b.file), start: b.start, head: b.file,
+    code: b.lines.join('\n'), lang: langFor(b.file), start: b.start, head: b.file, htmlLines,
     badge: fin ? 'نهائي' : 'مؤقت', badgeClass: fin ? 'fin' : 'tmp', range, foot,
   });
 }
