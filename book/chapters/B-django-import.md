@@ -82,7 +82,7 @@ C:\xampp\php\php.exe database\tools\django_json_to_sql.php C:\path\to\data.json 
 ```
 
 - **الأسطر 33–36**: فشل التحويل (ملف ناقص أو ليس JSON)؟ تشرح `json_last_error_msg()` السبب بالإنجليزية، ويتوقف السكربت برمز فشل.
-- **السطر 38**: Django يحفظ التواريخ بتوقيت غرينتش (UTC، الحرف `Z` في المثال)، ونحن نريد توقيت الجزائر.
+- **السطر 38**: Django يحفظ التواريخ بتوقيت غرينتش (UTC، الحرف `Z` في المثال)، ونحن نريد توقيت الجزائر، فننشئ له كائن منطقة زمنية `DateTimeZone` نستعمله في التحويل.
 
 @file database/tools/django_json_to_sql.php 40-72
 
