@@ -157,6 +157,24 @@ for ch in chapters:
         m = re.match(r'^@file\s+(\S+)(?:\s+(\S+))?(.*)$', line)
         if m:
             f, rng, rest = m.group(1), m.group(2), m.group(3) or ''
+            # مدى متعدد «a-b,c-d»: كل جزء يُنقل وحده
+            if rng and ',' in rng and all(RANGE.match(p) for p in rng.split(',')) and f in V1 and f in V2:
+                ctx = f
+                parts = []
+                for p in rng.split(','):
+                    r = RANGE.match(p)
+                    s, e = int(r.group(1)), (len(lines(V1[f])) if r.group(2) == '$' else int(r.group(2)))
+                    s2, e2, same = map_range(f, s, e)
+                    if r.group(2) == '$':
+                        e2 = len(lines(V2[f]))
+                    cover(f, s2, e2)
+                    stats['same' if same else 'changed'] += 1
+                    if not same:
+                        report.append(f'{ch}:{ln} ~ {f} {p} → {s2}-{e2}')
+                        report.extend('      ' + d for d in diff_lines(f, s, e, s2, e2))
+                    parts.append(f'{s2}-{"$" if r.group(2) == "$" else e2}')
+                out.append(f'@file {f} {",".join(parts)}{rest}')
+                continue
             if rng and not RANGE.match(rng) and rng != '-':
                 rest, rng = ' ' + rng + rest, None
             ctx = f

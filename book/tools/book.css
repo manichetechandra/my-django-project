@@ -166,6 +166,8 @@ th code { background: rgba(255,255,255,.15); color: #fff; }
 .code-head .range { background: rgba(255,255,255,.14); }
 .code-body { padding: 1.6mm 0; }
 .code .l { display: flex; break-inside: avoid; }
+.code .l.gap { background: repeating-linear-gradient(135deg, #f3f5f7 0 4px, #e9edf1 4px 8px); margin: .4mm 0; }
+.code .l.gap .c { font-family: 'Noto Kufi Arabic', sans-serif; direction: rtl; text-align: right; font-size: 7.2pt; color: #7b8794; padding-right: 2mm; }
 .code .n {
   flex: 0 0 9.5mm; box-sizing: border-box; padding: 0 2mm 0 0; text-align: right;
   color: #9aa5b1; border-right: 1px solid #dfe5eb; margin-right: 2.5mm; user-select: none;

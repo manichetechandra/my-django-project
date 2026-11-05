@@ -36,7 +36,13 @@ for (const file of files) {
     if ((m = line.match(/^@file\s+(\S+)(?:\s+(\S+))?/))) {
       const all = finalLines(m[1]);
       let s = 1, e = all.length;
-      if (m[2] && m[2] !== '-' && /^\d/.test(m[2])) { const r = m[2].match(/^(\d+)-(\d+|\$)$/); s = +r[1]; e = r[2] === '$' ? all.length : +r[2]; }
+      // مدى واحد «a-b» أو متعدد «a-b,c-d» (نأخذ من أول جزء إلى آخره)
+      if (m[2] && m[2] !== '-' && /^\d/.test(m[2])) {
+        const parts = m[2].split(',').map((p) => p.match(/^(\d+)-(\d+|\$)$/));
+        s = +parts[0][1];
+        const last = parts[parts.length - 1];
+        e = last[2] === '$' ? all.length : +last[2];
+      }
       ctx = { label: `${m[1]} ${s}-${e}`, lines: all, s, e };
       return;
     }

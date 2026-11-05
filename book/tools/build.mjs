@@ -202,10 +202,12 @@ function fixBidi(line, plain) {
   });
 }
 
-function codeBlock({ code, lang, start = 1, head = '', badge = '', badgeClass = 'ex', range = '', foot = '', kind = '' }) {
+function codeBlock({ code, lang, start = 1, head = '', badge = '', badgeClass = 'ex', range = '', foot = '', kind = '', nums = null, gaps = null }) {
   const plain = !lang || lang === 'plaintext' || !hljs.getLanguage(lang);
   const lines = splitLines(highlight(code, lang)).map((l) => fixBidi(l, plain));
-  const rows = lines.map((l, i) => `<div class="l"><span class="n">${start + i}</span><span class="c">${l === '' ? ' ' : l}</span></div>`).join('');
+  // nums: رقم كل سطر (للمدى المتعدد)، gaps: نص سطر فاصل يظهر قبل السطر رقم i (أسطر تُضاف في فصل لاحق)
+  const rows = lines.map((l, i) => (gaps && gaps[i] ? `<div class="l gap"><span class="n">⋮</span><span class="c">${esc(gaps[i])}</span></div>` : '')
+    + `<div class="l"><span class="n">${nums ? nums[i] : start + i}</span><span class="c">${l === '' ? ' ' : l}</span></div>`).join('');
   const headHtml = (head || badge || range)
     ? `<div class="code-head">${badge ? `<span class="badge ${badgeClass}">${badge}</span>` : ''}<span class="path">${esc(head)}</span>${range ? `<span class="range">${range}</span>` : ''}</div>`
     : '';
@@ -222,6 +224,7 @@ function includeFile(spec, chapter) {
   if (!fs.existsSync(abs)) throw new Error(`@file: الملف غير موجود: ${file} (${chapter})`);
   const all = fs.readFileSync(abs, 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
   let s = 1, e = all.length;
+  if (rangeSpec && rangeSpec.includes(',')) return includeFileParts(file, all, rangeSpec, insert || replace, chapter);
   if (rangeSpec && rangeSpec !== '-') {
     const m = rangeSpec.match(/^(\d+)-(\d+|\$)$/);
     if (!m) throw new Error(`@file: مدى غير صالح "${rangeSpec}" في ${chapter}`);
@@ -238,6 +241,35 @@ function includeFile(spec, chapter) {
   return codeBlock({
     code: all.slice(s - 1, e).join('\n'), lang: langFor(file), start: s,
     head: file, badge, badgeClass: replace ? 'ins' : (s === 1 ? 'new' : (insert ? 'ins' : 'cont')), range, foot,
+  });
+}
+
+// مدى متعدد «1-42,47-53»: صندوق واحد بأجزاء الملف، وبين الأجزاء سطر فاصل للأسطر التي تُضاف في فصل لاحق
+function includeFileParts(file, all, rangeSpec, insert, chapter) {
+  const parts = rangeSpec.split(',').map((p) => {
+    const m = p.match(/^(\d+)-(\d+|\$)$/);
+    if (!m) throw new Error(`@file: مدى غير صالح "${p}" في ${chapter}`);
+    return [+m[1], m[2] === '$' ? all.length : +m[2]];
+  });
+  parts.forEach(([s, e], i) => {
+    if (s < 1 || e > all.length || s > e || (i && s <= parts[i - 1][1] + 1)) throw new Error(`@file: المدى ${rangeSpec} غير صالح للملف ${file} (${all.length} سطر) في ${chapter}`);
+  });
+  if (!coverage.has(file)) coverage.set(file, []);
+  const code = [], nums = [], gaps = {};
+  parts.forEach(([s, e], i) => {
+    coverage.get(file).push([s, e, chapter, insert ? 'insert' : 'file']);
+    if (i) {
+      const a = parts[i - 1][1] + 1, b = s - 1;
+      gaps[code.length] = a === b ? `السطر ${a}: نضيفه في فصل لاحق` : `الأسطر ${a}–${b}: نضيفها في فصل لاحق`;
+    }
+    for (let n = s; n <= e; n++) { code.push(all[n - 1]); nums.push(n); }
+  });
+  const first = parts[0][0], last = parts[parts.length - 1][1];
+  const range = `الأسطر ${parts.map(([s, e]) => (s === e ? `${s}` : `${s}–${e}`)).join('، ')} من ${all.length}`;
+  const foot = last === all.length ? 'نهاية الملف' : `يتبع الملف من السطر ${last + 1}`;
+  return codeBlock({
+    code: code.join('\n'), lang: langFor(file), nums, gaps, head: file,
+    badge: first === 1 ? 'ملف جديد' : (insert ? 'إدراج' : 'تابع الملف'), badgeClass: first === 1 ? 'new' : (insert ? 'ins' : 'cont'), range, foot,
   });
 }
 

@@ -46,6 +46,12 @@ return [
         'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', (string) $env('TRUSTED_PROXIES', ''))))),
     ],
 
+    'uploads' => [
+        'max_image_mb'    => 5,   // الصور (صور الطلاب، الأخبار...)
+        'max_document_mb' => 10,  // وثائق الطلبات
+        'max_file_mb'     => 20,  // ملفات مركز التحميلات
+    ],
+
     // الحماية (انظر SECURITY.md)
     'security' => [
         // محاولات الدخول الفاشلة المسموحة خلال login_window ثانية (فضاء الطالب + لوحة الإدارة)
@@ -64,41 +70,10 @@ return [
         'web_recovery'       => filter_var($env('WEB_RECOVERY', '1'), FILTER_VALIDATE_BOOLEAN),
     ],
 
-    'uploads' => [
-        'max_image_mb'    => 5,   // الصور (صور الطلاب، الأخبار...)
-        'max_document_mb' => 10,  // وثائق الطلبات
-        'max_file_mb'     => 20,  // ملفات مركز التحميلات
-    ],
-
-    // مسابقات التوظيف والترشح الإلكتروني (انظر SECURITY.md — قسم «المسابقات»)
-    'recruitment' => [
-        // مفتاح تشفير معطيات المترشحين ووثائقهم: 64 حرفاً من 0-9 و a-f (ولّده بـ: php -r "echo bin2hex(random_bytes(32));")
-        // اتركه فارغاً ليُنشأ تلقائياً عند أول ترشح في storage/private/recruitment.key
-        // ⚠️ احتفظ بنسخة من المفتاح في مكان آمن: إن ضاع لا يمكن قراءة ملفات المترشحين أبداً (ولا حتى من المبرمج)
-        'key'          => $env('RECRUITMENT_KEY', ''),
-        'max_file_mb'  => 3,   // حجم كل وثيقة PDF
-        'max_total_mb' => 15,  // مجموع وثائق الطلب الواحد
-        // من نفس العنوان: محاولات الإرسال في الساعة، والطلبات المقبولة في اليوم (مقاهي الإنترنت يتشاركها عدة مترشحين)
-        'apply_attempts_max' => 30,
-        'apply_success_max'  => 20,
-        // صفحة «متابعة طلب»: المحاولات كل 15 دقيقة من نفس العنوان، ولنفس رقم المتابعة من كل العناوين
-        'track_max_per_ip'   => 10,
-        'track_max_per_code' => 5,
-        // الترشح الإلكتروني يتطلب HTTPS (إلا على جهازك http://localhost). ضع 0 للاختبار فقط
-        'require_https' => $env('RECRUITMENT_REQUIRE_HTTPS', '1') === '1',
-    ],
-
     // اللغات: العربية أساسية على الروابط العادية، والبقية تحت /fr/ و /en/
     'i18n' => [
         'default'   => 'ar',
         'languages' => ['ar' => 'العربية', 'fr' => 'Français', 'en' => 'English'],
-    ],
-
-    // محرر النصوص المنسّقة في لوحة الإدارة (TinyMCE): يُبحث عنه تلقائياً (مجلد tinymce في مجلد الموقع، أو assets/vendor/tinymce...)
-    // وإن وضعته في مكان آخر داخل مجلد الموقع اكتب مساره هنا، مثل 'editors/tinymce' (المجلد الذي فيه tinymce.min.js أو فوقه).
-    // أسفل كل نموذج فيه محرر سطر يبيّن النسخة المستعملة ومسارها
-    'editor' => [
-        'tinymce' => $env('TINYMCE_PATH', ''),
     ],
 
     // الترجمة التلقائية في لوحة الإدارة (زر «ترجمة تلقائية» + ترجمة الحقول الفارغة عند الحفظ)
@@ -118,5 +93,30 @@ return [
         // عناوين الخدمتين (لا تغيّرها إلا للاختبار بخادم محلي: dev/mock_translate.py)
         'gemini_endpoint'   => $env('GEMINI_ENDPOINT', 'https://generativelanguage.googleapis.com/v1beta'),
         'mymemory_endpoint' => $env('MYMEMORY_ENDPOINT', 'https://api.mymemory.translated.net/get'),
+    ],
+
+    // محرر النصوص المنسّقة في لوحة الإدارة (TinyMCE): يُبحث عنه تلقائياً (مجلد tinymce في مجلد الموقع، أو assets/vendor/tinymce...)
+    // وإن وضعته في مكان آخر داخل مجلد الموقع اكتب مساره هنا، مثل 'editors/tinymce' (المجلد الذي فيه tinymce.min.js أو فوقه).
+    // أسفل كل نموذج فيه محرر سطر يبيّن النسخة المستعملة ومسارها
+    'editor' => [
+        'tinymce' => $env('TINYMCE_PATH', ''),
+    ],
+
+    // مسابقات التوظيف والترشح الإلكتروني (انظر SECURITY.md — قسم «المسابقات»)
+    'recruitment' => [
+        // مفتاح تشفير معطيات المترشحين ووثائقهم: 64 حرفاً من 0-9 و a-f (ولّده بـ: php -r "echo bin2hex(random_bytes(32));")
+        // اتركه فارغاً ليُنشأ تلقائياً عند أول ترشح في storage/private/recruitment.key
+        // ⚠️ احتفظ بنسخة من المفتاح في مكان آمن: إن ضاع لا يمكن قراءة ملفات المترشحين أبداً (ولا حتى من المبرمج)
+        'key'          => $env('RECRUITMENT_KEY', ''),
+        'max_file_mb'  => 3,   // حجم كل وثيقة PDF
+        'max_total_mb' => 15,  // مجموع وثائق الطلب الواحد
+        // من نفس العنوان: محاولات الإرسال في الساعة، والطلبات المقبولة في اليوم (مقاهي الإنترنت يتشاركها عدة مترشحين)
+        'apply_attempts_max' => 30,
+        'apply_success_max'  => 20,
+        // صفحة «متابعة طلب»: المحاولات كل 15 دقيقة من نفس العنوان، ولنفس رقم المتابعة من كل العناوين
+        'track_max_per_ip'   => 10,
+        'track_max_per_code' => 5,
+        // الترشح الإلكتروني يتطلب HTTPS (إلا على جهازك http://localhost). ضع 0 للاختبار فقط
+        'require_https' => $env('RECRUITMENT_REQUIRE_HTTPS', '1') === '1',
     ],
 ];
