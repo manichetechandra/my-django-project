@@ -1,7 +1,7 @@
-@@file app/views/news/news_list.php 27.1
-@@block head 27.1 from=app/views/news/news_list.php:1-4
+@@file app/views/news/news_list.php 29.1
+@@block head 29.1 from=app/views/news/news_list.php:1-4
 @@end
-@@block content-static 27.1
+@@block content-static 29.1
 
 <div class="container" style="margin-top: 30px;">
     
@@ -118,7 +118,7 @@
 </div>
 
 @@end
-@@block content-final 27.2 replaces=content-static from=app/views/news/news_list.php:5-113
+@@block content-final 29.2 replaces=content-static from=app/views/news/news_list.php:5-113
 @@end
-@@block tail 27.1 from=app/views/news/news_list.php:114-114
+@@block tail 29.1 from=app/views/news/news_list.php:114-114
 @@end

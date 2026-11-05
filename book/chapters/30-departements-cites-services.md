@@ -109,7 +109,7 @@
 
 ### المتحكم
 
-جدول `services` أنشأناه في الفصل 25 (من أجل عدّاد الخدمات في الرئيسية). أنشئ `app/controllers/services.php`:
+جدول `services` أنشأناه في الفصل 27 (من أجل عدّاد الخدمات في الرئيسية). أنشئ `app/controllers/services.php`:
 
 @file app/controllers/services.php
 

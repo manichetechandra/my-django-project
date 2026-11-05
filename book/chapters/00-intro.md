@@ -23,8 +23,8 @@
   <div class="st"><b>صفحة ثابتة</b>HTML وCSS فقط<small>الفصول 1–9</small></div><span class="ar">←</span>
   <div class="st"><b>PHP</b>مصفوفات وحلقات وinclude<small>الفصول 10–12</small></div><span class="ar">←</span>
   <div class="st"><b>قاعدة البيانات</b>MySQL مكان المصفوفات<small>الفصول 13–15</small></div><span class="ar">←</span>
-  <div class="st hl"><b>تنظيم المشروع</b>البنية الاحترافية النهائية<small>الفصول 16–25</small></div><span class="ar">←</span>
-  <div class="st"><b>باقي الصفحات</b>كل نوع جديد: ثابت ثم ديناميكي<small>الفصول 26–37</small></div>
+  <div class="st hl"><b>تنظيم المشروع</b>البنية الاحترافية النهائية<small>الفصول 16–27</small></div><span class="ar">←</span>
+  <div class="st"><b>باقي الصفحات</b>كل نوع جديد: ثابت ثم ديناميكي<small>الفصول 28–42</small></div>
 </div>
 
 1. **الصفحة الرئيسية ثابتة**: نكتب `index.html` قطعة قطعة بنفس ترتيب الصفحة: شريط التنقل (navbar)، ثم السلايدر، ثم شريط الأخبار وآخر الأخبار، ثم النشاطات والإحصائيات، ثم الأقسام والإقامات، ثم التذييل (footer). كل محتواها مكتوب باليد، وبعد كل قطعة تفتح المتصفح وترى النتيجة.

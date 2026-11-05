@@ -1,7 +1,7 @@
-@@file app/views/students/admin/dashboard.php 34.1
-@@block head 34.1 from=app/views/students/admin/dashboard.php:1-132
+@@file app/views/students/admin/dashboard.php 36.1
+@@block head 36.1 from=app/views/students/admin/dashboard.php:1-132
 @@end
-@@block content-static 34.1
+@@block content-static 36.1
 <?php block('content'); ?>
 
 <!-- ========================================
@@ -212,9 +212,9 @@
     
 
 @@end
-@@block content-final 34.2 replaces=content-static from=app/views/students/admin/dashboard.php:133-316
+@@block content-final 36.2 replaces=content-static from=app/views/students/admin/dashboard.php:133-316
 @@end
-@@block charts 34.1 from=app/views/students/admin/dashboard.php:317-374
+@@block charts 36.1 from=app/views/students/admin/dashboard.php:317-374
 @@end
-@@block charts-js 34.2 from=app/views/students/admin/dashboard.php:375-550
+@@block charts-js 36.2 from=app/views/students/admin/dashboard.php:375-550
 @@end

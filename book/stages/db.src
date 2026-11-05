@@ -3,7 +3,7 @@
 @@end
 @@block s-users-home 14 from=database/schema.sql:52-105
 @@end
-@@block s-director 25 from=database/schema.sql:106-127
+@@block s-director 27 from=database/schema.sql:106-127
 @@end
 @@block s-news 14 from=database/schema.sql:163-193
 @@end
@@ -13,11 +13,11 @@
 @@end
 @@block s-departements 14 from=database/schema.sql:312-339
 @@end
-@@block s-services 25 from=database/schema.sql:340-376
+@@block s-services 27 from=database/schema.sql:340-376
 @@end
-@@block s-downloads-faq 25 from=database/schema.sql:397-455
+@@block s-downloads-faq 27 from=database/schema.sql:397-455
 @@end
-@@block s-notifications 24 from=database/schema.sql:456-482
+@@block s-notifications 26 from=database/schema.sql:456-482
 @@end
-@@block s-sitestats 23 from=database/schema.sql:483-504
+@@block s-sitestats 24 from=database/schema.sql:483-504
 @@end

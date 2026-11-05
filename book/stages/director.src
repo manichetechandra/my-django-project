@@ -1,7 +1,7 @@
-@@file app/views/homepage/director_word.php 26.1
-@@block head 26.1 from=app/views/homepage/director_word.php:1-90
+@@file app/views/homepage/director_word.php 28.1
+@@block head 28.1 from=app/views/homepage/director_word.php:1-90
 @@end
-@@block content-static 26.1
+@@block content-static 28.1
 
 <!-- Header -->
 <div class="director-header">
@@ -52,7 +52,7 @@
 </div>
 
 @@end
-@@block content-final 26.2 replaces=content-static from=app/views/homepage/director_word.php:91-180
+@@block content-final 28.2 replaces=content-static from=app/views/homepage/director_word.php:91-180
 @@end
-@@block tail 26.1 from=app/views/homepage/director_word.php:181-181
+@@block tail 28.1 from=app/views/homepage/director_word.php:181-181
 @@end

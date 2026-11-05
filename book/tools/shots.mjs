@@ -90,24 +90,24 @@ const stageShots = [
   { name: '09-footer', stage: ['home', 9], url: '/', h: 420, scrollTo: 'footer', scrollPad: 60 },
   { name: '09-full', stage: ['home', 9], url: '/', w: 1920, full: true, scaleTo: 0.3, wait: 2600 },
   // صفحات بمحتوى ثابت فوق الموقع التجريبي (/tmp/site): overlay = [stage, step]
-  { name: '26-director-static', overlay: ['director', 26.1], url: '/director-word/', h: 760 },
-  { name: '27-newslist-static', overlay: ['newslist', 27.1], url: '/news/', h: 900 },
-  { name: '29-contact-static', overlay: ['contact', 29.1], url: '/contact/', h: 1000, scrollTo: 'form', scrollPad: 200 },
-  { name: '32-dashboard-static', overlay: ['dashboard', 32.1], url: '/students/dashboard/', login: STUDENT, h: 1000 },
-  { name: '34-dashboard-static', overlay: ['staffdash', 34.1], url: '/students/admin/dashboard/', login: STAFF, h: 1000 },
-  { name: '35-static-index', overlay: ['admindemo', 35], plain: true, url: '/admin-demo/index.html', h: 760 },
+  { name: '26-director-static', overlay: ['director', 28.1], url: '/director-word/', h: 760 },
+  { name: '27-newslist-static', overlay: ['newslist', 29.1], url: '/news/', h: 900 },
+  { name: '29-contact-static', overlay: ['contact', 31.1], url: '/contact/', h: 1000, scrollTo: 'form', scrollPad: 200 },
+  { name: '32-dashboard-static', overlay: ['dashboard', 34.1], url: '/students/dashboard/', login: STUDENT, h: 1000 },
+  { name: '34-dashboard-static', overlay: ['staffdash', 36.1], url: '/students/admin/dashboard/', login: STAFF, h: 1000 },
+  { name: '35-static-index', overlay: ['admindemo', 37], plain: true, url: '/admin-demo/index.html', h: 760 },
   {
-    name: '35-static-list', overlay: ['admindemo', 35], plain: true, url: '/admin-demo/list.html', h: 640,
+    name: '35-static-list', overlay: ['admindemo', 37], plain: true, url: '/admin-demo/list.html', h: 640,
     act: async (page) => { const boxes = await page.$$('[data-row-check]'); for (const i of [0, 2]) await boxes[i].click(); },
   },
   {
-    name: '35-static-form', overlay: ['admindemo', 35], plain: true, url: '/admin-demo/form.html', h: 900,
+    name: '35-static-form', overlay: ['admindemo', 37], plain: true, url: '/admin-demo/form.html', h: 900,
     act: async (page) => { await page.type('#f_title', 'تمديد التسجيل في الإقامات'); },
   },
-  { name: '36-news-list', overlay: ['adminnews', 36.3], url: '/admin/news/', login: STAFF, h: 700 },
-  { name: '36-news-form', overlay: ['adminnews', 36.3], url: '/admin/news/1/', login: STAFF, h: 1250 },
+  { name: '36-news-list', overlay: ['adminnews', 39.3], url: '/admin/news/', login: STAFF, h: 700 },
+  { name: '36-news-form', overlay: ['adminnews', 39.3], url: '/admin/news/1/', login: STAFF, h: 1250 },
   {
-    name: '36-news-errors', overlay: ['adminnews', 36.3], url: '/admin/news/add/', login: STAFF, h: 760,
+    name: '36-news-errors', overlay: ['adminnews', 39.3], url: '/admin/news/add/', login: STAFF, h: 760,
     act: async (page) => {
       await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('.admin-submit-row [type=submit]')]);
     },

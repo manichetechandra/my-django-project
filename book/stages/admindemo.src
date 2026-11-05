@@ -1,5 +1,5 @@
-@@file admin-demo/index.html 35
-@@block index-top 35
+@@file admin-demo/index.html 37
+@@block index-top 37
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -39,7 +39,7 @@
 </aside>
 <main class="admin-main">
 @@end
-@@block index-main 35
+@@block index-main 37
     <div class="alert alert-success alert-dismissible" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="إغلاق"><span aria-hidden="true">&times;</span></button>
         مرحباً! تم تسجيل الدخول كمشرف
@@ -146,7 +146,7 @@
         </div>
     </div>
 @@end
-@@block index-bottom 35
+@@block index-bottom 37
 </main>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
@@ -154,7 +154,7 @@
 </body>
 </html>
 @@end
-@@block list-top 35 file=admin-demo/list.html@35
+@@block list-top 37 file=admin-demo/list.html@37
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -194,7 +194,7 @@
 </aside>
 <main class="admin-main">
 @@end
-@@block list-main 35 file=admin-demo/list.html@35
+@@block list-main 37 file=admin-demo/list.html@37
     <div class="admin-header">
         <h1 class="admin-title"><i class="fa fa-newspaper-o"></i> الأخبار <small>(12)</small></h1>
         <a href="form.html" class="btn btn-success"><i class="fa fa-plus"></i> إضافة خبر</a>
@@ -308,7 +308,7 @@
         </div>
     </div>
 @@end
-@@block list-bottom 35 file=admin-demo/list.html@35
+@@block list-bottom 37 file=admin-demo/list.html@37
 </main>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
@@ -316,7 +316,7 @@
 </body>
 </html>
 @@end
-@@block form-top 35 file=admin-demo/form.html@35
+@@block form-top 37 file=admin-demo/form.html@37
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -356,7 +356,7 @@
 </aside>
 <main class="admin-main">
 @@end
-@@block form-main 35 file=admin-demo/form.html@35
+@@block form-main 37 file=admin-demo/form.html@37
     <ol class="breadcrumb">
         <li><a href="index.html">لوحة الإدارة</a></li>
         <li><a href="list.html">الأخبار</a></li>
@@ -418,7 +418,7 @@
         </div>
     </form>
 @@end
-@@block form-bottom 35 file=admin-demo/form.html@35
+@@block form-bottom 37 file=admin-demo/form.html@37
 </main>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>

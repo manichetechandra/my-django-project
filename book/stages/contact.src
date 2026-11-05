@@ -1,7 +1,7 @@
-@@file app/views/contact/contact.php 29.1
-@@block head 29.1 from=app/views/contact/contact.php:1-182
+@@file app/views/contact/contact.php 31.1
+@@block head 31.1 from=app/views/contact/contact.php:1-182
 @@end
-@@block content-static 29.1
+@@block content-static 31.1
 
 <!-- Header -->
 <div class="contact-header">
@@ -178,7 +178,7 @@
 <br><br>
 
 @@end
-@@block content-final 29.2 replaces=content-static from=app/views/contact/contact.php:183-407
+@@block content-final 31.2 replaces=content-static from=app/views/contact/contact.php:183-407
 @@end
-@@block tail 29.1 from=app/views/contact/contact.php:408-441
+@@block tail 31.1 from=app/views/contact/contact.php:408-441
 @@end

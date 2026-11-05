@@ -1,7 +1,7 @@
-@@file app/views/students/dashboard.php 32.1
-@@block head 32.1 from=app/views/students/dashboard.php:1-218
+@@file app/views/students/dashboard.php 34.1
+@@block head 34.1 from=app/views/students/dashboard.php:1-218
 @@end
-@@block content-static 32.1
+@@block content-static 34.1
 <?php block('content'); ?>
 
 <!-- Header -->
@@ -208,7 +208,7 @@
 
 <?php endblock(); ?>
 @@end
-@@block content-final 32.2 replaces=content-static from=app/views/students/dashboard.php:219-420
+@@block content-final 34.2 replaces=content-static from=app/views/students/dashboard.php:219-420
 @@end
-@@block tail 32.1 from=app/views/students/dashboard.php:421-440
+@@block tail 34.1 from=app/views/students/dashboard.php:421-440
 @@end

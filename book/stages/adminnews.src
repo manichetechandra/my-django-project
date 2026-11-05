@@ -1,5 +1,5 @@
-@@file app/controllers/admin.php 36.1
-@@block header-temp 36.1
+@@file app/controllers/admin.php 39.1
+@@block header-temp 39.1
 <?php
 /**
  * لوحة الإدارة /admin/ — مؤقت: قسم الأخبار وحده، بدوال مكتوبة باليد.
@@ -7,9 +7,9 @@
  */
 
 @@end
-@@block guard 36.1 from=app/controllers/admin.php:41-55
+@@block guard 39.1 from=app/controllers/admin.php:41-55
 @@end
-@@block render-temp 36.1
+@@block render-temp 39.1
 function admin_render(string $view, array $data = []): void
 {
     // القائمة الجانبية: قسم واحد في الوقت الحالي
@@ -31,9 +31,9 @@ function admin_index(): void
 }
 
 @@end
-@@block auth 36.1 from=app/controllers/admin.php:130-328
+@@block auth 39.1 from=app/controllers/admin.php:130-328
 @@end
-@@block news-list 36.1
+@@block news-list 39.1
 // ====================================================================== الأخبار (مؤقت)
 
 /** لا نعرف في هذه المرحلة إلا قسم الأخبار */
@@ -54,7 +54,7 @@ function admin_list(string $key): void
     ]);
 }
 @@end
-@@block news-form 36.2
+@@block news-form 39.2
 
 function admin_add(string $key): void
 {
@@ -148,7 +148,7 @@ function admin_news_form(?News $news): void
     ]);
 }
 @@end
-@@block news-delete 36.3
+@@block news-delete 39.3
 
 function admin_delete(string $key, $id): void
 {
@@ -169,7 +169,7 @@ function admin_delete(string $key, $id): void
     ]);
 }
 @@end
-@@block news-list-view 36.1 file=app/views/admin/news_list.php@36.1
+@@block news-list-view 39.1 file=app/views/admin/news_list.php@39.1
 <?php extend('admin/layout'); ?>
 <?php block('title'); ?><?= e($page_title) ?><?php endblock(); ?>
 <?php block('content'); ?>
@@ -226,7 +226,7 @@ function admin_delete(string $key, $id): void
 </div>
 <?php endblock(); ?>
 @@end
-@@block news-form-view 36.2 file=app/views/admin/news_form.php@36.2
+@@block news-form-view 39.2 file=app/views/admin/news_form.php@39.2
 <?php extend('admin/layout'); ?>
 <?php block('title'); ?><?= e($page_title) ?><?php endblock(); ?>
 <?php block('content'); ?>
